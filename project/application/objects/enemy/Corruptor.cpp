@@ -43,6 +43,8 @@ void Corruptor::Initialize()
 	// 出現時は無敵状態
 	isInvincible_ = true;
 
+	// パーティクル
+	ParticleEmitter::Emit("laserGroup", position_, 2);
 }
 
 void Corruptor::Finalize()
@@ -64,7 +66,7 @@ void Corruptor::Update()
 	float distanceToPlayer = position_.Distance(playerPosition_);
 
 	// プレイヤーとの距離が一定以上かどうかのフラグ更新
-	isFarFromPlayer_ = (distanceToPlayer > 2.0f);
+	isFarFromPlayer_ = (distanceToPlayer < 2.5f);
 
 	// aabbの更新
 	aabb_.min = position_ - object_->GetScale();
@@ -72,11 +74,20 @@ void Corruptor::Update()
 	aabb_.max.y += 1.0f;
 	collider_.SetPosition(position_);
 
+	if (isExploded_)
+	{
+		// 爆発後に少しだけスケールを大きくする
+		scale_ += Vector3(0.1f, 0.1f, 0.1f);
+	}
+
 }
 
 void Corruptor::Draw()
 {
-	object_->Draw();
+	if (!isExploded_)
+	{
+		object_->Draw();
+	}
 }
 
 void Corruptor::Draw2D()
@@ -112,7 +123,7 @@ void Corruptor::Move()
 	rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
 	rotation_.x = 0.0f;
 
-	moveVelocity_ /= 30.0f;
+	moveVelocity_ /= 7.0f;
 	moveVelocity_.y = 0.0f;
 	position_ += moveVelocity_;
 
@@ -144,6 +155,39 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 			hp_--;
 
 			isHit_ = true;
+		}
+	}
+
+	if (_other->GetColliderID() == "NormalEnemy" or
+		_other->GetColliderID() == "TrapEnemy" or
+		_other->GetColliderID() == "Corruptor")
+	{
+
+		// 敵の位置
+		Vector3 enemyPosition = _other->GetOwner()->GetPosition();
+
+		// 敵同士が重ならないようにする
+		Vector3 direction = position_ - enemyPosition;
+		direction.Normalize();
+		float distance = 2.5f; // 敵同士の間の距離を調整するための値
+
+		// 互いに重ならないように少しずつ位置を調整
+		if ((position_ - enemyPosition).Length() < distance)
+		{
+			position_ += direction * 0.1f; // 微調整のための値
+		}
+	}
+
+	if (_other->GetColliderID() == "Wall" or
+		_other->GetColliderID() == "Barrie")
+	{
+		// 相手のAABBを取得
+		const AABB* otherAABB = _other->GetAABB();
+
+		if (otherAABB)
+		{
+			// 自分のAABBと位置を渡して補正
+			CorrectOverlap(*otherAABB, aabb_, position_);
 		}
 	}
 }

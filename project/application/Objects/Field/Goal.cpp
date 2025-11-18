@@ -67,6 +67,12 @@ void Goal::Update()
 	
 	// 状態を保存
 	wasBarrierDestroyed_ = isBarrierDestroyed_;
+
+	if (isCleared_)
+	{
+		ParticleEmitter::Emit("goal", position_, 2);
+	}
+
 }
 
 void Goal::Draw()

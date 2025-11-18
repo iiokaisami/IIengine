@@ -57,6 +57,11 @@ public:
 	/// </summary>
 	void StartDeathMotion();
 
+	/// <summary>
+	/// クリアシーン更新
+	/// </summary>
+	void ClearSceneUpdate();
+
 private:
 
 	// オート移動
@@ -187,6 +192,13 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE cubeHandle_ = { 0 };
 	float environmentStrength_ = 1.0f;
 
+	// 移動可能フラグ
+	bool isCanMove_ = true;
+
+	// 移動制限
+	Vector2 limitMax_ = { 40.0f, 30.0f };
+	Vector2 limitMin_ = { -40.0f, -30.0f };
+
 	// デスモーション用構造体
 	struct Motion
 	{
@@ -207,10 +219,21 @@ private:
 
 	Motion deathMotion_;
 
-	bool isCanMove_ = true;
+	// クリアシーン用構造体
+	struct ClearMotion
+	{
+		Vector3 center = { 0.0f, 0.0f, 0.0f };
+		float radius = 3.0f;
+		float angleSpeed = 1.5f;
+		float currentAngle = 0.0f;
+		float initialAngle = 0.0f;
+		bool clockwise = true;
+		Vector3 position;
+		Vector3 rotation;
+		Vector3 scale;
+	};
 
-	// 移動制限
-	Vector2 limitMax_ = { 40.0f, 30.0f };
-	Vector2 limitMin_ = { -40.0f, -30.0f };
+	ClearMotion clearMotion_;
+	
 };
 

@@ -91,6 +91,12 @@ public: // セッター
 	/// <param name="_isHit">被弾フラグ</param>
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
 
+	/// <summary>
+	/// 爆発したかどうかのフラグをセット
+	/// </summary>
+	/// <param name="_isExploded">爆発フラグ</param>
+	void SetIsExploded(bool _isExploded) { isExploded_ = _isExploded; }
+
 	// オブジェクトのpositionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
 	// オブジェクトのrotationをセット
@@ -128,6 +134,9 @@ private:
 
 	// プレイヤーとの距離が一定以上かどうかのフラグ
 	bool isFarFromPlayer_ = false;
+
+	// 爆発フラグ(爆発後の判定用にisDead_は取っておきたい)
+	bool isExploded_ = false;
 
 };
 

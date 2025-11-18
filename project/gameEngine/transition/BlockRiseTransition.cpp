@@ -18,7 +18,7 @@ BlockRiseTransition::BlockRiseTransition(Mode mode) : mode_(mode)
         {
             Block block;
             block.sprite = std::make_unique<Sprite>();
-            block.sprite->Initialize("black.png", { 0,0 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+            block.sprite->Initialize("white.png", { 0,0 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 
             block.position = { x * blockSize_, y * blockSize_ };
             block.scale = { 0.0f, 0.0f };

@@ -50,6 +50,9 @@ void Player::Initialize()
 	cubeSrvIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(cubeMapPath_);
 	cubeHandle_ = TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(cubeSrvIndex_);
 
+	// 移動可能フラグ
+	isCanMove_ = true;
+
 	// 死亡モーション初期値
 	deathMotion_.isActive = false;
 	deathMotion_.isComplete = false;
@@ -59,8 +62,6 @@ void Player::Initialize()
 	deathMotion_.wobbleFreq = 10.0f;
 	deathMotion_.popScale = 2.0f;
 
-
-	isCanMove_ = true;
 }
 
 void Player::Finalize()
@@ -136,6 +137,12 @@ void Player::Update()
 
 			hp_ = 8;
 		}
+	}
+
+	// 死亡したらy軸回転を徐々に0にする
+	if (isDead_)
+	{
+		rotation_.y = Lerp(rotation_.y, 0.0f, 0.05f);
 	}
 
 	// 弾の削除
@@ -359,8 +366,7 @@ void Player::DeadEffect()
 		float t = static_cast<float>(frame) / static_cast<float>(deathMotion_.shakeFrames);
 		t = std::clamp(t, 0.0f, 1.0f);
 
-		// 減衰付きサイン振動（frame単位）
-		// 周波数補正: wobbleFreq 回/秒 想定 -> frameベースの角度は frame * wobbleFreq * 2*pi / 60
+		// 減衰付きサイン振動
 		float angular = static_cast<float>(frame) * deathMotion_.wobbleFreq * (2.0f * 3.14159265f / 60.0f);
 		float decay = 1.0f - t; // だんだん振幅を減らす
 		float wobble = std::sin(angular) * deathMotion_.wobbleAmplitude * decay;
@@ -394,9 +400,7 @@ void Player::DeadEffect()
 		return;
 	}
 
-	// ぷるぷるが終わった直後：はじけ（瞬時に大きくして消える）
-	// ここでは即時にスケールを0にする仕様とのことなので、瞬時に scale=0 にする
-	// （もし一瞬だけ大きく見せたい場合は簡単に挿入できる）
+	// 最後は大きさ０にする
 	scale_.x = 0.0f;
 	scale_.y = 0.0f;
 	scale_.z = 0.0f;
@@ -440,6 +444,137 @@ void Player::StartDeathMotion()
 		object_->SetScale(scale_);
 		object_->Update();
 	}
+}
+
+void Player::ClearSceneUpdate()
+{
+	isCanMove_ = false;
+
+	using clock = std::chrono::steady_clock;
+	constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
+
+	// 調整用パラメータ
+	static Vector3 center{ 0.0f, 0.5f, 0.0f }; // 軌道中心（高さ = center.y）
+	static float radius = 8.0f;              // 軌道半径
+	static float angularSpeed = 1.5f;        // 角速度 (rad/s)
+	static float currentAngle = 0.2f;        // 現在角度（初期オフセット含む）
+	static bool clockwise = false;           // 回転方向
+
+	// ポヨポヨ（XZとYを別々に制御）
+	static float poyoAmp = 0.2f;            // 横(X)振幅
+	static float poyoAmpZ = 0.2f;           // 縦(Z)振幅（独立）
+	static float poyoAmpY = 0.2f;           // 高さ(Y)振幅（独立）
+	static float poyoFreq = 1.2f;            // 周波数 (Hz) （X/Z の基本周波数）
+	static float poyoFreqY = 1.2f;           // Y の周波数 (Hz)
+	static float poyoPhase = 0.0f;           // 位相（X/Z）
+	static float poyoPhaseY = 0.0f;          // 位相（Y）
+	static bool maintainArea = false;        // true -> sx * sz ≈ 1 に保つ（XZ面積維持）
+	static bool maintainVolume = false;     // true -> sx * sy * sz ≈ 1 に保つ（3D体積維持）
+
+	// 基本スケール
+	static Vector3 baseScale{ 1.0f, 1.0f, 1.0f };
+
+
+	// 時刻
+	static clock::time_point lastTime = clock::now();
+	static bool initialized = false;
+	static float totalTime = 0.0f;
+
+	auto now = clock::now();
+	float dt = 1.0f / 60.0f;
+	if (!initialized)
+	{
+		lastTime = now;
+		initialized = true;
+	} else
+	{
+		std::chrono::duration<float> elapsed = now - lastTime;
+		dt = elapsed.count();
+		if (dt > 0.1f) dt = 0.1f; // ウィンドウ復帰などで大きくなりすぎないようにする
+		lastTime = now;
+	}
+	totalTime += dt;
+
+	// 角度更新
+	float dir = clockwise ? -1.0f : 1.0f;
+	currentAngle += dir * angularSpeed * dt;
+	// 角度を安定化
+	if (currentAngle > TWO_PI) currentAngle = std::fmod(currentAngle, TWO_PI);
+	else if (currentAngle < 0.0f) currentAngle = std::fmod(currentAngle + TWO_PI, TWO_PI);
+
+	// 位置
+	clearMotion_.position.x = center.x + radius * std::cos(currentAngle);
+	clearMotion_.position.y = center.y;
+	clearMotion_.position.z = center.z + radius * std::sin(currentAngle);
+
+	// 進行方向に向ける円運動の速度ベクトル
+	float velX = -radius * std::sin(currentAngle) * (dir * angularSpeed);
+	float velZ = radius * std::cos(currentAngle) * (dir * angularSpeed);
+	// 小さな速度では直前の向きを保つためのガード
+	static float lastYaw = 0.0f;
+	if (std::abs(velX) < 1e-6f && std::abs(velZ) < 1e-6f)
+	{
+		// 速度がほぼ0なら角度は更新しない
+	} else
+	{
+		// atan2(x,z) を使って yaw を得る（プロジェクト内の回転軸と合わせてください）
+		lastYaw = std::atan2(velX, velZ);
+	}
+	clearMotion_.rotation.x = 0.0f;
+	clearMotion_.rotation.y = lastYaw;
+	clearMotion_.rotation.z = 0.0f;
+
+	// スケール (X, Z は既存ロジック。Y を追加して体積維持 or 独立制御を可能にする)
+	float omegaXZ = 2.0f * 3.14159265358979323846f * poyoFreq;
+	float sXZ = std::sin(omegaXZ * totalTime + poyoPhase);
+	float sx = 1.0f + poyoAmp * sXZ;
+	sx = std::max(0.05f, sx); // 極端に潰れないようにクランプ
+
+	float sz;
+	if (maintainArea)
+	{
+		// 面積維持（XZ面）
+		sz = 1.0f / sx;
+		sz = std::clamp(sz, 0.05f, 5.0f);
+	} else
+	{
+		sz = 1.0f + poyoAmpZ * std::sin(omegaXZ * totalTime + poyoPhase + 3.14159265f / 2.0f);
+		sz = std::clamp(sz, 0.05f, 5.0f);
+	}
+
+	// Y方向（高さ）のポヨポヨ
+	float sy; // 実スケール（乗算前）
+	if (maintainVolume)
+	{
+		// 3D体積維持：相対スケールの積を1に近づける -> sy_rel = 1 / (sx_rel * sz_rel)
+		float sx_rel = std::max(0.01f, sx);
+		float sz_rel = std::max(0.01f, sz);
+		float sy_rel = 1.0f / (sx_rel * sz_rel);
+		sy_rel = std::clamp(sy_rel, 0.05f, 5.0f);
+		sy = baseScale.y * sy_rel;
+	} else
+	{
+		// Yは独立して振動させる
+		float omegaY = 2.0f * 3.14159265358979323846f * poyoFreqY;
+		float sY = std::sin(omegaY * totalTime + poyoPhaseY);
+		float sy_rel = 1.0f + poyoAmpY * sY;
+		sy_rel = std::clamp(sy_rel, 0.05f, 5.0f);
+		sy = baseScale.y * sy_rel;
+	}
+
+	// baseScale を乗算して最終スケールを出す
+	clearMotion_.scale.x = baseScale.x * sx; // 横方向
+	clearMotion_.scale.y = sy;               // 高さも変化させる
+	clearMotion_.scale.z = baseScale.z * sz; // 縦方向（top-down だと視覚的に z を使う）
+
+	object_->SetPosition(clearMotion_.position);
+	object_->SetRotate(clearMotion_.rotation);
+	object_->SetScale(clearMotion_.scale);
+	object_->Update();
+
+	// パーティクル
+	ParticleEmitter::Emit("walk", clearMotion_.position, 1);
+
 }
 
 void Player::AutoMove()
@@ -564,7 +699,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		isHitMoment_ = true;
 	} 
 
-	if (!isEvading_ && _other->GetColliderID() == "ExplosionTimeBomb")
+	if (!isEvading_ && (_other->GetColliderID() == "ExplosionTimeBomb" or
+		_other->GetColliderID() == "Corruptor"))
 	{
 		if (_other->GetOwner()->IsActive())
 		{

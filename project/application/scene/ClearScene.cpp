@@ -7,55 +7,39 @@ void ClearScene::Initialize()
 
 	camera_ = std::make_shared<Camera>();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
-	camera_->SetPosition({ 0.0f,4.0f,-20.0f });
+	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
 	cameraManager.AddCamera(camera_);
 	cameraManager.SetActiveCamera(0);
 
-	cameraPosition_ = { 0.0f,4.0f,-10.0f };
+	cameraPosition_ = { 0.0f,12.0f,-33.0f };
 	cameraRotate_ = { 0.3f,0.0f,0.0f };
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
-	// --- 3Dオブジェクト ---
+	//プレイヤー
+	pPlayer_ = std::make_unique<Player>();
+	pPlayer_->Initialize();
+
+	// スプライト
 	for (uint32_t i = 0; i < 3; ++i)
-	{
-		Object3d* object = new Object3d();
-		if (i == 0)
-		{
-			object->Initialize("sphere.obj");
-		}
-		if (i == 1)
-		{
-			object->Initialize("terrain.obj");
-		}
-		if (i == 2)
-		{
-			object->Initialize("plane.obj");
-		}
-		position_ = { 0.0f,0.0f,5.0f };
-		scale_ = { 1.0f,1.0f,1.0f };
-		object->SetPosition(position_);
-		object->SetScale(scale_);
-
-		object3ds.push_back(object);
-	}
-
-	for (uint32_t i = 0; i < 1; ++i)
 	{
 		Sprite* sprite = new Sprite();
 		
 		if (i == 0)
 		{
-			sprite->Initialize("clear.png", { 0,0 }, {1.0f,1.0f,1.0f,1.0f}, { 0,0 });
+			sprite->Initialize("clearLogo.png", { -10,0 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+		} 
+		else if (i == 1)
+		{
+			sprite->Initialize("gameOverReTry.png", { 0,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+		} 
+		else if (i == 2)
+		{
+			sprite->Initialize("gameOverToTitle.png", { -70,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		}
 		
 		sprites.push_back(sprite);
-
-		/*Vector2 size = sprite->GetSize();
-		size.x = 370.0f;
-		size.y = 370.0f;
-		sprite->SetSize(size);*/
 	}
 
 	// シーン開始時にフェードイン
@@ -67,10 +51,7 @@ void ClearScene::Initialize()
 
 void ClearScene::Finalize()
 {
-	for (auto& obj : object3ds)
-	{
-		delete obj;
-	}
+	pPlayer_->Finalize();
 
 	for (Sprite* sprite : sprites)
 	{
@@ -96,29 +77,23 @@ void ClearScene::Update()
 
 	}
 
-
+	// カメラ更新
 	camera_->Update();
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
-
-	for (auto& obj : object3ds)
-	{
-		obj->Update();
-	}
-
-	rotate_.y += 0.01f;
-	object3ds[0]->SetScale(scale_);
-	object3ds[0]->SetRotate(rotate_);
-
+	// スプライト更新
 	for (Sprite* sprite : sprites)
 	{
 		sprite->Update();
 
 	}
 
+	// プレイヤー更新
+	pPlayer_->ClearSceneUpdate();
+
 	// パーティクル
-	ParticleEmitter::Emit("petalGroup", position_, 1);
+	ParticleEmitter::Emit("goal", particlePosition_, 1);
 
 #ifdef USE_IMGUI
 
@@ -126,12 +101,11 @@ void ClearScene::Update()
 
 	ImGui::Begin("ClearScene");
 
-	//ImGui::SliderFloat4("transparent", &color_.x, 0.0f, 1.0f);
 
-	ImGui::SliderFloat3("cameraPosition", &cameraPosition_.x, -20.0f, 20.0f);
+	ImGui::SliderFloat3("cameraPosition", &cameraPosition_.x, -80.0f, 20.0f);
 	ImGui::SliderFloat3("cameraRotate", &cameraRotate_.x, -3.14f, 3.14f);
 
-	ImGui::SliderFloat3("sphere scale", &scale_.x, 0.0f, 10.0f);
+	ImGui::SliderFloat3("particlePosition", &particlePosition_.x, -50.0f, 50.0f);
 
 	ImGui::End();
 
@@ -149,6 +123,18 @@ void ClearScene::Update()
 				SceneManager::GetInstance()->ChangeScene("TITLE");
 			});
 	}
+
+	if (Input::GetInstance()->TriggerKey(DIK_R))
+	{
+		// トランジション開始
+		transition_ = std::make_unique<BlockRiseTransition>();
+		isTransitioning_ = true;
+		transition_->Start([]
+			{
+				// シーン切り替え
+				SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+			});
+	}
 }
 
 void ClearScene::Draw()
@@ -156,10 +142,8 @@ void ClearScene::Draw()
 	// 描画前処理(Object)
 	Object3dCommon::GetInstance()->CommonDrawSetting();
 
-	for (auto& obj : object3ds)
-	{
-		obj->Draw();
-	}
+	// プレイヤー描画
+	pPlayer_->Draw();
 
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();
@@ -168,7 +152,6 @@ void ClearScene::Draw()
 	{
 		sprite->Draw();
 	}
-
 
 	// トランジション描画
 	if (isTransitioning_ && transition_)

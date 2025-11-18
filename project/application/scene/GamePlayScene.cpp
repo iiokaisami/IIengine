@@ -83,11 +83,10 @@ void GamePlayScene::Initialize()
 		}
 	}
 
-	// シーン開始時にフェードイン
-	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
+	// シーン開始時遷移演出
+	blockTransition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
-	transition_->Start(nullptr);
-
+	blockTransition_->Start(nullptr);
 
 	// スタートカメラ演出
 	isStartCamera_ = true;
@@ -96,6 +95,12 @@ void GamePlayScene::Initialize()
 	// デスカメラフラグ初期化
 	isDeathCamera_ = false;
 	isDeadCameraPlayer_ = false;
+
+	// クリアカメラフラグ初期化
+	isClearMoment_ = false;
+	isClearCamera_ = false;
+	isClearFadeStart_ = false;
+
 }
 
 void GamePlayScene::Finalize()
@@ -123,17 +128,28 @@ void GamePlayScene::Finalize()
 void GamePlayScene::Update()
 {
 	// トランジション更新
-	if (isTransitioning_ && transition_)
+	if (isTransitioning_ && blockTransition_)
 	{
-		transition_->Update();
+		blockTransition_->Update();
 
 		// トランジション終了判定
-		if (transition_->IsFinished())
+		if (blockTransition_->IsFinished())
 		{
-			transition_.reset();
+			blockTransition_.reset();
 			isTransitioning_ = false;
 		}
 
+	}
+
+	if(isTransitioning_ && fadeTransition_)
+	{
+		fadeTransition_->Update();
+		// トランジション終了判定
+		if (fadeTransition_->IsFinished())
+		{
+			fadeTransition_.reset();
+			isTransitioning_ = false;
+		}
 	}
 	
 	// スタートカメラ演出
@@ -214,6 +230,9 @@ void GamePlayScene::Update()
 		UpdateDeathCamera(1.0f / 60.0f);
 	}
 
+	// クリア更新
+	ClearUpdate();
+
 
 #ifdef USE_IMGUI
 
@@ -251,12 +270,12 @@ void GamePlayScene::Update()
 #endif // USE_IMGUI
 
 
-	if (Input::GetInstance()->TriggerKey(DIK_UP) or (pGoal_->IsCleared() && !isTransitioning_))
+	if (Input::GetInstance()->TriggerKey(DIK_UP) or (isClearFadeStart_ && !isTransitioning_))
 	{
 		// トランジション開始
-		transition_ = std::make_unique<BlockRiseTransition>();
+		fadeTransition_ = std::make_unique<FadeTransition>();
 		isTransitioning_ = true;
-		transition_->Start([]
+		fadeTransition_->Start([]
 			{
 			// シーン切り替え
 			SceneManager::GetInstance()->ChangeScene("CLEAR");
@@ -265,9 +284,9 @@ void GamePlayScene::Update()
 	if (Input::GetInstance()->TriggerKey(DIK_DOWN) or (pPlayer_->IsDeathMotionComplete() && !isTransitioning_))
 	{
 		// トランジション開始
-		transition_ = std::make_unique<BlockRiseTransition>();
+		blockTransition_ = std::make_unique<BlockRiseTransition>();
 		isTransitioning_ = true;
-		transition_->Start([]
+		blockTransition_->Start([]
 			{
 				// シーン切り替え
 				SceneManager::GetInstance()->ChangeScene("GAMEOVER");
@@ -304,9 +323,13 @@ void GamePlayScene::Draw()
 
 
 	// トランジション描画
-	if (isTransitioning_ && transition_)
+	if (isTransitioning_ && blockTransition_)
 	{
- 		transition_->Draw();
+		blockTransition_->Draw();
+	}
+	if (isTransitioning_ && fadeTransition_)
+	{
+		fadeTransition_->Draw();
 	}
 }
 
@@ -499,5 +522,99 @@ void GamePlayScene::UpdateDeathCamera(float deltaTime)
 		// プレイヤー死亡演出
 		pPlayer_->StartDeathMotion();
 
+	}
+}
+
+void GamePlayScene::ClearUpdate()
+{
+	if (pGoal_->IsCleared() && !isTransitioning_ && !isClearMoment_)
+	{
+		// 一度だけフラグ
+		isClearMoment_ = true;
+
+		isClearCamera_ = true;
+		clearCameraTimer_ = -2.0f;
+
+		// プレイヤー位置と現カメラ位置から開始角度・半径・高さを算出
+		Vector3 playerPos = pPlayer_->GetPosition();
+		Vector3 camPos = camera->GetPosition();
+
+		float dx = camPos.x - playerPos.x;
+		float dz = camPos.z - playerPos.z;
+		// startAngle を atan2(dx, dz)の順で取る(Bezier等で使ったのと整合を取る)
+		clearStartAngle_ = std::atan2(dx, dz);
+		clearStartRadius_ = std::sqrt(dx * dx + dz * dz);
+		clearStartHeight_ = camPos.y - playerPos.y;
+
+		// 最終的にプレイヤーの正面は 0 に
+		clearTargetAngleOffset_ = 0.0f;
+	}
+
+
+	if (isClearCamera_)
+	{
+		if (clearCameraTimer_ >= 0.0f)
+		{
+
+			clearCameraTimer_ += 1.0f / 60.0f;
+			float t = std::clamp(clearCameraTimer_ / clearCameraDuration_, 0.0f, 1.0f);
+
+			// イージング
+			float t_eased = Ease::InOutQuad(t);
+
+			// --- 回転速度をさらに落とす係数 小さくするほど遅く回る ---
+			const float rotationSpeedMultiplier = 0.12f; // 調整可
+			// --- カメラを上昇させる量 ---
+			const float clearHeightRise = 30.0f; // 調整可 正の値で上昇
+
+			// 角度は start -> target を経由して rotations 周回させる
+			float targetAngle = clearTargetAngleOffset_;
+			float delta = targetAngle - clearStartAngle_;
+			// normalize delta to [-pi, pi]
+			while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
+			while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
+
+			// 周回数に multiplier をかけて実効的な回転量を減らす（急激な回転を抑制）
+			float rotationsScaled = clearCameraRotations_ * rotationSpeedMultiplier;
+			float totalAngularTravel = delta + rotationsScaled * 2.0f * (float)M_PI;
+			float angle = clearStartAngle_ + totalAngularTravel * t_eased;
+
+			// 半径は収縮させない（開始時の半径を維持）
+			const float radius = clearStartRadius_;
+
+			// 高さは開始高さから徐々に上昇
+			float height = clearStartHeight_ + clearHeightRise * t_eased;
+
+			// カメラ位置を計算(playerを中心に極座標から)
+			Vector3 playerPos = pPlayer_->GetPosition();
+			Vector3 camPos;
+			camPos.x = playerPos.x + std::sin(angle) * radius;
+			camPos.z = playerPos.z + std::cos(angle) * radius;
+			camPos.y = playerPos.y + height;
+
+			camera->SetPosition(camPos);
+
+			// カメラの回転：プレイヤーを見る方向に向ける
+			Vector3 dir = (playerPos - camPos);
+			// yaw: y軸回転(左右)を atan2(dir.x, dir.z)
+			float yaw = std::atan2(dir.x, dir.z);
+			// pitch: x軸回転(上下)を atan2(-dir.y, sqrt(x^2+z^2))
+			float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+			float pitch = std::atan2(-dir.y, horizontalDist);
+
+			Vector3 camRot = { pitch, yaw, 0.0f };
+			camera->SetRotate(camRot);
+
+			// 終了仕切る前にフェード開始判定
+			if (t >= 0.4f)
+			{
+				// 遷移演出開始
+				isClearFadeStart_ = true;
+			}
+		}
+		else
+		{
+			clearCameraTimer_ += 1.0f / 60.0f;
+		}
 	}
 }

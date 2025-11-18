@@ -12,6 +12,7 @@
 #include "../../gameEngine/level_editor/LevelDataLoader.h"
 
 #include "../../gameEngine/transition/BlockRiseTransition.h"
+#include "../../gameEngine/transition/FadeTransition.h"
 
 /// <summary>
 ///	ゲームプレイシーン
@@ -60,6 +61,11 @@ private:
 	/// <param name="deltaTime">デルタタイム</param>
 	void UpdateDeathCamera(float deltaTime);
 
+	/// <summary>
+	/// クリア更新
+	/// </summary>
+	void ClearUpdate();
+
 
 private:
 
@@ -75,7 +81,8 @@ private:
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	// 遷移
-	std::unique_ptr<BlockRiseTransition> transition_ = nullptr;
+	std::unique_ptr<BlockRiseTransition> blockTransition_ = nullptr;
+	std::unique_ptr<FadeTransition> fadeTransition_ = nullptr;
 	bool isTransitioning_ = false;
 
 	// 衝突判定
@@ -127,5 +134,19 @@ private:
 	float deathStartHeight_ = 0.0f;
 	float deathEndHeight_ = 12.0f;
 	float deathTargetAngleOffset_ = 0.0f;
+
+	// クリア時カメラ演出変数
+	bool isClearMoment_ = false;
+	bool isClearCamera_ = false;
+	bool isClearFadeStart_ = false;
+	float clearCameraTimer_ = 0.0f;
+	float clearCameraDuration_ = 3.0f;
+	float clearCameraRotations_ = 20.0f;
+	float clearStartAngle_ = 0.0f;
+	float clearStartRadius_ = 20.0f;
+	float clearEndRadius_ = 5.0f;
+	float clearStartHeight_ = 10.0f;
+	float clearEndHeight_ = 3.0f;
+	float clearTargetAngleOffset_ = 0.0f;
 
 };

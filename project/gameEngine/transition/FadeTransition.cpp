@@ -7,7 +7,7 @@
 FadeTransition::FadeTransition(Mode mode) : mode_(mode) 
 {
     fadeSprite_ = std::make_unique<Sprite>();
-    fadeSprite_->Initialize("uvChecker.png", { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0, 0 });
+    fadeSprite_->Initialize("white.png", { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0, 0 });
     Vector2 size = fadeSprite_->GetSize();
     size.x = 1280.0f;
     size.y = 720.0f;

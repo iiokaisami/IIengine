@@ -119,13 +119,20 @@ Particle ParticleMotion::MakeRupture(std::mt19937& rand, const Vector3& center)
 
 Particle ParticleMotion::MakeFountain(std::mt19937& rand, const Vector3& base)
 {
-    std::uniform_real_distribution<float> distXY(-1.5f, 1.5f);
+    std::uniform_real_distribution<float> distXZ(-40.0f, 40.0f);
+	std::uniform_real_distribution<float> distRot(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> distColor(0.1f, 0.7f);
     Particle particle;
-    particle.transform.translate = base + Vector3(distXY(rand), 0.0f, distXY(rand));
-    particle.transform.scale = { 1.0f, 1.0f, 1.0f }; // スケールを設定
-    particle.velocity = Vector3(0.0f, 0.1f, 0.0f);
-    particle.lifeTime = 2.0f;
+    particle.transform.translate = base + Vector3(distXZ(rand), 0.0f, distXZ(rand));
+    particle.transform.translate.y += base.y - 0.5f;
+	particle.transform.rotate = Vector3(distRot(rand), distRot(rand), distRot(rand));
+    particle.transform.scale = { 0.5f, 0.5f, 0.5f }; // スケールを設定
+    particle.velocity = Vector3(0.0f, 1.5f, 0.0f);
+	particle.scaleVelocity = Vector3(-0.15f, -0.15f, -0.15f);
+	particle.angularVelocity = Vector3(distRot(rand), distRot(rand), distRot(rand));
+    particle.lifeTime = 1.5f;
     particle.currentTime = 0.0f;
+	particle.color = { distColor(rand), distColor(rand), 1.0f, 0.7f }; // 青色系
     return particle;
 }
 

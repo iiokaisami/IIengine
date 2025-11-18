@@ -25,6 +25,11 @@ void EnemyManager::Finalize()
 	{
 		enemy->Finalize();
 	}
+
+	for(auto& corruptor : pCorruptors_)
+	{
+		corruptor->Finalize();
+	}
 }
 
 void EnemyManager::Update()
@@ -93,6 +98,32 @@ void EnemyManager::Update()
 		pTrapEnemies_.end()
 	);
 
+	// コラプターの更新
+	for(auto& corruptor : pCorruptors_)
+	{
+		corruptor->SetPlayerPosition(playerPosition_);
+		corruptor->Update();
+	}
+
+	// isDead がたったら削除
+	pCorruptors_.erase(
+		std::remove_if(
+			pCorruptors_.begin(),
+			pCorruptors_.end(),
+			[this](std::unique_ptr<Corruptor>& corruptor)
+			{
+				if (corruptor->IsDead())
+				{
+					corruptor->Finalize();
+					// 敵のカウントを減らす
+					enemyCount_--;
+					return true;
+				}
+				return false;
+			}),
+		pCorruptors_.end()
+	);
+
 	// ウェーブステートの更新
 	pState_->Update();
 	
@@ -124,6 +155,12 @@ void EnemyManager::Draw()
 	{
 		enemy->Draw();
 	}
+
+	for(auto& corruptor : pCorruptors_)
+	{
+		corruptor->Draw();
+	}
+
 }
 
 void EnemyManager::ImGuiDraw()

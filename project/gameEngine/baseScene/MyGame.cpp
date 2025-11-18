@@ -40,6 +40,7 @@ void MyGame::Initialize()
 	particleManager->CreateParticleGroup("spark", "resources/images/white.png", "plane.obj", "Triangle", "Spark");
 	particleManager->CreateParticleGroup("sparkBurst", "resources/images/white.png", "plane.obj", "Triangle", "SparkBurst");
 	particleManager->CreateParticleGroup("rupture", "resources/images/white.png", "plane.obj", "Triangle", "Rupture");
+	particleManager->CreateParticleGroup("goal", "resources/images/white.png", "plane.obj", "Cube", "Fountain");
 
 	// Cylinderを出すときに向き指定する
 	ParticleMotion::SetDirection("UP");

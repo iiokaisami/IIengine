@@ -10,6 +10,7 @@
 #include "../../gameEngine/baseScene/BaseScene.h"
 #include "../../gameEngine/transition/BlockRiseTransition.h"
 #include "../../gameEngine/particle/ParticleEmitter.h"
+#include "../objects/player/Player.h"
 
 /// <summary>
 /// クリアシーン
@@ -45,11 +46,11 @@ private:
 	std::unique_ptr<BlockRiseTransition> transition_ = nullptr;
 	bool isTransitioning_ = false;
 
-	// 3Dオブジェクト
-	std::vector<Object3d*> object3ds = {};
-	Vector3 position_ = { 0.0f,0.0f,-10.0f };
-	Vector3 scale_{};
-	Vector3 rotate_{};
+	// プレイヤー
+	std::unique_ptr<Player> pPlayer_ = nullptr;
+
+	// パーティクル位置
+	Vector3 particlePosition_ = { 0.0f,-3.5f,-3.5f };
 
 };
 

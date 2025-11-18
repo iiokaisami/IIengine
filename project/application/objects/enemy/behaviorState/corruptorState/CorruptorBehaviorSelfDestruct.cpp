@@ -26,7 +26,18 @@ void CorruptorBehaviorSelfDestruct::Update()
 	// はじける演出
 	float scale = Lerp(1.0f, 2.0f, Ease::OutCubic(t));
 	motion_.transform.scale = Vector3(scale, scale, scale);
-	
+
+	// 揺れ演出
+	Vector3 shakeOffset =
+	{
+	((motion_.count % 2 == 0) ? 1.0f : -1.0f) * 0.1f,
+	0.0f, // Y軸は揺らさない
+	((motion_.count % 3 == 0) ? 1.0f : -1.0f) * 0.1f
+	};
+
+	Vector3 originPos = pCorruptor_->GetPosition();
+
+	pCorruptor_->SetObjectPosition(originPos + shakeOffset);
 	pCorruptor_->SetObjectScale(motion_.transform.scale);
 	pCorruptor_->SetScale(motion_.transform.scale);
 
