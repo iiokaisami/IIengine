@@ -94,6 +94,8 @@ void ClearScene::Update()
 
 	// パーティクル
 	ParticleEmitter::Emit("goal", particlePosition_, 1);
+	ParticleEmitter::Emit("petalGroup", petalPosition_, 1);
+
 
 #ifdef USE_IMGUI
 
@@ -105,7 +107,7 @@ void ClearScene::Update()
 	ImGui::SliderFloat3("cameraPosition", &cameraPosition_.x, -80.0f, 20.0f);
 	ImGui::SliderFloat3("cameraRotate", &cameraRotate_.x, -3.14f, 3.14f);
 
-	ImGui::SliderFloat3("particlePosition", &particlePosition_.x, -50.0f, 50.0f);
+	ImGui::SliderFloat3("particlePosition", &petalPosition_.x, -50.0f, 50.0f);
 
 	ImGui::End();
 

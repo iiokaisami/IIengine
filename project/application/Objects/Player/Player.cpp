@@ -10,10 +10,13 @@ void Player::Initialize()
 	position_ = { 0.2f,0.7f,-1.2f };
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
-	
-	// 仮置き
 	scale_ = { 1.0f,1.5f,1.0f };
 	object_->SetScale(scale_);
+
+
+	// ライト設定
+	object_->SetLighting(true);
+	//object_->SetDirectionalLightEnable(true);
 
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();

@@ -276,9 +276,8 @@ Particle ParticleMotion::MakeLaser(std::mt19937& rand, const Vector3& translate)
 
 Particle ParticleMotion::MakePetal(std::mt19937& rand, const Vector3& translate)
 {
-    translate;
     // XZ: -5～5, Y: 5
-    std::uniform_real_distribution<float> distXZ(-3.0f, 3.0f);
+    std::uniform_real_distribution<float> distXZ(-5.0f, 5.0f);
     std::uniform_real_distribution<float> distRot(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
     std::uniform_real_distribution<float> distScale(0.2f, 0.5f);
     std::uniform_real_distribution<float> distColorR(0.8f, 1.0f); // ピンク系
@@ -288,7 +287,7 @@ Particle ParticleMotion::MakePetal(std::mt19937& rand, const Vector3& translate)
     std::uniform_real_distribution<float> distWiggle(-0.05f, 0.05f);
 
     Particle p;
-    p.transform.translate = Vector3(distXZ(rand), 4.5f, distXZ(rand));
+    p.transform.translate = Vector3(translate.x + distXZ(rand), translate.y, translate.z + distXZ(rand));
     p.transform.scale = { distScale(rand), distScale(rand), distScale(rand) };
     p.transform.rotate = { distRot(rand), distRot(rand), distRot(rand) };
     // ひらひら感: XZに微小な揺れ、Yはゆっくり落下
@@ -297,7 +296,7 @@ Particle ParticleMotion::MakePetal(std::mt19937& rand, const Vector3& translate)
     p.angularVelocity = { distAngVel(rand), distAngVel(rand), distAngVel(rand) };
     // 花びららしい色
     p.color = { distColorR(rand), distColorG(rand), distColorB(rand), 1.0f };
-    p.lifeTime = 6.0f;
+    p.lifeTime = 8.0f;
     p.currentTime = 0.0f;
     return p;
 }

@@ -51,6 +51,7 @@ private:
 
 	// パーティクル位置
 	Vector3 particlePosition_ = { 0.0f,-3.5f,-3.5f };
+	Vector3 petalPosition_ = { 0.0f,12.0f,-18.0f };
 
 };
 
