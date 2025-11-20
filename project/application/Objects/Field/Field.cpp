@@ -9,10 +9,10 @@ void Field::Initialize()
 	position_ = { 0.0f,0.0f,0.0f };
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
-	
-	// 仮置き
 	scale_ = { 100.0f,0.1f,100.0f };
 	object_->SetScale(scale_);
+	// ライト設定
+	object_->SetDirectionalLightEnable(true);
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();

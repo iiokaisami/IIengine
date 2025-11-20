@@ -11,7 +11,9 @@ void Barrie::Initialize()
 	scale_ = defaultScale_;
 	targetScale_ = defaultScale_;
 	object_->SetScale(scale_);
-	
+	// ライト設定
+	object_->SetDirectionalLightEnable(true);
+
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
 	objectName_ = "Barrie";

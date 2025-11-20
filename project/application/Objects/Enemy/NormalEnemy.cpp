@@ -22,7 +22,8 @@ void NormalEnemy::Initialize()
     // 仮置き
     scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
-
+    // ライト設定
+    object_->SetDirectionalLightEnable(true);
 
     colliderManager_ = ColliderManager::GetInstance();
 

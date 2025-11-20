@@ -16,6 +16,8 @@ void Corruptor::Initialize()
 	object_->SetRotate(rotation_);
 	scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
+	// ライト設定
+	object_->SetDirectionalLightEnable(true);
 
 	// コライダー設定
 	colliderManager_ = ColliderManager::GetInstance();

@@ -8,8 +8,6 @@ void EnemyBullet::Initialize()
 
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
-
-	// 仮置き
 	scale_ = { 0.7f,0.7f,0.7f };
 	object_->SetScale(scale_);
 

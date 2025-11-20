@@ -15,8 +15,7 @@ void Player::Initialize()
 
 
 	// ライト設定
-	object_->SetLighting(true);
-	//object_->SetDirectionalLightEnable(true);
+	object_->SetDirectionalLightEnable(true);
 
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();

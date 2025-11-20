@@ -8,10 +8,10 @@ void Goal::Initialize()
 	position_ = { 0.0f,0.0f,-3.5f };
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
-
-	// 仮置き
 	scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
+	// ライト設定
+	object_->SetDirectionalLightEnable(true);
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
