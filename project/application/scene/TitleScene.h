@@ -65,13 +65,8 @@ private:
 
 	// 2Dスプライト
 	std::vector<Sprite*>sprites = {};
-
-	// 3Dオブジェクト
-	std::vector<Object3d*> object3ds = {};
-	Vector3 position_ = { 0.0f,0.0f,-10.0f };
-	Vector3 scale_{};
-	Vector3 rotate_{ 0.0f,0.0f,0.0f };
-
+	// 描画するスプライトの数
+	uint32_t spriteNum_ = 1;
 
 	// 衝突判定
 	ColliderManager* colliderManager_ = nullptr;

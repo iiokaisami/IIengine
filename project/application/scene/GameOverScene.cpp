@@ -19,7 +19,7 @@ void GameOverScene::Initialize()
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
-	for (uint32_t i = 0; i < 3; ++i)
+	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
 		Sprite* sprite = new Sprite();
 		

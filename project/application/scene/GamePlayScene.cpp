@@ -55,7 +55,7 @@ void GamePlayScene::Initialize()
 	cameraRestCenter_ = pPlayer_->GetPosition() + Vector3{ 0.0f,70.0f,-20.0f };
 
 	// スプライト
-	for (uint32_t i = 0; i < 1; ++i)
+	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
 		Sprite* sprite = new Sprite();
 

@@ -21,33 +21,6 @@ void TitleScene::Initialize()
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
 
 
-	// --- 3Dオブジェクト ---
-	for (uint32_t i = 0; i < 2; ++i)
-	{
-		Object3d* object = new Object3d();
-		if (i == 0)
-		{
-			object->Initialize("logo.obj");
-		}
-		if (i == 1)
-		{
-			object->Initialize("terrain.obj");
-		}
-
-		position_ = { 0.0f,0.0f,5.0f };
-		scale_ = { 1.0f,1.0f,1.0f };
-		object->SetPosition(position_);
-		//object->SetScale(scale_);
-
-		object3ds.push_back(object);
-	}
-	// ロゴ
-	object3ds[0]->SetPosition({ -13.0f,10.0f,0.745f });
-	object3ds[0]->SetScale({ 3.5f,3.5f,3.5f });
-	object3ds[0]->SetRotate({ 0.0f,3.14f,0.0f });
-
-
-
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
 	colliderManager_->Initialize();
@@ -67,7 +40,7 @@ void TitleScene::Initialize()
 
 
 	// --- 2Dスプライト ---
-	for (uint32_t i = 0; i < 1; ++i)
+	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
 		Sprite* sprite = new Sprite();
 
@@ -76,7 +49,6 @@ void TitleScene::Initialize()
 			
 			sprite->Initialize("titleUI.png", { 0,0 }, color_, { 0,0 });
 		}
-
 		sprites.push_back(sprite);
 
 	}
@@ -105,11 +77,6 @@ void TitleScene::Initialize()
 
 void TitleScene::Finalize()
 {
-	for (auto& obj : object3ds)
-	{
-		delete obj;
-	}
-
 	pPlayer_->Finalize();
 	pEnemyManager_->Finalize();
 	pField_->Finalize();
@@ -163,11 +130,6 @@ void TitleScene::Update()
 
 	// ライトの設定
 	SetLightSettings();
-	// モデル更新
-	for (auto& obj : object3ds)
-	{
-		obj->Update();
-	}
 
 	// ロゴ
 	LogoPosition();
@@ -210,8 +172,6 @@ void TitleScene::Update()
 
 	ImGui::SliderFloat3("cameraPosition", &cameraPosition_.x, -70.0f, 20.0f);
 	ImGui::SliderFloat3("cameraRotate", &cameraRotate_.x, -3.14f, 3.14f);
-
-	ImGui::SliderFloat3("sphere scale", &scale_.x, 0.0f, 10.0f);
 
 	if (ImGui::Button("Terrain Draw"))
 	{
@@ -296,13 +256,6 @@ void TitleScene::Draw()
 	// 描画前処理(Object)
 	Object3dCommon::GetInstance()->CommonDrawSetting();
 
-	//for (auto& obj : object3ds)
-	//{
-	//	obj->Draw();
-	//}
-
-	// ロゴ
-	object3ds[0]->Draw();
 	// プレイヤー
 	pPlayer_->Draw();
 	// エネミー
@@ -393,16 +346,11 @@ void TitleScene::CameraFollow()
 	camera_->SetPosition(nextPos);
 	camera_->SetRotate(nextRot);
 
-	// カメラの位置をobject3ds[0]に追従させる
-	if (!object3ds.empty() && object3ds[0])
-	{
-		object3ds[0]->SetPosition({nextPos.x - 15.0f,10.0f,nextPos.z + 20.75f});
-	}
 }
 
 void TitleScene::SetLightSettings()
 {
-	if (enableEnvironment)
+	/*if (enableEnvironment)
 	{
 		object3ds[0]->SetEnvironmentMapHandle(cubeHandle_, true);
 		object3ds[0]->SetEnvironmentStrength(environmentStrength_);
@@ -434,7 +382,7 @@ void TitleScene::SetLightSettings()
 		obj->SetSpotLightConsAngle(spotLightConsAngle);
 		obj->SetSpotLightCosFalloffStart(spotLightCosFalloffStart);
 
-	}
+	}*/
 }
 
 void TitleScene::LogoPosition()

@@ -47,6 +47,8 @@ private:
 
 	// 2Dスプライト
 	std::vector<Sprite*>sprites = {};
+	// 描画するスプライトの数
+	uint32_t spriteNum_ = 3;
 
 	// 遷移
 	std::unique_ptr<BlockRiseTransition> transition_ = nullptr;
