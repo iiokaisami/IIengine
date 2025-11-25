@@ -51,6 +51,7 @@ void EnemyBehaviorDead::Update()
 
 		// パーティクル
 		ParticleEmitter::Emit("petalGroup", motion_.transform.position, 6);
+		ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
 	}
 
 }

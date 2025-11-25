@@ -166,6 +166,13 @@ public:
 	/// <returns>生成したパーティクル</returns>
 	static Particle MakeDust(std::mt19937& rand, const Vector3& translate);
 
+	/// <summary>
+	/// 敵土埃
+	/// </summary>
+	/// <param name="rand">ランダム生成器</param>
+	/// <param name="base">発現位置</param>
+	/// <returns>生成したパーティクル</returns>
+	static Particle MakeEnemyDust(std::mt19937& rand, const Vector3& translate);
     
 	/// <summary>
 	/// デバフ
@@ -191,6 +198,22 @@ public:
 	/// <returns>生成したパーティクル</returns>
 	static Particle MakeSparkBurst(std::mt19937& rand, const Vector3& translate);
  
+	/// <summary>
+	/// ヒットリアクション中心からサイドに弾けるように飛ぶ
+	/// </summary>
+	/// <param name="rand">ランダム生成器</param>
+	/// <param name="translate">発現位置</param>
+	/// <returns>生成したパーティクル</returns>
+	static Particle MakeHitReaction(std::mt19937& rand, const Vector3& translate);
+
+	/// <summary>
+	/// 弾丸ヒットリアクション
+	/// </summary>
+	/// <param name="rand">ランダム生成器</param>
+	/// <param name="translate">発現位置</param>
+	/// <returns>生成したパーティクル</returns>
+	static Particle MakeBulletHitReaction(std::mt19937& rand, const Vector3& translate);
+
 public: // セッター
 
 	/// <summary>

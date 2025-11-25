@@ -59,10 +59,10 @@ void Corruptor::Update()
 	// アクティブフラグ
 	isActive_ = !isInvincible_;
 
+	object_->Update();
+
 	// 行動ステート更新
 	pBehaviorState_->Update();
-
-	object_->Update();
 
 	// プレイヤーとの距離更新
 	float distanceToPlayer = position_.Distance(playerPosition_);
@@ -130,6 +130,8 @@ void Corruptor::Move()
 	position_ += moveVelocity_;
 
 	ObjectTransformSet(position_, rotation_, scale_);
+
+	ParticleEmitter::Emit("enemyWalk", position_, 1);
 
 }
 

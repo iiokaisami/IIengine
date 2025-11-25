@@ -71,6 +71,7 @@ void TrapEnemy::Finalize()
 			{
 				if (trap->IsDead())
 				{
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
 					trap->Finalize();
 					return true;
 				}
@@ -90,6 +91,7 @@ void TrapEnemy::Finalize()
 			{
 				if (trap->IsDead())
 				{
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
 					trap->Finalize();
 					return true;
 				}
@@ -140,6 +142,7 @@ void TrapEnemy::Update()
 			{
 				if (trap->IsDead())
 				{
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
 					trap->Finalize();
 					return true;
 				}
@@ -153,6 +156,7 @@ void TrapEnemy::Update()
 			{
 				if (trap->IsDead())
 				{
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
 					trap->Finalize();
 					return true;
 				}
@@ -247,6 +251,8 @@ void TrapEnemy::Move()
     position_ += moveVelocity_;
 
     ObjectTransformSet(position_, rotation_, scale_);
+
+    ParticleEmitter::Emit("enemyWalk", position_, 1);
 }
 
 

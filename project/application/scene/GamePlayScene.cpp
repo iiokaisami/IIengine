@@ -359,7 +359,7 @@ void GamePlayScene::CameraShake()
 		if (activeCamera)
 		{
 			// カメラをシェイク (持続時間,振幅)
-			activeCamera->StartShake(0.3f, 0.6f);
+			activeCamera->StartShake(0.3f, 1.2f);
 
 			// ヒットフラグをリセット
 			pPlayer_->SetHitMoment(false);

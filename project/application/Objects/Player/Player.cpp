@@ -40,7 +40,7 @@ void Player::Initialize()
 	PostEffectManager::GetInstance()->GetPassAs<VignettePass>("Vignette")->SetStrength(0.0f);
 
 	// ステータス
-	hp_ = 8;
+	hp_ = 12;
 	isDead_ = false;
 	isAutoControl_= false;
 
@@ -78,6 +78,7 @@ void Player::Finalize()
 		{
 			if (bullet->IsDead())
 			{
+				ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
 				bullet->Finalize();
 				delete bullet;
 				return true;
@@ -150,11 +151,13 @@ void Player::Update()
 	// 弾の削除
 	pBullets_.remove_if([](PlayerBullet* bullet)
 		{
-		if (bullet->IsDead()) {
-			bullet->Finalize();
-			delete bullet;
-			return true;
-		}
+			if (bullet->IsDead())
+			{
+				ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
+				bullet->Finalize();
+				delete bullet;
+				return true;
+			}
 		return false;
 		});
 
@@ -692,6 +695,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		if (hp_ > 0.3)
 		{
 			hp_--;
+
+			ParticleEmitter::Emit("HitReaction", position_, 5);
 		}
 		else
 		{
@@ -710,6 +715,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			if (hp_ > 0.3)
 			{
 				hp_ -= 1.5f;
+				ParticleEmitter::Emit("HitReaction", position_, 8);
 			}
 			else
 			{

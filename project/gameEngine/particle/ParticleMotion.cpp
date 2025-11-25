@@ -20,7 +20,7 @@ Particle ParticleMotion::Create(const std::string& name, std::mt19937& rand, con
         return it->second(rand, pos);
     }
 
-    // 無効な名前 → デフォルト粒子（何もしない）
+    // 無効な名前 → デフォルト粒子
     Particle p;
     p.transform.translate = pos;
     p.transform.scale = { 1, 1, 1 };
@@ -48,9 +48,12 @@ void ParticleMotion::Initialize()
 	Register("Water", MakeWater);
 	Register("Bubble", MakeBubble);
 	Register("Dust", MakeDust);
+	Register("EnemyDust", MakeEnemyDust);
 	Register("Debuff", MakeDebuff);
 	Register("Spark", MakeSpark);
     Register("SparkBurst", MakeSparkBurst);
+	Register("HitReaction", MakeHitReaction);
+	Register("BltReaction", MakeBulletHitReaction);
 }
 
 const std::unordered_map<std::string, ParticleMotion::MotionFunc>& ParticleMotion::GetAll()
@@ -107,10 +110,13 @@ Particle ParticleMotion::MakeExplosion(std::mt19937& rand, const Vector3& center
 Particle ParticleMotion::MakeRupture(std::mt19937& rand, const Vector3& center)
 {
     std::uniform_real_distribution<float> dist(-15.0f, 15.0f);
+	std::uniform_real_distribution<float> distRot(-3.0f, 3.0f);
+
     Particle particle;
     particle.transform.translate = { center.x,center.y + 1.0f,center.z };
     particle.transform.scale = { 1.0f, 1.0f, 1.0f };
     particle.velocity = Vector3(dist(rand), dist(rand), dist(rand));
+	particle.angularVelocity = Vector3(distRot(rand), distRot(rand), distRot(rand));
     particle.lifeTime = 1.0f;
     particle.currentTime = 0.0f;
     particle.color = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -366,6 +372,29 @@ Particle ParticleMotion::MakeDust(std::mt19937& rand, const Vector3& translate)
     return p;
 }
 
+Particle ParticleMotion::MakeEnemyDust(std::mt19937& rand, const Vector3& translate)
+{
+    // XZ方向に広がる・Yは少し上向き
+    std::uniform_real_distribution<float> distXZ(-0.6f, 0.6f);
+    std::uniform_real_distribution<float> distVelY(0.08f, 0.15f);
+    std::uniform_real_distribution<float> distScale(0.08f, 0.15f);
+
+    Particle p;
+    // 足元から少し下げて発生
+    p.transform.translate = translate + Vector3(distXZ(rand), 0.0f, distXZ(rand));
+    p.transform.scale = { distScale(rand), distScale(rand), distScale(rand) };
+    p.transform.rotate = { 0.0f, 0.0f, 0.0f };
+    // XZ方向に広がり、Yは少し上向き
+    p.velocity = { distXZ(rand), distVelY(rand), distXZ(rand) };
+    // 徐々に大きくなる
+    p.scaleVelocity = { 0.01f, 0.01f, 0.01f };
+    // 青色・やや透明
+    p.color = { 0.0f, 0.0f, 1.0f, 0.9f };
+    p.lifeTime = 0.8f;
+    p.currentTime = 0.0f;
+    return p;
+}
+
 Particle ParticleMotion::MakeDebuff(std::mt19937& rand, const Vector3& translate)
 {
     std::uniform_real_distribution<float> distAngle(0.0f, 2.0f * std::numbers::pi_v<float>);
@@ -501,6 +530,80 @@ Particle ParticleMotion::MakeSparkBurst(std::mt19937& rand, const Vector3& trans
     std::uniform_real_distribution<float> distLife(0.5f, 0.8f);
     p.lifeTime = distLife(rand);
     p.currentTime = 0.0f;
+    return p;
+}
+
+Particle ParticleMotion::MakeHitReaction(std::mt19937& rand, const Vector3& translate)
+{
+    std::uniform_real_distribution<float> distAngle(0.0f, 2.0f * std::numbers::pi_v<float>);
+    std::uniform_real_distribution<float> distSpeed(3.0f, 5.0f);      // 初速を大幅に増加
+    std::uniform_real_distribution<float> distY(-0.1f, 0.25f);       // 上下成分のブレ
+    std::uniform_real_distribution<float> distUp(0.15f, 0.45f);      // 発生位置を少し上げる量
+    std::uniform_real_distribution<float> distScale(0.3f, 0.5f);     // 初期スケール
+    std::uniform_real_distribution<float> distScaleVel(-0.25f, -0.08f); // 徐々に小さくする速度
+    std::uniform_real_distribution<float> distRot(-3.14f, 3.14f);    // 初期回転
+    std::uniform_real_distribution<float> distAngVel(-10.0f, 10.0f); // 回転速度を強めに
+    std::uniform_real_distribution<float> distLife(0.5f, 0.8f);      // 寿命をやや延長
+    std::uniform_real_distribution<float> distRed(0.30f, 0.60f);
+    std::uniform_real_distribution<float> distTint(0.02f, 0.08f);
+
+    float angle = distAngle(rand);
+    float speed = distSpeed(rand);
+    float yComp = distY(rand);
+    float raise = distUp(rand);
+
+    // XZ平面のランダム方向に強く弾く（少し上向きバイアス）
+    Vector3 dir = { std::cos(angle), yComp + 0.15f, std::sin(angle) };
+    dir = dir.Normalize();
+
+    Particle p;
+    p.transform.translate = translate;
+    // 発生位置を少し上げてモデルに埋もれにくくする
+    p.transform.translate.y += raise;
+
+    // 初期スケール・回転
+    float s = distScale(rand);
+    p.transform.scale = { s, s, s };
+    p.transform.rotate = { distRot(rand), distRot(rand), distRot(rand) };
+
+    // 高速に飛ばす（XZ方向が主）
+    p.velocity = dir * speed;
+
+    // 徐々に小さくする
+    float sv = distScaleVel(rand);
+    p.scaleVelocity = { sv, sv, sv };
+
+    // 回転を強めに付与
+    p.angularVelocity = { distAngVel(rand), distAngVel(rand), distAngVel(rand) };
+
+    // 暗めの赤（微妙にばらつき）
+    float r = distRed(rand);
+    float g = distTint(rand);
+    float b = distTint(rand) * 0.4f;
+    p.color = { r, g, b, 1.0f };
+
+    p.lifeTime = distLife(rand);
+    p.currentTime = 0.0f;
+
+    return p;
+}
+
+Particle ParticleMotion::MakeBulletHitReaction(std::mt19937& rand, const Vector3& translate)
+{
+    std::uniform_real_distribution<float> distRadius(0.5f, 1.0f);
+
+    // 縦横は同じ大きさにする
+	float dist = distRadius(rand);
+
+    Particle p;
+    p.transform.scale = { dist, dist, dist };
+    p.transform.translate = translate;
+    p.velocity = { 0, 1.0f, 0 };
+	p.scaleVelocity = { 1.0f, 1.0f, 1.0f };
+    p.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    p.lifeTime = 0.5f;
+    p.currentTime = 0.0f;
+
     return p;
 }
 

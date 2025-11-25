@@ -71,6 +71,7 @@ void NormalEnemy::Finalize()
             {
                 if (bullet->IsDead())
                 {
+					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
                     bullet->Finalize();
                     return true;
                 }
@@ -107,6 +108,7 @@ void NormalEnemy::Update()
             {
                 if (bullet->IsDead())
                 {
+                    ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
                     bullet->Finalize();
                     return true;
                 }
@@ -217,6 +219,8 @@ void NormalEnemy::Move()
 		SetScale(scale_);
 
 		ObjectTransformSet(position_, rotation_, scale_);
+
+		ParticleEmitter::Emit("enemyWalk", position_, 1);
     }
 }
 
