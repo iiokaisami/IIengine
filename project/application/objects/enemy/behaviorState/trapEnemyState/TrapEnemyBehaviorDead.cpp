@@ -51,6 +51,7 @@ void TrapEnemyBehaviorDead::Update()
 
 		// パーティクル
 		ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 6);
+		ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
 	}
 }
 
