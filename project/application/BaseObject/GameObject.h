@@ -106,5 +106,5 @@ protected: // メンバー
     // デスフラグ
 	bool isDead_ = false; 
     // オブジェクトがアクティブかどうか(回避中など判定を付けたくない場合等)
-	bool isActive_ = true;
+	bool isActive_ = false;
 };

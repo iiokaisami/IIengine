@@ -53,7 +53,8 @@ void EnemyBullet::Update()
 
 
 	//時間経過でデス
-	if (--deathTimer_ <= 0) {
+	if (--deathTimer_ <= 0) 
+	{
 		isDead_ = true;
 	}
 }
@@ -93,12 +94,14 @@ void EnemyBullet::UpdateModel()
 
 void EnemyBullet::OnCollisionTrigger(const Collider* _other)
 {
-	if (!_other->GetOwner()->IsActive() && _other->GetColliderID() == "Player" or
+	if (!_other->GetOwner()->IsActive() && 
+		(_other->GetColliderID() == "Player" or
 		_other->GetColliderID() == "PlayerBullet" or
 		_other->GetColliderID() == "Wall" or
 		_other->GetColliderID() == "TrapEnemy" or
-		_other->GetColliderID() == "Barrie")
+		_other->GetColliderID() == "Barrie"))
 	{
+		ParticleEmitter::Emit("BltReaction", position_, 1);
 		isDead_ = true;
 	} 
 }

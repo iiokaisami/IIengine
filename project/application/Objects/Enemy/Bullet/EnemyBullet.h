@@ -2,6 +2,7 @@
 
 #include "../../../baseObject/GameObject.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
+#include "../../../../gameEngine/particle/ParticleEmitter.h"
 
 #include <Object3d.h>
 

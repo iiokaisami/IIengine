@@ -71,7 +71,6 @@ void NormalEnemy::Finalize()
             {
                 if (bullet->IsDead())
                 {
-					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
                     bullet->Finalize();
                     return true;
                 }
@@ -108,7 +107,6 @@ void NormalEnemy::Update()
             {
                 if (bullet->IsDead())
                 {
-                    ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
                     bullet->Finalize();
                     return true;
                 }

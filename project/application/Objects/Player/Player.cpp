@@ -110,6 +110,8 @@ void Player::Update()
 		// オート攻撃
 		AutoAttack();
 
+		isActive_ = false;
+
 		if (isDead_)
 		{
 			isDead_ = false;
@@ -689,7 +691,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 {
 
 	if (!isEvading_ && (_other->GetColliderID() == "EnemyBullet" or
-		_other->GetColliderID() == "NormalEnemy"))
+		_other->GetColliderID() == "NormalEnemy" or
+		_other->GetColliderID() == "TrapEnemy"))
 	{
 		// プレイヤーのHPを減少
 		if (hp_ > 0.3)

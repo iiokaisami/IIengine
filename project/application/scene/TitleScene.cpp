@@ -66,9 +66,7 @@ void TitleScene::Initialize()
 	cubeSrvIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(cubeMapPath_);
 	cubeHandle_ = TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(cubeSrvIndex_);
 	
-	// パーティクル
-	//ParticleEmitter::Emit("magic1Group", { 0.0f,1.0f,-1.0f }, 1);
-	
+		
 	// シーン開始時にフェードイン
 	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
@@ -107,20 +105,6 @@ void TitleScene::Update()
 			isTransitioning_ = false;
 		}
 	
-	}
-
-
-	if (time_ > 9.0f)
-	{
-		time_ = 0.0f;
-	}
-
-	time_ += 1.0f / 60.0f;
-
-	// パーティクル発生
-	if (std::fmod(time_, 1.0f) < 0.1f)
-	{
-		//ParticleEmitter::Emit("magic2Group", { 0.0f,1.0f,0.0f }, 5);
 	}
 
 	camera_->Update();
