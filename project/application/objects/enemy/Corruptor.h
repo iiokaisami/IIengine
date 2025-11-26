@@ -62,6 +62,12 @@ private: // 衝突判定
 	/// <param name="_other">衝突相手のコライダー</param>
 	void OnCollisionTrigger(const Collider* _other);
 
+	/// <summary>
+	/// 衝突中の処理
+	/// </summary>
+	/// <param name="_other">衝突相手のコライダー</param>
+	void OnCollision(const Collider* _other);
+
 public: // ゲッター
 
 	// 被弾フラグ

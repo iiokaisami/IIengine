@@ -741,7 +741,9 @@ void Player::OnCollisionTrigger(const Collider* _other)
 
 void Player::OnCollision(const Collider* _other)
 {
-	if (_other->GetColliderID() == "Wall" or _other->GetColliderID() == "Barrie" or _other->GetColliderID() == "NormalEnemy")
+	if (_other->GetColliderID() == "Wall" or
+		_other->GetColliderID() == "Barrie" or 
+		_other->GetColliderID() == "NormalEnemy")
 	{
 		// 相手のAABBを取得
 		const AABB* otherAABB = _other->GetAABB();

@@ -31,6 +31,7 @@ void Corruptor::Initialize()
 		.shape = Shape::AABB,
 		.shapeData = &aabb_,
 		.attribute = colliderManager_->GetNewAttribute(objectName_),
+		.onCollision = std::bind(&Corruptor::OnCollision, this, std::placeholders::_1),
 		.onCollisionTrigger = std::bind(&Corruptor::OnCollisionTrigger, this, std::placeholders::_1),
 	};
 	collider_.MakeAABBDesc(desc);
@@ -146,6 +147,7 @@ void Corruptor::ObjectTransformSet(const Vector3& _position, const Vector3& _rot
 	object_->SetPosition(_position);
 	object_->SetRotate(_rotation);
 	object_->SetScale(_scale);
+	object_->Update();
 }
 
 void Corruptor::OnCollisionTrigger(const Collider* _other)
@@ -181,7 +183,10 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 			position_ += direction * 0.1f; // 微調整のための値
 		}
 	}
+}
 
+void Corruptor::OnCollision(const Collider* _other)
+{
 	if (_other->GetColliderID() == "Wall" or
 		_other->GetColliderID() == "Barrie")
 	{
