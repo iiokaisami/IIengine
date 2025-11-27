@@ -231,6 +231,68 @@ void MyGame::Update()
 		postEffectManager->GetPassAs<GaussianFilterPass>("GaussianFilter")->SetIntensity(gaussianIntensity);
 	}
 
+	// TimeManager 用の ImGui 操作パネルを追加
+	if (ImGui::CollapsingHeader("TimeManager"))
+	{
+		// 現在のタイムスケールを取得
+		float currentScale = TimeManager::Instance().GetTimeScale();
+
+		// スライダーの表示値（ユーザー操作時に優先して反映）
+		static float timeScaleSlider = currentScale;
+		// 外部からタイムスケールが変更された場合、ユーザー操作中でなければ同期する
+		if (!ImGui::IsAnyItemActive() && std::abs(timeScaleSlider - currentScale) > 1e-6f)
+		{
+			timeScaleSlider = currentScale;
+		}
+
+		// スライダーで直接変更
+		if (ImGui::SliderFloat("Time Scale", &timeScaleSlider, 0.0f, 2.0f))
+		{
+			TimeManager::Instance().SetTimeScale(timeScaleSlider);
+		}
+
+		// 一時停止 / 再開 ボタン
+		if (ImGui::Button("Pause"))
+		{
+			TimeManager::Instance().Pause();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Resume"))
+		{
+			TimeManager::Instance().Resume();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Reset"))
+		{
+			TimeManager::Instance().SetTimeScale(1.0f);
+			timeScaleSlider = 1.0f;
+		}
+
+		// スムーズ変更の入力
+		static float smoothTarget = 0.0f;
+		static float smoothDuration = 0.5f;
+		ImGui::InputFloat("Smooth Target", &smoothTarget, 0.1f, 1.0f, "%.2f");
+		ImGui::InputFloat("Smooth Duration (s)", &smoothDuration, 0.1f, 1.0f, "%.2f");
+
+		if (ImGui::Button("Smooth To Target"))
+		{
+			// duration が負にならないように保護
+			TimeManager::Instance().SmoothTimeScale(smoothTarget, std::max(0.0f, smoothDuration));
+		}
+
+		// ステップ実行
+		static float stepSeconds = 0.016f;
+		ImGui::InputFloat("Step Seconds", &stepSeconds, 0.001f, 0.1f, "%.3f");
+		if (ImGui::Button("Step"))
+		{
+			TimeManager::Instance().Step(stepSeconds);
+		}
+
+		// 現在の値を表示
+		ImGui::Text("Current TimeScale = %.3f", currentScale);
+	}
+
+
 #endif // USE_IMGUI
 
 }

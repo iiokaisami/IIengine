@@ -62,7 +62,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)gameEngine\2d;$(ProjectDir)gameEngine\3d;$(ProjectDir)gameEngine\audio;$(ProjectDir)gameEngine\base;$(ProjectDir)gameEngine\io;$(ProjectDir)gameEngine\math;$(ProjectDir)gameEngine\utillity;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)gameEngine\2d;$(ProjectDir)gameEngine\3d;$(ProjectDir)gameEngine\audio;$(ProjectDir)gameEngine\base;$(ProjectDir)gameEngine\io;$(ProjectDir)gameEngine\math;$(ProjectDir)gameEngine\utillity;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals\imgui;$(ProjectDir)gameEngine\time;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -90,7 +90,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)gameEngine\2d;$(ProjectDir)gameEngine\3d;$(ProjectDir)gameEngine\audio;$(ProjectDir)gameEngine\base;$(ProjectDir)gameEngine\io;$(ProjectDir)gameEngine\math;$(ProjectDir)gameEngine\utillity;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)gameEngine\2d;$(ProjectDir)gameEngine\3d;$(ProjectDir)gameEngine\audio;$(ProjectDir)gameEngine\base;$(ProjectDir)gameEngine\io;$(ProjectDir)gameEngine\math;$(ProjectDir)gameEngine\utillity;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals\imgui;$(ProjectDir)gameEngine\time;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -198,6 +198,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorMove.cpp" />
     <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSetTrap.cpp" />
     <ClCompile Include="gameEngine\transition\TransitionManager.cpp" />
+    <ClCompile Include="gameEngine\time\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -292,6 +293,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorMove.h" />
     <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSetTrap.h" />
     <ClInclude Include="gameEngine\transition\TransitionManager.h" />
+    <ClInclude Include="gameEngine\time\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

@@ -12,6 +12,9 @@ void Framework::Run()
 			break;
 		}
 
+		// 時間管理
+		TimeManager::Instance().Tick();
+
 #ifdef USE_IMGUI
 		// ImGui開始
 		imGuiManager->Begin();

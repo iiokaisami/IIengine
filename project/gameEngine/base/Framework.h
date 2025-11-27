@@ -25,6 +25,7 @@
 #include "SrvManager.h"
 #include "Audio.h"
 #include "RenderTexture.h"
+#include "TimeManager.h"
 
 #include "postEffect/PostEffectManager.h"
 #include "postEffect/NoneEffectPass.h"

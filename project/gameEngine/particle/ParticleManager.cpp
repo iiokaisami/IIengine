@@ -9,6 +9,7 @@
 
 #include "Object3dCommon.h"
 #include "ModelManager.h"
+#include "TimeManager.h"
 
 ParticleManager* ParticleManager::instance_ = nullptr;
 
@@ -287,6 +288,9 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 void ParticleManager::Update()
 {
+	// TimeManagerからデルタタイムを取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+	
     camera_ = object3dCommon_->GetDefaultCamera();
 
     Matrix4x4 viewMatrix = camera_->GetViewMatrix();
@@ -314,13 +318,13 @@ void ParticleManager::Update()
             }
 
             // パーティクルの位置を更新
-            (*it).transform.translate += (*it).velocity * kDeltaTime_;
+            (*it).transform.translate += (*it).velocity * dt;
             // パーティクルの回転を更新
-            (*it).transform.rotate += (*it).angularVelocity * kDeltaTime_;
+            (*it).transform.rotate += (*it).angularVelocity * dt;
             // パーティクルのスケールを更新
-            (*it).transform.scale += (*it).scaleVelocity * kDeltaTime_;
+            (*it).transform.scale += (*it).scaleVelocity * dt;
             // パーティクルの寿命
-            (*it).currentTime += kDeltaTime_;
+            (*it).currentTime += dt;
             float alpha = 1.0f - ((*it).currentTime / (*it).lifeTime);
 
             // アルファ値をパーティクルの色に適用
