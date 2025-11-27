@@ -1,5 +1,9 @@
 #include "Player.h"
 
+#include <cmath>
+
+#include "TimeManager.h"
+
 void Player::Initialize()
 {
 	// --- 3Dオブジェクト ---
@@ -44,8 +48,6 @@ void Player::Initialize()
 	isDead_ = false;
 	isAutoControl_= false;
 
-	// パーティクル
-
 	// 環境マップ
 	cubeMapPath_ = "resources/images/studio.dds";
 	TextureManager::GetInstance()->LoadTexture(cubeMapPath_);
@@ -64,6 +66,11 @@ void Player::Initialize()
 	deathMotion_.wobbleFreq = 10.0f;
 	deathMotion_.popScale = 2.0f;
 
+	// フレームレート補正
+	moveSpeed_.x *= kDefaultFrameRate;
+	moveSpeed_.z *= kDefaultFrameRate;
+	evadeSpeed_.x *= kDefaultFrameRate;
+	evadeSpeed_.z *= kDefaultFrameRate;
 }
 
 void Player::Finalize()
@@ -177,6 +184,26 @@ void Player::Update()
 
 	// 暗闇処理
 	HitVignetteTrap();
+
+	// クールダウン系
+	if (countCoolDownFrame_ > 0)
+	{
+		countCoolDownFrame_--;
+	}
+	
+	// Evade 時間管理
+	if (isEvading_)
+	{
+		if (evadeFrame_ > 0)
+		{
+			evadeFrame_--;
+
+		}
+		else
+		{
+			isEvading_ = false;
+		}
+	}
 }
 
 void Player::Draw()
@@ -225,6 +252,9 @@ void Player::ImGuiDraw()
 
 void Player::Move()
 {
+	// scaled delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	moveVelocity_ = {};
 
 	// 画面上の見た目通りに移動（カメラ回転なし）
@@ -267,7 +297,7 @@ void Player::Move()
 	}
 
 	// 位置更新
-	position_ += moveVelocity_;
+	position_ += moveVelocity_ * dt;
 
 	// 移動制限
 	ClampPosition();
@@ -311,7 +341,10 @@ void Player::Attack()
 
 void Player::Evade()
 {
-	// 回避入力（左Shiftキー）
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// 回避入力
 	if (!isEvading_ && Input::GetInstance()->PushKey(DIK_LSHIFT))
 	{
 		// 移動方向がある場合のみ回避
@@ -338,7 +371,7 @@ void Player::Evade()
 	if (isEvading_)
 	{
 		// 回避移動
-		position_ += evadeDirection_ * kEvadeSpeed_;
+		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } *dt;
 
 		// 移動制限
 		ClampPosition();
@@ -374,7 +407,7 @@ void Player::DeadEffect()
 		t = std::clamp(t, 0.0f, 1.0f);
 
 		// 減衰付きサイン振動
-		float angular = static_cast<float>(frame) * deathMotion_.wobbleFreq * (2.0f * 3.14159265f / 60.0f);
+		float angular = static_cast<float>(frame) * deathMotion_.wobbleFreq * (2.0f * 3.14159265f / kDefaultFrameRate);
 		float decay = 1.0f - t; // だんだん振幅を減らす
 		float wobble = std::sin(angular) * deathMotion_.wobbleAmplitude * decay;
 
@@ -440,9 +473,6 @@ void Player::StartDeathMotion()
 	deathMotion_.startRotation = rotation_;
 	deathMotion_.startScale = scale_;
 
-	// 即時に少し大きく見せたい場合は startScale を調整しておく
-	// deathMotion_.startScale = scale_;
-
 	// 反映
 	if (object_)
 	{
@@ -457,7 +487,9 @@ void Player::ClearSceneUpdate()
 {
 	isCanMove_ = false;
 
-	using clock = std::chrono::steady_clock;
+	// unscaled delta
+	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
+
 	constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
 
 	// 調整用パラメータ
@@ -467,39 +499,19 @@ void Player::ClearSceneUpdate()
 	static float currentAngle = 0.2f;        // 現在角度（初期オフセット含む）
 	static bool clockwise = false;           // 回転方向
 
-	// ポヨポヨ（XZとYを別々に制御）
-	static float poyoAmp = 0.2f;            // 横(X)振幅
-	static float poyoAmpZ = 0.2f;           // 縦(Z)振幅（独立）
-	static float poyoAmpY = 0.2f;           // 高さ(Y)振幅（独立）
-	static float poyoFreq = 1.2f;            // 周波数 (Hz) （X/Z の基本周波数）
-	static float poyoFreqY = 1.2f;           // Y の周波数 (Hz)
-	static float poyoPhase = 0.0f;           // 位相（X/Z）
-	static float poyoPhaseY = 0.0f;          // 位相（Y）
-	static bool maintainArea = false;        // true -> sx * sz ≈ 1 に保つ（XZ面積維持）
-	static bool maintainVolume = false;     // true -> sx * sy * sz ≈ 1 に保つ（3D体積維持）
-
-	// 基本スケール
+	// other poyo params...
+	static float poyoAmp = 0.2f;
+	static float poyoAmpZ = 0.2f;
+	static float poyoAmpY = 0.2f;
+	static float poyoFreq = 1.2f;
+	static float poyoFreqY = 1.2f;
+	static float poyoPhase = 0.0f;
+	static float poyoPhaseY = 0.0f;
+	static bool maintainArea = false;
+	static bool maintainVolume = false;
 	static Vector3 baseScale{ 1.0f, 1.0f, 1.0f };
 
-
-	// 時刻
-	static clock::time_point lastTime = clock::now();
-	static bool initialized = false;
 	static float totalTime = 0.0f;
-
-	auto now = clock::now();
-	float dt = 1.0f / 60.0f;
-	if (!initialized)
-	{
-		lastTime = now;
-		initialized = true;
-	} else
-	{
-		std::chrono::duration<float> elapsed = now - lastTime;
-		dt = elapsed.count();
-		if (dt > 0.1f) dt = 0.1f; // ウィンドウ復帰などで大きくなりすぎないようにする
-		lastTime = now;
-	}
 	totalTime += dt;
 
 	// 角度更新
@@ -522,7 +534,8 @@ void Player::ClearSceneUpdate()
 	if (std::abs(velX) < 1e-6f && std::abs(velZ) < 1e-6f)
 	{
 		// 速度がほぼ0なら角度は更新しない
-	} else
+	} 
+	else
 	{
 		// atan2(x,z) を使って yaw を得る（プロジェクト内の回転軸と合わせてください）
 		lastYaw = std::atan2(velX, velZ);
@@ -543,7 +556,8 @@ void Player::ClearSceneUpdate()
 		// 面積維持（XZ面）
 		sz = 1.0f / sx;
 		sz = std::clamp(sz, 0.05f, 5.0f);
-	} else
+	} 
+	else
 	{
 		sz = 1.0f + poyoAmpZ * std::sin(omegaXZ * totalTime + poyoPhase + 3.14159265f / 2.0f);
 		sz = std::clamp(sz, 0.05f, 5.0f);
@@ -559,7 +573,8 @@ void Player::ClearSceneUpdate()
 		float sy_rel = 1.0f / (sx_rel * sz_rel);
 		sy_rel = std::clamp(sy_rel, 0.05f, 5.0f);
 		sy = baseScale.y * sy_rel;
-	} else
+	} 
+	else
 	{
 		// Yは独立して振動させる
 		float omegaY = 2.0f * 3.14159265358979323846f * poyoFreqY;
@@ -586,6 +601,8 @@ void Player::ClearSceneUpdate()
 
 void Player::AutoMove()
 {
+	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
+
 	static int moveTimer = 0;
 	static Vector3 autoDir = { 0.0f, 0.0f, 1.0f }; // 初期は前進
 
@@ -641,7 +658,7 @@ void Player::AutoMove()
 	}
 
 	// 位置更新
-	position_ += moveVelocity_;
+	position_ += moveVelocity_ * dt;
 
 	// 移動制限
 	ClampPosition();
