@@ -9,6 +9,8 @@
 #include "behaviorState/normalEnemyState/EnemyBehaviorHitReact.h"
 #include "behaviorState/normalEnemyState/EnemyBehaviorDead.h"
 
+#include "TimeManager.h"
+
 void NormalEnemy::Initialize()
 {
     // --- 3Dオブジェクト ---
@@ -23,7 +25,8 @@ void NormalEnemy::Initialize()
     scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
     // ライト設定
-    object_->SetDirectionalLightEnable(true);
+    //object_->SetDirectionalLightEnable(true);
+    object_->SetLighting(true);
 
     colliderManager_ = ColliderManager::GetInstance();
 
@@ -184,9 +187,11 @@ void NormalEnemy::ImGuiDraw()
 void NormalEnemy::Move()
 {
 
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
     if (isFarFromPlayer_)
     {
-        // プレイヤーとの距離が一定以下の場合、追尾を停止(0にすると色々まずかった)
+        // プレイヤーとの距離が一定以下の場合、追尾を停止(0にするとまずかった)
         moveVelocity_ = { 0.000001f, 0.0f, 0.0f };        
         return;
     }
@@ -210,7 +215,7 @@ void NormalEnemy::Move()
         moveVelocity_ /= 20.0f;
 
         moveVelocity_.y = 0.0f;
-        position_ += moveVelocity_;
+        position_ += moveVelocity_ * (dt * kDefaultFrameRate);
 
 		SetPosition(position_);
 		SetRotation(rotation_);

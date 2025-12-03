@@ -111,13 +111,6 @@ void TitleScene::Update()
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
-
-	// ライトの設定
-	SetLightSettings();
-
-	// ロゴ
-	LogoPosition();
-
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
 
@@ -332,44 +325,3 @@ void TitleScene::CameraFollow()
 
 }
 
-void TitleScene::SetLightSettings()
-{
-	/*if (enableEnvironment)
-	{
-		object3ds[0]->SetEnvironmentMapHandle(cubeHandle_, true);
-		object3ds[0]->SetEnvironmentStrength(environmentStrength_);
-	}
-	
-
-	for (auto& obj : object3ds)
-	{
-		obj->SetLighting(enableLighting);
-		obj->SetDirectionalLightEnable(enableDirectionalLight);
-		obj->SetDirectionalLightColor({ directionalLightColor.x, directionalLightColor.y, directionalLightColor.z, 1.0f });
-		obj->SetDirectionalLightDirection(directionalLightDirection);
-		obj->SetDirectionalLightIntensity(directionalLightIntensity);
-
-		obj->SetPointLightEnable(enablePointLight);
-		obj->SetPointLightColor({ pointLightColor.x, pointLightColor.y, pointLightColor.z, 1.0f });
-		obj->SetPointLightPosition(pointLightPosition);
-		obj->SetPointLightIntensity(pointLightIntensity);
-		obj->SetPointLightRadius(pointLightRadius);
-		obj->SetPointLightDecay(pointLightDecay);
-
-		obj->SetSpotLightEnable(enableSpotLight);
-		obj->SetSpotLightColor({ spotLightColor.x, spotLightColor.y, spotLightColor.z, 1.0f });
-		obj->SetSpotLightPosition(spotLightPosition);
-		obj->SetSpotLightDirection(spotLightDirection);
-		obj->SetSpotLightIntensity(spotLightIntensity);
-		obj->SetSpotLightDistance(spotLightDistance);
-		obj->SetSpotLightDecay(spotLightDecay);
-		obj->SetSpotLightConsAngle(spotLightConsAngle);
-		obj->SetSpotLightCosFalloffStart(spotLightCosFalloffStart);
-
-	}*/
-}
-
-void TitleScene::LogoPosition()
-{
-	
-}

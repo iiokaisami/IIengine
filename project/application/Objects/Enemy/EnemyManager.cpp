@@ -3,6 +3,8 @@
 #include "waveState/EnemyWaveStage1.h"
 #include "waveState/EnemyWaveStage2.h"
 
+#include "TimeManager.h"
+
 void EnemyManager::Initialize()
 {
 	// エディタ読み込み
@@ -34,6 +36,11 @@ void EnemyManager::Finalize()
 
 void EnemyManager::Update()
 {
+	// デルタタイム取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+	// アップデートするフレーム数計算
+	const int framesThisUpdate = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
+
 	// ノーマルエネミーの更新
 	for (auto& enemy : pNormalEnemies_)
 	{
@@ -133,7 +140,7 @@ void EnemyManager::Update()
 		if (waveChangeInterval_ > 0)
 		{
 			isWaveChange_ = false;
-			waveChangeInterval_--;
+			waveChangeInterval_ = std::max(0, waveChangeInterval_ - framesThisUpdate);
 		} 
 		else
 		{

@@ -21,6 +21,10 @@ void ClearScene::Initialize()
 	pPlayer_ = std::make_unique<Player>();
 	pPlayer_->Initialize();
 
+	// フィールド
+	pField_ = std::make_unique<Field>();
+	pField_->Initialize();
+
 	// スプライト
 	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
@@ -52,6 +56,7 @@ void ClearScene::Initialize()
 void ClearScene::Finalize()
 {
 	pPlayer_->Finalize();
+	pField_->Finalize();
 
 	for (Sprite* sprite : sprites)
 	{
@@ -87,10 +92,13 @@ void ClearScene::Update()
 	{
 		sprite->Update();
 
-	}
+	}\
 
 	// プレイヤー更新
 	pPlayer_->ClearSceneUpdate();
+
+	// フィールド更新
+	pField_->Update();
 
 	// パーティクル
 	ParticleEmitter::Emit("goal", particlePosition_, 1);
@@ -146,6 +154,9 @@ void ClearScene::Draw()
 
 	// プレイヤー描画
 	pPlayer_->Draw();
+
+	// フィールド描画
+	pField_->Draw();
 
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();

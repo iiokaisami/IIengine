@@ -15,7 +15,7 @@ public:
 
 	VignetteTrap() = default;
 	~VignetteTrap() = default;
-	
+
 	// 初期化
 	void Initialize() override;
 	
@@ -30,7 +30,7 @@ public:
 	
 	// ImGui
 	void ImGuiDraw();
-	
+
 	// モデル更新
 	void UpdateModel();
 
@@ -70,6 +70,9 @@ public: // セッター
 	void SetTrapLandingPosition(const Vector3& _playerPosition);
 
 private:
+
+	// デフォルトのフレームレート
+	const float kDefaultFrameRate = 60.0f;
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;

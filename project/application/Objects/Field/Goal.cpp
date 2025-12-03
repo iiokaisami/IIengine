@@ -11,7 +11,8 @@ void Goal::Initialize()
 	scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
 	// ライト設定
-	object_->SetDirectionalLightEnable(true);
+	//object_->SetDirectionalLightEnable(true);
+	object_->SetLighting(true);
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();

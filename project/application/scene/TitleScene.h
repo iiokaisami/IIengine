@@ -36,6 +36,8 @@ public:
 	// 描画
 	void Draw() override;
 
+private: // 内部処理
+
 	// カメラ更新
 	void CameraUpdate();
 
@@ -45,11 +47,6 @@ public:
 	// カメラ追尾
 	void CameraFollow();
 
-	// ライトの設定
-	void SetLightSettings();
-
-	// ロゴ位置
-	void LogoPosition();
 
 private:
 

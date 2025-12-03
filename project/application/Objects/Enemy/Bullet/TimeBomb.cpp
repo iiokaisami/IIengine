@@ -2,6 +2,8 @@
 
 #include <numbers>
 
+#include "TimeManager.h"
+
 void TimeBomb::Initialize()
 {
 	// --- 3Dオブジェクト ---
@@ -13,8 +15,9 @@ void TimeBomb::Initialize()
 	scale_ = { 0.7f, 0.7f, 0.7f };
 	object_->SetScale(scale_);
 	// ライト設定
-	object_->SetDirectionalLightEnable(true);
-	
+	//object_->SetDirectionalLightEnable(true);
+	object_->SetLighting(true);
+
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
 	
@@ -59,6 +62,9 @@ void TimeBomb::Finalize()
 
 void TimeBomb::Update()
 {
+	// デルタタイム取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	// 着弾していなければ判定を付けない
 	isActive_ = !isLaunchingTrap_;
 
@@ -67,14 +73,12 @@ void TimeBomb::Update()
 	{
 		// 重力加速度
 		const float gravity = -9.8f;
-		// 1フレームの時間（例: 1/60秒）
-		const float deltaTime = 1.0f / 60.0f;
 
 		// 速度に重力を加算
-		velocity_.y += gravity * deltaTime;
+		velocity_.y += gravity * dt;
 
 		// 位置を速度で更新
-		position_ += velocity_ * deltaTime;
+		position_ += velocity_ * dt;
 	}
 
 	if ((position_ - landingPosition_).Length() < 0.1f or position_.y <= 0.5f)
@@ -94,7 +98,15 @@ void TimeBomb::Update()
 	// 壁との反射クールタイム
 	if (wallCollisionCooldown_ > 0)
 	{
-		wallCollisionCooldown_--;
+		// フレーム数に変換
+		int framesToDecrement = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
+
+		// クールタイムをデクリメント
+		if (wallCollisionCooldown_ > 0)
+		{
+			if (framesToDecrement >= static_cast<int>(wallCollisionCooldown_)) wallCollisionCooldown_ = 0;
+			else wallCollisionCooldown_ -= framesToDecrement;
+		}
 	}
 
 	if (wallCollisionCooldown_ <= 0 && isWallCollision_)
@@ -107,7 +119,7 @@ void TimeBomb::Update()
 
 	UpdateModel();
 	
-	rotation_ += {0.1f, 0.1f, 0.0f};
+	rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
 	
 	// 設置判定の更新
 	setAABB_.min = position_ - object_->GetScale();
@@ -213,9 +225,11 @@ void TimeBomb::Explode()
 	// 爆発処理
 	if (isExploded_)
 	{
+		// デルタタイム取得
+		const float dt = TimeManager::Instance().GetDeltaTime();
 
 		// scaleを徐々に大きくして判定を広げる
-		elapsedTime += 1.0f/60.0f;
+		elapsedTime += dt;
 
 		// 経過割合（0.0〜1.0）
 		float t = std::clamp(elapsedTime / duration, 0.0f, 1.0f);

@@ -1,4 +1,5 @@
 #include "PlayerBullet.h"
+#include "TimeManager.h"
 
 void PlayerBullet::Initialize()
 {
@@ -11,7 +12,8 @@ void PlayerBullet::Initialize()
 	scale_ = { 0.5f,0.5f,0.5f };
 	object_->SetScale(scale_);
 	// ライト設定
-	object_->SetDirectionalLightEnable(true);
+	//object_->SetDirectionalLightEnable(true);
+	object_->SetLighting(true);
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -41,14 +43,16 @@ void PlayerBullet::Finalize()
 
 void PlayerBullet::Update()
 {
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	object_->Update();
 
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
 	object_->SetScale(scale_);
 
-	rotation_.y += 1.0f;
-	position_ += velocity_;
+	rotation_.y += 1.0f * dt * PlayerBullet::kDefaultFrameRate;
+	position_ += velocity_ * dt;
 
 	aabb_.min = position_ - object_->GetScale();
 	aabb_.max = position_ + object_->GetScale();
@@ -58,7 +62,8 @@ void PlayerBullet::Update()
 	ParticleEmitter::Emit("slash", position_, 1);
 
 	//時間経過でデス
-	if (--deathTimer_ <= 0)
+	deathRemainingSeconds_ -= dt;
+	if (deathRemainingSeconds_ <= 0.0f)
 	{
 		isDead_ = true;
 	}

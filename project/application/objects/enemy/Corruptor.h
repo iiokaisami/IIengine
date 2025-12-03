@@ -45,14 +45,6 @@ public:
 	/// </summary>
 	/// <param name="_pState">新しいステートのポインタ</param>
 	void ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState> _pState);
-	
-	/// <summary>
-	/// objectのtransformをセット
-	/// </summary>
-	/// <param name="_position">位置</param>
-	/// <param name="_rotation">回転</param>
-	/// <param name="_scale">スケール</param>
-	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
 
 private: // 衝突判定
 
@@ -103,6 +95,16 @@ public: // セッター
 	/// <param name="_isExploded">爆発フラグ</param>
 	void SetIsExploded(bool _isExploded) { isExploded_ = _isExploded; }
 
+	/// <summary>
+	/// objectのtransformをセット
+	/// </summary>
+	/// <param name="_position">位置</param>
+	/// <param name="_rotation">回転</param>
+	/// <param name="_scale">スケール</param>
+	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
+
+	/// 以下1つづつセット ///
+
 	// オブジェクトのpositionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
 	// オブジェクトのrotationをセット
@@ -111,6 +113,9 @@ public: // セッター
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
 private:
+
+	// デフォルトフレームレート
+	static constexpr float kDefaultFrameRate = 60.0f;
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;

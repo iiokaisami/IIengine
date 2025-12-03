@@ -2,6 +2,8 @@
 
 #include <numbers>
 
+#include "TimeManager.h"
+
 void VignetteTrap::Initialize()
 {
 	// --- 3Dオブジェクト ---
@@ -13,7 +15,8 @@ void VignetteTrap::Initialize()
 	scale_ = { 0.7f,0.7f,0.7f };
 	object_->SetScale(scale_);
 	// ライト設定
-	object_->SetDirectionalLightEnable(true);
+	//object_->SetDirectionalLightEnable(true);
+	object_->SetLighting(true);
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -41,6 +44,9 @@ void VignetteTrap::Finalize()
 
 void VignetteTrap::Update()
 {
+	// デルタイム取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	// 着弾していなければ判定を付けない
 	isActive_ = !isLaunchingTrap_;
 
@@ -49,14 +55,11 @@ void VignetteTrap::Update()
 	{
 		// 重力加速度
 		const float gravity = -9.8f;
-		// 1フレームの時間
-		const float deltaTime = 1.0f / 60.0f;
 
 		// 速度に重力を加算
-		velocity_.y += gravity * deltaTime;
-
+		velocity_.y += gravity * dt;
 		// 位置を速度で更新
-		position_ += velocity_ * deltaTime;
+		position_ += velocity_ * dt;
 	}
 	else
 	{
@@ -77,7 +80,16 @@ void VignetteTrap::Update()
 	// 壁との反射クールタイム
 	if (wallCollisionCooldown_ > 0)
 	{
-		wallCollisionCooldown_--;
+		int framesToDecrement = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
+
+		if (framesToDecrement >= static_cast<int>(wallCollisionCooldown_))
+		{
+			wallCollisionCooldown_ = 0;
+		}
+		else
+		{
+			wallCollisionCooldown_ -= framesToDecrement;
+		}
 	}
 
 	if (wallCollisionCooldown_ <= 0 && isWallCollision_)
@@ -90,7 +102,7 @@ void VignetteTrap::Update()
 
 	UpdateModel();
 
-	rotation_ += {0.1f, 0.1f, 0.0f};
+	rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
 
 	aabb_.min = position_ - object_->GetScale();
 	aabb_.max = position_ + object_->GetScale();

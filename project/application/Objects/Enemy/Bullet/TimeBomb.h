@@ -83,6 +83,9 @@ public: // セッター
 
 private:
 
+	// デフォルトのフレームレート
+	const float kDefaultFrameRate = 60.0f;
+
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
 

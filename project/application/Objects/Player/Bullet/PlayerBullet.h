@@ -49,7 +49,11 @@ public: // ゲッター
 	/// 速度取得
 	/// </summary>
 	/// <returns>速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3 _velocity) { return velocity_ = _velocity; }
+	Vector3 SetVelocity(const Vector3 _velocity)
+	{
+		velocity_ = _velocity * kDefaultFrameRate; 
+		return velocity_; 
+	}
 
 public: // セッター
 
@@ -59,6 +63,8 @@ public: // セッター
 	void RunSetMask();
 
 private: // メンバ変数
+
+	static constexpr float kDefaultFrameRate = 60.0f;
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
@@ -76,6 +82,6 @@ private: // メンバ変数
 	static const int32_t kLifeTime = 60 * 5;
 
 	//デスタイマー
-	int32_t deathTimer_ = kLifeTime;
-
+	//int32_t deathTimer_ = kLifeTime;
+	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 };

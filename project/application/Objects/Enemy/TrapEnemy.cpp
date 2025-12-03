@@ -7,6 +7,7 @@
 #include "behaviorState/trapEnemyState/TrapEnemyBehaviorHitReact.h"
 #include "behaviorState/trapEnemyState/TrapEnemyBehaviorDead.h"
 
+#include "TimeManager.h"
 
 void TrapEnemy::Initialize()
 {
@@ -21,7 +22,8 @@ void TrapEnemy::Initialize()
     scale_ = { 1.0f,1.0f,1.0f };
     object_->SetScale(scale_);
     // ライト設定
-    object_->SetDirectionalLightEnable(true);
+    //object_->SetDirectionalLightEnable(true);
+    object_->SetLighting(true);
 
     colliderManager_ = ColliderManager::GetInstance();
 
@@ -220,6 +222,9 @@ void TrapEnemy::ImGuiDraw()
 
 void TrapEnemy::Move()
 {
+	// デルタタイム取得
+    const float dt = TimeManager::Instance().GetDeltaTime();
+
     toPlayer_ = playerPosition_ - position_;
     Vector3 direction = Normalize(toPlayer_);
     moveVelocity_ = Normalize(moveVelocity_);
@@ -248,7 +253,7 @@ void TrapEnemy::Move()
 
     moveVelocity_ /= 30.0f;
     moveVelocity_.y = 0.0f;
-    position_ += moveVelocity_;
+    position_ += moveVelocity_ * (dt * kDefaultFrameRate);
 
     ObjectTransformSet(position_, rotation_, scale_);
 

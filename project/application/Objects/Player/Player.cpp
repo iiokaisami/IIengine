@@ -19,7 +19,7 @@ void Player::Initialize()
 
 
 	// ライト設定
-	object_->SetDirectionalLightEnable(true);
+	object_->SetLighting(true);
 
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -252,7 +252,7 @@ void Player::ImGuiDraw()
 
 void Player::Move()
 {
-	// scaled delta
+	// delta
 	const float dt = TimeManager::Instance().GetDeltaTime();
 
 	moveVelocity_ = {};
@@ -308,6 +308,24 @@ void Player::Move()
 
 void Player::Attack()
 {
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// ローカル持続クールダウン
+	static float shootCooldownSec = 0.0f;
+	// 既存のフレームベース定数を秒に変換して利用
+	const float shootCooldownDuration = static_cast<float>(kShootCoolDownFrame_) / kDefaultFrameRate;
+
+	// クールダウンを進める
+	if (shootCooldownSec > 0.0f)
+	{
+		shootCooldownSec -= dt;
+		if (shootCooldownSec < 0.0f)
+		{
+			shootCooldownSec = 0.0f;
+		}
+	}
+
 	if (Input::GetInstance()->PushKey(DIK_SPACE))
 	{
 		// プレイヤーの向きに合わせて弾の速度を変更
@@ -318,7 +336,7 @@ void Player::Attack()
 			std::cosf(rotation_.x) * std::cosf(rotation_.y)      // z
 		};
 
-		if (countCoolDownFrame_ <= 0)
+		if (shootCooldownSec <= 0)
 		{
 			// 弾を生成し、初期化
 			PlayerBullet* newBullet = new PlayerBullet();
@@ -333,10 +351,9 @@ void Player::Attack()
 			// 弾を登録する
 			pBullets_.push_back(newBullet);
 
-			countCoolDownFrame_ = kShootCoolDownFrame_;
+			shootCooldownSec = shootCooldownDuration;
 		}
 	}
-	countCoolDownFrame_--;
 }
 
 void Player::Evade()
@@ -371,14 +388,14 @@ void Player::Evade()
 	if (isEvading_)
 	{
 		// 回避移動
-		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } *dt;
+		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } * dt;
 
 		// 移動制限
 		ClampPosition();
 
 		// 回避中のx軸回転（線形補間で速めに回す）
 		float t = 1.0f - static_cast<float>(evadeFrame_) / static_cast<float>(kEvadeDuration_);
-		rotation_.x = evadeStartRotationX_ + (evadeTargetRotationX_ - evadeStartRotationX_) * t;
+		rotation_.x = evadeStartRotationX_ + (evadeTargetRotationX_ - evadeStartRotationX_) * t * dt * kDefaultFrameRate;
 
 		evadeFrame_--;
 		if (evadeFrame_ <= 0)
@@ -775,6 +792,9 @@ void Player::OnCollision(const Collider* _other)
 
 void Player::HitVignetteTrap()
 {
+	// デルタタイム
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	// フェードアウト中の処理
 	if (isFadingOut_)
 	{
@@ -782,7 +802,7 @@ void Player::HitVignetteTrap()
 		static float fadeTimer = 0.0f;
 
 		fadeTimer++;
-		float t = fadeTimer / fadeDuration;
+		float t = (fadeTimer / fadeDuration) * dt * kDefaultFrameRate;
 		t = std::clamp(t, 0.0f, 1.0f);
 		vignetteStrength_ = std::lerp(1.8f, 0.0f, t);
 
@@ -811,7 +831,7 @@ void Player::HitVignetteTrap()
 		if (vignetteTime_ > 150)
 		{
 			// フェードイン
-			float t = 1.0f - static_cast<float>(kMaxVignetteTime - vignetteTime_) / 30.0f;
+			float t = (1.0f - static_cast<float>(kMaxVignetteTime - vignetteTime_) / 30.0f) * dt * kDefaultFrameRate;
 			t = std::clamp(t, 0.0f, 1.0f);
 			vignetteStrength_ = std::lerp(1.8f, 0.0f, t);
 		}

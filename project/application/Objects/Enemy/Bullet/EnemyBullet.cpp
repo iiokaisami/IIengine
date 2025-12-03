@@ -1,4 +1,5 @@
 #include "EnemyBullet.h"
+#include "TimeManager.h"
 
 void EnemyBullet::Initialize()
 {
@@ -10,6 +11,8 @@ void EnemyBullet::Initialize()
 	object_->SetRotate(rotation_);
 	scale_ = { 0.7f,0.7f,0.7f };
 	object_->SetScale(scale_);
+
+	object_->SetLighting(true);
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -37,23 +40,25 @@ void EnemyBullet::Finalize()
 
 void EnemyBullet::Update()
 {
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	UpdateModel();
 
-	rotation_ += {0.1f, 0.1f, 0.0f};
-	position_ += velocity_;
+	rotation_ += { 0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f };
+	position_ += velocity_ * dt;
 
 	aabb_.min = position_ - object_->GetScale();
 	aabb_.max = position_ + object_->GetScale();
 	collider_.SetPosition(position_);
 
 	// 残り寿命に応じてスケールを小さくする
-	float t = static_cast<float>(deathTimer_) / static_cast<float>(kLifeTime);
-	t = std::clamp(t, 0.0f, 1.0f);
-	scale_ = { 0.7f * t, 0.7f * t, 0.7f * t };
+	float lifeRatio = std::clamp(deathRemainingSeconds_ / (kLifeTime / kDefaultFrameRate), 0.0f, 1.0f);
+	scale_ = { 0.7f * lifeRatio, 0.7f * lifeRatio, 0.7f * lifeRatio };
 
 
 	//時間経過でデス
-	if (--deathTimer_ <= 0) 
+	deathRemainingSeconds_ -= dt;
+	if (deathRemainingSeconds_ <= 0.0f)
 	{
 		isDead_ = true;
 	}

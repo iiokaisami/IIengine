@@ -12,7 +12,8 @@ void Wall::Initialize()
 	object_->SetScale(scale_);
 	
 	// ライト設定
-	object_->SetDirectionalLightEnable(true);
+	//object_->SetDirectionalLightEnable(true);
+	object_->SetLighting(true);
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();

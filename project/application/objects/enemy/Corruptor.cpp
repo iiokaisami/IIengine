@@ -5,6 +5,8 @@
 #include "behaviorState/corruptorState/CorruptorBehaviorMove.h"
 #include "behaviorState/corruptorState/CorruptorBehaviorSelfDestruct.h"
 
+#include "TimeManager.h"
+
 void Corruptor::Initialize()
 {
 	// 3Dオブジェクト生成
@@ -17,7 +19,8 @@ void Corruptor::Initialize()
 	scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
 	// ライト設定
-	object_->SetDirectionalLightEnable(true);
+	//object_->SetDirectionalLightEnable(true);
+	object_->SetLighting(true);
 
 	// コライダー設定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -57,6 +60,9 @@ void Corruptor::Finalize()
 
 void Corruptor::Update()
 {
+	// デルタタイム取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	// アクティブフラグ
 	isActive_ = !isInvincible_;
 
@@ -80,7 +86,7 @@ void Corruptor::Update()
 	if (isExploded_)
 	{
 		// 爆発後に少しだけスケールを大きくする
-		scale_ += Vector3(0.1f, 0.1f, 0.1f);
+		scale_ += Vector3(0.1f, 0.1f, 0.1f) * dt * kDefaultFrameRate;
 	}
 
 }
@@ -114,6 +120,9 @@ void Corruptor::ImGuiDraw()
 
 void Corruptor::Move()
 {
+	// デルタタイム取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	// プレイヤー方向ベクトル計算
 	toPlayer_ = playerPosition_ - position_;
 	Vector3 direction = Normalize(toPlayer_);
@@ -128,7 +137,7 @@ void Corruptor::Move()
 
 	moveVelocity_ /= 7.0f;
 	moveVelocity_.y = 0.0f;
-	position_ += moveVelocity_;
+	position_ += moveVelocity_ * dt * kDefaultFrameRate;
 
 	ObjectTransformSet(position_, rotation_, scale_);
 

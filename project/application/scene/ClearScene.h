@@ -11,6 +11,7 @@
 #include "../../gameEngine/transition/BlockRiseTransition.h"
 #include "../../gameEngine/particle/ParticleEmitter.h"
 #include "../objects/player/Player.h"
+#include "../objects/field/Field.h"
 
 /// <summary>
 /// クリアシーン
@@ -51,8 +52,11 @@ private:
 	// プレイヤー
 	std::unique_ptr<Player> pPlayer_ = nullptr;
 
+	// フィールド
+	std::unique_ptr<Field> pField_ = nullptr;
+
 	// パーティクル位置
-	Vector3 particlePosition_ = { 0.0f,-3.5f,-3.5f };
+	Vector3 particlePosition_ = { 0.0f,0.0f,-3.5f };
 	Vector3 petalPosition_ = { 0.0f,12.0f,-18.0f };
 
 };

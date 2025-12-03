@@ -39,18 +39,6 @@ public:
 	// ImGui
 	void ImGuiDraw();
 	
-	// 移動
-	void Move();
-	
-	// 攻撃
-	void Attack();
-
-	// 回避
-	void Evade();
-
-	// 死亡演出
-	void DeadEffect();
-
 	/// <summary>
 	/// デスモーション開始
 	/// 外部から呼び出す用
@@ -62,7 +50,19 @@ public:
 	/// </summary>
 	void ClearSceneUpdate();
 
-private:
+private: // 内部処理
+
+	// 移動
+	void Move();
+	
+	// 攻撃
+	void Attack();
+
+	// 回避
+	void Evade();
+
+	// 死亡演出
+	void DeadEffect();
 
 	// オート移動
 	void AutoMove();
