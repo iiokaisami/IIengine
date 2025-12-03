@@ -13,7 +13,6 @@ class SpriteCommon
 {
 #pragma region シングルトンインスタンス
 private:
-	static SpriteCommon* instance;
 
 	SpriteCommon() = default;
 	~SpriteCommon() = default;

@@ -5,22 +5,13 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 
-
-Input* Input::instance = nullptr;
-
 Input* Input::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new Input;
-	}
-	return instance;
+	static Input instance;
+	return &instance;
 }
 
-void Input::Finalize()
-{
-	delete instance;
-	instance = nullptr;
-}
+void Input::Finalize(){}
 
 void Input::Initialize(WinApp* winApp)
 {

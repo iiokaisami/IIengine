@@ -42,14 +42,14 @@ void TitleScene::Initialize()
 	// --- 2Dスプライト ---
 	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
-		Sprite* sprite = new Sprite();
+		auto sprite = std::make_unique<Sprite>();
 
 		if (i == 0)
 		{
 			
 			sprite->Initialize("titleUI.png", { 0,0 }, color_, { 0,0 });
 		}
-		sprites.push_back(sprite);
+		sprites_.push_back(std::move(sprite));
 
 	}
 
@@ -78,12 +78,6 @@ void TitleScene::Finalize()
 	pPlayer_->Finalize();
 	pEnemyManager_->Finalize();
 	pField_->Finalize();
-
-	for (Sprite* sprite : sprites)
-	{
-		delete sprite;
-	}
-	sprites.clear();
 
 	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData_);
 	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData2_);
@@ -129,7 +123,7 @@ void TitleScene::Update()
 	pField_->Update();
 
 
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Update();
 
@@ -243,7 +237,7 @@ void TitleScene::Draw()
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();
 
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Draw();
 	}

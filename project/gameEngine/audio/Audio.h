@@ -36,7 +36,6 @@ class Audio
 {
 #pragma region シングルトンインスタンス
 private:
-	static Audio* instance;
 
 	Audio() = default;
 	~Audio() = default;

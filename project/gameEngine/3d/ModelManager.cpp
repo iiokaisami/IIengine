@@ -5,21 +5,13 @@
 #include "DirectXCommon.h"
 #include "ModelCommon.h"
 
-ModelManager* ModelManager::instance = nullptr;
-
 ModelManager* ModelManager::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new ModelManager;
-	}
-	return instance;
+	static ModelManager instance;
+	return &instance;
 }
 
-void ModelManager::Finalize()
-{
-	delete instance;
-	instance = nullptr;
-}
+void ModelManager::Finalize(){}
 
 void ModelManager::Initialize(DirectXCommon* dxCommon)
 {

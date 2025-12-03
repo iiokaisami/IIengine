@@ -67,9 +67,6 @@ public:
 
 private:
 
-    // インスタンス
-	static PostEffectManager* instance_;
-
     std::unordered_map<std::string, std::unique_ptr<IPostEffectPass>> passes_;
 
     std::unique_ptr<IPostEffectPass> noneEffect_;

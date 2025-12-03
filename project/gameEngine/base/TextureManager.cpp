@@ -3,24 +3,15 @@
 #include <cassert>
 #include <d3d12.h>
 
-TextureManager* TextureManager::instance = nullptr;
-
 uint32_t TextureManager::kSRVIndexTop = 1;
 
 TextureManager* TextureManager::GetInstance()
 {
-	if (instance == nullptr)
-	{
-		instance = new TextureManager;
-	}
-	return instance;
+	static TextureManager instance;
+	return &instance;
 }
 
-void TextureManager::Finalize()
-{
-	delete instance;
-	instance = nullptr;
-}
+void TextureManager::Finalize(){}
 
 void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager)
 {

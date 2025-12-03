@@ -61,7 +61,7 @@ private:
 	bool isTransitioning_ = false;
 
 	// 2Dスプライト
-	std::vector<Sprite*>sprites = {};
+	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 1;
 

@@ -81,17 +81,19 @@ void Player::Finalize()
 		bullet->Finalize();
 	}
 
-	pBullets_.remove_if([](PlayerBullet* bullet)
-		{
-			if (bullet->IsDead())
+	pBullets_.erase(
+		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
 			{
-				ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
-				bullet->Finalize();
-				delete bullet;
-				return true;
-			}
-			return false;
-		});
+				if (bullet->IsDead())
+				{
+					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
+					bullet->Finalize();
+					return true;
+				}
+				return false;
+			}),
+		pBullets_.end()
+	);
 
 	colliderManager_->DeleteCollider(&collider_);
 }
@@ -158,17 +160,19 @@ void Player::Update()
 	}
 
 	// 弾の削除
-	pBullets_.remove_if([](PlayerBullet* bullet)
-		{
-			if (bullet->IsDead())
+	pBullets_.erase(
+		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
 			{
-				ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
-				bullet->Finalize();
-				delete bullet;
-				return true;
-			}
-		return false;
-		});
+				if (bullet->IsDead())
+				{
+					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
+					bullet->Finalize();
+					return true;
+				}
+				return false;
+			}),
+		pBullets_.end()
+	);
 
 	// 弾更新
 	for (auto& bullet : pBullets_)
@@ -339,7 +343,7 @@ void Player::Attack()
 		if (shootCooldownSec <= 0)
 		{
 			// 弾を生成し、初期化
-			PlayerBullet* newBullet = new PlayerBullet();
+			auto newBullet = std::make_unique<PlayerBullet>();
 
 			newBullet->SetPosition(position_);
 			newBullet->Initialize();
@@ -349,7 +353,7 @@ void Player::Attack()
 			collider_.SetMask(colliderManager_->GetNewMask(collider_.GetColliderID(), "PlayerBullet"));
 
 			// 弾を登録する
-			pBullets_.push_back(newBullet);
+			pBullets_.push_back(std::move(newBullet));
 
 			shootCooldownSec = shootCooldownDuration;
 		}
@@ -699,14 +703,14 @@ void Player::AutoAttack()
 			std::cosf(rotation_.x) * std::cosf(rotation_.y)      // z
 		};
 		// 弾を生成し、初期化
-		PlayerBullet* newBullet = new PlayerBullet();
+		auto newBullet = std::make_unique<PlayerBullet>();
 		newBullet->SetPosition(position_);
 		newBullet->Initialize();
 		newBullet->SetVelocity(bulletVelocity);
 		newBullet->RunSetMask();
 		collider_.SetMask(colliderManager_->GetNewMask(collider_.GetColliderID(), "PlayerBullet"));
 		// 弾を登録する
-		pBullets_.push_back(newBullet);
+		pBullets_.push_back(std::move(newBullet));
 		attackCooldown = attackInterval;
 	}
 	else

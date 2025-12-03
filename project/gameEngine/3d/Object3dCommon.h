@@ -15,7 +15,6 @@ class Object3dCommon
 #pragma region シングルトンインスタンス
 
 private:
-	static Object3dCommon* instance;
 
 	Object3dCommon() = default;
 	~Object3dCommon() = default;

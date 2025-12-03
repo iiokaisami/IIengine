@@ -139,7 +139,7 @@ private:
 	Collider::ColliderDesc desc = {};
 
 	// 弾
-	std::list<PlayerBullet*> pBullets_ = {};
+	std::vector<std::unique_ptr<PlayerBullet>> pBullets_ = {};
 
 	// 発射クールタイム
 	const int kShootCoolDownFrame_ = 15;

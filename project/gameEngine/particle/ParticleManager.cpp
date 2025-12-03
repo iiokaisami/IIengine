@@ -11,15 +11,10 @@
 #include "ModelManager.h"
 #include "TimeManager.h"
 
-ParticleManager* ParticleManager::instance_ = nullptr;
-
 ParticleManager* ParticleManager::GetInstance()
 {
-    if (instance_ == nullptr) 
-    {
-        instance_ = new ParticleManager();
-    }
-    return instance_;
+    static ParticleManager instance;
+    return &instance;
 }
 
 void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, ModelCommon* modelCommon)
@@ -59,11 +54,7 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
     camera_ = object3dCommon_->GetDefaultCamera();
 }
 
-void ParticleManager::Finalize()
-{
-    delete instance_;
-    instance_ = nullptr;
-}
+void ParticleManager::Finalize(){}
 
 void ParticleManager::CreatePipeline()
 {

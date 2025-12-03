@@ -17,7 +17,8 @@ class CameraManager
 {
 public:
     // シングルトンパターンを使いたい場合
-    static CameraManager& GetInstance() {
+    static CameraManager& GetInstance() 
+    {
         static CameraManager instance;
         return instance;
     }

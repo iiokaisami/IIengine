@@ -11,7 +11,6 @@ class SceneManager
 {
 #pragma region シングルトンインスタンス
 private:
-	static SceneManager* instance;
 
 	SceneManager() = default;
 	~SceneManager() = default;

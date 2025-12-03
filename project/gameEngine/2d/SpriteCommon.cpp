@@ -2,21 +2,13 @@
 
 #include <cassert>
 
-SpriteCommon* SpriteCommon::instance = nullptr;
-
 SpriteCommon* SpriteCommon::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new SpriteCommon;
-	}
-	return instance;
+	static SpriteCommon instance;
+	return &instance;
 }
 
-void SpriteCommon::Finalize()
-{
-	delete instance;
-	instance = nullptr;
-}
+void SpriteCommon::Finalize(){}
 
 void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 {

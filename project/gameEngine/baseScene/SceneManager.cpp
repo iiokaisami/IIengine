@@ -1,23 +1,16 @@
 #include "SceneManager.h"
 #include <cassert>
 
-SceneManager* SceneManager::instance = nullptr;
-
 SceneManager* SceneManager::GetInstance()
 {
-    if (instance == nullptr) {
-        instance = new SceneManager;
-    }
-    return instance;
+    static SceneManager instance;
+    return &instance;
 }
 
 void SceneManager::Finalize()
 {
     scene_->Finalize();
     delete scene_;
-
-    delete instance;
-    instance = nullptr;
 }
 
 void SceneManager::Update()

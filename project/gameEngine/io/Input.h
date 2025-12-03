@@ -17,7 +17,6 @@ class Input
 {
 #pragma region シングルトンインスタンス
 private:
-	static Input* instance;
 
 	Input() = default;
 	~Input() = default;

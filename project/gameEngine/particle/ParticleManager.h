@@ -63,7 +63,6 @@ public:
 	// シングルトンインスタンスの取得
 	static ParticleManager* GetInstance();
 
-
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -184,9 +183,6 @@ private: // 構造体
 	};
 
 private:
-
-	//インスタンス
-	static ParticleManager* instance_;
 
 	ParticleManager() = default;  // コンストラクタはプライベート
 
