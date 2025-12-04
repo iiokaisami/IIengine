@@ -1,5 +1,6 @@
 #include "Audio.h"
 #include <cassert>
+#include <cstring>
 
 Audio* Audio::GetInstance()
 {
@@ -95,8 +96,8 @@ SoundData Audio::LoadWav(const char* filename)
 	}
 
 	// Dataチャンクのデータ部（波形データの読み込み）
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
+	std::vector<char> tmpBuffer(data.size);
+	file.read(tmpBuffer.data(), data.size);
 
 	// Wavファイルを閉じる
 	file.close();
@@ -106,8 +107,11 @@ SoundData Audio::LoadWav(const char* filename)
 	SoundData soundData = {};
 
 	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
+	soundData.pBuffer.resize(data.size);
+	std::memcpy(soundData.pBuffer.data(), tmpBuffer.data(), data.size);
 	soundData.bufferSize = data.size;
+
+	soundData.sourceVoice = nullptr;
 
 	return soundData;
 }
@@ -124,22 +128,20 @@ void Audio::SoundUnload(Microsoft::WRL::ComPtr<IXAudio2> xAudio2, SoundData* sou
 	// 音声データ解放
 	xAudio2.Reset();
 
-	delete[] soundData->pBuffer;
-
-	soundData->pBuffer = 0;
+	soundData->pBuffer.clear();
 	soundData->bufferSize = 0;
 	soundData->wfex = {};
 }
 
-void Audio::PlayWave(const SoundData& soundData, bool loop, float volume)
+void Audio::PlayWave(SoundData& soundData, bool loop, float volume)
 {
 	// 波形フォーマットをもとにSourceVoiceの生成
-    hr = xAudio2_->CreateSourceVoice(const_cast<IXAudio2SourceVoice**>(&soundData.sourceVoice), &soundData.wfex);
+	hr = xAudio2_->CreateSourceVoice(&soundData.sourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(hr));
 
 	// 再生する波形データの設定
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
+	buf.pAudioData = soundData.pBuffer.data();
 	buf.AudioBytes = soundData.bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 

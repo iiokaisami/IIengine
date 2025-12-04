@@ -142,7 +142,7 @@ void Framework::Finalize()
 	srvManager.reset();
 
 	sceneManager_->Finalize();
-	delete sceneFactory_;
+	sceneFactory_.reset();
 
 	input->Finalize();
 

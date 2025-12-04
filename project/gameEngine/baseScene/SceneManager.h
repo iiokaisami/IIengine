@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "BaseScene.h"
 #include "AbstractSceneFactory.h"
 
@@ -46,10 +49,10 @@ public:
 private:
 
 	// 今のシーン
-	BaseScene* scene_ = nullptr;
+	std::unique_ptr<BaseScene> scene_ = nullptr;
 
 	// 次のシーン
-	BaseScene* nextScene_ = nullptr;
+	std::unique_ptr<BaseScene> nextScene_ = nullptr;
 
 	// シーンファクトリー
 	AbstractSceneFactory* sceneFactory_ = nullptr;

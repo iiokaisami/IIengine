@@ -1,29 +1,30 @@
 #include "SceneFactory.h"
 
+#include <memory>
+
 #include "../../application/scene/TitleScene.h"
 #include "../../application/scene/GamePlayScene.h"
 #include "../../application/scene/GameOverScene.h"
 #include "../../application/scene/ClearScene.h"
 
-BaseScene* SceneFactory::CreateScene(const std::string& sceneName)
+std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& sceneName)
 {
-	BaseScene* newScene = nullptr;
 	if (sceneName == "TITLE")
 	{
-		newScene = new TitleScene();
+		return std::make_unique<TitleScene>();
 	}
 	else if (sceneName == "GAMEPLAY")
 	{
-		newScene = new GamePlayScene();
+		return std::make_unique<GamePlayScene>();
 	}
 	else if (sceneName == "GAMEOVER")
 	{
-		newScene = new GameOverScene();
+		return std::make_unique<GameOverScene>();
 	}
 	else if (sceneName == "CLEAR")
 	{
-		newScene = new ClearScene();
+		return std::make_unique<ClearScene>();
 	}
 
-	return newScene;
+	return nullptr;
 }

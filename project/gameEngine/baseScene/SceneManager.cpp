@@ -9,22 +9,27 @@ SceneManager* SceneManager::GetInstance()
 
 void SceneManager::Finalize()
 {
-    scene_->Finalize();
-    delete scene_;
+    if (scene_) 
+    {
+        scene_->Finalize();
+        scene_.reset();
+    }
 }
 
 void SceneManager::Update()
 {
-    if (nextScene_) {
+    if (nextScene_)
+    {
         // 旧シーン終了
-        if (scene_) {
+        if (scene_)
+        {
             scene_->Finalize();
-            delete scene_;
+            scene_.reset();
         }
 
         // シーン切り替え
-        scene_ = nextScene_;
-        nextScene_ = nullptr;
+        scene_ = std::move(nextScene_);
+        nextScene_.reset();
 
         // シーンマネージャをセット
         scene_->SetSceneManager(this);
@@ -34,13 +39,19 @@ void SceneManager::Update()
     }
 
     // 実行中シーンを更新する
-    scene_->Update();
+    if (scene_) 
+    {
+        scene_->Update();
+    }
 }
 
 void SceneManager::Draw()
 {
     // 実行中シーンを描画する
-    scene_->Draw();
+    if (scene_)
+    {
+        scene_->Draw();
+    }
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName)

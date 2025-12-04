@@ -61,6 +61,6 @@ private:
 	std::map<std::string, std::unique_ptr<Model>> models;
 
 	// モデル共通部
-	ModelCommon* modelCommon_ = nullptr;
+	std::unique_ptr<ModelCommon> modelCommon_ = nullptr;
 };
 

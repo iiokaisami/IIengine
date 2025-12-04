@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include "Input.h"
 #include "WinApp.h"
@@ -86,7 +87,7 @@ protected:
 	Audio* audio = nullptr;
 
 	SceneManager* sceneManager_ = nullptr;
-	AbstractSceneFactory* sceneFactory_ = nullptr;
+	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 
 	SpriteCommon* spriteCommon = nullptr;
 	TextureManager* textureManager = nullptr;
