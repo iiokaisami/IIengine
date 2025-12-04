@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AbstractSceneFactory.h"
+#include "../../../gameEngine/baseScene/AbstractSceneFactory.h"
 
 /// <summary>
 /// シーンファクトリ

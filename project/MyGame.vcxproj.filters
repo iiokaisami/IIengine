@@ -133,7 +133,7 @@
     <ClCompile Include="gameEngine\baseScene\MyGame.cpp">
       <Filter>gameEngine\baseScene</Filter>
     </ClCompile>
-    <ClCompile Include="gameEngine\baseScene\SceneFactory.cpp">
+    <ClCompile Include="application\scene\SceneFactory.cpp">
       <Filter>gameEngine\baseScene</Filter>
     </ClCompile>
     <ClCompile Include="gameEngine\baseScene\SceneManager.cpp">
@@ -393,7 +393,7 @@
     <ClInclude Include="gameEngine\baseScene\MyGame.h">
       <Filter>gameEngine\baseScene</Filter>
     </ClInclude>
-    <ClInclude Include="gameEngine\baseScene\SceneFactory.h">
+    <ClInclude Include="application\scene\SceneFactory.h">
       <Filter>gameEngine\baseScene</Filter>
     </ClInclude>
     <ClInclude Include="gameEngine\baseScene\SceneManager.h">

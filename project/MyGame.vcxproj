@@ -152,7 +152,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameEngine\particle\MeshBuilder.cpp" />
     <ClCompile Include="gameEngine\particle\ParticleMotion.cpp" />
     <ClCompile Include="gameEngine\level_editor\LevelDataLoader.cpp" />
-    <ClCompile Include="gameEngine\baseScene\SceneFactory.cpp" />
+    <ClCompile Include="application\scene\SceneFactory.cpp" />
     <ClCompile Include="gameEngine\baseScene\SceneManager.cpp" />
     <ClCompile Include="gameEngine\baseScene\BaseScene.cpp" />
     <ClCompile Include="gameEngine\base\Framework.cpp" />
@@ -246,7 +246,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="gameEngine\base\postEffect\NoneEffectPass.h" />
     <ClInclude Include="gameEngine\particle\MeshBuilder.h" />
     <ClInclude Include="gameEngine\particle\ParticleMotion.h" />
-    <ClInclude Include="gameEngine\baseScene\SceneFactory.h" />
+    <ClInclude Include="application\scene\SceneFactory.h" />
     <ClInclude Include="gameEngine\baseScene\AbstractSceneFactory.h" />
     <ClInclude Include="gameEngine\baseScene\SceneManager.h" />
     <ClInclude Include="gameEngine\baseScene\BaseScene.h" />
