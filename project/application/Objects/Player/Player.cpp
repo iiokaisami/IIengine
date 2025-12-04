@@ -349,9 +349,6 @@ void Player::Attack()
 			newBullet->Initialize();
 			newBullet->SetVelocity(bulletVelocity);
 
-			newBullet->RunSetMask();
-			collider_.SetMask(colliderManager_->GetNewMask(collider_.GetColliderID(), "PlayerBullet"));
-
 			// 弾を登録する
 			pBullets_.push_back(std::move(newBullet));
 
@@ -707,8 +704,7 @@ void Player::AutoAttack()
 		newBullet->SetPosition(position_);
 		newBullet->Initialize();
 		newBullet->SetVelocity(bulletVelocity);
-		newBullet->RunSetMask();
-		collider_.SetMask(colliderManager_->GetNewMask(collider_.GetColliderID(), "PlayerBullet"));
+		
 		// 弾を登録する
 		pBullets_.push_back(std::move(newBullet));
 		attackCooldown = attackInterval;

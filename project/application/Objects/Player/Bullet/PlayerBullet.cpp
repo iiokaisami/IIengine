@@ -102,8 +102,3 @@ void PlayerBullet::OnCollisionTrigger(const Collider* _other)
 		isDead_ = true;
 	}  
 }
-
-void PlayerBullet::RunSetMask()
-{
-	collider_.SetMask(colliderManager_->GetNewMask(collider_.GetColliderID(), "Player"));
-}

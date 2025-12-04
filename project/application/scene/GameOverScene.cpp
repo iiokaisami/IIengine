@@ -21,7 +21,7 @@ void GameOverScene::Initialize()
 
 	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
-		Sprite* sprite = new Sprite();
+		auto sprite = std::make_unique<Sprite>();
 		
 		if (i == 0)
 		{
@@ -36,7 +36,7 @@ void GameOverScene::Initialize()
 			sprite->Initialize("gameOverToTitle.png", { -70,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		}
 
-		sprites.push_back(sprite);
+		sprites_.push_back(std::move(sprite));
 	}
 
 
@@ -65,11 +65,6 @@ void GameOverScene::Finalize()
 	pPlayer_->Finalize();
 	pEnemyManager_->Finalize();
 
-	for (Sprite* sprite : sprites)
-	{
-		delete sprite;
-	}
-
 	cameraManager.RemoveCamera(0);
 }
 
@@ -93,7 +88,7 @@ void GameOverScene::Update()
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);	
 
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Update();
 
@@ -177,7 +172,7 @@ void GameOverScene::Draw()
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();
 
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Draw();
 	}

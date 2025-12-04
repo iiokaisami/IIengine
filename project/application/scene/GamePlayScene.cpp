@@ -57,14 +57,14 @@ void GamePlayScene::Initialize()
 	// スプライト
 	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
-		Sprite* sprite = new Sprite();
+		auto sprite = std::make_unique<Sprite>();
 
 		if (i == 0)
 		{
 			sprite->Initialize("playUI.png", { 0,600 }, color_, { 0,0 });
 		}
 
-		sprites.push_back(sprite);
+		sprites_.push_back(std::move(sprite));
 	}
 
 	// レベルデータの読み込み
@@ -114,12 +114,6 @@ void GamePlayScene::Finalize()
 	}
 	pGoal_->Finalize();
 
-	for (Sprite* sprite : sprites)
-	{
-		delete sprite;
-	}
-	sprites.clear();
-
 	// カメラ解放
 	cameraManager.RemoveCamera(0);
 	cameraManager.RemoveCamera(1);
@@ -158,7 +152,7 @@ void GamePlayScene::Update()
 	// カメラマネージャーの更新
 	cameraManager.UpdateAll();
 
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Update();
 
@@ -316,7 +310,7 @@ void GamePlayScene::Draw()
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();
 
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Draw();
 	}

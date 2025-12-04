@@ -57,10 +57,6 @@ public: // ゲッター
 
 public: // セッター
 
-	/// <summary>
-	/// 衝突属性設定
-	/// </summary>
-	void RunSetMask();
 
 private: // メンバ変数
 

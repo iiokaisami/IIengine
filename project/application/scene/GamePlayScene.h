@@ -77,7 +77,7 @@ private:
 	Vector3 cameraPosition = { 0.0f,-20.0f,0.0f };
 
 	// 2Dスプライト
-	std::vector<Sprite*>sprites = {};
+	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 1;

@@ -68,9 +68,9 @@ void Collider::SetAttribute(uint32_t _attribute)
     collisionAttribute_ = _attribute;
 }
 
-void Collider::SetMask(uint32_t* _mask)
+void Collider::SetMask(uint32_t _mask)
 {
-    pCollisionMask_ = _mask;
+    collisionMask_ = _mask;
 }
 
 void Collider::OnCollisionTrigger(const Collider* _other)

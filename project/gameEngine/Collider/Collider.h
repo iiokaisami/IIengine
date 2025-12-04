@@ -82,7 +82,7 @@ public: // ゲッター
     inline uint32_t GetCollisionAttribute()const { return collisionAttribute_; }
     
 	// 衝突マスク取得
-    inline uint32_t GetCollisionMask()const { return *pCollisionMask_; }
+    inline uint32_t GetCollisionMask()const { return collisionMask_; }
     
 	// 形状タイプ取得
     inline Shape GetShape()const { return shape_; }
@@ -149,7 +149,7 @@ public: // セッター
 	/// 衝突マスク設定
     /// </summary>
     /// <param name="_mask">マスク値へのポインタ</param>
-    void SetMask(uint32_t* _mask);
+    void SetMask(uint32_t _mask);
    
     /// <summary>
 	/// 衝突時コールバック設定
@@ -232,6 +232,6 @@ private:
     // 衝突属性(自分)
     uint32_t collisionAttribute_ = 0xffffffff;
     // 衝突マスク(相手)
-    uint32_t* pCollisionMask_ = new uint32_t(0xffffffff);
+    uint32_t collisionMask_ = 0xffffffff;
 };
 

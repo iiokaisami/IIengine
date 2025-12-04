@@ -9,7 +9,8 @@ Audio* Audio::GetInstance()
 
 void Audio::Finalize()
 {
-	if (masterVoice_) {
+	if (masterVoice_) 
+	{
 		masterVoice_->DestroyVoice();
 		masterVoice_ = nullptr;
 	}
@@ -81,7 +82,8 @@ SoundData Audio::LoadWav(const char* filename)
 		if (strncmp(data.id, "data", 4) == 0) {
 			break; // "data" チャンクを見つけたらループを抜ける
 		}
-		else {
+		else 
+		{
 			// 現在のチャンクが "data" でない場合、そのサイズ分シーク
 			file.seekg(data.size, std::ios_base::cur);
 		}

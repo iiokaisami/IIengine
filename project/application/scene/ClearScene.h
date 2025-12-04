@@ -41,7 +41,7 @@ private:
 	Vector3 cameraRotate_{};
 
 	// 2Dスプライト
-	std::vector<Sprite*>sprites = {};
+	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 3;
 

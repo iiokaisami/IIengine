@@ -28,7 +28,7 @@ void ClearScene::Initialize()
 	// スプライト
 	for (uint32_t i = 0; i < spriteNum_; ++i)
 	{
-		Sprite* sprite = new Sprite();
+		auto sprite = std::make_unique<Sprite>();
 		
 		if (i == 0)
 		{
@@ -43,7 +43,7 @@ void ClearScene::Initialize()
 			sprite->Initialize("gameOverToTitle.png", { -70,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		}
 		
-		sprites.push_back(sprite);
+		sprites_.push_back(std::move(sprite));
 	}
 
 	// シーン開始時にフェードイン
@@ -57,11 +57,6 @@ void ClearScene::Finalize()
 {
 	pPlayer_->Finalize();
 	pField_->Finalize();
-
-	for (Sprite* sprite : sprites)
-	{
-		delete sprite;
-	}
 
 	cameraManager.RemoveCamera(0);
 }
@@ -88,11 +83,10 @@ void ClearScene::Update()
 	camera_->SetRotate(cameraRotate_);
 
 	// スプライト更新
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Update();
-
-	}\
+	}
 
 	// プレイヤー更新
 	pPlayer_->ClearSceneUpdate();
@@ -161,7 +155,7 @@ void ClearScene::Draw()
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();
 
-	for (Sprite* sprite : sprites)
+	for (auto& sprite : sprites_)
 	{
 		sprite->Draw();
 	}
