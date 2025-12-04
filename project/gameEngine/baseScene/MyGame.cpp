@@ -7,12 +7,11 @@ void MyGame::Initialize()
 	Framework::Initialize();
 
 	// シーンマネージャに最初のシーンをセット
-	sceneFactory_ = new SceneFactory();
-	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+	sceneFactory_ = std::make_unique<SceneFactory>();
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 
 	// 最初のシーンを設定
 	SceneManager::GetInstance()->ChangeScene("TITLE");
-
 
 
 	// モデルの読み込み処理をスレッドで実行
@@ -67,8 +66,7 @@ void MyGame::Finalize()
 	}
 
 
-	delete sceneFactory_;
-	sceneFactory_ = nullptr;
+	sceneFactory_.reset();
 
 	Framework::Finalize();
 

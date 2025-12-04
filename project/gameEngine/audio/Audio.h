@@ -3,7 +3,8 @@
 #include <xaudio2.h>
 #pragma comment(lib, "xaudio2.lib")
 #include <fstream>
-#include "wrl.h"
+#include <vector>
+#include <wrl/client.h>
 
 // チャンクヘッダ
 struct ChunkHeader {
@@ -23,8 +24,8 @@ struct FormatChunk {
 // 音声データ
 struct SoundData {
 	WAVEFORMATEX wfex;		// 波形フォーマット
-	BYTE* pBuffer;			// バッファの先頭アドレス
-	IXAudio2SourceVoice* sourceVoice; // ソースボイス
+	std::vector<BYTE> pBuffer;			// バッファの先頭アドレス
+	IXAudio2SourceVoice* sourceVoice = nullptr;  // ソースボイス
 	unsigned int bufferSize;// バッファサイズ
 };
 
@@ -74,7 +75,7 @@ public:
 	/// <param name="soundData"> 再生したいサウンドデータ</param>
 	/// <param name="loop">ループするか</param>
 	/// <param name="volume">ボリューム</param>
-	void PlayWave(const SoundData& soundData, bool loop, float volume);
+	void PlayWave(SoundData& soundData, bool loop, float volume);
 
 	/// <summary>
 	/// サウンド停止 

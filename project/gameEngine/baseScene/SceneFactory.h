@@ -15,5 +15,5 @@ public:
 	/// </summary>
 	/// <param name="sceneName">生成したいシーンの名前</param>
 	/// <returns>生成されたシーンのインスタンス</returns>
-	BaseScene* CreateScene(const std::string& sceneName) override;
+	std::unique_ptr<BaseScene> CreateScene(const std::string& sceneName) override;
 };

@@ -15,7 +15,7 @@ void ModelManager::Finalize(){}
 
 void ModelManager::Initialize(DirectXCommon* dxCommon)
 {
-	modelCommon_ = new ModelCommon();
+	modelCommon_ = std::make_unique<ModelCommon>();
 	modelCommon_->Initialize(dxCommon);
 }
 
@@ -39,7 +39,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 
 	// モデルの生成とファイル読み込み・初期化 ---
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->Initialize(modelCommon_, directory, fileName);
+	model->Initialize(modelCommon_.get(), directory, fileName);
 
 	// モデルをmapコンテナに格納する
 	models.insert(std::make_pair(fileName, std::move(model))); // 所有権を譲渡

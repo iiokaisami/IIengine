@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Framework.h"
-
 #include "SceneFactory.h"
 
 /// <summary>
@@ -33,6 +32,8 @@ public:
 	// サウンド
 	SoundData soundData_;
 	SoundData soundData2_;
+
+private:
 
 	bool useExampleGroup_ = true;
 
