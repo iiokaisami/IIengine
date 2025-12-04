@@ -12759,7 +12759,7 @@ void ModelManager::Finalize(){}
 
 void ModelManager::Initialize(DirectXCommon* dxCommon)
 {
-	modelCommon_ = new ModelCommon();
+	modelCommon_ = std::make_unique<ModelCommon>();
 	modelCommon_->Initialize(dxCommon);
 }
 
@@ -12783,7 +12783,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 
 	// モデルの生成とファイル読み込み・初期化 ---
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->Initialize(modelCommon_, directory, fileName);
+	model->Initialize(modelCommon_.get(), directory, fileName);
 
 	// モデルをmapコンテナに格納する
 	models.insert(std::make_pair(fileName, std::move(model))); // 所有権を譲渡
@@ -12867,7 +12867,7 @@ private:
 	std::map<std::string, std::unique_ptr<Model>> models;
 
 	// モデル共通部
-	ModelCommon* modelCommon_ = nullptr;
+	std::unique_ptr<ModelCommon> modelCommon_ = nullptr;
 };
 
 
@@ -14640,6 +14640,7 @@ File Path: project/gameEngine/audio/Audio.cpp
 ============================================================
 #include "Audio.h"
 #include <cassert>
+#include <cstring>
 
 Audio* Audio::GetInstance()
 {
@@ -14735,8 +14736,8 @@ SoundData Audio::LoadWav(const char* filename)
 	}
 
 	// Dataチャンクのデータ部（波形データの読み込み）
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
+	std::vector<char> tmpBuffer(data.size);
+	file.read(tmpBuffer.data(), data.size);
 
 	// Wavファイルを閉じる
 	file.close();
@@ -14746,8 +14747,11 @@ SoundData Audio::LoadWav(const char* filename)
 	SoundData soundData = {};
 
 	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
+	soundData.pBuffer.resize(data.size);
+	std::memcpy(soundData.pBuffer.data(), tmpBuffer.data(), data.size);
 	soundData.bufferSize = data.size;
+
+	soundData.sourceVoice = nullptr;
 
 	return soundData;
 }
@@ -14764,22 +14768,20 @@ void Audio::SoundUnload(Microsoft::WRL::ComPtr<IXAudio2> xAudio2, SoundData* sou
 	// 音声データ解放
 	xAudio2.Reset();
 
-	delete[] soundData->pBuffer;
-
-	soundData->pBuffer = 0;
+	soundData->pBuffer.clear();
 	soundData->bufferSize = 0;
 	soundData->wfex = {};
 }
 
-void Audio::PlayWave(const SoundData& soundData, bool loop, float volume)
+void Audio::PlayWave(SoundData& soundData, bool loop, float volume)
 {
 	// 波形フォーマットをもとにSourceVoiceの生成
-    hr = xAudio2_->CreateSourceVoice(const_cast<IXAudio2SourceVoice**>(&soundData.sourceVoice), &soundData.wfex);
+	hr = xAudio2_->CreateSourceVoice(&soundData.sourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(hr));
 
 	// 再生する波形データの設定
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
+	buf.pAudioData = soundData.pBuffer.data();
 	buf.AudioBytes = soundData.bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 
@@ -14824,7 +14826,8 @@ File Path: project/gameEngine/audio/Audio.h
 #include <xaudio2.h>
 #pragma comment(lib, "xaudio2.lib")
 #include <fstream>
-#include "wrl.h"
+#include <vector>
+#include <wrl/client.h>
 
 // チャンクヘッダ
 struct ChunkHeader {
@@ -14844,8 +14847,8 @@ struct FormatChunk {
 // 音声データ
 struct SoundData {
 	WAVEFORMATEX wfex;		// 波形フォーマット
-	BYTE* pBuffer;			// バッファの先頭アドレス
-	IXAudio2SourceVoice* sourceVoice; // ソースボイス
+	std::vector<BYTE> pBuffer;			// バッファの先頭アドレス
+	IXAudio2SourceVoice* sourceVoice = nullptr;  // ソースボイス
 	unsigned int bufferSize;// バッファサイズ
 };
 
@@ -14895,7 +14898,7 @@ public:
 	/// <param name="soundData"> 再生したいサウンドデータ</param>
 	/// <param name="loop">ループするか</param>
 	/// <param name="volume">ボリューム</param>
-	void PlayWave(const SoundData& soundData, bool loop, float volume);
+	void PlayWave(SoundData& soundData, bool loop, float volume);
 
 	/// <summary>
 	/// サウンド停止 
@@ -16387,7 +16390,7 @@ void Framework::Finalize()
 	srvManager.reset();
 
 	sceneManager_->Finalize();
-	delete sceneFactory_;
+	sceneFactory_.reset();
 
 	input->Finalize();
 
@@ -16447,6 +16450,7 @@ File Path: project/gameEngine/base/Framework.h
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include "Input.h"
 #include "WinApp.h"
@@ -16524,7 +16528,7 @@ protected:
 	Audio* audio = nullptr;
 
 	SceneManager* sceneManager_ = nullptr;
-	AbstractSceneFactory* sceneFactory_ = nullptr;
+	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 
 	SpriteCommon* spriteCommon = nullptr;
 	TextureManager* textureManager = nullptr;
@@ -18644,6 +18648,7 @@ File Path: project/gameEngine/baseScene/AbstractSceneFactory.h
 #pragma once
 
 #include "BaseScene.h"
+#include <memory>
 #include <string>
 
 /// <summary>
@@ -18662,7 +18667,7 @@ public:
 	/// </summary>
 	/// <param name="sceneName">生成したいシーンの名前</param>
 	/// <returns>生成されたシーンのインスタンス</returns>
-	virtual BaseScene* CreateScene(const std::string& sceneName) = 0;
+	virtual std::unique_ptr<BaseScene> CreateScene(const std::string& sceneName) = 0;
 };
 
 ============================================================
@@ -18750,12 +18755,11 @@ void MyGame::Initialize()
 	Framework::Initialize();
 
 	// シーンマネージャに最初のシーンをセット
-	sceneFactory_ = new SceneFactory();
-	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+	sceneFactory_ = std::make_unique<SceneFactory>();
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 
 	// 最初のシーンを設定
 	SceneManager::GetInstance()->ChangeScene("TITLE");
-
 
 
 	// モデルの読み込み処理をスレッドで実行
@@ -18810,8 +18814,7 @@ void MyGame::Finalize()
 	}
 
 
-	delete sceneFactory_;
-	sceneFactory_ = nullptr;
+	sceneFactory_.reset();
 
 	Framework::Finalize();
 
@@ -19109,7 +19112,6 @@ File Path: project/gameEngine/baseScene/MyGame.h
 #pragma once
 
 #include "Framework.h"
-
 #include "SceneFactory.h"
 
 /// <summary>
@@ -19142,6 +19144,8 @@ public:
 	SoundData soundData_;
 	SoundData soundData2_;
 
+private:
+
 	bool useExampleGroup_ = true;
 
 	// 0 : グレースケール無効, 1: グレースケール有効
@@ -19162,32 +19166,33 @@ File Path: project/gameEngine/baseScene/SceneFactory.cpp
 ============================================================
 #include "SceneFactory.h"
 
+#include <memory>
+
 #include "../../application/scene/TitleScene.h"
 #include "../../application/scene/GamePlayScene.h"
 #include "../../application/scene/GameOverScene.h"
 #include "../../application/scene/ClearScene.h"
 
-BaseScene* SceneFactory::CreateScene(const std::string& sceneName)
+std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& sceneName)
 {
-	BaseScene* newScene = nullptr;
 	if (sceneName == "TITLE")
 	{
-		newScene = new TitleScene();
+		return std::make_unique<TitleScene>();
 	}
 	else if (sceneName == "GAMEPLAY")
 	{
-		newScene = new GamePlayScene();
+		return std::make_unique<GamePlayScene>();
 	}
 	else if (sceneName == "GAMEOVER")
 	{
-		newScene = new GameOverScene();
+		return std::make_unique<GameOverScene>();
 	}
 	else if (sceneName == "CLEAR")
 	{
-		newScene = new ClearScene();
+		return std::make_unique<ClearScene>();
 	}
 
-	return newScene;
+	return nullptr;
 }
 
 
@@ -19211,7 +19216,7 @@ public:
 	/// </summary>
 	/// <param name="sceneName">生成したいシーンの名前</param>
 	/// <returns>生成されたシーンのインスタンス</returns>
-	BaseScene* CreateScene(const std::string& sceneName) override;
+	std::unique_ptr<BaseScene> CreateScene(const std::string& sceneName) override;
 };
 
 ============================================================
@@ -19228,22 +19233,27 @@ SceneManager* SceneManager::GetInstance()
 
 void SceneManager::Finalize()
 {
-    scene_->Finalize();
-    delete scene_;
+    if (scene_) 
+    {
+        scene_->Finalize();
+        scene_.reset();
+    }
 }
 
 void SceneManager::Update()
 {
-    if (nextScene_) {
+    if (nextScene_)
+    {
         // 旧シーン終了
-        if (scene_) {
+        if (scene_)
+        {
             scene_->Finalize();
-            delete scene_;
+            scene_.reset();
         }
 
         // シーン切り替え
-        scene_ = nextScene_;
-        nextScene_ = nullptr;
+        scene_ = std::move(nextScene_);
+        nextScene_.reset();
 
         // シーンマネージャをセット
         scene_->SetSceneManager(this);
@@ -19253,13 +19263,19 @@ void SceneManager::Update()
     }
 
     // 実行中シーンを更新する
-    scene_->Update();
+    if (scene_) 
+    {
+        scene_->Update();
+    }
 }
 
 void SceneManager::Draw()
 {
     // 実行中シーンを描画する
-    scene_->Draw();
+    if (scene_)
+    {
+        scene_->Draw();
+    }
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName)
@@ -19275,6 +19291,9 @@ void SceneManager::ChangeScene(const std::string& sceneName)
 File Path: project/gameEngine/baseScene/SceneManager.h
 ============================================================
 #pragma once
+
+#include <memory>
+#include <string>
 
 #include "BaseScene.h"
 #include "AbstractSceneFactory.h"
@@ -19322,10 +19341,10 @@ public:
 private:
 
 	// 今のシーン
-	BaseScene* scene_ = nullptr;
+	std::unique_ptr<BaseScene> scene_ = nullptr;
 
 	// 次のシーン
-	BaseScene* nextScene_ = nullptr;
+	std::unique_ptr<BaseScene> nextScene_ = nullptr;
 
 	// シーンファクトリー
 	AbstractSceneFactory* sceneFactory_ = nullptr;
