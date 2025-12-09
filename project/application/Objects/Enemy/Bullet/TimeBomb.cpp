@@ -52,6 +52,10 @@ void TimeBomb::Initialize()
 	explosionCollider_.MakeAABBDesc(explosionDesc);
 	colliderManager_->RegisterCollider(&explosionCollider_);
 
+
+	// 消滅時の動作初期化
+	deathMotion_.isActive = false;
+	deathMotion_.timer = 0.0f;
 }
 
 void TimeBomb::Finalize()
@@ -117,8 +121,13 @@ void TimeBomb::Update()
 		isWallCollision_ = false;
 	}
 
+	// 消滅モーション更新
+	DeadMotion();
+
+	// モデル更新
 	UpdateModel();
 	
+	// 回転更新
 	rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
 	
 	// 設置判定の更新
@@ -171,15 +180,52 @@ void TimeBomb::LaunchTrap()
 	velocity_.y = (diff.y - 0.5f * gravity * flightTime_ * flightTime_) / flightTime_;
 }
 
+void TimeBomb::DeadMotion()
+{
+	// フラグが立っていなければ処理しない
+	if (!deathMotion_.isActive)
+	{
+		return;
+	}
+
+	// デルタタイム取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// タイマー更新
+	deathMotion_.timer += dt;
+	deathMotion_.motionPos = position_;
+
+	// 振動処理
+	float vibration = sinf(deathMotion_.timer * kVibrationFreq) * kVibrationAmp;
+
+	// 位置に振動を加算
+	position_.x = deathMotion_.motionPos.x + vibration;
+	position_.z = deathMotion_.motionPos.z + vibration;
+
+	// スケールを徐々に縮小
+	scale_ *= kShrinkFactor;
+
+	// 一定以下になったら消滅処理完了
+	if (scale_.x < kEndScale && scale_.y < kEndScale && scale_.z < kEndScale)
+	{
+		isDead_ = true;
+	}
+
+}
+
 void TimeBomb::OnSetCollisionTrigger(const Collider* _other)
 {
 	// プレイヤー、ノーマルエネミー、プレイヤーの弾と衝突した場合
 	if (isActive_ && (_other->GetColliderID() == "Player" or 
-		_other->GetColliderID() == "NormalEnemy" or 
-		_other->GetColliderID() == "PlayerBullet"))
+		_other->GetColliderID() == "NormalEnemy"))
 	{
 		// 爆発状態へ
 		isExploded_ = true;
+	}
+
+	if (_other->GetColliderID() == "PlayerBullet")
+	{
+		deathMotion_.isActive = true;
 	}
 
 }
@@ -211,8 +257,7 @@ void TimeBomb::OnExplosionTrigger(const Collider* _other)
 {
 	if (isExploded_ &&
 		(_other->GetColliderID() == "Player" or 
-			_other->GetColliderID() == "NormalEnemy" or
-			_other->GetColliderID() == "PlayerBullet"))
+			_other->GetColliderID() == "NormalEnemy"))
 	{
 		isDead_ = true;
 		// パーティクル起動

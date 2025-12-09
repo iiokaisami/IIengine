@@ -160,23 +160,6 @@ void GamePlayScene::Update()
 
 	}
 
-	// P押してカメラ切り替え
-	if (Input::GetInstance()->TriggerKey(DIK_P))
-	{
-		if (cameraManager.GetActiveIndex() == 0)
-		{
-			cameraManager.SetActiveCamera(1);
-
-		}
-		else if (cameraManager.GetActiveIndex() == 1)
-		{
-			cameraManager.SetActiveCamera(0);
-
-		}
-	}
-	// 稼働中のカメラインデックス
-	activeIndex = cameraManager.GetActiveIndex();
-
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
 
@@ -230,36 +213,7 @@ void GamePlayScene::Update()
 
 #ifdef USE_IMGUI
 
-	ImGui::Begin("PlayScene");
-
-
-	// 透明度の更新
-	ImGui::SliderFloat4("SpriteColor", &color_.x, 0.0f, 1.0f);
-
-	// camera
-	Vector3 cam1Pos = camera->GetPosition();
-	Vector3 cam1Rot = camera->GetRotate();
-	if (ImGui::SliderFloat3("cameraPosition", &cam1Pos.x, -100.0f, 100.0f))
-	{
-		camera->SetPosition(cam1Pos);
-	}
-	if (ImGui::SliderFloat3("cameraRotate", &cam1Rot.x, -10.0f, 10.0f)) 
-	{
-		camera->SetRotate(cam1Rot);
-	}
-
-
-	ImGui::End();
-
-	pPlayer_->ImGuiDraw();
-	pEnemyManager_->ImGuiDraw();
-	pField_->ImGuiDraw();
-	for (auto& wall : pWalls_)
-	{
-		wall->ImGuiDraw();
-	}
-	pGoal_->ImGuiDraw();
-
+	AllImGui();
 
 #endif // USE_IMGUI
 
@@ -325,6 +279,44 @@ void GamePlayScene::Draw()
 	{
 		fadeTransition_->Draw();
 	}
+}
+
+void GamePlayScene::AllImGui()
+{
+#ifdef USE_IMGUI
+
+	ImGui::Begin("PlayScene");
+
+
+	// 透明度の更新
+	ImGui::SliderFloat4("SpriteColor", &color_.x, 0.0f, 1.0f);
+
+	// camera
+	Vector3 cam1Pos = camera->GetPosition();
+	Vector3 cam1Rot = camera->GetRotate();
+	if (ImGui::SliderFloat3("cameraPosition", &cam1Pos.x, -100.0f, 100.0f))
+	{
+		camera->SetPosition(cam1Pos);
+	}
+	if (ImGui::SliderFloat3("cameraRotate", &cam1Rot.x, -10.0f, 10.0f))
+	{
+		camera->SetRotate(cam1Rot);
+	}
+
+
+	ImGui::End();
+
+	pPlayer_->ImGuiDraw();
+	pEnemyManager_->ImGuiDraw();
+	pField_->ImGuiDraw();
+	for (auto& wall : pWalls_)
+	{
+		wall->ImGuiDraw();
+	}
+	pGoal_->ImGuiDraw();
+
+
+#endif // USE_IMGUI
 }
 
 void GamePlayScene::CameraUpdate()

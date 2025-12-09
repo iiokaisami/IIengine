@@ -37,6 +37,11 @@ public:
 	// 放物線上に発射
 	void LaunchTrap();
 
+public: // 内部関数
+
+	// 消滅時のリアクション
+	void DeadMotion();
+
 private:
 
 	/// <summary>
@@ -82,6 +87,23 @@ public: // セッター
 	void SetTrapLandingPosition(const Vector3& _playerPosition);
 
 private:
+
+	// 消滅時の動作構造体
+	struct DeathMotion
+	{
+		bool isActive = false;
+		float timer = 0.0f;
+		Vector3 motionPos = {};
+	};
+
+	// 消滅モーション調整パラメーター
+	static constexpr float kVibrationFreq = 200.0f;    // 振動周波数
+	static constexpr float kVibrationAmp = 0.2f;     // 振動幅(±px)
+
+	static constexpr float kShrinkFactor = 0.92f;    // 縮小率(指数減衰)
+	static constexpr float kEndScale = 0.05f;    // 消滅判定スケール
+	// 消滅時の動作
+	DeathMotion deathMotion_{};
 
 	// デフォルトのフレームレート
 	const float kDefaultFrameRate = 60.0f;

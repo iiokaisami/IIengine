@@ -36,6 +36,9 @@ public:
 
 private:
 
+	// このシーンで出す全てのImGui
+	void AllImGui();
+
 	// カメラ更新
 	void CameraUpdate();
 

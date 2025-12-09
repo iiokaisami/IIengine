@@ -15,7 +15,6 @@ void VignetteTrap::Initialize()
 	scale_ = { 0.7f,0.7f,0.7f };
 	object_->SetScale(scale_);
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
 
 	// 当たり判定
@@ -35,6 +34,12 @@ void VignetteTrap::Initialize()
 	};
 	collider_.MakeAABBDesc(desc);
 	colliderManager_->RegisterCollider(&collider_);
+
+
+	// 消滅時の動作初期化
+	deathMotion_.isActive = false;
+	deathMotion_.timer = 0.0f;
+
 }
 
 void VignetteTrap::Finalize()
@@ -100,6 +105,9 @@ void VignetteTrap::Update()
 		isWallCollision_ = false;
 	}
 
+	// 消滅モーション更新
+	DeadMotion();
+
 	UpdateModel();
 
 	rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
@@ -145,14 +153,47 @@ void VignetteTrap::LaunchTrap()
 	velocity_.y = (diff.y - 0.5f * gravity * flightTime_ * flightTime_) / flightTime_;
 }
 
+void VignetteTrap::DeadMotion()
+{
+	// フラグが立っていなければ処理しない
+	if (!deathMotion_.isActive)
+	{
+		return;
+	}
+
+	// デルタタイム取得
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// タイマー更新
+	deathMotion_.timer += dt;
+	deathMotion_.motionPos = position_;
+
+	// 振動処理
+	float vibration = sinf(deathMotion_.timer * kVibrationFreq) * kVibrationAmp;
+
+	// 位置に振動を加算
+	position_.x = deathMotion_.motionPos.x + vibration;
+	position_.z = deathMotion_.motionPos.z + vibration;
+
+	// スケールを徐々に縮小
+	scale_ *= kShrinkFactor;
+
+	// 一定以下になったら消滅処理完了
+	if (scale_.x < kEndScale && scale_.y < kEndScale && scale_.z < kEndScale)
+	{
+		isDead_ = true;
+	}
+}
+
 void VignetteTrap::OnCollisionTrigger(const Collider* _other)
 {
-	if (isActive_ && (_other->GetColliderID() == "Player" or 
+	if (!deathMotion_.isActive && isActive_ &&
+		(_other->GetColliderID() == "Player" or 
 		_other->GetColliderID() == "PlayerBullet" or
 		_other->GetColliderID() == "NormalEnemy"))
 	{
 		// 死亡
-		isDead_ = true;
+		deathMotion_.isActive = true;
 	}
 }
 
