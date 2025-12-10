@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Framework.h"
-#include "SceneFactory.h"
+#include "../../../application/scene/SceneFactory.h"
 
 /// <summary>
 /// ゲーム固有のフレームワーク
