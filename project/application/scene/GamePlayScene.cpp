@@ -116,7 +116,6 @@ void GamePlayScene::Finalize()
 
 	// カメラ解放
 	cameraManager.RemoveCamera(0);
-	cameraManager.RemoveCamera(1);
 }
 
 void GamePlayScene::Update()
