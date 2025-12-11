@@ -76,6 +76,38 @@ void Sprite::Initialize(std::string textureFilePath,
 
 void Sprite::Update()
 {
+	// スクリーン追従モード FollowWorldPosition
+	if (followWorldPositionPtr_ != nullptr && worldToScreenFunc_)
+	{
+		Vector3 worldPosWithOffset = {
+			followWorldPositionPtr_->x + followWorldOffset_.x,
+			followWorldPositionPtr_->y + followWorldOffset_.y,
+			followWorldPositionPtr_->z + followWorldOffset_.z
+		};
+		// worldToScreenFunc_ はスクリーン座標を返す
+		Vector2 screenPos = worldToScreenFunc_(worldPosWithOffset);
+		position_.x = screenPos.x;
+		position_.y = screenPos.y;
+	}
+	// 親行列追従モード FollowParentWorldMatrix
+	else if (parentWorldMatrixPtr_ != nullptr)
+	{
+		// local transform を作る
+		Transform localTransform = transform_;
+		localTransform.translate = parentLocalOffset_;
+		// ローカル行列を作る
+		Matrix4x4 localWorld = MakeAffineMatrix(localTransform.scale, localTransform.rotate, localTransform.translate);
+		// 親ワールド行列と合成
+		Matrix4x4 composedWorld = Multiply(*parentWorldMatrixPtr_, localWorld);
+		// World 行列を直接セット
+		transformationMatrixData_->World = composedWorld;
+		// viewProjPtr_ がセットされていれば WVP を計算
+		if (viewProjPtr_ != nullptr)
+		{
+			transformationMatrixData_->WVP = Multiply(composedWorld, *viewProjPtr_);
+		}
+	}
+
 	float left = 0.0f - anchorPoint_.x;
 	float right = 1.0f - anchorPoint_.x;
 	float top = 0.0f - anchorPoint_.y;
@@ -136,14 +168,16 @@ void Sprite::Update()
 	transform_.rotate = { 0.0f,0.0f,rotation_ };
 	transform_.scale = { size_.x,size_.y,1.0f };
 
-
-	Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
-	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-	transformationMatrixData_->WVP = worldViewProjectionMatrixSprite;
-	transformationMatrixData_->World = worldMatrixSprite;
-
+	// 親行列追従でない場合は通常通り WVP を作る
+	if (parentWorldMatrixPtr_ == nullptr)
+	{
+		Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+		Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
+		Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
+		Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
+		transformationMatrixData_->WVP = worldViewProjectionMatrixSprite;
+		transformationMatrixData_->World = worldMatrixSprite;
+	}
 
 }
 
@@ -167,6 +201,32 @@ void Sprite::Draw()
 	spriteCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 
+}
+
+void Sprite::FollowWorldPosition(const Vector3* worldPosPtr, Vector3 offset)
+{
+	// ワールド座標ポインタを保存
+	followWorldPositionPtr_ = worldPosPtr;
+	// オフセットを保存
+	followWorldOffset_ = offset;
+}
+
+void Sprite::FollowParentWorldMatrix(const Matrix4x4* parentWorldPtr, bool followRotation, Vector3 localOffset)
+{
+	// 親のワールド行列ポインタを保存
+	parentWorldMatrixPtr_ = parentWorldPtr;
+	// 回転追従フラグを保存		
+	parentFollowRotation_ = followRotation;
+	// ローカルオフセットを保存
+	parentLocalOffset_ = localOffset;
+}
+
+void Sprite::StopFollowing()
+{
+	// 追従ポインタをnullptrに設定
+	followWorldPositionPtr_ = nullptr;
+	parentWorldMatrixPtr_ = nullptr;
+	worldToScreenFunc_ = nullptr;
 }
 
 void Sprite::SetColorChange(const Vector4& color)

@@ -32,6 +32,8 @@ public:
 	/// <param name="deltaTime">前フレームからの経過時間</param>
 	void UpdateShake(float deltaTime);
 
+	Vector2 WorldToScreen(const Vector3& worldPos) const;
+
 public: // セッター
 
 	/// <summary>
