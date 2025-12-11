@@ -10046,6 +10046,11 @@ void GamePlayScene::Initialize()
 		{
 			sprite->Initialize("playUI.png", { 0,600 }, color_, { 0,0 });
 		}
+		else if (i == 1)
+		{
+			sprite->Initialize("uvChecker.png", { 0,0 }, color_, { 0.5f,0.5f });
+			sprite->SetSize({ 100.0f, 20.0f });
+		}
 
 		sprites_.push_back(std::move(sprite));
 	}
@@ -10134,14 +10139,6 @@ void GamePlayScene::Update()
 	// カメラマネージャーの更新
 	cameraManager.UpdateAll();
 
-	for (auto& sprite : sprites_)
-	{
-		sprite->Update();
-
-		sprite->SetColor(color_);
-
-	}
-
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
 
@@ -10174,6 +10171,16 @@ void GamePlayScene::Update()
 	pGoal_->Update();
 	pGoal_->SetBarrierDestroyed(pEnemyManager_->IsAllEnemyDefeated());
 
+	// 追尾スプライトの更新
+	auto activeCamera = cameraManager.GetActiveCamera();
+	if (activeCamera)
+	{
+		// プレイヤーにオフセット
+		Vector3 worldHeadPos = pPlayer_->GetPosition() + Vector3{ 0.0f, 1.6f, 1.5f };
+		Vector2 screen = activeCamera->WorldToScreen(worldHeadPos);
+		sprites_[1]->SetPosition(screen);
+	}
+
 	// プレイヤーが死んだらデスカメラを開始(1回だけ)
 	if (pPlayer_->IsDead() && !pPlayer_->IsAutoControl() && !isTransitioning_ && !isDeadCameraPlayer_)
 	{
@@ -10191,6 +10198,14 @@ void GamePlayScene::Update()
 
 	// クリア更新
 	ClearUpdate();
+
+	// スプライトの更新
+	for (auto& sprite : sprites_)
+	{
+		sprite->Update();
+
+		sprite->SetColor(color_);
+	}
 
 
 #ifdef USE_IMGUI
@@ -10251,6 +10266,7 @@ void GamePlayScene::Draw()
 		sprite->Draw();
 	}
 
+	pPlayer_->Draw2D();
 
 	// トランジション描画
 	if (isTransitioning_ && blockTransition_)
@@ -10676,7 +10692,7 @@ private:
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 2;
 
 	// 遷移
 	std::unique_ptr<BlockRiseTransition> blockTransition_ = nullptr;
@@ -11343,6 +11359,38 @@ void Sprite::Initialize(std::string textureFilePath,
 
 void Sprite::Update()
 {
+	// スクリーン追従モード FollowWorldPosition
+	if (followWorldPositionPtr_ != nullptr && worldToScreenFunc_)
+	{
+		Vector3 worldPosWithOffset = {
+			followWorldPositionPtr_->x + followWorldOffset_.x,
+			followWorldPositionPtr_->y + followWorldOffset_.y,
+			followWorldPositionPtr_->z + followWorldOffset_.z
+		};
+		// worldToScreenFunc_ はスクリーン座標を返す
+		Vector2 screenPos = worldToScreenFunc_(worldPosWithOffset);
+		position_.x = screenPos.x;
+		position_.y = screenPos.y;
+	}
+	// 親行列追従モード FollowParentWorldMatrix
+	else if (parentWorldMatrixPtr_ != nullptr)
+	{
+		// local transform を作る
+		Transform localTransform = transform_;
+		localTransform.translate = parentLocalOffset_;
+		// ローカル行列を作る
+		Matrix4x4 localWorld = MakeAffineMatrix(localTransform.scale, localTransform.rotate, localTransform.translate);
+		// 親ワールド行列と合成
+		Matrix4x4 composedWorld = Multiply(*parentWorldMatrixPtr_, localWorld);
+		// World 行列を直接セット
+		transformationMatrixData_->World = composedWorld;
+		// viewProjPtr_ がセットされていれば WVP を計算
+		if (viewProjPtr_ != nullptr)
+		{
+			transformationMatrixData_->WVP = Multiply(composedWorld, *viewProjPtr_);
+		}
+	}
+
 	float left = 0.0f - anchorPoint_.x;
 	float right = 1.0f - anchorPoint_.x;
 	float top = 0.0f - anchorPoint_.y;
@@ -11403,14 +11451,16 @@ void Sprite::Update()
 	transform_.rotate = { 0.0f,0.0f,rotation_ };
 	transform_.scale = { size_.x,size_.y,1.0f };
 
-
-	Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
-	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-	transformationMatrixData_->WVP = worldViewProjectionMatrixSprite;
-	transformationMatrixData_->World = worldMatrixSprite;
-
+	// 親行列追従でない場合は通常通り WVP を作る
+	if (parentWorldMatrixPtr_ == nullptr)
+	{
+		Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+		Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
+		Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
+		Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
+		transformationMatrixData_->WVP = worldViewProjectionMatrixSprite;
+		transformationMatrixData_->World = worldMatrixSprite;
+	}
 
 }
 
@@ -11434,6 +11484,32 @@ void Sprite::Draw()
 	spriteCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 
+}
+
+void Sprite::FollowWorldPosition(const Vector3* worldPosPtr, Vector3 offset)
+{
+	// ワールド座標ポインタを保存
+	followWorldPositionPtr_ = worldPosPtr;
+	// オフセットを保存
+	followWorldOffset_ = offset;
+}
+
+void Sprite::FollowParentWorldMatrix(const Matrix4x4* parentWorldPtr, bool followRotation, Vector3 localOffset)
+{
+	// 親のワールド行列ポインタを保存
+	parentWorldMatrixPtr_ = parentWorldPtr;
+	// 回転追従フラグを保存		
+	parentFollowRotation_ = followRotation;
+	// ローカルオフセットを保存
+	parentLocalOffset_ = localOffset;
+}
+
+void Sprite::StopFollowing()
+{
+	// 追従ポインタをnullptrに設定
+	followWorldPositionPtr_ = nullptr;
+	parentWorldMatrixPtr_ = nullptr;
+	worldToScreenFunc_ = nullptr;
 }
 
 void Sprite::SetColorChange(const Vector4& color)
@@ -11468,6 +11544,7 @@ File Path: project/gameEngine/2d/Sprite.h
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
+#include <functional>
 
 #include "../../externals/DirectXTex/DirectXTex.h"
 #include "../../externals/DirectXTex/d3dx12.h"
@@ -11500,6 +11577,23 @@ public:
 	// 描画
 	void Draw();
 
+	/// <summary>
+	/// ワールド座標追従
+	/// </summary>
+	/// <param name="worldPosPtr">ワールド座標ポインタ</param>
+	/// <param name="offset">オフセット</param>
+	void FollowWorldPosition(const Vector3* worldPosPtr,Vector3 offset = {0,0,0});
+
+	/// <summary>
+	/// 親のワールド行列追従
+	/// </summary>
+	/// <param name="parentWorldMatrix">親のワールド行列ポインタ</param>
+	/// <param name="followRotation">回転追従フラグ</param>
+	/// <param name="localOffset">ローカルオフセット</param>
+	void FollowParentWorldMatrix(const Matrix4x4* parentWorldPtr, bool followRotation = true, Vector3 localOffset = { 0,0,0 });
+
+	// 追従を停止する
+	void StopFollowing();
 
 public:// ゲッター
 
@@ -11584,7 +11678,19 @@ public:// セッター
 	/// 
 	void SetTextureSize(const Vector2& textureSize) { textureSize_ = textureSize; }
 
-private:
+	/// <summary>
+	/// ワールド座標をスクリーン座標に変換する関数の設定
+	/// </summary>
+	/// <param name="func">変換関数</param>
+	void SetWorldToScreenFunc(std::function<Vector2(const Vector3&)> func) { worldToScreenFunc_ = func; }
+
+	/// <summary>
+	///	ビュー射影行列ポインタ設定
+	/// </summary>
+	/// <param name="viewProjPtr">ビュー射影行列ポインタ</param>
+	void SetViewProjectionMatrixPtr(const Matrix4x4* viewProjPtr) { viewProjPtr_ = viewProjPtr; }
+
+private: // 内部関数
 
 	// テクスチャサイズをイメージに合わせる
 	void AdjustTextureSize();
@@ -11637,7 +11743,6 @@ private:
 	//VertexShaderで利用するTransformationMatrix用のResourceを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_{};
 
-
 	// バッファリソース内のデータを指すポインタ
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
@@ -11655,10 +11760,7 @@ private:
 	// テクスチャ番号
 	uint32_t textureIndex = 0;
 
-
-
 	Transform transform_;
-
 
 	Vector2 position_ = { 0.0f,50.0f };
 	float rotation_ = 0.0f;
@@ -11679,6 +11781,20 @@ private:
 	Vector2 textureSize_ = { 100.0f,100.0f };
 
 	Vector4 color_{};
+
+	// ワールド座標追従
+	const Vector3* followWorldPositionPtr_ = nullptr;
+	Vector3 followWorldOffset_ = { 0,0,0 };
+	std::function<Vector2(const Vector3&)> worldToScreenFunc_; // 外部から渡す
+
+	// 親ワールド行列追従
+	const Matrix4x4* parentWorldMatrixPtr_ = nullptr;
+	Vector3 parentLocalOffset_ = { 0,0,0 };
+	bool parentFollowRotation_ = true;
+
+	// 親行列追従のために viewProjection を外部から渡す（WVP の計算に必要）
+	const Matrix4x4* viewProjPtr_ = nullptr;
+
 };
 
 
@@ -12018,6 +12134,34 @@ void Camera::UpdateShake(float deltaTime)
 	SetPosition(originalPosition + Vector3(offsetX, offsetY, offsetZ));
 }
 
+Vector2 Camera::WorldToScreen(const Vector3& worldPos) const
+{
+	// ワールド座標をクリップ座標に変換
+	float x = worldPos.x;
+	float y = worldPos.y;
+	float z = worldPos.z;
+	float w = 1.0f;
+
+	// ビュープロジェクション行列をかける
+	Vector4 clip;
+	const Matrix4x4& m = viewProjectionMatrix_;
+	clip.x = x * m.m[0][0] + y * m.m[1][0] + z * m.m[2][0] + w * m.m[3][0];
+	clip.y = x * m.m[0][1] + y * m.m[1][1] + z * m.m[2][1] + w * m.m[3][1];
+	clip.z = x * m.m[0][2] + y * m.m[1][2] + z * m.m[2][2] + w * m.m[3][2];
+	clip.w = x * m.m[0][3] + y * m.m[1][3] + z * m.m[2][3] + w * m.m[3][3];
+
+	// 透視除算
+	if (fabs(clip.w) < 1e-6f) return Vector2(-10000.0f, -10000.0f);
+
+	Vector3 ndc = { clip.x / clip.w, clip.y / clip.w, clip.z / clip.w };
+
+	// NDCをスクリーン座標に変換d
+	float sx = (ndc.x * 0.5f + 0.5f) * float(WinApp::kClientWidth);
+	float sy = (-ndc.y * 0.5f + 0.5f) * float(WinApp::kClientHeight);
+
+	return Vector2(sx, sy);
+}
+
 
 ============================================================
 File Path: project/gameEngine/3d/Camera.h
@@ -12055,6 +12199,8 @@ public:
 	/// </summary>
 	/// <param name="deltaTime">前フレームからの経過時間</param>
 	void UpdateShake(float deltaTime);
+
+	Vector2 WorldToScreen(const Vector3& worldPos) const;
 
 public: // セッター
 
