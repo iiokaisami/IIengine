@@ -3,6 +3,7 @@
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
+#include <functional>
 
 #include "../../externals/DirectXTex/DirectXTex.h"
 #include "../../externals/DirectXTex/d3dx12.h"
@@ -35,6 +36,23 @@ public:
 	// 描画
 	void Draw();
 
+	/// <summary>
+	/// ワールド座標追従
+	/// </summary>
+	/// <param name="worldPosPtr">ワールド座標ポインタ</param>
+	/// <param name="offset">オフセット</param>
+	void FollowWorldPosition(const Vector3* worldPosPtr,Vector3 offset = {0,0,0});
+
+	/// <summary>
+	/// 親のワールド行列追従
+	/// </summary>
+	/// <param name="parentWorldMatrix">親のワールド行列ポインタ</param>
+	/// <param name="followRotation">回転追従フラグ</param>
+	/// <param name="localOffset">ローカルオフセット</param>
+	void FollowParentWorldMatrix(const Matrix4x4* parentWorldPtr, bool followRotation = true, Vector3 localOffset = { 0,0,0 });
+
+	// 追従を停止する
+	void StopFollowing();
 
 public:// ゲッター
 
@@ -119,7 +137,19 @@ public:// セッター
 	/// 
 	void SetTextureSize(const Vector2& textureSize) { textureSize_ = textureSize; }
 
-private:
+	/// <summary>
+	/// ワールド座標をスクリーン座標に変換する関数の設定
+	/// </summary>
+	/// <param name="func">変換関数</param>
+	void SetWorldToScreenFunc(std::function<Vector2(const Vector3&)> func) { worldToScreenFunc_ = func; }
+
+	/// <summary>
+	///	ビュー射影行列ポインタ設定
+	/// </summary>
+	/// <param name="viewProjPtr">ビュー射影行列ポインタ</param>
+	void SetViewProjectionMatrixPtr(const Matrix4x4* viewProjPtr) { viewProjPtr_ = viewProjPtr; }
+
+private: // 内部関数
 
 	// テクスチャサイズをイメージに合わせる
 	void AdjustTextureSize();
@@ -172,7 +202,6 @@ private:
 	//VertexShaderで利用するTransformationMatrix用のResourceを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_{};
 
-
 	// バッファリソース内のデータを指すポインタ
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
@@ -190,10 +219,7 @@ private:
 	// テクスチャ番号
 	uint32_t textureIndex = 0;
 
-
-
 	Transform transform_;
-
 
 	Vector2 position_ = { 0.0f,50.0f };
 	float rotation_ = 0.0f;
@@ -214,4 +240,18 @@ private:
 	Vector2 textureSize_ = { 100.0f,100.0f };
 
 	Vector4 color_{};
+
+	// ワールド座標追従
+	const Vector3* followWorldPositionPtr_ = nullptr;
+	Vector3 followWorldOffset_ = { 0,0,0 };
+	std::function<Vector2(const Vector3&)> worldToScreenFunc_; // 外部から渡す
+
+	// 親ワールド行列追従
+	const Matrix4x4* parentWorldMatrixPtr_ = nullptr;
+	Vector3 parentLocalOffset_ = { 0,0,0 };
+	bool parentFollowRotation_ = true;
+
+	// 親行列追従のために viewProjection を外部から渡す（WVP の計算に必要）
+	const Matrix4x4* viewProjPtr_ = nullptr;
+
 };

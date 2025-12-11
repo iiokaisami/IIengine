@@ -83,7 +83,7 @@ private:
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 2;
 
 	// 遷移
 	std::unique_ptr<BlockRiseTransition> blockTransition_ = nullptr;
