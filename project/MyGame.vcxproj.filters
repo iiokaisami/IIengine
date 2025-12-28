@@ -307,6 +307,9 @@
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp" />
     <ClCompile Include="gameEngine\time\TimeManager.cpp" />
+    <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
+    <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
+    <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -576,6 +579,10 @@
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h" />
     <ClInclude Include="gameEngine\time\TimeManager.h" />
+    <ClInclude Include="application\scene\cameraController\ICameraController.h" />
+    <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
+    <ClInclude Include="application\scene\cameraController\FollowController.h" />
+    <ClInclude Include="application\scene\cameraController\ShakeController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

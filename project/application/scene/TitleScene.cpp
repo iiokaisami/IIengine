@@ -3,12 +3,15 @@
 #include <cmath>
 #include <ModelManager.h>
 
+#include "TimeManager.h"
+
 void TitleScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
-	camera_ = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 
 	cameraPosition_ = camera_->GetRotate();
 	cameraRotate_ = camera_->GetPosition();
@@ -16,9 +19,9 @@ void TitleScene::Initialize()
 	cameraPosition_.z = -15.0f;
 	cameraRotate_.x = 1.2f;
 
-	cameraManager.AddCamera(camera_);
+	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 
 
 	// 衝突判定
@@ -66,6 +69,24 @@ void TitleScene::Initialize()
 	cubeSrvIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(cubeMapPath_);
 	cubeHandle_ = TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(cubeSrvIndex_);
 	
+	// カメラの追従
+	camera_->AddController(std::make_unique<FollowController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
+		0.8f, 0.25f
+	));
+
+	// カメラのシェイク
+	camera_->AddController(std::make_unique<ShakeController>(
+		camera_->GetCamera(),
+		[this]() -> bool {
+			bool hit = pPlayer_->IsHitMoment();
+			if (hit) pPlayer_->SetHitMoment(false); // consume
+			return hit;
+		},
+		0.3f, // duration
+		0.5f  // amplitude
+	));
 		
 	// シーン開始時にフェードイン
 	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
@@ -82,7 +103,15 @@ void TitleScene::Finalize()
 	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData_);
 	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData2_);
 
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_) 
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void TitleScene::Update()
@@ -98,12 +127,10 @@ void TitleScene::Update()
 			transition_.reset();
 			isTransitioning_ = false;
 		}
-	
 	}
 
-	camera_->Update();
-	camera_->SetPosition(cameraPosition_);
-	camera_->SetRotate(cameraRotate_);
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -114,7 +141,9 @@ void TitleScene::Update()
 	pEnemyManager_->SetPlayerPosition(pPlayer_->GetPosition());
 
 	// カメラの更新(シェイク、追尾、引き)
-	CameraUpdate();
+	camera_->Update(dt);
+	camera_->SetPosition(cameraPosition_);
+	camera_->SetRotate(cameraRotate_);
 	
 	// エネミー
 	pEnemyManager_->TitleEnemyUpdate();
@@ -249,73 +278,3 @@ void TitleScene::Draw()
 	}
 	
 }
-
-void TitleScene::CameraUpdate()
-{
-	// カメラのシェイク
-	CameraShake();
-
-	// カメラの追従
-	CameraFollow();
-}
-
-void TitleScene::CameraShake()
-{
-	// アクティブカメラの情報を取得
-	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		auto viewMatrix = activeCamera->GetViewMatrix();
-	}
-
-	// プレイヤーがヒットした場合にカメラをシェイク
-	if (pPlayer_->IsHitMoment())
-	{
-		// アクティブなカメラを取得
-		if (activeCamera)
-		{
-			// カメラをシェイク (持続時間,振幅)
-			activeCamera->StartShake(0.3f, 0.5f);
-
-			// ヒットフラグをリセット
-			pPlayer_->SetHitMoment(false);
-		}
-	}
-
-	// シェイク
-	if (activeCamera)
-	{
-		activeCamera->UpdateShake(1.0f / 60.0f);
-	}
-}
-
-void TitleScene::CameraFollow()
-{
-	if (!camera_ or !pPlayer_)
-	{
-		return;
-	}
-
-	Vector3 playerPos = pPlayer_->GetPosition();
-
-	// 固定のオフセット（プレイヤーから見たカメラ位置）
-	Vector3 offset = { 0.0f, 80.0f, -20.0f };  // Y: 高さ、Z: 後方
-
-	// 追従先の位置・回転
-	Vector3 targetPos = playerPos + offset;
-	Vector3 targetRot = { 2.0f, 0.0f, 0.0f };  // やや下向き
-
-	// 滑らかに補間して追従
-	Vector3 currentPos = camera_->GetPosition();
-	Vector3 nextPos;
-	nextPos.Lerp(currentPos, targetPos, 0.8f);
-
-	Vector3 currentRot = camera_->GetRotate();
-	Vector3 nextRot;
-	nextRot.Lerp(currentRot, targetRot, 0.25f);
-
-	camera_->SetPosition(nextPos);
-	camera_->SetRotate(nextRot);
-
-}
-

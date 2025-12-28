@@ -9,6 +9,9 @@
 
 #include "../../gameEngine/baseScene/BaseScene.h"
 #include "../../gameEngine/particle/ParticleEmitter.h"
+#include "cameraController/SceneCamera.h"
+#include "cameraController/ShakeController.h"
+#include "cameraController/FollowController.h"
 
 #include "../../application/objects/player/Player.h"
 #include "../../application/objects/enemy/EnemyManager.h"
@@ -36,23 +39,11 @@ public:
 	// 描画
 	void Draw() override;
 
-private: // 内部処理
-
-	// カメラ更新
-	void CameraUpdate();
-
-	// カメラシェイク
-	void CameraShake();
-
-	// カメラ追尾
-	void CameraFollow();
-
-
 private:
 
 	// カメラ
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera_ = std::make_shared<Camera>();
+	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 

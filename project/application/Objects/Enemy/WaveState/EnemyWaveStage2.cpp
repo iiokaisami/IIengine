@@ -9,7 +9,7 @@ EnemyWaveStage2::EnemyWaveStage2(EnemyManager* _pEnemyManager) : EnemyWaveState(
 void EnemyWaveStage2::Initialize()
 {
 	// CSVファイルの読み込み
-	LoadCSV("resources/csv/EnemyPop2.csv");
+	//LoadCSV("resources/csv/EnemyPop2.csv");
 
 	// EnemyManagerから共有LevelDataを受け取る
 	SetLevelData(pEnemyManager_->GetLevelData());
