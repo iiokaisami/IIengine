@@ -101,7 +101,15 @@
     └──     ├── SceneFactory.cpp
     └──     ├── SceneFactory.h
     └──     ├── TitleScene.cpp
-    └──     └── TitleScene.h
+    └──     ├── TitleScene.h
+    └──     └── cameraController/
+    └──         ├── FollowController.cpp
+    └──         ├── FollowController.h
+    └──         ├── ICameraController.h
+    └──         ├── SceneCamera.cpp
+    └──         ├── SceneCamera.h
+    └──         ├── ShakeController.cpp
+    └──         └── ShakeController.h
     ├── gameEngine/
     └── ├── 2d/
     └── └── ├── Sprite.cpp
@@ -355,6 +363,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp" />
+    <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\FadeTransition.cpp" />
@@ -435,6 +444,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSetTrap.cpp" />
     <ClCompile Include="gameEngine\transition\TransitionManager.cpp" />
     <ClCompile Include="gameEngine\time\TimeManager.cpp" />
+    <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
+    <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -448,6 +459,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h" />
+    <ClInclude Include="application\scene\cameraController\FollowController.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />
     <ClInclude Include="gameEngine\transition\FadeTransition.h" />
@@ -530,6 +542,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSetTrap.h" />
     <ClInclude Include="gameEngine\transition\TransitionManager.h" />
     <ClInclude Include="gameEngine\time\TimeManager.h" />
+    <ClInclude Include="application\scene\cameraController\ICameraController.h" />
+    <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
+    <ClInclude Include="application\scene\cameraController\ShakeController.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -930,6 +945,9 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp" />
     <ClCompile Include="gameEngine\time\TimeManager.cpp" />
+    <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
+    <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
+    <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1199,6 +1217,10 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h" />
     <ClInclude Include="gameEngine\time\TimeManager.h" />
+    <ClInclude Include="application\scene\cameraController\ICameraController.h" />
+    <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
+    <ClInclude Include="application\scene\cameraController\FollowController.h" />
+    <ClInclude Include="application\scene\cameraController\ShakeController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -4935,8 +4957,6 @@ EnemyWaveStage1::EnemyWaveStage1(EnemyManager* _pEnemyManager) : EnemyWaveState(
 
 void EnemyWaveStage1::Initialize()
 {
-	// CSVファイルの読み込み
-	LoadCSV("resources/csv/EnemyPop1.csv");
 
 	// EnemyManagerから共有LevelDataを受け取る
 	SetLevelData(pEnemyManager_->GetLevelData());
@@ -4946,8 +4966,6 @@ void EnemyWaveStage1::Initialize()
 
 void EnemyWaveStage1::Update()
 {
-	// 確認用csv更新
-	//UpdateCSV(pEnemyManager_);
 
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
@@ -5006,7 +5024,7 @@ EnemyWaveStage2::EnemyWaveStage2(EnemyManager* _pEnemyManager) : EnemyWaveState(
 void EnemyWaveStage2::Initialize()
 {
 	// CSVファイルの読み込み
-	LoadCSV("resources/csv/EnemyPop2.csv");
+	//LoadCSV("resources/csv/EnemyPop2.csv");
 
 	// EnemyManagerから共有LevelDataを受け取る
 	SetLevelData(pEnemyManager_->GetLevelData());
@@ -10831,12 +10849,15 @@ File Path: project/application/scene/TitleScene.cpp
 #include <cmath>
 #include <ModelManager.h>
 
+#include "TimeManager.h"
+
 void TitleScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
-	camera_ = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 
 	cameraPosition_ = camera_->GetRotate();
 	cameraRotate_ = camera_->GetPosition();
@@ -10844,9 +10865,9 @@ void TitleScene::Initialize()
 	cameraPosition_.z = -15.0f;
 	cameraRotate_.x = 1.2f;
 
-	cameraManager.AddCamera(camera_);
+	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 
 
 	// 衝突判定
@@ -10894,6 +10915,24 @@ void TitleScene::Initialize()
 	cubeSrvIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(cubeMapPath_);
 	cubeHandle_ = TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(cubeSrvIndex_);
 	
+	// カメラの追従
+	camera_->AddController(std::make_unique<FollowController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
+		0.8f, 0.25f
+	));
+
+	// カメラのシェイク
+	camera_->AddController(std::make_unique<ShakeController>(
+		camera_->GetCamera(),
+		[this]() -> bool {
+			bool hit = pPlayer_->IsHitMoment();
+			if (hit) pPlayer_->SetHitMoment(false); // consume
+			return hit;
+		},
+		0.3f, // duration
+		0.5f  // amplitude
+	));
 		
 	// シーン開始時にフェードイン
 	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
@@ -10910,7 +10949,15 @@ void TitleScene::Finalize()
 	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData_);
 	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData2_);
 
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_) 
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void TitleScene::Update()
@@ -10926,12 +10973,10 @@ void TitleScene::Update()
 			transition_.reset();
 			isTransitioning_ = false;
 		}
-	
 	}
 
-	camera_->Update();
-	camera_->SetPosition(cameraPosition_);
-	camera_->SetRotate(cameraRotate_);
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -10942,7 +10987,9 @@ void TitleScene::Update()
 	pEnemyManager_->SetPlayerPosition(pPlayer_->GetPosition());
 
 	// カメラの更新(シェイク、追尾、引き)
-	CameraUpdate();
+	camera_->Update(dt);
+	camera_->SetPosition(cameraPosition_);
+	camera_->SetRotate(cameraRotate_);
 	
 	// エネミー
 	pEnemyManager_->TitleEnemyUpdate();
@@ -11078,77 +11125,6 @@ void TitleScene::Draw()
 	
 }
 
-void TitleScene::CameraUpdate()
-{
-	// カメラのシェイク
-	CameraShake();
-
-	// カメラの追従
-	CameraFollow();
-}
-
-void TitleScene::CameraShake()
-{
-	// アクティブカメラの情報を取得
-	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		auto viewMatrix = activeCamera->GetViewMatrix();
-	}
-
-	// プレイヤーがヒットした場合にカメラをシェイク
-	if (pPlayer_->IsHitMoment())
-	{
-		// アクティブなカメラを取得
-		if (activeCamera)
-		{
-			// カメラをシェイク (持続時間,振幅)
-			activeCamera->StartShake(0.3f, 0.5f);
-
-			// ヒットフラグをリセット
-			pPlayer_->SetHitMoment(false);
-		}
-	}
-
-	// シェイク
-	if (activeCamera)
-	{
-		activeCamera->UpdateShake(1.0f / 60.0f);
-	}
-}
-
-void TitleScene::CameraFollow()
-{
-	if (!camera_ or !pPlayer_)
-	{
-		return;
-	}
-
-	Vector3 playerPos = pPlayer_->GetPosition();
-
-	// 固定のオフセット（プレイヤーから見たカメラ位置）
-	Vector3 offset = { 0.0f, 80.0f, -20.0f };  // Y: 高さ、Z: 後方
-
-	// 追従先の位置・回転
-	Vector3 targetPos = playerPos + offset;
-	Vector3 targetRot = { 2.0f, 0.0f, 0.0f };  // やや下向き
-
-	// 滑らかに補間して追従
-	Vector3 currentPos = camera_->GetPosition();
-	Vector3 nextPos;
-	nextPos.Lerp(currentPos, targetPos, 0.8f);
-
-	Vector3 currentRot = camera_->GetRotate();
-	Vector3 nextRot;
-	nextRot.Lerp(currentRot, targetRot, 0.25f);
-
-	camera_->SetPosition(nextPos);
-	camera_->SetRotate(nextRot);
-
-}
-
-
-
 ============================================================
 File Path: project/application/scene/TitleScene.h
 ============================================================
@@ -11163,6 +11139,9 @@ File Path: project/application/scene/TitleScene.h
 
 #include "../../gameEngine/baseScene/BaseScene.h"
 #include "../../gameEngine/particle/ParticleEmitter.h"
+#include "cameraController/SceneCamera.h"
+#include "cameraController/ShakeController.h"
+#include "cameraController/FollowController.h"
 
 #include "../../application/objects/player/Player.h"
 #include "../../application/objects/enemy/EnemyManager.h"
@@ -11190,23 +11169,11 @@ public:
 	// 描画
 	void Draw() override;
 
-private: // 内部処理
-
-	// カメラ更新
-	void CameraUpdate();
-
-	// カメラシェイク
-	void CameraShake();
-
-	// カメラ追尾
-	void CameraFollow();
-
-
 private:
 
 	// カメラ
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera_ = std::make_shared<Camera>();
+	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 
@@ -11277,6 +11244,413 @@ private:
 	float time_ = 0.0f;
 
 };
+
+============================================================
+File Path: project/application/scene/cameraController/FollowController.cpp
+============================================================
+#include "FollowController.h"
+
+#include <Camera.h>
+
+FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp, float rotationLerp)
+	: camera_(camera),
+      targetPos_(targetPos),
+      positionLerp_(positionLerp),
+	  rotationLerp_(rotationLerp)
+{}
+
+void FollowController::Update(float dt)
+{
+	dt;
+	// 無効またはカメラがない場合は処理しない
+	if(!active_ or !camera_)
+	{
+		return;
+	}
+
+	// 追尾対象の位置を取得
+	Vector3 playerPos = targetPos_();
+	// 固定のオフセット 
+	Vector3 targetPos = playerPos + offset_;
+	// 現在のカメラ位置を取得
+	Vector3 currentPos = camera_->GetPosition();
+	// 次の位置を補間で計算
+	Vector3 nextPos;
+	nextPos.Lerp(currentPos, targetPos, positionLerp_);
+	// カメラの位置を設定
+	camera_->SetPosition(nextPos);
+
+	// 次の回転を補間で計算
+	Vector3 currentRot = camera_->GetRotate();
+	Vector3 nextRot;
+	nextRot.Lerp(currentRot, targetRot_, rotationLerp_);
+	// カメラの回転を設定
+	camera_->SetRotate(nextRot);
+
+}
+
+
+============================================================
+File Path: project/application/scene/cameraController/FollowController.h
+============================================================
+#pragma once
+
+#include <functional>
+#include <memory>
+
+#include <Vector3.h>
+#include "ICameraController.h"
+
+// 前方宣言
+class Camera;
+
+/// <summary>
+/// 追尾カメラコントローラー
+/// </summary>
+class FollowController : public ICameraController
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="camera">カメラ</param>
+	/// <param name="targetPos">追尾対象の位置を返す関数</param>
+	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
+	/// <param name="raotationLerp">回転の補間値(0.0f~1.0f)</param>
+	/// </summary>
+	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp = 0.8f, float rotationLerp = 0.25f);
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">デルタタイム</param>
+	void Update(float dt) override;
+
+	// 開始
+	void Start() override { active_ = true; }
+
+	// 停止
+	void Stop() override { active_ = false; }
+
+public: // ゲッター
+
+	// コントローラーが有効かどうか
+	bool IsActive() const override { return active_; }
+
+private:
+
+	// カメラ
+	std::shared_ptr<Camera> camera_ = nullptr;
+	// 追尾対象の位置を返す関数
+	std::function<Vector3()> targetPos_ = nullptr;
+	// 位置の補間値
+	float positionLerp_ = 0.8f;
+	// 回転の補間値
+	float rotationLerp_ = 0.25f;
+	// 有効フラグ
+	bool active_ = true;
+
+	const Vector3 offset_ = { 0.0f, 80.0f, -20.0f };
+	const Vector3 targetRot_ = { 2.0f, 0.0f, 0.0f };
+};
+
+
+
+============================================================
+File Path: project/application/scene/cameraController/ICameraController.h
+============================================================
+#pragma once
+
+#include <memory>
+
+/// <summary>
+/// カメラコントローラーインターフェース
+/// </summary>
+class ICameraController
+{
+public:
+
+	// デストラクタ
+	virtual ~ICameraController() = default;
+
+	// 開始
+	virtual void Start() {}
+
+	// 停止
+	virtual void Stop() {}
+	
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">デルタタイム</param>
+	virtual void Update(float dt) = 0;
+	
+	// ImGui描画
+	virtual void ImGuiDraw() {}
+
+public: // ゲッター
+
+	// コントローラーが有効かどうか
+	virtual bool IsActive() const { return true; }
+
+};
+
+
+
+============================================================
+File Path: project/application/scene/cameraController/SceneCamera.cpp
+============================================================
+#include "SceneCamera.h"
+
+#include <Camera.h>
+#include <CameraManager.h>
+
+SceneCamera::SceneCamera()
+	: camera_(std::make_shared<Camera>()),
+	  cameraManager_(CameraManager::GetInstance())
+{}
+
+SceneCamera::~SceneCamera() = default;
+
+void SceneCamera::Initialize()
+{
+	// 必ず先頭でカメラを全クリア
+    cameraManager_.ClearAllCameras();
+ 
+	// カメラの作成
+	cameraManager_.AddCamera(camera_);
+    
+	// アクティブカメラの設定
+	cameraManager_.SetActiveCamera(0);
+ }
+
+void SceneCamera::Finalize()
+{
+	// カメラの削除
+	cameraManager_.RemoveCamera(0);
+}
+
+void SceneCamera::AddController(std::unique_ptr<ICameraController> controller)
+{
+	// コントローラーを追加
+	controllers_.push_back(std::move(controller));
+}
+
+void SceneCamera::Update(float dt)
+{
+	// 各コントローラーの更新
+	for (auto& controller : controllers_)
+	{
+		if (controller->IsActive())
+		{
+			controller->Update(dt);
+		}
+	}
+
+	// カメラの更新
+	if (camera_)
+	{
+		camera_->Update();
+	}
+}
+
+Vector3 SceneCamera::GetPosition() const
+{
+	if (camera_)
+	{
+		return camera_->GetPosition();
+	}
+	return Vector3{}; // デフォルト
+}
+
+Vector3 SceneCamera::GetRotate() const
+{
+	if (camera_)
+	{
+		return camera_->GetRotate();
+	}
+	return Vector3{};
+}
+
+void SceneCamera::SetPosition(const Vector3& pos)
+{
+	if (this->camera_)
+	{
+		camera_->SetPosition(pos);
+	}
+}
+
+void SceneCamera::SetRotate(const Vector3& rot)
+{
+	if (this->camera_)
+	{
+		camera_->SetRotate(rot);
+	}
+}
+
+============================================================
+File Path: project/application/scene/cameraController/SceneCamera.h
+============================================================
+#pragma once
+
+#include <vector>
+#include <memory>
+#include <functional>
+#include <Vector3.h>
+
+#include "ICameraController.h"
+
+/// 前方宣言
+class Camera;
+class CameraManager;
+
+/// <summary>
+/// シーンカメラ
+/// </summary>
+class SceneCamera
+{
+public:
+
+	// コンストラクタ
+	SceneCamera();
+	// デストラクタ
+	~SceneCamera();
+
+	// 初期化
+	void Initialize();
+	// 終了
+	void Finalize();
+
+	/// <summary>
+	/// コントローラー追加
+	/// </summary>
+	/// <param name="controller">追加するコントローラーのユニークポインタ</param>
+	void AddController(std::unique_ptr<ICameraController> controller);
+	// カメラ更新
+	void Update(float dt);
+
+public: // ゲッター
+
+	// カメラ取得
+	std::shared_ptr<Camera> GetCamera() const { return camera_; }
+
+	// 位置取得
+	Vector3 GetPosition() const;
+	// 回転取得
+	Vector3 GetRotate() const;
+	
+public: // セッター
+
+	// 位置設定
+	void SetPosition(const Vector3& position);
+	// 回転設定
+	void SetRotate(const Vector3& rotate);
+
+private:
+
+	// カメラ
+	std::shared_ptr<Camera> camera_ = nullptr;
+	// カメラコントローラーリスト
+	std::vector<std::unique_ptr<ICameraController>> controllers_;
+	// カメラマネージャー
+	CameraManager& cameraManager_;
+
+};
+
+
+
+============================================================
+File Path: project/application/scene/cameraController/ShakeController.cpp
+============================================================
+#include "ShakeController.h"
+
+#include <Camera.h>
+
+ShakeController::ShakeController(std::shared_ptr<Camera> camera, std::function<bool()> consumeHit, float defaultDuration, float defaultAmp)
+    : camera_(camera),
+      consumeHit_(consumeHit),
+      duration_(defaultDuration),
+	  amplitude_(defaultAmp)
+{}
+
+void ShakeController::Update(float dt)
+{
+    if (!active_ || !camera_)
+    {
+        return;
+    }
+
+    if (consumeHit_ && consumeHit_()) 
+    {
+        // シェイクスタート
+        camera_->StartShake(duration_, amplitude_);
+    }
+
+    camera_->UpdateShake(dt);
+}
+
+
+============================================================
+File Path: project/application/scene/cameraController/ShakeController.h
+============================================================
+#pragma once
+
+#include <functional>
+#include <memory>
+
+#include "ICameraController.h"
+
+// 前方宣言
+class Camera;
+
+/// <summary>
+/// カメラシェイクコントローラー
+/// </summary>
+class ShakeController : public ICameraController
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="camera">カメラ</param>
+	/// <param name="consumeHit">ヒットを消費する関数(ヒットがあればtrueを返す)</param>
+	/// <param name="defaultDuration">シェイク継続時間</param>
+	/// <param name="defaultAmp">シェイク振幅</param>
+	ShakeController(std::shared_ptr<Camera> camera, std::function<bool()> consumeHit, float defaultDuration = 0.3f, float defaultAmp = 1.0f);
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">デルタタイム</param>
+	void Update(float dt) override;
+	// 開始
+	void Start() override { active_ = true; }
+	// 停止
+	void Stop() override { active_ = false; }
+
+public: // ゲッター
+
+	// コントローラーが有効かどうか
+	bool IsActive() const override { return active_; }
+
+private:
+
+	// カメラ
+	std::shared_ptr<Camera> camera_ = nullptr;
+	// ヒットを消費する関数
+	std::function<bool()> consumeHit_ = nullptr;
+	// 有効フラグ
+	bool active_ = true;
+	// シェイク継続時間
+	float duration_ = 0.3f;
+	// シェイク振幅
+	float amplitude_ = 1.0f;
+
+};
+
+
 
 ============================================================
 File Path: project/gameEngine/2d/Sprite.cpp
