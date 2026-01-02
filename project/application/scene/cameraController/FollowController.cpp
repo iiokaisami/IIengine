@@ -2,11 +2,12 @@
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp, float rotationLerp)
+FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp, float rotationLerp, Vector3 targetRot)
 	: camera_(camera),
       targetPos_(targetPos),
       positionLerp_(positionLerp),
-	  rotationLerp_(rotationLerp)
+	  rotationLerp_(rotationLerp),
+	  targetRot_(targetRot)
 {}
 
 void FollowController::Update(float dt)
@@ -37,4 +38,19 @@ void FollowController::Update(float dt)
 	// カメラの回転を設定
 	camera_->SetRotate(nextRot);
 
+}
+
+void FollowController::SnapToTarget()
+{
+	if (!camera_ or !targetPos_)
+	{
+		return;
+	}
+
+	Vector3 playerPos = targetPos_();
+	Vector3 targetPos = playerPos + offset_;
+
+	// 直接スナップ
+	camera_->SetPosition(targetPos);
+	camera_->SetRotate(targetRot_);
 }

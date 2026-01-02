@@ -1,15 +1,18 @@
 #include "ClearScene.h"
 
+#include "TimeManager.h"
+
 void ClearScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
-	camera_ = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
 	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
-	cameraManager.AddCamera(camera_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
+	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
 
 	cameraPosition_ = { 0.0f,12.0f,-33.0f };
@@ -58,7 +61,15 @@ void ClearScene::Finalize()
 	pPlayer_->Finalize();
 	pField_->Finalize();
 
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_)
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void ClearScene::Update()
@@ -77,10 +88,14 @@ void ClearScene::Update()
 
 	}
 
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	// カメラ更新
-	camera_->Update();
+	camera_->Update(dt);
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
+
 
 	// スプライト更新
 	for (auto& sprite : sprites_)

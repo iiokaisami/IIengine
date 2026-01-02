@@ -12,6 +12,7 @@
 #include "../../gameEngine/particle/ParticleEmitter.h"
 #include "../objects/player/Player.h"
 #include "../objects/field/Field.h"
+#include "cameraController/SceneCamera.h"
 
 /// <summary>
 /// クリアシーン
@@ -36,7 +37,7 @@ public:
 private:
 
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera_ = std::make_shared<Camera>();
+	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 

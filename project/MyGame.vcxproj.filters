@@ -310,6 +310,9 @@
     <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
     <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
     <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
+    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
+    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
+    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -583,6 +586,9 @@
     <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
     <ClInclude Include="application\scene\cameraController\FollowController.h" />
     <ClInclude Include="application\scene\cameraController\ShakeController.h" />
+    <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
+    <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
+    <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

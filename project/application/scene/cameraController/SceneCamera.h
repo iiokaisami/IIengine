@@ -33,6 +33,30 @@ public:
 	/// </summary>
 	/// <param name="controller">追加するコントローラーのユニークポインタ</param>
 	void AddController(std::unique_ptr<ICameraController> controller);
+
+	// 指定したコントローラTを生成登録、生ポインタを返す
+	template<typename T, typename... Args>
+	T* AddController(Args&&... args)
+	{
+		static_assert(std::is_base_of<ICameraController, T>::value, "T must derive from ICameraController");
+		auto ptr = std::make_unique<T>(std::forward<Args>(args)...);
+		T* raw = ptr.get();
+		controllers_.push_back(std::move(ptr));
+		return raw;
+	}
+
+	// 登録済みのコントローラTを検索してT*を返す
+	template<typename T>
+	T* FindController() const
+	{
+		static_assert(std::is_base_of<ICameraController, T>::value, "T must derive from ICameraController");
+		for (const auto& c : controllers_)
+		{
+			if (auto p = dynamic_cast<T*>(c.get())) return p;
+		}
+		return nullptr;
+	}
+	
 	// カメラ更新
 	void Update(float dt);
 

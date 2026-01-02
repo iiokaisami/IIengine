@@ -24,7 +24,7 @@ public:
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
 	/// <param name="raotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
-	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp = 0.8f, float rotationLerp = 0.25f);
+	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
 
 	/// <summary>
 	/// 更新
@@ -37,6 +37,9 @@ public:
 
 	// 停止
 	void Stop() override { active_ = false; }
+
+	// カメラ位置と回転を強制セット
+	void SnapToTarget();
 
 public: // ゲッター
 
@@ -56,7 +59,7 @@ private:
 	// 有効フラグ
 	bool active_ = true;
 
-	const Vector3 offset_ = { 0.0f, 80.0f, -20.0f };
-	const Vector3 targetRot_ = { 2.0f, 0.0f, 0.0f };
+	const Vector3 offset_ = { 0.0f, 78.0f, -17.0f };
+	Vector3 targetRot_ = { 2.0f, 0.0f, 0.0f };
 };
 

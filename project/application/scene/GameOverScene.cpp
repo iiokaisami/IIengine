@@ -2,16 +2,19 @@
 
 #include <Ease.h>
 
+#include "TimeManager.h"
+
 void GameOverScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
-	camera_ = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
 	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
-	cameraManager.AddCamera(camera_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
+	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
 
 	cameraPosition_ = { 0.0f,20.0f,-50.0f };
@@ -54,6 +57,19 @@ void GameOverScene::Initialize()
 	pEnemyManager_ = std::make_unique<EnemyManager>();
 	pEnemyManager_->GameOverEnemyInit();
 
+
+	// カメラのシェイク
+	camera_->AddController(std::make_unique<ShakeController>(
+		camera_->GetCamera(),
+		[this]() -> bool {
+			bool hit = pPlayer_->IsHitMoment();
+			if (hit) pPlayer_->SetHitMoment(false); // consume
+			return hit;
+		},
+		0.3f, // duration
+		0.5f  // amplitude
+	));
+
 	// シーン開始時にフェードイン
 	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
@@ -65,7 +81,15 @@ void GameOverScene::Finalize()
 	pPlayer_->Finalize();
 	pEnemyManager_->Finalize();
 
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_)
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void GameOverScene::Update()
@@ -84,9 +108,13 @@ void GameOverScene::Update()
 
 	}
 
-	camera_->Update();
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// カメラ更新
+	camera_->Update(dt);
 	camera_->SetPosition(cameraPosition_);
-	camera_->SetRotate(cameraRotate_);	
+	camera_->SetRotate(cameraRotate_);
 
 	for (auto& sprite : sprites_)
 	{

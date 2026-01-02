@@ -14,6 +14,13 @@
 #include "../../gameEngine/transition/BlockRiseTransition.h"
 #include "../../gameEngine/transition/FadeTransition.h"
 
+#include "cameraController/SceneCamera.h"
+#include "cameraController/ShakeController.h"
+#include "cameraController/FollowController.h"
+#include "cameraController/StartCameraController.h"
+#include "cameraController/DeathCameraController.h"
+#include "cameraController/ClearCameraController.h"
+
 /// <summary>
 ///	ゲームプレイシーン
 /// プレイヤー操作、敵出現、フィールド、ゴール、衝突判定、シーン遷移
@@ -39,45 +46,15 @@ private:
 	// このシーンで出す全てのImGui
 	void AllImGui();
 
-	// カメラ更新
-	void CameraUpdate();
-
-	// カメラシェイク
-	void CameraShake();
-
-	// カメラ追尾
-	void CameraFollow();
-
-	/// <summary>
-	/// スタートカメラ
-	///	</summary>
-	void StartCamera();
-
-	/// <summary>
-	/// デスカメラ
-	/// </summary>
-	void StartDeathCamera();
-
-	/// <summary>
-	/// デスカメラ更新
-	/// </summary>
-	/// <param name="deltaTime">デルタタイム</param>
-	void UpdateDeathCamera(float deltaTime);
-
-	/// <summary>
-	/// クリア更新
-	/// </summary>
-	void ClearUpdate();
-
-
 private:
 
+	// カメラ
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera = nullptr;
+	std::shared_ptr<SceneCamera> camera_ = nullptr;
     
     uint32_t activeIndex = 0;
-	Vector3 cameraRotate = { -0.9f,0.0f,0.0f};
-	Vector3 cameraPosition = { 0.0f,-20.0f,0.0f };
+	Vector3 cameraRotate_ = { -0.9f,0.0f,0.0f};
+	Vector3 cameraPosition_ = { 0.0f,-20.0f,0.0f };
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};

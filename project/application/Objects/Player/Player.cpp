@@ -733,6 +733,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		{
 			hp_--;
 
+			isHitMoment_ = true;
+
 			ParticleEmitter::Emit("HitReaction", position_, 5);
 		}
 		else
@@ -740,7 +742,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isDead_ = true;
 		}
 
-		isHitMoment_ = true;
+		
 	} 
 
 	if (!isEvading_ && (_other->GetColliderID() == "ExplosionTimeBomb" or

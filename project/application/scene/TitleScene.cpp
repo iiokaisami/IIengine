@@ -73,13 +73,15 @@ void TitleScene::Initialize()
 	camera_->AddController(std::make_unique<FollowController>(
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
-		0.8f, 0.25f
+		0.8f, 0.25f,
+		Vector3{ 2.0f, 0.0f, 0.0f }
 	));
 
 	// カメラのシェイク
 	camera_->AddController(std::make_unique<ShakeController>(
 		camera_->GetCamera(),
-		[this]() -> bool {
+		[this]() -> bool
+		{
 			bool hit = pPlayer_->IsHitMoment();
 			if (hit) pPlayer_->SetHitMoment(false); // consume
 			return hit;

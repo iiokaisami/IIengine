@@ -12,6 +12,8 @@
 #include "../../application/objects/player/Player.h"
 #include "../../application/objects/enemy/EnemyManager.h"
 #include "../../gameEngine/collider/ColliderManager.h"
+#include "cameraController/SceneCamera.h"
+#include "cameraController/ShakeController.h"
 
 /// <summary>
 /// ゲームオーバーシーン
@@ -41,7 +43,7 @@ private:
 private:
 
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera_ = std::make_shared<Camera>();
+	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 

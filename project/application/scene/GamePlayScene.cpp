@@ -4,31 +4,27 @@
 #include <Ease.h>
 #include <corecrt_math_defines.h>
 
+#include "TimeManager.h"
+
 void GamePlayScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
 	// カメラの作成
-	camera = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 
-	cameraRotate = camera->GetRotate();
-	cameraPosition = camera->GetPosition();
-	cameraPosition.y = 70.0f;
-	cameraPosition.z = -15.0f;
-	cameraRotate.x = 1.2f;
+	cameraRotate_ = camera_->GetRotate();
+	cameraPosition_ = camera_->GetPosition();
+	cameraPosition_.y = 70.0f;
+	cameraPosition_.z = -15.0f;
+	cameraRotate_.x = 1.2f;
 
-	camera->SetPosition(camStart_);
-	camera->SetRotate(camStartRot_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 
-	// カメラの追加
-	cameraManager.AddCamera(camera);
-
-	// アクティブカメラの設定
-	cameraManager.SetActiveCamera(0);
-	activeIndex = cameraManager.GetActiveIndex();
-
-	Object3dCommon::GetInstance()->SetDefaultCamera(cameraManager.GetActiveCamera());
+	camera_->SetPosition(camStart_);
+	camera_->SetRotate(camStartRot_);
 
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -49,10 +45,6 @@ void GamePlayScene::Initialize()
 	// ゴールの初期化
 	pGoal_ = std::make_unique<Goal>();
 	pGoal_->Initialize();
-
-	// 追尾の初期化
-	cameraIsResting_ = true;
-	cameraRestCenter_ = pPlayer_->GetPosition() + Vector3{ 0.0f,70.0f,-20.0f };
 
 	// スプライト
 	for (uint32_t i = 0; i < spriteNum_; ++i)
@@ -88,6 +80,88 @@ void GamePlayScene::Initialize()
 		}
 	}
 
+	// カメラの追従
+	camera_->AddController(std::make_unique<FollowController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
+		0.8f, 0.25f,
+		Vector3{ 1.4f, 0.0f, 0.0f }
+	));
+
+	// カメラのシェイク
+	camera_->AddController(std::make_unique<ShakeController>(
+		camera_->GetCamera(),
+		[this]() -> bool
+		{
+			bool hit = pPlayer_->IsHitMoment();
+			if (hit) pPlayer_->SetHitMoment(false); // consume
+			return hit;
+		},
+		0.3f, // duration
+		0.5f  // amplitude
+	));
+
+	// スタート用コントローラ作成
+	camera_->AddController<StartCameraController>(
+		camera_->GetCamera(),
+		camStart_, camControl1_, camControl2_, camEnd_,
+		camStartRot_, camEndRot_,
+		cameraStartDuration_);
+
+	// デスカメラコントローラ作成
+	camera_->AddController<DeathCameraController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
+		deathCameraDuration_, deathCameraRotations_, deathEndRadius_, deathEndHeight_);
+
+	// クリアカメラコントローラ作成
+	camera_->AddController<ClearCameraController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
+		clearCameraDuration_, clearCameraRotations_, 0.12f, 30.0f, 0.4f);
+
+	// コールバック設定（FindController を使ってその場で取得）
+	if (auto* death = camera_->FindController<DeathCameraController>())
+	{
+		death->SetOnFinish([this]()
+			{
+			if (pPlayer_)
+			{
+				pPlayer_->StartDeathMotion();
+			}
+		
+			});
+	}
+
+	if (auto* clear = camera_->FindController<ClearCameraController>())
+	{
+		clear->SetOnFadeStart([this]() { isClearFadeStart_ = true; });
+		clear->SetOnFinish([this]()
+			{
+			if (auto* follow = camera_->FindController<FollowController>()) follow->Start();
+			});
+	}
+
+	if (auto* startCtrl = camera_->FindController<StartCameraController>())
+	{
+		startCtrl->SetOnFinish([this]()
+			{
+				// スタート演出終わったらフォロー再開
+				if (auto* follow = camera_->FindController<FollowController>())
+				{
+					follow->SnapToTarget();
+					follow->Start();
+				}
+				// フラグがあればクリア
+				isStartCamera_ = false;
+			});
+
+		// 演出前に追尾を止めておく
+		if (auto* follow = camera_->FindController<FollowController>()) follow->Stop();
+		// 演出を開始
+		startCtrl->Start();
+	}
+
 	// シーン開始時遷移演出
 	blockTransition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
@@ -119,8 +193,15 @@ void GamePlayScene::Finalize()
 	}
 	pGoal_->Finalize();
 
-	// カメラ解放
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_)
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void GamePlayScene::Update()
@@ -150,11 +231,8 @@ void GamePlayScene::Update()
 		}
 	}
 	
-	// スタートカメラ演出
-	StartCamera();
-
-	// カメラマネージャーの更新
-	cameraManager.UpdateAll();
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -164,13 +242,48 @@ void GamePlayScene::Update()
 	// プレイヤーの位置をエネミーマネージャーにセット
 	pEnemyManager_->SetPlayerPosition(pPlayer_->GetPosition());
 
-	// カメラの更新(シェイク、追尾、引き)
-	if (!isStartCamera_ && !pPlayer_->IsDead())
+	// デス演出トリガー
+	if (pPlayer_->IsDead() && !pPlayer_->IsAutoControl() && !isTransitioning_ && !isDeadCameraPlayer_)
 	{
-		camera->SetRotate(cameraRotate);
-		camera->SetPosition(cameraPosition);
-		CameraUpdate();
+		// 一度だけ開始フラグを立てる
+		isDeadCameraPlayer_ = true;
+		isDeathCamera_ = true;
+
+		// 追尾を止める
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
+		// デスカメラ開始
+		if (auto* death = camera_->FindController<DeathCameraController>())
+		{
+			death->Start();
+		}
 	}
+
+	// クリア演出トリガー
+	if (pGoal_->IsCleared() && !isTransitioning_ && !isClearMoment_)
+	{
+		isClearMoment_ = true;
+		isClearCamera_ = true;
+
+		// 追尾を止める
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
+
+		// クリアカメラ開始
+		if (auto* clear = camera_->FindController<ClearCameraController>())
+		{
+			clear->Start();
+		}
+	}
+
+	// カメラの更新(シェイク、追尾、引き)
+	camera_->Update(dt);
+	// カメラマネージャーの更新
+	cameraManager.UpdateAll();
 
 	// エネミーの更新
 	pEnemyManager_->Update();
@@ -197,24 +310,6 @@ void GamePlayScene::Update()
 		Vector2 screen = activeCamera->WorldToScreen(worldHeadPos);
 		sprites_[1]->SetPosition(screen);
 	}
-
-	// プレイヤーが死んだらデスカメラを開始(1回だけ)
-	if (pPlayer_->IsDead() && !pPlayer_->IsAutoControl() && !isTransitioning_ && !isDeadCameraPlayer_)
-	{
-		if (!isDeathCamera_)
-		{
-			StartDeathCamera();
-		}
-	}
-
-	// DeathCamera更新(StartDeathCameraが呼ばれている場合)
-	if (isDeathCamera_)
-	{
-		UpdateDeathCamera(1.0f / 60.0f);
-	}
-
-	// クリア更新
-	ClearUpdate();
 
 	// スプライトの更新
 	for (auto& sprite : sprites_)
@@ -307,15 +402,15 @@ void GamePlayScene::AllImGui()
 	ImGui::SliderFloat4("SpriteColor", &color_.x, 0.0f, 1.0f);
 
 	// camera
-	Vector3 cam1Pos = camera->GetPosition();
-	Vector3 cam1Rot = camera->GetRotate();
+	Vector3 cam1Pos = camera_->GetPosition();
+	Vector3 cam1Rot = camera_->GetRotate();
 	if (ImGui::SliderFloat3("cameraPosition", &cam1Pos.x, -100.0f, 100.0f))
 	{
-		camera->SetPosition(cam1Pos);
+		camera_->SetPosition(cam1Pos);
 	}
 	if (ImGui::SliderFloat3("cameraRotate", &cam1Rot.x, -10.0f, 10.0f))
 	{
-		camera->SetRotate(cam1Rot);
+		camera_->SetRotate(cam1Rot);
 	}
 
 
@@ -332,290 +427,4 @@ void GamePlayScene::AllImGui()
 
 
 #endif // USE_IMGUI
-}
-
-void GamePlayScene::CameraUpdate()
-{
-	// カメラのシェイク
-	CameraShake();
-
-	// カメラの追従
-	CameraFollow();
-
-}
-
-void GamePlayScene::CameraShake()
-{
-	// アクティブカメラの情報を取得
-	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		auto viewMatrix = activeCamera->GetViewMatrix();
-	}
-
-	// プレイヤーがヒットした場合にカメラをシェイク
-	if (pPlayer_->IsHitMoment())
-	{
-		// アクティブなカメラを取得
-		if (activeCamera)
-		{
-			// カメラをシェイク (持続時間,振幅)
-			activeCamera->StartShake(0.3f, 1.2f);
-
-			// ヒットフラグをリセット
-			pPlayer_->SetHitMoment(false);
-		}
-	}
-
-	// シェイク
-	if (activeCamera)
-	{
-		activeCamera->UpdateShake(1.0f / 60.0f);
-	}
-}
-
-void GamePlayScene::CameraFollow()
-{
-	if (!camera or !pPlayer_) 
-	{
-		return;
-	}
-
-	Vector3 playerPos = pPlayer_->GetPosition();
-
-	// 固定のオフセット（プレイヤーから見たカメラ位置）
-	Vector3 offset = { 0.0f, 80.0f, -20.0f };  // Y: 高さ、Z: 後方
-
-	// 追従先の位置・回転
-	Vector3 targetPos = playerPos + offset;
-	Vector3 targetRot = { 2.0f, 0.0f, 0.0f };  // やや下向き
-
-	// 滑らかに補間して追従
-	Vector3 currentPos = camera->GetPosition();
-	Vector3 nextPos;
-	nextPos.Lerp(currentPos, targetPos, 0.8f);
-
-	Vector3 currentRot = camera->GetRotate();
-	Vector3 nextRot;
-	nextRot.Lerp(currentRot, targetRot, 0.25f);
-
-	camera->SetPosition(nextPos);
-	camera->SetRotate(nextRot);
-}
-
-void GamePlayScene::StartCamera()
-{
-	if (isStartCamera_ && !isTransitioning_)
-	{
-		cameraStartTimer_ += 1.0f / 60.0f;
-		float t = std::clamp(cameraStartTimer_ / cameraStartDuration_, 0.0f, 1.0f);
-		float t_eased = Ease::InOutQuad(t);
-
-		// 補間
-		Vector3 camPos = Bezier3(camStart_, camControl1_, camControl2_, camEnd_, t_eased);
-		Vector3 camRot = Lerp(camStartRot_, camEndRot_, t_eased);
-		camera->SetPosition(camPos);
-		camera->SetRotate(camRot);
-
-		if (t >= 1.0f)
-		{
-			isStartCamera_ = false; // 終了
-			camera->SetPosition(camEnd_);
-			camera->SetRotate(camEndRot_);
-		}
-	}
-
-}
-
-void GamePlayScene::StartDeathCamera()
-{
-	if (!camera or !pPlayer_)
-	{
-		return;
-	}
-
-	// 一度だけフラグ
-	isDeadCameraPlayer_ = true;
-
-	isDeathCamera_ = true;
-	deathCameraTimer_ = 0.0f;
-
-	// プレイヤー位置と現カメラ位置から開始角度・半径・高さを算出
-	Vector3 playerPos = pPlayer_->GetPosition();
-	Vector3 camPos = camera->GetPosition();
-
-	float dx = camPos.x - playerPos.x;
-	float dz = camPos.z - playerPos.z;
-	// startAngle を atan2(dx, dz)の順で取る(Bezier等で使ったのと整合を取る)
-	deathStartAngle_ = std::atan2(dx, dz);
-	deathStartRadius_ = std::sqrt(dx * dx + dz * dz);
-	deathStartHeight_ = camPos.y - playerPos.y;
-
-	// 最終的にプレイヤーの正面は 0 に
-	deathTargetAngleOffset_ = 0.0f;
-}
-
-void GamePlayScene::UpdateDeathCamera(float deltaTime)
-{
-	if (!isDeathCamera_ or (!camera || !pPlayer_))
-	{
-		return;
-	}
-
-	deathCameraTimer_ += deltaTime;
-	float t = std::clamp(deathCameraTimer_ / deathCameraDuration_, 0.0f, 1.0f);
-
-	// イージング
-	float t_eased = Ease::InOutQuad(t);
-
-	// 角度は start -> target を経由して rotations 周回させる
-	// targetAngle = deathTargetAngleOffset_0: プレイヤー前方
-	float targetAngle = deathTargetAngleOffset_;
-	// 差分を符号付きで正規化しておき、さらに周回分を追加
-	float delta = targetAngle - deathStartAngle_;
-	// normalize delta to [-pi, pi]
-	while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-	while (delta < (float) - M_PI) delta += 2.0f * (float)M_PI;
-	float totalAngularTravel = delta + deathCameraRotations_ * 2.0f * (float)M_PI;
-	float angle = deathStartAngle_ + totalAngularTravel * t_eased;
-
-	// 半径と高さを補間(start -> end)
-	float radius = std::lerp(deathStartRadius_, deathEndRadius_, t_eased);
-	float height = std::lerp(deathStartHeight_, deathEndHeight_, t_eased);
-
-	// カメラ位置を計算(playerを中心に極座標から)
-	Vector3 playerPos = pPlayer_->GetPosition();
-	Vector3 camPos;
-	camPos.x = playerPos.x + std::sin(angle) * radius;
-	camPos.z = playerPos.z + std::cos(angle) * radius;
-	camPos.y = playerPos.y + height;
-
-	camera->SetPosition(camPos);
-
-	// カメラの回転：プレイヤーを見る方向に向ける
-	Vector3 dir = (playerPos - camPos);
-	// yaw: y軸回転(左右)を atan2(dir.x, dir.z)
-	float yaw = std::atan2(dir.x, dir.z);
-	// pitch: x軸回転(上下)を atan2(-dir.y, sqrt(x^2+z^2))
-	float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
-	float pitch = std::atan2(-dir.y, horizontalDist);
-
-	Vector3 camRot = { pitch, yaw, 0.0f };
-	camera->SetRotate(camRot);
-
-	// 終了判定
-	if (t >= 1.0f)
-	{
-		isDeathCamera_ = false;
-		// 最終的にぴったり正面位置にセットして終了
-		Vector3 finalPos;
-		finalPos.x = playerPos.x + std::sin(targetAngle) * deathEndRadius_;
-		finalPos.z = playerPos.z + std::cos(targetAngle) * deathEndRadius_;
-		finalPos.y = playerPos.y + deathEndHeight_;
-		camera->SetPosition(finalPos);
-
-		Vector3 finalDir = (playerPos - finalPos);
-		float finalYaw = std::atan2(finalDir.x, finalDir.z);
-		float finalH = std::sqrt(finalDir.x * finalDir.x + finalDir.z * finalDir.z);
-		float finalPitch = std::atan2(-finalDir.y, finalH);
-		camera->SetRotate({ finalPitch, finalYaw, 0.0f });
-
-		// プレイヤー死亡演出
-		pPlayer_->StartDeathMotion();
-
-	}
-}
-
-void GamePlayScene::ClearUpdate()
-{
-	if (pGoal_->IsCleared() && !isTransitioning_ && !isClearMoment_)
-	{
-		// 一度だけフラグ
-		isClearMoment_ = true;
-
-		isClearCamera_ = true;
-		clearCameraTimer_ = -2.0f;
-
-		// プレイヤー位置と現カメラ位置から開始角度・半径・高さを算出
-		Vector3 playerPos = pPlayer_->GetPosition();
-		Vector3 camPos = camera->GetPosition();
-
-		float dx = camPos.x - playerPos.x;
-		float dz = camPos.z - playerPos.z;
-		// startAngle を atan2(dx, dz)の順で取る(Bezier等で使ったのと整合を取る)
-		clearStartAngle_ = std::atan2(dx, dz);
-		clearStartRadius_ = std::sqrt(dx * dx + dz * dz);
-		clearStartHeight_ = camPos.y - playerPos.y;
-
-		// 最終的にプレイヤーの正面は 0 に
-		clearTargetAngleOffset_ = 0.0f;
-	}
-
-
-	if (isClearCamera_)
-	{
-		if (clearCameraTimer_ >= 0.0f)
-		{
-
-			clearCameraTimer_ += 1.0f / 60.0f;
-			float t = std::clamp(clearCameraTimer_ / clearCameraDuration_, 0.0f, 1.0f);
-
-			// イージング
-			float t_eased = Ease::InOutQuad(t);
-
-			// --- 回転速度をさらに落とす係数 小さくするほど遅く回る ---
-			const float rotationSpeedMultiplier = 0.12f; // 調整可
-			// --- カメラを上昇させる量 ---
-			const float clearHeightRise = 30.0f; // 調整可 正の値で上昇
-
-			// 角度は start -> target を経由して rotations 周回させる
-			float targetAngle = clearTargetAngleOffset_;
-			float delta = targetAngle - clearStartAngle_;
-			// normalize delta to [-pi, pi]
-			while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-			while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
-
-			// 周回数に multiplier をかけて実効的な回転量を減らす（急激な回転を抑制）
-			float rotationsScaled = clearCameraRotations_ * rotationSpeedMultiplier;
-			float totalAngularTravel = delta + rotationsScaled * 2.0f * (float)M_PI;
-			float angle = clearStartAngle_ + totalAngularTravel * t_eased;
-
-			// 半径は収縮させない（開始時の半径を維持）
-			const float radius = clearStartRadius_;
-
-			// 高さは開始高さから徐々に上昇
-			float height = clearStartHeight_ + clearHeightRise * t_eased;
-
-			// カメラ位置を計算(playerを中心に極座標から)
-			Vector3 playerPos = pPlayer_->GetPosition();
-			Vector3 camPos;
-			camPos.x = playerPos.x + std::sin(angle) * radius;
-			camPos.z = playerPos.z + std::cos(angle) * radius;
-			camPos.y = playerPos.y + height;
-
-			camera->SetPosition(camPos);
-
-			// カメラの回転：プレイヤーを見る方向に向ける
-			Vector3 dir = (playerPos - camPos);
-			// yaw: y軸回転(左右)を atan2(dir.x, dir.z)
-			float yaw = std::atan2(dir.x, dir.z);
-			// pitch: x軸回転(上下)を atan2(-dir.y, sqrt(x^2+z^2))
-			float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
-			float pitch = std::atan2(-dir.y, horizontalDist);
-
-			Vector3 camRot = { pitch, yaw, 0.0f };
-			camera->SetRotate(camRot);
-
-			// 終了仕切る前にフェード開始判定
-			if (t >= 0.4f)
-			{
-				// 遷移演出開始
-				isClearFadeStart_ = true;
-			}
-		}
-		else
-		{
-			clearCameraTimer_ += 1.0f / 60.0f;
-		}
-	}
 }
