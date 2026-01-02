@@ -103,13 +103,19 @@
     └──     ├── TitleScene.cpp
     └──     ├── TitleScene.h
     └──     └── cameraController/
+    └──         ├── ClearCameraController.cpp
+    └──         ├── ClearCameraController.h
+    └──         ├── DeathCameraController.cpp
+    └──         ├── DeathCameraController.h
     └──         ├── FollowController.cpp
     └──         ├── FollowController.h
     └──         ├── ICameraController.h
     └──         ├── SceneCamera.cpp
     └──         ├── SceneCamera.h
     └──         ├── ShakeController.cpp
-    └──         └── ShakeController.h
+    └──         ├── ShakeController.h
+    └──         ├── StartCameraController.cpp
+    └──         └── StartCameraController.h
     ├── gameEngine/
     └── ├── 2d/
     └── └── ├── Sprite.cpp
@@ -364,6 +370,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp" />
     <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
+    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
+    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\FadeTransition.cpp" />
@@ -446,6 +454,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameEngine\time\TimeManager.cpp" />
     <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
     <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
+    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -460,6 +469,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h" />
     <ClInclude Include="application\scene\cameraController\FollowController.h" />
+    <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
+    <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />
     <ClInclude Include="gameEngine\transition\FadeTransition.h" />
@@ -545,6 +556,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\ICameraController.h" />
     <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
     <ClInclude Include="application\scene\cameraController\ShakeController.h" />
+    <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -948,6 +960,9 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
     <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
     <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
+    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
+    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
+    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1221,6 +1236,9 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
     <ClInclude Include="application\scene\cameraController\FollowController.h" />
     <ClInclude Include="application\scene\cameraController\ShakeController.h" />
+    <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
+    <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
+    <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -6924,6 +6942,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		{
 			hp_--;
 
+			isHitMoment_ = true;
+
 			ParticleEmitter::Emit("HitReaction", position_, 5);
 		}
 		else
@@ -6931,7 +6951,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isDead_ = true;
 		}
 
-		isHitMoment_ = true;
+		
 	} 
 
 	if (!isEvading_ && (_other->GetColliderID() == "ExplosionTimeBomb" or
@@ -9467,16 +9487,19 @@ File Path: project/application/scene/ClearScene.cpp
 ============================================================
 #include "ClearScene.h"
 
+#include "TimeManager.h"
+
 void ClearScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
-	camera_ = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
 	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
-	cameraManager.AddCamera(camera_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
+	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
 
 	cameraPosition_ = { 0.0f,12.0f,-33.0f };
@@ -9525,7 +9548,15 @@ void ClearScene::Finalize()
 	pPlayer_->Finalize();
 	pField_->Finalize();
 
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_)
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void ClearScene::Update()
@@ -9544,10 +9575,14 @@ void ClearScene::Update()
 
 	}
 
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
 	// カメラ更新
-	camera_->Update();
+	camera_->Update(dt);
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
+
 
 	// スプライト更新
 	for (auto& sprite : sprites_)
@@ -9653,6 +9688,7 @@ File Path: project/application/scene/ClearScene.h
 #include "../../gameEngine/particle/ParticleEmitter.h"
 #include "../objects/player/Player.h"
 #include "../objects/field/Field.h"
+#include "cameraController/SceneCamera.h"
 
 /// <summary>
 /// クリアシーン
@@ -9677,7 +9713,7 @@ public:
 private:
 
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera_ = std::make_shared<Camera>();
+	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 
@@ -9711,16 +9747,19 @@ File Path: project/application/scene/GameOverScene.cpp
 
 #include <Ease.h>
 
+#include "TimeManager.h"
+
 void GameOverScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
-	camera_ = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
 	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_);
-	cameraManager.AddCamera(camera_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
+	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
 
 	cameraPosition_ = { 0.0f,20.0f,-50.0f };
@@ -9763,6 +9802,19 @@ void GameOverScene::Initialize()
 	pEnemyManager_ = std::make_unique<EnemyManager>();
 	pEnemyManager_->GameOverEnemyInit();
 
+
+	// カメラのシェイク
+	camera_->AddController(std::make_unique<ShakeController>(
+		camera_->GetCamera(),
+		[this]() -> bool {
+			bool hit = pPlayer_->IsHitMoment();
+			if (hit) pPlayer_->SetHitMoment(false); // consume
+			return hit;
+		},
+		0.3f, // duration
+		0.5f  // amplitude
+	));
+
 	// シーン開始時にフェードイン
 	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
@@ -9774,7 +9826,15 @@ void GameOverScene::Finalize()
 	pPlayer_->Finalize();
 	pEnemyManager_->Finalize();
 
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_)
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void GameOverScene::Update()
@@ -9793,9 +9853,13 @@ void GameOverScene::Update()
 
 	}
 
-	camera_->Update();
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// カメラ更新
+	camera_->Update(dt);
 	camera_->SetPosition(cameraPosition_);
-	camera_->SetRotate(cameraRotate_);	
+	camera_->SetRotate(cameraRotate_);
 
 	for (auto& sprite : sprites_)
 	{
@@ -9941,6 +10005,8 @@ File Path: project/application/scene/GameOverScene.h
 #include "../../application/objects/player/Player.h"
 #include "../../application/objects/enemy/EnemyManager.h"
 #include "../../gameEngine/collider/ColliderManager.h"
+#include "cameraController/SceneCamera.h"
+#include "cameraController/ShakeController.h"
 
 /// <summary>
 /// ゲームオーバーシーン
@@ -9970,7 +10036,7 @@ private:
 private:
 
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera_ = std::make_shared<Camera>();
+	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 
@@ -10005,31 +10071,27 @@ File Path: project/application/scene/GamePlayScene.cpp
 #include <Ease.h>
 #include <corecrt_math_defines.h>
 
+#include "TimeManager.h"
+
 void GamePlayScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
 	cameraManager.ClearAllCameras();
 
 	// カメラの作成
-	camera = std::make_shared<Camera>();
+	camera_ = std::make_unique<SceneCamera>();
+	camera_->Initialize();
 
-	cameraRotate = camera->GetRotate();
-	cameraPosition = camera->GetPosition();
-	cameraPosition.y = 70.0f;
-	cameraPosition.z = -15.0f;
-	cameraRotate.x = 1.2f;
+	cameraRotate_ = camera_->GetRotate();
+	cameraPosition_ = camera_->GetPosition();
+	cameraPosition_.y = 70.0f;
+	cameraPosition_.z = -15.0f;
+	cameraRotate_.x = 1.2f;
 
-	camera->SetPosition(camStart_);
-	camera->SetRotate(camStartRot_);
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 
-	// カメラの追加
-	cameraManager.AddCamera(camera);
-
-	// アクティブカメラの設定
-	cameraManager.SetActiveCamera(0);
-	activeIndex = cameraManager.GetActiveIndex();
-
-	Object3dCommon::GetInstance()->SetDefaultCamera(cameraManager.GetActiveCamera());
+	camera_->SetPosition(camStart_);
+	camera_->SetRotate(camStartRot_);
 
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -10050,10 +10112,6 @@ void GamePlayScene::Initialize()
 	// ゴールの初期化
 	pGoal_ = std::make_unique<Goal>();
 	pGoal_->Initialize();
-
-	// 追尾の初期化
-	cameraIsResting_ = true;
-	cameraRestCenter_ = pPlayer_->GetPosition() + Vector3{ 0.0f,70.0f,-20.0f };
 
 	// スプライト
 	for (uint32_t i = 0; i < spriteNum_; ++i)
@@ -10089,6 +10147,88 @@ void GamePlayScene::Initialize()
 		}
 	}
 
+	// カメラの追従
+	camera_->AddController(std::make_unique<FollowController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
+		0.8f, 0.25f,
+		Vector3{ 1.4f, 0.0f, 0.0f }
+	));
+
+	// カメラのシェイク
+	camera_->AddController(std::make_unique<ShakeController>(
+		camera_->GetCamera(),
+		[this]() -> bool
+		{
+			bool hit = pPlayer_->IsHitMoment();
+			if (hit) pPlayer_->SetHitMoment(false); // consume
+			return hit;
+		},
+		0.3f, // duration
+		0.5f  // amplitude
+	));
+
+	// スタート用コントローラ作成
+	camera_->AddController<StartCameraController>(
+		camera_->GetCamera(),
+		camStart_, camControl1_, camControl2_, camEnd_,
+		camStartRot_, camEndRot_,
+		cameraStartDuration_);
+
+	// デスカメラコントローラ作成
+	camera_->AddController<DeathCameraController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
+		deathCameraDuration_, deathCameraRotations_, deathEndRadius_, deathEndHeight_);
+
+	// クリアカメラコントローラ作成
+	camera_->AddController<ClearCameraController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
+		clearCameraDuration_, clearCameraRotations_, 0.12f, 30.0f, 0.4f);
+
+	// コールバック設定（FindController を使ってその場で取得）
+	if (auto* death = camera_->FindController<DeathCameraController>())
+	{
+		death->SetOnFinish([this]()
+			{
+			if (pPlayer_)
+			{
+				pPlayer_->StartDeathMotion();
+			}
+		
+			});
+	}
+
+	if (auto* clear = camera_->FindController<ClearCameraController>())
+	{
+		clear->SetOnFadeStart([this]() { isClearFadeStart_ = true; });
+		clear->SetOnFinish([this]()
+			{
+			if (auto* follow = camera_->FindController<FollowController>()) follow->Start();
+			});
+	}
+
+	if (auto* startCtrl = camera_->FindController<StartCameraController>())
+	{
+		startCtrl->SetOnFinish([this]()
+			{
+				// スタート演出終わったらフォロー再開
+				if (auto* follow = camera_->FindController<FollowController>())
+				{
+					follow->SnapToTarget();
+					follow->Start();
+				}
+				// フラグがあればクリア
+				isStartCamera_ = false;
+			});
+
+		// 演出前に追尾を止めておく
+		if (auto* follow = camera_->FindController<FollowController>()) follow->Stop();
+		// 演出を開始
+		startCtrl->Start();
+	}
+
 	// シーン開始時遷移演出
 	blockTransition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
@@ -10120,8 +10260,15 @@ void GamePlayScene::Finalize()
 	}
 	pGoal_->Finalize();
 
-	// カメラ解放
-	cameraManager.RemoveCamera(0);
+	// Object3dCommon に設定したデフォルトカメラを解除
+	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+
+	// SceneCamera
+	if (camera_)
+	{
+		camera_->Finalize();
+		camera_.reset();
+	}
 }
 
 void GamePlayScene::Update()
@@ -10151,11 +10298,8 @@ void GamePlayScene::Update()
 		}
 	}
 	
-	// スタートカメラ演出
-	StartCamera();
-
-	// カメラマネージャーの更新
-	cameraManager.UpdateAll();
+	// delta
+	const float dt = TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -10165,13 +10309,48 @@ void GamePlayScene::Update()
 	// プレイヤーの位置をエネミーマネージャーにセット
 	pEnemyManager_->SetPlayerPosition(pPlayer_->GetPosition());
 
-	// カメラの更新(シェイク、追尾、引き)
-	if (!isStartCamera_ && !pPlayer_->IsDead())
+	// デス演出トリガー
+	if (pPlayer_->IsDead() && !pPlayer_->IsAutoControl() && !isTransitioning_ && !isDeadCameraPlayer_)
 	{
-		camera->SetRotate(cameraRotate);
-		camera->SetPosition(cameraPosition);
-		CameraUpdate();
+		// 一度だけ開始フラグを立てる
+		isDeadCameraPlayer_ = true;
+		isDeathCamera_ = true;
+
+		// 追尾を止める
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
+		// デスカメラ開始
+		if (auto* death = camera_->FindController<DeathCameraController>())
+		{
+			death->Start();
+		}
 	}
+
+	// クリア演出トリガー
+	if (pGoal_->IsCleared() && !isTransitioning_ && !isClearMoment_)
+	{
+		isClearMoment_ = true;
+		isClearCamera_ = true;
+
+		// 追尾を止める
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
+
+		// クリアカメラ開始
+		if (auto* clear = camera_->FindController<ClearCameraController>())
+		{
+			clear->Start();
+		}
+	}
+
+	// カメラの更新(シェイク、追尾、引き)
+	camera_->Update(dt);
+	// カメラマネージャーの更新
+	cameraManager.UpdateAll();
 
 	// エネミーの更新
 	pEnemyManager_->Update();
@@ -10198,24 +10377,6 @@ void GamePlayScene::Update()
 		Vector2 screen = activeCamera->WorldToScreen(worldHeadPos);
 		sprites_[1]->SetPosition(screen);
 	}
-
-	// プレイヤーが死んだらデスカメラを開始(1回だけ)
-	if (pPlayer_->IsDead() && !pPlayer_->IsAutoControl() && !isTransitioning_ && !isDeadCameraPlayer_)
-	{
-		if (!isDeathCamera_)
-		{
-			StartDeathCamera();
-		}
-	}
-
-	// DeathCamera更新(StartDeathCameraが呼ばれている場合)
-	if (isDeathCamera_)
-	{
-		UpdateDeathCamera(1.0f / 60.0f);
-	}
-
-	// クリア更新
-	ClearUpdate();
 
 	// スプライトの更新
 	for (auto& sprite : sprites_)
@@ -10308,15 +10469,15 @@ void GamePlayScene::AllImGui()
 	ImGui::SliderFloat4("SpriteColor", &color_.x, 0.0f, 1.0f);
 
 	// camera
-	Vector3 cam1Pos = camera->GetPosition();
-	Vector3 cam1Rot = camera->GetRotate();
+	Vector3 cam1Pos = camera_->GetPosition();
+	Vector3 cam1Rot = camera_->GetRotate();
 	if (ImGui::SliderFloat3("cameraPosition", &cam1Pos.x, -100.0f, 100.0f))
 	{
-		camera->SetPosition(cam1Pos);
+		camera_->SetPosition(cam1Pos);
 	}
 	if (ImGui::SliderFloat3("cameraRotate", &cam1Rot.x, -10.0f, 10.0f))
 	{
-		camera->SetRotate(cam1Rot);
+		camera_->SetRotate(cam1Rot);
 	}
 
 
@@ -10334,293 +10495,6 @@ void GamePlayScene::AllImGui()
 
 #endif // USE_IMGUI
 }
-
-void GamePlayScene::CameraUpdate()
-{
-	// カメラのシェイク
-	CameraShake();
-
-	// カメラの追従
-	CameraFollow();
-
-}
-
-void GamePlayScene::CameraShake()
-{
-	// アクティブカメラの情報を取得
-	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		auto viewMatrix = activeCamera->GetViewMatrix();
-	}
-
-	// プレイヤーがヒットした場合にカメラをシェイク
-	if (pPlayer_->IsHitMoment())
-	{
-		// アクティブなカメラを取得
-		if (activeCamera)
-		{
-			// カメラをシェイク (持続時間,振幅)
-			activeCamera->StartShake(0.3f, 1.2f);
-
-			// ヒットフラグをリセット
-			pPlayer_->SetHitMoment(false);
-		}
-	}
-
-	// シェイク
-	if (activeCamera)
-	{
-		activeCamera->UpdateShake(1.0f / 60.0f);
-	}
-}
-
-void GamePlayScene::CameraFollow()
-{
-	if (!camera or !pPlayer_) 
-	{
-		return;
-	}
-
-	Vector3 playerPos = pPlayer_->GetPosition();
-
-	// 固定のオフセット（プレイヤーから見たカメラ位置）
-	Vector3 offset = { 0.0f, 80.0f, -20.0f };  // Y: 高さ、Z: 後方
-
-	// 追従先の位置・回転
-	Vector3 targetPos = playerPos + offset;
-	Vector3 targetRot = { 2.0f, 0.0f, 0.0f };  // やや下向き
-
-	// 滑らかに補間して追従
-	Vector3 currentPos = camera->GetPosition();
-	Vector3 nextPos;
-	nextPos.Lerp(currentPos, targetPos, 0.8f);
-
-	Vector3 currentRot = camera->GetRotate();
-	Vector3 nextRot;
-	nextRot.Lerp(currentRot, targetRot, 0.25f);
-
-	camera->SetPosition(nextPos);
-	camera->SetRotate(nextRot);
-}
-
-void GamePlayScene::StartCamera()
-{
-	if (isStartCamera_ && !isTransitioning_)
-	{
-		cameraStartTimer_ += 1.0f / 60.0f;
-		float t = std::clamp(cameraStartTimer_ / cameraStartDuration_, 0.0f, 1.0f);
-		float t_eased = Ease::InOutQuad(t);
-
-		// 補間
-		Vector3 camPos = Bezier3(camStart_, camControl1_, camControl2_, camEnd_, t_eased);
-		Vector3 camRot = Lerp(camStartRot_, camEndRot_, t_eased);
-		camera->SetPosition(camPos);
-		camera->SetRotate(camRot);
-
-		if (t >= 1.0f)
-		{
-			isStartCamera_ = false; // 終了
-			camera->SetPosition(camEnd_);
-			camera->SetRotate(camEndRot_);
-		}
-	}
-
-}
-
-void GamePlayScene::StartDeathCamera()
-{
-	if (!camera or !pPlayer_)
-	{
-		return;
-	}
-
-	// 一度だけフラグ
-	isDeadCameraPlayer_ = true;
-
-	isDeathCamera_ = true;
-	deathCameraTimer_ = 0.0f;
-
-	// プレイヤー位置と現カメラ位置から開始角度・半径・高さを算出
-	Vector3 playerPos = pPlayer_->GetPosition();
-	Vector3 camPos = camera->GetPosition();
-
-	float dx = camPos.x - playerPos.x;
-	float dz = camPos.z - playerPos.z;
-	// startAngle を atan2(dx, dz)の順で取る(Bezier等で使ったのと整合を取る)
-	deathStartAngle_ = std::atan2(dx, dz);
-	deathStartRadius_ = std::sqrt(dx * dx + dz * dz);
-	deathStartHeight_ = camPos.y - playerPos.y;
-
-	// 最終的にプレイヤーの正面は 0 に
-	deathTargetAngleOffset_ = 0.0f;
-}
-
-void GamePlayScene::UpdateDeathCamera(float deltaTime)
-{
-	if (!isDeathCamera_ or (!camera || !pPlayer_))
-	{
-		return;
-	}
-
-	deathCameraTimer_ += deltaTime;
-	float t = std::clamp(deathCameraTimer_ / deathCameraDuration_, 0.0f, 1.0f);
-
-	// イージング
-	float t_eased = Ease::InOutQuad(t);
-
-	// 角度は start -> target を経由して rotations 周回させる
-	// targetAngle = deathTargetAngleOffset_0: プレイヤー前方
-	float targetAngle = deathTargetAngleOffset_;
-	// 差分を符号付きで正規化しておき、さらに周回分を追加
-	float delta = targetAngle - deathStartAngle_;
-	// normalize delta to [-pi, pi]
-	while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-	while (delta < (float) - M_PI) delta += 2.0f * (float)M_PI;
-	float totalAngularTravel = delta + deathCameraRotations_ * 2.0f * (float)M_PI;
-	float angle = deathStartAngle_ + totalAngularTravel * t_eased;
-
-	// 半径と高さを補間(start -> end)
-	float radius = std::lerp(deathStartRadius_, deathEndRadius_, t_eased);
-	float height = std::lerp(deathStartHeight_, deathEndHeight_, t_eased);
-
-	// カメラ位置を計算(playerを中心に極座標から)
-	Vector3 playerPos = pPlayer_->GetPosition();
-	Vector3 camPos;
-	camPos.x = playerPos.x + std::sin(angle) * radius;
-	camPos.z = playerPos.z + std::cos(angle) * radius;
-	camPos.y = playerPos.y + height;
-
-	camera->SetPosition(camPos);
-
-	// カメラの回転：プレイヤーを見る方向に向ける
-	Vector3 dir = (playerPos - camPos);
-	// yaw: y軸回転(左右)を atan2(dir.x, dir.z)
-	float yaw = std::atan2(dir.x, dir.z);
-	// pitch: x軸回転(上下)を atan2(-dir.y, sqrt(x^2+z^2))
-	float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
-	float pitch = std::atan2(-dir.y, horizontalDist);
-
-	Vector3 camRot = { pitch, yaw, 0.0f };
-	camera->SetRotate(camRot);
-
-	// 終了判定
-	if (t >= 1.0f)
-	{
-		isDeathCamera_ = false;
-		// 最終的にぴったり正面位置にセットして終了
-		Vector3 finalPos;
-		finalPos.x = playerPos.x + std::sin(targetAngle) * deathEndRadius_;
-		finalPos.z = playerPos.z + std::cos(targetAngle) * deathEndRadius_;
-		finalPos.y = playerPos.y + deathEndHeight_;
-		camera->SetPosition(finalPos);
-
-		Vector3 finalDir = (playerPos - finalPos);
-		float finalYaw = std::atan2(finalDir.x, finalDir.z);
-		float finalH = std::sqrt(finalDir.x * finalDir.x + finalDir.z * finalDir.z);
-		float finalPitch = std::atan2(-finalDir.y, finalH);
-		camera->SetRotate({ finalPitch, finalYaw, 0.0f });
-
-		// プレイヤー死亡演出
-		pPlayer_->StartDeathMotion();
-
-	}
-}
-
-void GamePlayScene::ClearUpdate()
-{
-	if (pGoal_->IsCleared() && !isTransitioning_ && !isClearMoment_)
-	{
-		// 一度だけフラグ
-		isClearMoment_ = true;
-
-		isClearCamera_ = true;
-		clearCameraTimer_ = -2.0f;
-
-		// プレイヤー位置と現カメラ位置から開始角度・半径・高さを算出
-		Vector3 playerPos = pPlayer_->GetPosition();
-		Vector3 camPos = camera->GetPosition();
-
-		float dx = camPos.x - playerPos.x;
-		float dz = camPos.z - playerPos.z;
-		// startAngle を atan2(dx, dz)の順で取る(Bezier等で使ったのと整合を取る)
-		clearStartAngle_ = std::atan2(dx, dz);
-		clearStartRadius_ = std::sqrt(dx * dx + dz * dz);
-		clearStartHeight_ = camPos.y - playerPos.y;
-
-		// 最終的にプレイヤーの正面は 0 に
-		clearTargetAngleOffset_ = 0.0f;
-	}
-
-
-	if (isClearCamera_)
-	{
-		if (clearCameraTimer_ >= 0.0f)
-		{
-
-			clearCameraTimer_ += 1.0f / 60.0f;
-			float t = std::clamp(clearCameraTimer_ / clearCameraDuration_, 0.0f, 1.0f);
-
-			// イージング
-			float t_eased = Ease::InOutQuad(t);
-
-			// --- 回転速度をさらに落とす係数 小さくするほど遅く回る ---
-			const float rotationSpeedMultiplier = 0.12f; // 調整可
-			// --- カメラを上昇させる量 ---
-			const float clearHeightRise = 30.0f; // 調整可 正の値で上昇
-
-			// 角度は start -> target を経由して rotations 周回させる
-			float targetAngle = clearTargetAngleOffset_;
-			float delta = targetAngle - clearStartAngle_;
-			// normalize delta to [-pi, pi]
-			while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-			while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
-
-			// 周回数に multiplier をかけて実効的な回転量を減らす（急激な回転を抑制）
-			float rotationsScaled = clearCameraRotations_ * rotationSpeedMultiplier;
-			float totalAngularTravel = delta + rotationsScaled * 2.0f * (float)M_PI;
-			float angle = clearStartAngle_ + totalAngularTravel * t_eased;
-
-			// 半径は収縮させない（開始時の半径を維持）
-			const float radius = clearStartRadius_;
-
-			// 高さは開始高さから徐々に上昇
-			float height = clearStartHeight_ + clearHeightRise * t_eased;
-
-			// カメラ位置を計算(playerを中心に極座標から)
-			Vector3 playerPos = pPlayer_->GetPosition();
-			Vector3 camPos;
-			camPos.x = playerPos.x + std::sin(angle) * radius;
-			camPos.z = playerPos.z + std::cos(angle) * radius;
-			camPos.y = playerPos.y + height;
-
-			camera->SetPosition(camPos);
-
-			// カメラの回転：プレイヤーを見る方向に向ける
-			Vector3 dir = (playerPos - camPos);
-			// yaw: y軸回転(左右)を atan2(dir.x, dir.z)
-			float yaw = std::atan2(dir.x, dir.z);
-			// pitch: x軸回転(上下)を atan2(-dir.y, sqrt(x^2+z^2))
-			float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
-			float pitch = std::atan2(-dir.y, horizontalDist);
-
-			Vector3 camRot = { pitch, yaw, 0.0f };
-			camera->SetRotate(camRot);
-
-			// 終了仕切る前にフェード開始判定
-			if (t >= 0.4f)
-			{
-				// 遷移演出開始
-				isClearFadeStart_ = true;
-			}
-		}
-		else
-		{
-			clearCameraTimer_ += 1.0f / 60.0f;
-		}
-	}
-}
-
 
 ============================================================
 File Path: project/application/scene/GamePlayScene.h
@@ -10640,6 +10514,13 @@ File Path: project/application/scene/GamePlayScene.h
 
 #include "../../gameEngine/transition/BlockRiseTransition.h"
 #include "../../gameEngine/transition/FadeTransition.h"
+
+#include "cameraController/SceneCamera.h"
+#include "cameraController/ShakeController.h"
+#include "cameraController/FollowController.h"
+#include "cameraController/StartCameraController.h"
+#include "cameraController/DeathCameraController.h"
+#include "cameraController/ClearCameraController.h"
 
 /// <summary>
 ///	ゲームプレイシーン
@@ -10666,45 +10547,15 @@ private:
 	// このシーンで出す全てのImGui
 	void AllImGui();
 
-	// カメラ更新
-	void CameraUpdate();
-
-	// カメラシェイク
-	void CameraShake();
-
-	// カメラ追尾
-	void CameraFollow();
-
-	/// <summary>
-	/// スタートカメラ
-	///	</summary>
-	void StartCamera();
-
-	/// <summary>
-	/// デスカメラ
-	/// </summary>
-	void StartDeathCamera();
-
-	/// <summary>
-	/// デスカメラ更新
-	/// </summary>
-	/// <param name="deltaTime">デルタタイム</param>
-	void UpdateDeathCamera(float deltaTime);
-
-	/// <summary>
-	/// クリア更新
-	/// </summary>
-	void ClearUpdate();
-
-
 private:
 
+	// カメラ
 	CameraManager& cameraManager = CameraManager::GetInstance();
-	std::shared_ptr<Camera> camera = nullptr;
+	std::shared_ptr<SceneCamera> camera_ = nullptr;
     
     uint32_t activeIndex = 0;
-	Vector3 cameraRotate = { -0.9f,0.0f,0.0f};
-	Vector3 cameraPosition = { 0.0f,-20.0f,0.0f };
+	Vector3 cameraRotate_ = { -0.9f,0.0f,0.0f};
+	Vector3 cameraPosition_ = { 0.0f,-20.0f,0.0f };
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
@@ -10919,13 +10770,15 @@ void TitleScene::Initialize()
 	camera_->AddController(std::make_unique<FollowController>(
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
-		0.8f, 0.25f
+		0.8f, 0.25f,
+		Vector3{ 2.0f, 0.0f, 0.0f }
 	));
 
 	// カメラのシェイク
 	camera_->AddController(std::make_unique<ShakeController>(
 		camera_->GetCamera(),
-		[this]() -> bool {
+		[this]() -> bool
+		{
 			bool hit = pPlayer_->IsHitMoment();
 			if (hit) pPlayer_->SetHitMoment(false); // consume
 			return hit;
@@ -11246,17 +11099,433 @@ private:
 };
 
 ============================================================
+File Path: project/application/scene/cameraController/ClearCameraController.cpp
+============================================================
+#include "ClearCameraController.h"
+
+#include <algorithm>
+#include <cmath>
+#include <corecrt_math_defines.h>
+
+#include <Camera.h>
+#include <Ease.h>
+
+ClearCameraController::ClearCameraController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float rotationSpeedMultiplier, float heightRise, float fadeStartThreshold)
+    : camera_(std::move(camera)),
+      getPlayerPos_(std::move(targetPos)),
+      duration_(duration), 
+      rotations_(rotations),
+      rotationSpeedMultiplier_(rotationSpeedMultiplier),
+      heightRise_(heightRise),
+      fadeStartThreshold_(fadeStartThreshold)
+{
+}
+
+void ClearCameraController::Start()
+{
+    if (!camera_ or !getPlayerPos_)
+    {
+        return;
+    }
+
+    timer_ = 0.0f;
+    fadeSignaled_ = false;
+    active_ = true;
+
+    // 開始時のプレイヤー位置とカメラ位置から start angle/radius/height を計算
+    Vector3 playerPos = getPlayerPos_();
+    Vector3 camPos = camera_->GetPosition();
+
+    float dx = camPos.x - playerPos.x;
+    float dz = camPos.z - playerPos.z;
+
+    // startAngle を atan2(dx, dz) の順で取る（既存コードと整合）
+    startAngle_ = std::atan2(dx, dz);
+    startRadius_ = std::sqrt(dx * dx + dz * dz);
+    startHeight_ = camPos.y - playerPos.y;
+}
+
+void ClearCameraController::Stop()
+{
+    active_ = false;
+}
+
+void ClearCameraController::Update(float dt)
+{
+    if (!active_ or !camera_ or !getPlayerPos_)
+    {
+        return;
+    }
+
+    timer_ += dt;
+    float t = std::clamp(timer_ / duration_, 0.0f, 1.0f);
+
+    float t_eased = Ease::InOutQuad(t);
+
+    // 角速度抑制の倍率を適用
+    float rotationsScaled = rotations_ * rotationSpeedMultiplier_;
+    float targetAngle = 0.0f; // プレイヤー正面
+    float delta = targetAngle - startAngle_;
+    while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
+    while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
+
+    float totalAngularTravel = delta + rotationsScaled * 2.0f * (float)M_PI;
+    float angle = startAngle_ + totalAngularTravel * t_eased;
+
+    // 半径は開始時のものを維持（元コード）
+    const float radius = startRadius_;
+
+    // 高さは開始高さから徐々に上昇
+    float height = startHeight_ + heightRise_ * t_eased;
+
+    // カメラ位置（極座標から）
+    Vector3 playerPos = getPlayerPos_();
+    Vector3 camPos;
+    camPos.x = playerPos.x + std::sin(angle) * radius;
+    camPos.z = playerPos.z + std::cos(angle) * radius;
+    camPos.y = playerPos.y + height;
+
+    camera_->SetPosition(camPos);
+
+    // カメラ回転：プレイヤーを見る方向
+    Vector3 dir = (playerPos - camPos);
+    float yaw = std::atan2(dir.x, dir.z);
+    float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+    float pitch = std::atan2(-dir.y, horizontalDist);
+
+    camera_->SetRotate({ pitch, yaw, 0.0f });
+
+    // フェード開始判定
+    if (!fadeSignaled_ && t >= fadeStartThreshold_)
+    {
+        fadeSignaled_ = true;
+        if (onFadeStart_) onFadeStart_();
+    }
+
+    // 終了判定
+    if (t >= 1.0f)
+    {
+        active_ = false;
+        // 最終位置を厳密セット
+        Vector3 finalPos;
+        finalPos.x = playerPos.x + std::sin(targetAngle) * radius;
+        finalPos.z = playerPos.z + std::cos(targetAngle) * radius;
+        finalPos.y = playerPos.y + (startHeight_ + heightRise_);
+
+        camera_->SetPosition(finalPos);
+
+        Vector3 finalDir = (playerPos - finalPos);
+        float finalYaw = std::atan2(finalDir.x, finalDir.z);
+        float finalH = std::sqrt(finalDir.x * finalDir.x + finalDir.z * finalDir.z);
+        float finalPitch = std::atan2(-finalDir.y, finalH);
+        camera_->SetRotate({ finalPitch, finalYaw, 0.0f });
+
+        if (onFinish_)
+        {
+            onFinish_();
+        }
+    }
+}
+
+============================================================
+File Path: project/application/scene/cameraController/ClearCameraController.h
+============================================================
+#pragma once
+
+#include <memory>
+#include <functional>
+
+#include <Vector3.h>
+#include "ICameraController.h"
+
+// 前方宣言
+class Camera;
+
+/// <summary>
+/// クリアカメラコントローラー
+/// </summary>
+class ClearCameraController : public ICameraController
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="camera">カメラ</param>
+	/// <param name="targetPos">追尾対象の位置を返す関数</param>
+	/// <param name="duration">クリアカメラの持続時間</param>
+	ClearCameraController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 20.0f, float rotationSpeedMultiplier = 0.12f, float heightRise = 30.0f, float fadeStartThreshold = 0.4f);
+
+	// デストラクタ
+	~ClearCameraController() override = default;
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">デルタタイム</param>
+	void Update(float dt) override;
+
+	// 開始
+	void Start() override;
+
+	// 停止
+	void Stop() override;
+
+public: // ゲッター
+
+    bool IsActive() const override { return active_; }
+
+public: // セッター
+
+    // コールバック：フェード開始と演出完了
+    void SetOnFadeStart(std::function<void()> cb) { onFadeStart_ = std::move(cb); }
+    void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
+
+private:
+    std::shared_ptr<Camera> camera_;
+    std::function<Vector3()> getPlayerPos_;
+
+    // 開始時に計算して保持
+    float startAngle_ = 0.0f;
+    float startRadius_ = 0.0f;
+    float startHeight_ = 0.0f;
+
+    // 演出パラメータ
+    float duration_ = 3.0f;
+    float timer_ = 0.0f;
+    float rotations_ = 20.0f;
+    float rotationSpeedMultiplier_ = 0.12f;
+    float heightRise_ = 30.0f;
+    float fadeStartThreshold_ = 0.4f;
+
+    bool active_ = false;
+    bool fadeSignaled_ = false;
+
+    std::function<void()> onFadeStart_ = nullptr;
+    std::function<void()> onFinish_ = nullptr;
+
+};
+
+
+
+============================================================
+File Path: project/application/scene/cameraController/DeathCameraController.cpp
+============================================================
+#include "DeathCameraController.h"
+
+#include <algorithm>
+
+#include <Camera.h>
+#include <Ease.h>
+#include <cmath>
+#include <corecrt_math_defines.h>
+
+DeathCameraController::DeathCameraController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float endRadius, float endHeight)
+	: camera_(std::move(camera)),
+      getPlayerPos_(std::move(targetPos)),
+      duration_(duration),
+      rotations_(rotations),
+      endRadius_(endRadius),
+	  endHeight_(endHeight)
+{
+}
+
+
+void DeathCameraController::Update(float dt)
+{
+    // 非アクティブまたはカメラが無効なら何もしない
+    if (!active_ or !camera_ or !getPlayerPos_)
+    {
+        return;
+    }
+
+    // 経過時間を進める
+    timer_ += dt;
+    float t = std::clamp(timer_ / duration_, 0.0f, 1.0f);
+    float t_eased = Ease::InOutQuad(t);
+
+    float targetAngle = 0.0f; // 最終的にプレイヤー前方が 0
+    float delta = targetAngle - startAngle_;
+    // normalize delta to [-pi, pi]
+    while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
+    while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
+
+    float totalAngularTravel = delta + rotations_ * 2.0f * (float)M_PI;
+    float angle = startAngle_ + totalAngularTravel * t_eased;
+
+    // 半径・高さを補間
+    float radius = std::lerp(startRadius_, endRadius_, t_eased);
+    float height = std::lerp(startHeight_, endHeight_, t_eased);
+
+    // カメラ位置を設定
+    Vector3 playerPos = getPlayerPos_();
+    Vector3 camPos;
+    camPos.x = playerPos.x + std::sin(angle) * radius;
+    camPos.z = playerPos.z + std::cos(angle) * radius;
+    camPos.y = playerPos.y + height;
+
+    camera_->SetPosition(camPos);
+
+    // カメラ回転をプレイヤー方向に向ける
+    Vector3 dir = (playerPos - camPos);
+    float yaw = std::atan2(dir.x, dir.z);
+    float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+    float pitch = std::atan2(-dir.y, horizontalDist);
+
+    camera_->SetRotate({ pitch, yaw, 0.0f });
+
+    if (t >= 1.0f)
+    {
+        active_ = false;
+
+        // 最終位置を厳密にセット
+        Vector3 finalPos;
+        finalPos.x = playerPos.x + std::sin(targetAngle) * endRadius_;
+        finalPos.z = playerPos.z + std::cos(targetAngle) * endRadius_;
+        finalPos.y = playerPos.y + endHeight_;
+        camera_->SetPosition(finalPos);
+
+        Vector3 finalDir = (playerPos - finalPos);
+        float finalYaw = std::atan2(finalDir.x, finalDir.z);
+        float finalH = std::sqrt(finalDir.x * finalDir.x + finalDir.z * finalDir.z);
+        float finalPitch = std::atan2(-finalDir.y, finalH);
+        camera_->SetRotate({ finalPitch, finalYaw, 0.0f });
+
+        // 完了コールバック
+        if (onFinish_)
+        {
+            onFinish_();
+        }
+    }
+}
+
+void DeathCameraController::Start()
+{
+	// カメラまたはプレイヤー位置関数が無効なら何もしない
+    if (!camera_ or !getPlayerPos_)
+    {
+        return;
+    }
+
+    timer_ = 0.0f;
+    active_ = true;
+
+    // プレイヤー位置と現在カメラ位置から開始角度・半径・高さを算出
+    Vector3 playerPos = getPlayerPos_();
+    Vector3 camPos = camera_->GetPosition();
+
+    float dx = camPos.x - playerPos.x;
+    float dz = camPos.z - playerPos.z;
+
+    // startAngle を atan2(dx, dz)の順で取る
+    startAngle_ = std::atan2(dx, dz);
+    startRadius_ = std::sqrt(dx * dx + dz * dz);
+    startHeight_ = camPos.y - playerPos.y;
+}
+
+void DeathCameraController::Stop()
+{
+    active_ = false;
+}
+
+============================================================
+File Path: project/application/scene/cameraController/DeathCameraController.h
+============================================================
+#pragma once
+
+#include <memory>
+#include <functional>
+
+#include <Vector3.h>
+#include "ICameraController.h"
+
+// 前方宣言
+class Camera;
+
+/// <summary>
+/// デスカメラコントローラー
+/// </summary>
+class DeathCameraController : public ICameraController
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="camera">カメラ</param>
+	/// <param name="targetPos">追尾対象の位置を返す関数</param>
+	/// <param name="duration">デスカメラの持続時間</param>
+	DeathCameraController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 2.0f, float endRadius = 12.0f, float endHeight = 12.0f);
+
+	// デストラクタ
+	~DeathCameraController() override = default;
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">デルタタイム</param>
+	void Update(float dt) override;
+
+	// 開始
+	void Start() override;
+
+	// 停止
+	void Stop() override;
+
+public: // セッター
+
+	// 演出完了時のコールバック
+	void SetOnFinish(std::function<void()> callback) { onFinish_ = std::move(callback); }
+
+public: // ゲッター
+
+	// コントローラーが有効かどうか
+	bool IsActive() const override { return active_; }
+
+private:
+
+	// カメラ
+	std::shared_ptr<Camera> camera_;
+	// 追尾対象の位置を返す関数
+	std::function<Vector3()> getPlayerPos_;
+
+	// start のときに計算して保持する
+	float startAngle_ = 0.0f;
+	float startRadius_ = 0.0f;
+	float startHeight_ = 0.0f;
+
+	// 終了時のターゲット
+	float endRadius_ = 12.0f;
+	float endHeight_ = 12.0f;
+
+	// 演出時間関連
+	float duration_ = 3.0f;
+	float timer_ = 0.0f;
+	float rotations_ = 2.0f;
+
+	// 有効フラグ
+	bool active_ = false;
+
+	// 演出完了時のコールバック
+	std::function<void()> onFinish_ = nullptr;
+
+};
+
+
+
+============================================================
 File Path: project/application/scene/cameraController/FollowController.cpp
 ============================================================
 #include "FollowController.h"
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp, float rotationLerp)
+FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp, float rotationLerp, Vector3 targetRot)
 	: camera_(camera),
       targetPos_(targetPos),
       positionLerp_(positionLerp),
-	  rotationLerp_(rotationLerp)
+	  rotationLerp_(rotationLerp),
+	  targetRot_(targetRot)
 {}
 
 void FollowController::Update(float dt)
@@ -11289,6 +11558,21 @@ void FollowController::Update(float dt)
 
 }
 
+void FollowController::SnapToTarget()
+{
+	if (!camera_ or !targetPos_)
+	{
+		return;
+	}
+
+	Vector3 playerPos = targetPos_();
+	Vector3 targetPos = playerPos + offset_;
+
+	// 直接スナップ
+	camera_->SetPosition(targetPos);
+	camera_->SetRotate(targetRot_);
+}
+
 
 ============================================================
 File Path: project/application/scene/cameraController/FollowController.h
@@ -11319,7 +11603,7 @@ public:
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
 	/// <param name="raotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
-	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp = 0.8f, float rotationLerp = 0.25f);
+	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
 
 	/// <summary>
 	/// 更新
@@ -11332,6 +11616,9 @@ public:
 
 	// 停止
 	void Stop() override { active_ = false; }
+
+	// カメラ位置と回転を強制セット
+	void SnapToTarget();
 
 public: // ゲッター
 
@@ -11351,8 +11638,8 @@ private:
 	// 有効フラグ
 	bool active_ = true;
 
-	const Vector3 offset_ = { 0.0f, 80.0f, -20.0f };
-	const Vector3 targetRot_ = { 2.0f, 0.0f, 0.0f };
+	const Vector3 offset_ = { 0.0f, 78.0f, -17.0f };
+	Vector3 targetRot_ = { 2.0f, 0.0f, 0.0f };
 };
 
 
@@ -11527,6 +11814,30 @@ public:
 	/// </summary>
 	/// <param name="controller">追加するコントローラーのユニークポインタ</param>
 	void AddController(std::unique_ptr<ICameraController> controller);
+
+	// 指定したコントローラTを生成登録、生ポインタを返す
+	template<typename T, typename... Args>
+	T* AddController(Args&&... args)
+	{
+		static_assert(std::is_base_of<ICameraController, T>::value, "T must derive from ICameraController");
+		auto ptr = std::make_unique<T>(std::forward<Args>(args)...);
+		T* raw = ptr.get();
+		controllers_.push_back(std::move(ptr));
+		return raw;
+	}
+
+	// 登録済みのコントローラTを検索してT*を返す
+	template<typename T>
+	T* FindController() const
+	{
+		static_assert(std::is_base_of<ICameraController, T>::value, "T must derive from ICameraController");
+		for (const auto& c : controllers_)
+		{
+			if (auto p = dynamic_cast<T*>(c.get())) return p;
+		}
+		return nullptr;
+	}
+	
 	// カメラ更新
 	void Update(float dt);
 
@@ -11647,6 +11958,166 @@ private:
 	float duration_ = 0.3f;
 	// シェイク振幅
 	float amplitude_ = 1.0f;
+
+};
+
+
+
+============================================================
+File Path: project/application/scene/cameraController/StartCameraController.cpp
+============================================================
+#include "StartCameraController.h"
+
+#include <algorithm>
+
+#include <Camera.h>
+#include <Ease.h>
+#include <MyMath.h>
+
+StartCameraController::StartCameraController(std::shared_ptr<Camera> camera,
+    const Vector3& cameraStart, const Vector3& cameraControl1, const Vector3& cameraControl2, const Vector3& cameraEnd,
+    const Vector3& cameraStartRot, const Vector3& cameraEndRot, float duration)
+    : camera_(std::move(camera)),
+      startPos_(cameraStart),
+      control1_(cameraControl1),
+      control2_(cameraControl2),
+      endPos_(cameraEnd),
+      startRot_(cameraStartRot),
+      endRot_(cameraEndRot),
+      duration_(duration)
+{
+}
+
+void StartCameraController::Update(float dt)
+{
+	// 非アクティブまたはカメラが無効なら何もしない
+    if (!active_ or !camera_)
+    {
+        return;
+    }
+
+    timer_ += dt;
+    float t = std::clamp(timer_ / duration_, 0.0f, 1.0f);
+    float t_eased = Ease::InOutQuad(t);
+
+    // 位置
+    Vector3 camPos = Bezier3(startPos_, control1_, control2_, endPos_, t_eased);
+    // 回転
+    Vector3 camRot = Lerp(startRot_, endRot_, t_eased);
+
+    camera_->SetPosition(camPos);
+    camera_->SetRotate(camRot);
+
+    if (t >= 1.0f)
+    {
+        // 演出終了
+        camera_->SetPosition(endPos_);
+        camera_->SetRotate(endRot_);
+        active_ = false;
+
+		// コールバック呼び出し
+        if (onFinish_)
+        {
+            onFinish_();
+		}
+    }
+}
+
+void StartCameraController::Start()
+{
+    if (!camera_) return;
+    timer_ = 0.0f;
+    active_ = true;
+    // 初期位置を即セットしておく（任意）
+    camera_->SetPosition(startPos_);
+    camera_->SetRotate(startRot_);
+}
+
+void StartCameraController::Stop()
+{
+    active_ = false;
+}
+
+============================================================
+File Path: project/application/scene/cameraController/StartCameraController.h
+============================================================
+#pragma once
+
+#include <memory>
+#include <functional>
+
+#include <Vector3.h>
+#include "ICameraController.h"
+
+// 前方宣言
+class Camera;
+
+/// <summary>
+/// スタートカメラコントローラー
+/// </summary>
+class StartCameraController : public ICameraController
+{
+public:
+
+    /// <summary>
+	/// コンストラクタ
+    /// </summary>
+	/// <param name="camera">カメラ</param>
+	/// <param name="cameraStart">カメラ開始位置</param>
+	/// <param name="cameraControl1">カメラ制御点1</param>
+	/// <param name="cameraControl2">カメラ制御点2</param>
+	/// <param name="cameraEnd">カメラ終了位置</param>
+	/// <param name="cameraStartRot">カメラ開始回転</param>
+	/// <param name="cameraEndRot">カメラ終了回転</param>
+	/// <param name="duration">持続時間</param>
+    StartCameraController(std::shared_ptr<Camera> camera,const Vector3& cameraStart, const Vector3& cameraControl1, const Vector3& cameraControl2, const Vector3& cameraEnd, const Vector3& cameraStartRot, const Vector3& cameraEndRot, float duration = 1.5f);
+
+	// デストラクタ
+	~StartCameraController() override = default;
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">デルタタイム</param>
+	void Update(float dt) override;
+
+	// 演出を開始する
+	void Start() override;
+
+	// 演出を停止する
+	void Stop() override;
+
+public: // ゲッター
+
+	bool IsActive() const override { return active_; }
+
+public: // セッター
+
+	// 演出完了時のコールバック
+	void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
+
+private:
+
+	// カメラ
+	std::shared_ptr<Camera> camera_;
+
+	// ベジェ曲線の制御点と位置
+	Vector3 startPos_;
+	Vector3 control1_;
+	Vector3 control2_;
+	Vector3 endPos_;
+
+	// 回転の開始と終了
+	Vector3 startRot_;
+	Vector3 endRot_;
+
+	// 演出時間関連
+	float duration_ = 1.5f;
+	float timer_ = 0.0f;
+	bool active_ = false;
+
+	// 演出完了コールバック
+	std::function<void()> onFinish_;
 
 };
 
