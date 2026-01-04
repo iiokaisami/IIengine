@@ -3740,6 +3740,55 @@ void EnemyManager::ChangeState(std::unique_ptr<EnemyWaveState> _pState)
 	pState_->Initialize();
 }
 
+bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const
+{
+	// 最も近い敵の位置を探す
+	bool found = false;
+	float bestDist2 = FLT_MAX;
+
+	// コンテナ内の敵を検討するラムダ関数
+	auto consider = [&](const auto& container)
+		{
+			// 各敵を検討
+			for (const auto& ePtr : container)
+			{
+				// 敵が存在しない場合はスキップ
+				if (!ePtr)
+				{
+					continue;
+				}
+
+				// 敵が死んでいる場合はスキップ
+				if (ePtr->IsDead())
+				{
+					continue;
+				}
+
+				// 距離の二乗を計算
+				Vector3 pos = ePtr->GetPosition();
+				float dx = pos.x - from.x;
+				float dy = pos.y - from.y;
+				float dz = pos.z - from.z;
+				float d2 = dx * dx + dy * dy + dz * dz;
+
+				// 最小距離を更新
+				if (d2 < bestDist2)
+				{
+					bestDist2 = d2;
+					outPos = pos;
+					found = true;
+				}
+			}
+		};
+
+	// 各コンテナを検討
+	consider(pNormalEnemies_);
+	consider(pTrapEnemies_);
+	consider(pCorruptors_);
+
+	return found;
+}
+
 
 ============================================================
 File Path: project/application/Objects/Enemy/EnemyManager.h
@@ -3817,6 +3866,14 @@ public:
 	/// </summary>
 	/// <param name="_pState">新しいステート</param>
 	void ChangeState(std::unique_ptr<EnemyWaveState>_pState);
+
+	/// <summary>
+	/// 最も近い敵の位置を取得
+	/// </summary>
+	/// <param name="from">基準位置</param>
+	/// <param name="outPos">最も近い敵の位置</param>
+	/// <returns>最も近い敵が存在するかどうか</returns>
+	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
 
 public: // ゲッター
 
@@ -6434,7 +6491,11 @@ void Player::Initialize()
 			sprite->SetSize(hpBarSize_);
 		
 		}
-
+		else if (i == 1)
+		{
+			sprite->Initialize("nearEnemy.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.5f,1.0f });
+		}
+		
 		sprites_.push_back(std::move(sprite));
 	}
 	// 最大HP保存
@@ -6627,6 +6688,9 @@ void Player::Update()
 			isEvading_ = false;
 		}
 	}
+
+	// 最も近い敵インジケーター更新
+	UpdateNearEnemyIndicator();
 }
 
 void Player::Draw()
@@ -6714,6 +6778,12 @@ void Player::UpdateHPBar()
 	sprites_[0]->SetSize(newSize);
 	sprites_[0]->Update();
 
+}
+
+void Player::ClearTargetEnemy()
+{
+	hasTarget_ = false;
+	targetEnemyPosition_ = { 0.0f,0.0f,0.0f };
 }
 
 void Player::Move()
@@ -6870,6 +6940,74 @@ void Player::Evade()
 	}
 }
 
+void Player::UpdateNearEnemyIndicator()
+{
+	auto camera = CameraManager::GetInstance().GetActiveCamera();
+	if (!camera)
+	{
+		return;
+	}
+
+	// ターゲットがセットされていない場合は非表示
+	if (!hasTarget_)
+	{
+		sprites_[1]->SetPosition({ -10000.0f, -10000.0f });
+		sprites_[1]->Update();
+		return;
+	}
+
+	// スクリーン上の中心
+	Vector3 worldCenter = position_;
+	Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+	// ターゲットをスクリーンに投影
+	Vector2 enemyScreen = camera->WorldToScreen(targetEnemyPosition_);
+
+	// スクリーン差分
+	float dx = enemyScreen.x - screenCenter.x;
+	float dy = enemyScreen.y - screenCenter.y;
+
+	// targetAngleの計算
+	float targetAngle = std::atan2f(dx, -dy);
+	
+	// インジケーターの回転角度を徐々に変化させる
+	const float TWO_PI = 6.28318530717958647692f;
+	if (indicatorSpinAngle_ < 0.0f)
+	{
+		indicatorSpinAngle_ += TWO_PI;
+	}
+
+	// 位置角
+	float posAngle = targetAngle;
+	Vector2 size = sprites_[1]->GetSize();
+	float sx = screenCenter.x + std::sinf(posAngle) * indicatorRadius_;
+	float sy = screenCenter.y - std::cosf(posAngle) * indicatorRadius_;
+
+	// スプライトの回転
+	float arrowOffset = 0.0f;
+	float spriteRotation = targetAngle + arrowOffset;
+
+	// 距離に基づくサイズと透明度
+	Vector3 diffWorld = targetEnemyPosition_ - position_;
+	float worldDist = std::sqrt(diffWorld.x * diffWorld.x + diffWorld.y * diffWorld.y + diffWorld.z * diffWorld.z);
+	float norm = std::clamp(worldDist / indicatorMaxDetectRange_, 0.0f, 1.0f);
+	float sizeScale = std::lerp(1.2f, 0.6f, norm);
+	float alpha = std::lerp(1.0f, 0.4f, norm);
+
+	// 反映
+	sprites_[1]->SetPosition({ sx, sy });
+	sprites_[1]->SetRotation(spriteRotation);
+	sprites_[1]->SetSize(Vector2{ 62.0f * sizeScale, 62.0f * sizeScale });
+
+	// 色のアルファを反映
+	Vector4 col = sprites_[1]->GetColor();
+	col.w = alpha;
+	sprites_[1]->SetColorChange(col);
+
+	sprites_[1]->Update();
+
+}
+
 void Player::DeadEffect()
 {
 	if (!deathMotion_.isActive)
@@ -6879,7 +7017,7 @@ void Player::DeadEffect()
 
 	uint32_t frame = deathMotion_.count;
 
-	// まずは「ぷるぷる」フェーズ：frame < shakeFrames
+	// ぷるぷるフェーズ
 	if (frame < deathMotion_.shakeFrames)
 	{
 		// 正規化 t [0,1]
@@ -6967,7 +7105,7 @@ void Player::ClearSceneUpdate()
 {
 	isCanMove_ = false;
 
-	// unscaled delta
+	// delta
 	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
 
 	constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
@@ -6979,7 +7117,7 @@ void Player::ClearSceneUpdate()
 	static float currentAngle = 0.2f;        // 現在角度（初期オフセット含む）
 	static bool clockwise = false;           // 回転方向
 
-	// other poyo params...
+	// パラメータ
 	static float poyoAmp = 0.2f;
 	static float poyoAmpZ = 0.2f;
 	static float poyoAmpY = 0.2f;
@@ -7017,14 +7155,14 @@ void Player::ClearSceneUpdate()
 	} 
 	else
 	{
-		// atan2(x,z) を使って yaw を得る（プロジェクト内の回転軸と合わせてください）
+		// atan2(x,z) を使って yaw を得る
 		lastYaw = std::atan2(velX, velZ);
 	}
 	clearMotion_.rotation.x = 0.0f;
 	clearMotion_.rotation.y = lastYaw;
 	clearMotion_.rotation.z = 0.0f;
 
-	// スケール (X, Z は既存ロジック。Y を追加して体積維持 or 独立制御を可能にする)
+	// スケール
 	float omegaXZ = 2.0f * 3.14159265358979323846f * poyoFreq;
 	float sXZ = std::sin(omegaXZ * totalTime + poyoPhase);
 	float sx = 1.0f + poyoAmp * sXZ;
@@ -7033,7 +7171,7 @@ void Player::ClearSceneUpdate()
 	float sz;
 	if (maintainArea)
 	{
-		// 面積維持（XZ面）
+		// 面積維持
 		sz = 1.0f / sx;
 		sz = std::clamp(sz, 0.05f, 5.0f);
 	} 
@@ -7043,11 +7181,11 @@ void Player::ClearSceneUpdate()
 		sz = std::clamp(sz, 0.05f, 5.0f);
 	}
 
-	// Y方向（高さ）のポヨポヨ
-	float sy; // 実スケール（乗算前）
+	// Y方向
+	float sy; // 実スケール
 	if (maintainVolume)
 	{
-		// 3D体積維持：相対スケールの積を1に近づける -> sy_rel = 1 / (sx_rel * sz_rel)
+		
 		float sx_rel = std::max(0.01f, sx);
 		float sz_rel = std::max(0.01f, sz);
 		float sy_rel = 1.0f / (sx_rel * sz_rel);
@@ -7067,7 +7205,7 @@ void Player::ClearSceneUpdate()
 	// baseScale を乗算して最終スケールを出す
 	clearMotion_.scale.x = baseScale.x * sx; // 横方向
 	clearMotion_.scale.y = sy;               // 高さも変化させる
-	clearMotion_.scale.z = baseScale.z * sz; // 縦方向（top-down だと視覚的に z を使う）
+	clearMotion_.scale.z = baseScale.z * sz; // 縦方向
 
 	object_->SetPosition(clearMotion_.position);
 	object_->SetRotate(clearMotion_.rotation);
@@ -7378,6 +7516,9 @@ public:
 
 	// HPバー更新
 	void UpdateHPBar();
+
+	// ターゲットエネミークリア
+	void ClearTargetEnemy();
 	
 	/// <summary>
 	/// デスモーション開始
@@ -7400,6 +7541,9 @@ private: // 内部処理
 
 	// 回避
 	void Evade();
+
+	// 最も近い敵インジケーター更新
+	void UpdateNearEnemyIndicator();
 
 	// 死亡演出
 	void DeadEffect();
@@ -7464,6 +7608,12 @@ public: // セッター
 	/// <param name="_isCanMove">移動可能フラグ</param>
 	bool SetIsCanMove(bool _isCanMove) { return isCanMove_ = _isCanMove; }
 
+	/// <summary>
+	/// ターゲットエネミーの位置設定
+	/// </summary>
+	/// <param name="_targetPos">ターゲットエネミーの位置ベクトル</param>
+	void SetTargetEnemyPosition(const Vector3& _targetPos) { targetEnemyPosition_ = _targetPos; hasTarget_ = true; }
+
 private:
 
 	// デフォルトフレームレート
@@ -7474,7 +7624,7 @@ private:
 
 	// スプライト
 	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 2;
 
 	// HPバー
 	Vector2 hpBarSize_ = { 100.0f, 20.0f };
@@ -7482,6 +7632,14 @@ private:
 	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
 	float hpRatio_ = 1.0f;
 	float hpLerpSpeed_ = 10.0f;
+
+	// 最も近い敵
+	Vector3 targetEnemyPosition_ = { 0.0f,0.0f,0.0f };
+	bool hasTarget_ = false;
+	float indicatorSpinAngle_ = 0.0f;
+	float indicatorSpinSpeed_ = 2.0f;
+	float indicatorRadius_ = 60.0f;
+	float indicatorMaxDetectRange_ = 400.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -8345,6 +8503,55 @@ void EnemyManager::ChangeState(std::unique_ptr<EnemyWaveState> _pState)
 	pState_->Initialize();
 }
 
+bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const
+{
+	// 最も近い敵の位置を探す
+	bool found = false;
+	float bestDist2 = FLT_MAX;
+
+	// コンテナ内の敵を検討するラムダ関数
+	auto consider = [&](const auto& container)
+		{
+			// 各敵を検討
+			for (const auto& ePtr : container)
+			{
+				// 敵が存在しない場合はスキップ
+				if (!ePtr)
+				{
+					continue;
+				}
+
+				// 敵が死んでいる場合はスキップ
+				if (ePtr->IsDead())
+				{
+					continue;
+				}
+
+				// 距離の二乗を計算
+				Vector3 pos = ePtr->GetPosition();
+				float dx = pos.x - from.x;
+				float dy = pos.y - from.y;
+				float dz = pos.z - from.z;
+				float d2 = dx * dx + dy * dy + dz * dz;
+
+				// 最小距離を更新
+				if (d2 < bestDist2)
+				{
+					bestDist2 = d2;
+					outPos = pos;
+					found = true;
+				}
+			}
+		};
+
+	// 各コンテナを検討
+	consider(pNormalEnemies_);
+	consider(pTrapEnemies_);
+	consider(pCorruptors_);
+
+	return found;
+}
+
 
 ============================================================
 File Path: project/application/objects/enemy/EnemyManager.h
@@ -8422,6 +8629,14 @@ public:
 	/// </summary>
 	/// <param name="_pState">新しいステート</param>
 	void ChangeState(std::unique_ptr<EnemyWaveState>_pState);
+
+	/// <summary>
+	/// 最も近い敵の位置を取得
+	/// </summary>
+	/// <param name="from">基準位置</param>
+	/// <param name="outPos">最も近い敵の位置</param>
+	/// <returns>最も近い敵が存在するかどうか</returns>
+	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
 
 public: // ゲッター
 
@@ -10642,6 +10857,16 @@ void GamePlayScene::Update()
 
 	// エネミーの更新
 	pEnemyManager_->Update();
+	// 最も近いエネミーの位置を取得してプレイヤーにセット
+	Vector3 nearest;
+	if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest)) 
+	{
+		pPlayer_->SetTargetEnemyPosition(nearest);
+	}
+	else 
+	{
+		pPlayer_->ClearTargetEnemy();
+	}
 
 	// フィールドの更新
 	pField_->Update();
