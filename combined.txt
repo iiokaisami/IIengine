@@ -3538,6 +3538,22 @@ void EnemyManager::Draw()
 
 }
 
+void EnemyManager::Draw2D()
+{
+	for (auto& enemy : pNormalEnemies_)
+	{
+		enemy->Draw2D();
+	}
+	for (auto& enemy : pTrapEnemies_)
+	{
+		enemy->Draw2D();
+	}
+	for(auto& corruptor : pCorruptors_)
+	{
+		corruptor->Draw2D();
+	}
+}
+
 void EnemyManager::ImGuiDraw()
 {
 #ifdef USE_IMGUI
@@ -3761,6 +3777,9 @@ public:
 	// 描画
 	void Draw();
 
+	// スプライト描画
+	void Draw2D();
+
 	// ImGui
 	void ImGuiDraw();
 
@@ -3897,9 +3916,30 @@ void NormalEnemy::Initialize()
     scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
     // ライト設定
-    //object_->SetDirectionalLightEnable(true);
     object_->SetLighting(true);
 
+    // ステータス
+    hp_ = 3;
+    isDead_ = false;
+
+    // スプライト
+    for (uint32_t i = 0; i < spriteNum_; ++i)
+    {
+        auto sprite = std::make_unique<Sprite>();
+
+        if (i == 0)
+        {
+            sprite->Initialize("white.png", { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f }, { 0.0f,0.5f });
+            sprite->SetSize(hpBarSize_);
+
+        }
+
+        sprites_.push_back(std::move(sprite));
+    }
+    // 最大HP保存
+    maxHP_ = hp_;
+
+	// 当たり判定
     colliderManager_ = ColliderManager::GetInstance();
 
     objectName_ = "NormalEnemy";
@@ -3918,10 +3958,6 @@ void NormalEnemy::Initialize()
     collider_.MakeAABBDesc(desc);
     colliderManager_->RegisterCollider(&collider_);
 
-    // ステータス
-    hp_ = 3;
-    isDead_ = false;
-
     // 行動ステート
     ChangeBehaviorState(std::make_unique<EnemyBehaviorSpawn>(this));
 
@@ -3935,6 +3971,11 @@ void NormalEnemy::Initialize()
 
 void NormalEnemy::Finalize()
 {
+    for (auto& sprite : sprites_)
+    {
+        sprite.reset();
+    }
+
 	for (auto& bullet : pBullets_)
 	{
 		bullet->SetIsDead(true);
@@ -3963,6 +4004,9 @@ void NormalEnemy::Update()
 	pBehaviorState_->Update();
 
     object_->Update();
+
+    // HPバー更新
+    UpdateHPBar();
 
     // プレイヤーとの距離を計算
     float distanceToPlayer = position_.Distance(playerPosition_);
@@ -4019,6 +4063,10 @@ void NormalEnemy::Draw()
 
 void NormalEnemy::Draw2D()
 {
+    for (auto& sprite : sprites_)
+    {
+        sprite->Draw();
+    }
 }
 
 void NormalEnemy::ImGuiDraw()
@@ -4142,6 +4190,46 @@ void NormalEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _r
     object_->SetPosition(_position);
     object_->SetRotate(_rotation);
     object_->SetScale(_scale);
+}
+
+void NormalEnemy::UpdateHPBar()
+{
+    auto camera = CameraManager::GetInstance().GetActiveCamera();
+
+    if (!camera or sprites_.empty())
+    {
+        return;
+    }
+
+    // 目標HPを計算
+    float targetRatio = 1.0f;
+    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
+
+    // 補間
+    const float dt = TimeManager::Instance().GetDeltaTime();
+    // 補間係数
+    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
+    hpRatio_ += (targetRatio - hpRatio_) * t;
+
+    // スクリーン位置計算
+    Vector3 worldCenter = position_ + hpBarOffset_;
+    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+    // 左寄せに合わせて左端位置を決める
+    float baseWidth = hpBarSize_.x;
+    Vector2 leftPos = screenCenter;
+    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
+
+    // 幅を決める
+    Vector2 newSize = hpBarSize_;
+    newSize.x = baseWidth * hpRatio_;
+
+    // 反映
+    sprites_[0]->SetPosition(leftPos);
+    sprites_[0]->SetSize(newSize);
+    sprites_[0]->Update();
+
+
 }
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)
@@ -4300,6 +4388,11 @@ public:
 	/// <param name="_pState">新しいステートポインタ</param>
 	void ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pState);
 
+private: // 内部処理
+
+	// HPバー更新
+	void UpdateHPBar();
+
 private: // 衝突判定
 
 	/// <summary>
@@ -4366,6 +4459,17 @@ private:
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
+
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
+	uint32_t spriteNum_ = 1;
+
+	// HPバー
+	Vector2 hpBarSize_ = { 100.0f, 20.0f };
+	float maxHP_ = 100.0f;
+	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
+	float hpRatio_ = 1.0f;
+	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -4437,9 +4541,30 @@ void TrapEnemy::Initialize()
     scale_ = { 1.0f,1.0f,1.0f };
     object_->SetScale(scale_);
     // ライト設定
-    //object_->SetDirectionalLightEnable(true);
     object_->SetLighting(true);
 
+    // ステータス
+    hp_ = 3;
+    isDead_ = false;
+
+    // スプライト
+    for (uint32_t i = 0; i < spriteNum_; ++i)
+    {
+        auto sprite = std::make_unique<Sprite>();
+
+        if (i == 0)
+        {
+            sprite->Initialize("white.png", { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f }, { 0.0f,0.5f });
+            sprite->SetSize(hpBarSize_);
+
+        }
+
+        sprites_.push_back(std::move(sprite));
+    }
+    // 最大HP保存
+    maxHP_ = hp_;
+
+	// 当たり判定
     colliderManager_ = ColliderManager::GetInstance();
 
     objectName_ = "TrapEnemy";
@@ -4458,10 +4583,6 @@ void TrapEnemy::Initialize()
     collider_.MakeAABBDesc(desc);
     colliderManager_->RegisterCollider(&collider_);
 
-    // ステータス
-    hp_ = 3;
-    isDead_ = false;
-
     // 行動ステート
     ChangeBehaviorState(std::make_unique<TrapEnemyBehaviorSpawn>(this));
 
@@ -4474,7 +4595,10 @@ void TrapEnemy::Initialize()
 
 void TrapEnemy::Finalize()
 {
-    colliderManager_->DeleteCollider(&collider_);
+    for (auto& sprite : sprites_)
+    {
+        sprite.reset();
+    }
 
     // 罠
 	for (auto& trap : pTimeBomb_)
@@ -4517,6 +4641,8 @@ void TrapEnemy::Finalize()
 		pVignetteTrap_.end()
 	);
 
+
+    colliderManager_->DeleteCollider(&collider_);
 }
 
 void TrapEnemy::Update()
@@ -4528,6 +4654,9 @@ void TrapEnemy::Update()
     pBehaviorState_->Update();
 
     object_->Update();
+
+	// HPバー更新
+	UpdateHPBar();
 
     // プレイヤーとの距離を計算
     float distanceToPlayer = position_.Distance(playerPosition_);
@@ -4618,6 +4747,10 @@ void TrapEnemy::Draw()
 
 void TrapEnemy::Draw2D()
 {
+    for (auto& sprite : sprites_)
+    {
+        sprite->Draw();
+	}
 }
 
 void TrapEnemy::ImGuiDraw()
@@ -4713,6 +4846,46 @@ void TrapEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _rot
     object_->SetPosition(_position);
     object_->SetRotate(_rotation);
     object_->SetScale(_scale);
+}
+
+void TrapEnemy::UpdateHPBar()
+{
+    auto camera = CameraManager::GetInstance().GetActiveCamera();
+
+    if (!camera or sprites_.empty())
+    {
+        return;
+    }
+
+    // 目標HPを計算
+    float targetRatio = 1.0f;
+    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
+
+    // 補間
+    const float dt = TimeManager::Instance().GetDeltaTime();
+    // 補間係数
+    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
+    hpRatio_ += (targetRatio - hpRatio_) * t;
+
+    // スクリーン位置計算
+    Vector3 worldCenter = position_ + hpBarOffset_;
+    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+    // 左寄せに合わせて左端位置を決める
+    float baseWidth = hpBarSize_.x;
+    Vector2 leftPos = screenCenter;
+    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
+
+    // 幅を決める
+    Vector2 newSize = hpBarSize_;
+    newSize.x = baseWidth * hpRatio_;
+
+    // 反映
+    sprites_[0]->SetPosition(leftPos);
+    sprites_[0]->SetSize(newSize);
+    sprites_[0]->Update();
+
+
 }
 
 void TrapEnemy::OnCollisionTrigger(const Collider* _other)
@@ -4840,6 +5013,11 @@ public:
 	/// <param name="_pState">新しいステートのポインタ</param>
 	void ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pState);
 
+private:
+
+	// HPバー更新
+	void UpdateHPBar();
+
 private: // 衝突判定
 
 	/// <summary>
@@ -4912,6 +5090,17 @@ private:
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
+
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
+	uint32_t spriteNum_ = 1;
+
+	// HPバー
+	Vector2 hpBarSize_ = { 100.0f, 20.0f };
+	float maxHP_ = 100.0f;
+	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
+	float hpRatio_ = 1.0f;
+	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -6226,9 +6415,30 @@ void Player::Initialize()
 	scale_ = { 1.0f,1.5f,1.0f };
 	object_->SetScale(scale_);
 
-
 	// ライト設定
 	object_->SetLighting(true);
+
+	// ステータス
+	hp_ = 12;
+	isDead_ = false;
+	isAutoControl_ = false;
+
+	// スプライト
+	for (uint32_t i = 0; i < spriteNum_; ++i)
+	{
+		auto sprite = std::make_unique<Sprite>();
+
+		if (i == 0)
+		{
+			sprite->Initialize("hp.png", {0.0f,0.0f}, { 1.0f,1.0f,1.0f,1.0f }, { 0.0f,0.5f });
+			sprite->SetSize(hpBarSize_);
+		
+		}
+
+		sprites_.push_back(std::move(sprite));
+	}
+	// 最大HP保存
+	maxHP_ = hp_;
 
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -6251,11 +6461,6 @@ void Player::Initialize()
 
 	// 画面が更新されたらビネットを0にする
 	PostEffectManager::GetInstance()->GetPassAs<VignettePass>("Vignette")->SetStrength(0.0f);
-
-	// ステータス
-	hp_ = 12;
-	isDead_ = false;
-	isAutoControl_= false;
 
 	// 環境マップ
 	cubeMapPath_ = "resources/images/studio.dds";
@@ -6284,6 +6489,11 @@ void Player::Initialize()
 
 void Player::Finalize()
 {
+	for (auto& sprite: sprites_)
+	{
+		sprite.reset();
+	}
+
 	for (auto& bullet : pBullets_)
 	{
 		bullet->SetIsDead(true);
@@ -6432,6 +6642,10 @@ void Player::Draw()
 
 void Player::Draw2D()
 {
+	for(auto& sprite: sprites_)
+	{
+		sprite->Draw();
+	}
 }
 
 void Player::ImGuiDraw()
@@ -6461,6 +6675,45 @@ void Player::ImGuiDraw()
 	}
 
 #endif // USE_IMGUI
+}
+
+void Player::UpdateHPBar()
+{
+	auto camera = CameraManager::GetInstance().GetActiveCamera();
+	
+	if (!camera or sprites_.empty())
+	{
+		return;
+	}
+
+	// 目標HPを計算
+	float targetRatio = 1.0f;
+	if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
+
+	// 補間
+	const float dt = TimeManager::Instance().GetDeltaTime();
+	// 補間係数
+	float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
+	hpRatio_ += (targetRatio - hpRatio_) * t;
+
+	// スクリーン位置計算
+	Vector3 worldCenter = position_ + hpBarOffset_;
+	Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+	// 左寄せに合わせて左端位置を決める
+	float baseWidth = hpBarSize_.x;
+	Vector2 leftPos = screenCenter;
+	leftPos.x = screenCenter.x - (baseWidth * 0.5f);
+
+	// 幅を決める
+	Vector2 newSize = hpBarSize_;
+	newSize.x = baseWidth * hpRatio_;
+
+	// 反映
+	sprites_[0]->SetPosition(leftPos);
+	sprites_[0]->SetSize(newSize);
+	sprites_[0]->Update();
+
 }
 
 void Player::Move()
@@ -7122,6 +7375,9 @@ public:
 	
 	// ImGui
 	void ImGuiDraw();
+
+	// HPバー更新
+	void UpdateHPBar();
 	
 	/// <summary>
 	/// デスモーション開始
@@ -7215,6 +7471,17 @@ private:
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
+
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
+	uint32_t spriteNum_ = 1;
+
+	// HPバー
+	Vector2 hpBarSize_ = { 100.0f, 20.0f };
+	float maxHP_ = 100.0f;
+	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
+	float hpRatio_ = 1.0f;
+	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -7348,8 +7615,11 @@ void Corruptor::Initialize()
 	scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
+
+	// ステータス
+	isDead_ = false;
+	hp_ = 1.0f;
 
 	// コライダー設定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -7369,8 +7639,6 @@ void Corruptor::Initialize()
 	collider_.MakeAABBDesc(desc);
 	colliderManager_->RegisterCollider(&collider_);
 
-	// ステータス
-	isDead_ = false;
 
 	// 行動ステート
 	pBehaviorState_ = std::make_unique<CorruptorBehaviorSpawn>(this);
@@ -7663,6 +7931,9 @@ private:
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
+	
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -7870,6 +8141,22 @@ void EnemyManager::Draw()
 		corruptor->Draw();
 	}
 
+}
+
+void EnemyManager::Draw2D()
+{
+	for (auto& enemy : pNormalEnemies_)
+	{
+		enemy->Draw2D();
+	}
+	for (auto& enemy : pTrapEnemies_)
+	{
+		enemy->Draw2D();
+	}
+	for(auto& corruptor : pCorruptors_)
+	{
+		corruptor->Draw2D();
+	}
 }
 
 void EnemyManager::ImGuiDraw()
@@ -8094,6 +8381,9 @@ public:
 
 	// 描画
 	void Draw();
+
+	// スプライト描画
+	void Draw2D();
 
 	// ImGui
 	void ImGuiDraw();
@@ -10122,11 +10412,6 @@ void GamePlayScene::Initialize()
 		{
 			sprite->Initialize("playUI.png", { 0,600 }, color_, { 0,0 });
 		}
-		else if (i == 1)
-		{
-			sprite->Initialize("uvChecker.png", { 0,0 }, color_, { 0.5f,0.5f });
-			sprite->SetSize({ 100.0f, 20.0f });
-		}
 
 		sprites_.push_back(std::move(sprite));
 	}
@@ -10352,6 +10637,9 @@ void GamePlayScene::Update()
 	// カメラマネージャーの更新
 	cameraManager.UpdateAll();
 
+	// プレイヤーのHPバー更新(カメラの更新後に呼び出したい)
+	pPlayer_->UpdateHPBar();
+
 	// エネミーの更新
 	pEnemyManager_->Update();
 
@@ -10367,16 +10655,6 @@ void GamePlayScene::Update()
 	// ゴールの更新
 	pGoal_->Update();
 	pGoal_->SetBarrierDestroyed(pEnemyManager_->IsAllEnemyDefeated());
-
-	// 追尾スプライトの更新
-	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		// プレイヤーにオフセット
-		Vector3 worldHeadPos = pPlayer_->GetPosition() + Vector3{ 0.0f, 1.6f, 1.5f };
-		Vector2 screen = activeCamera->WorldToScreen(worldHeadPos);
-		sprites_[1]->SetPosition(screen);
-	}
 
 	// スプライトの更新
 	for (auto& sprite : sprites_)
@@ -10446,6 +10724,8 @@ void GamePlayScene::Draw()
 	}
 
 	pPlayer_->Draw2D();
+
+	pEnemyManager_->Draw2D();
 
 	// トランジション描画
 	if (isTransitioning_ && blockTransition_)
@@ -10561,7 +10841,7 @@ private:
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 2;
+	uint32_t spriteNum_ = 1;
 
 	// 遷移
 	std::unique_ptr<BlockRiseTransition> blockTransition_ = nullptr;
