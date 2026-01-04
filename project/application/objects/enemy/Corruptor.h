@@ -119,6 +119,9 @@ private:
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
+	
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;

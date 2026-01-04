@@ -25,9 +25,30 @@ void NormalEnemy::Initialize()
     scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
     // ライト設定
-    //object_->SetDirectionalLightEnable(true);
     object_->SetLighting(true);
 
+    // ステータス
+    hp_ = 3;
+    isDead_ = false;
+
+    // スプライト
+    for (uint32_t i = 0; i < spriteNum_; ++i)
+    {
+        auto sprite = std::make_unique<Sprite>();
+
+        if (i == 0)
+        {
+            sprite->Initialize("white.png", { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f }, { 0.0f,0.5f });
+            sprite->SetSize(hpBarSize_);
+
+        }
+
+        sprites_.push_back(std::move(sprite));
+    }
+    // 最大HP保存
+    maxHP_ = hp_;
+
+	// 当たり判定
     colliderManager_ = ColliderManager::GetInstance();
 
     objectName_ = "NormalEnemy";
@@ -46,10 +67,6 @@ void NormalEnemy::Initialize()
     collider_.MakeAABBDesc(desc);
     colliderManager_->RegisterCollider(&collider_);
 
-    // ステータス
-    hp_ = 3;
-    isDead_ = false;
-
     // 行動ステート
     ChangeBehaviorState(std::make_unique<EnemyBehaviorSpawn>(this));
 
@@ -63,6 +80,11 @@ void NormalEnemy::Initialize()
 
 void NormalEnemy::Finalize()
 {
+    for (auto& sprite : sprites_)
+    {
+        sprite.reset();
+    }
+
 	for (auto& bullet : pBullets_)
 	{
 		bullet->SetIsDead(true);
@@ -91,6 +113,9 @@ void NormalEnemy::Update()
 	pBehaviorState_->Update();
 
     object_->Update();
+
+    // HPバー更新
+    UpdateHPBar();
 
     // プレイヤーとの距離を計算
     float distanceToPlayer = position_.Distance(playerPosition_);
@@ -147,6 +172,10 @@ void NormalEnemy::Draw()
 
 void NormalEnemy::Draw2D()
 {
+    for (auto& sprite : sprites_)
+    {
+        sprite->Draw();
+    }
 }
 
 void NormalEnemy::ImGuiDraw()
@@ -270,6 +299,46 @@ void NormalEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _r
     object_->SetPosition(_position);
     object_->SetRotate(_rotation);
     object_->SetScale(_scale);
+}
+
+void NormalEnemy::UpdateHPBar()
+{
+    auto camera = CameraManager::GetInstance().GetActiveCamera();
+
+    if (!camera or sprites_.empty())
+    {
+        return;
+    }
+
+    // 目標HPを計算
+    float targetRatio = 1.0f;
+    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
+
+    // 補間
+    const float dt = TimeManager::Instance().GetDeltaTime();
+    // 補間係数
+    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
+    hpRatio_ += (targetRatio - hpRatio_) * t;
+
+    // スクリーン位置計算
+    Vector3 worldCenter = position_ + hpBarOffset_;
+    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+    // 左寄せに合わせて左端位置を決める
+    float baseWidth = hpBarSize_.x;
+    Vector2 leftPos = screenCenter;
+    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
+
+    // 幅を決める
+    Vector2 newSize = hpBarSize_;
+    newSize.x = baseWidth * hpRatio_;
+
+    // 反映
+    sprites_[0]->SetPosition(leftPos);
+    sprites_[0]->SetSize(newSize);
+    sprites_[0]->Update();
+
+
 }
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)

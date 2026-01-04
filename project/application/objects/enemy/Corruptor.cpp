@@ -19,8 +19,11 @@ void Corruptor::Initialize()
 	scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
+
+	// ステータス
+	isDead_ = false;
+	hp_ = 1.0f;
 
 	// コライダー設定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -40,8 +43,6 @@ void Corruptor::Initialize()
 	collider_.MakeAABBDesc(desc);
 	colliderManager_->RegisterCollider(&collider_);
 
-	// ステータス
-	isDead_ = false;
 
 	// 行動ステート
 	pBehaviorState_ = std::make_unique<CorruptorBehaviorSpawn>(this);

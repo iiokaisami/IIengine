@@ -17,9 +17,30 @@ void Player::Initialize()
 	scale_ = { 1.0f,1.5f,1.0f };
 	object_->SetScale(scale_);
 
-
 	// ライト設定
 	object_->SetLighting(true);
+
+	// ステータス
+	hp_ = 12;
+	isDead_ = false;
+	isAutoControl_ = false;
+
+	// スプライト
+	for (uint32_t i = 0; i < spriteNum_; ++i)
+	{
+		auto sprite = std::make_unique<Sprite>();
+
+		if (i == 0)
+		{
+			sprite->Initialize("hp.png", {0.0f,0.0f}, { 1.0f,1.0f,1.0f,1.0f }, { 0.0f,0.5f });
+			sprite->SetSize(hpBarSize_);
+		
+		}
+
+		sprites_.push_back(std::move(sprite));
+	}
+	// 最大HP保存
+	maxHP_ = hp_;
 
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
@@ -42,11 +63,6 @@ void Player::Initialize()
 
 	// 画面が更新されたらビネットを0にする
 	PostEffectManager::GetInstance()->GetPassAs<VignettePass>("Vignette")->SetStrength(0.0f);
-
-	// ステータス
-	hp_ = 12;
-	isDead_ = false;
-	isAutoControl_= false;
 
 	// 環境マップ
 	cubeMapPath_ = "resources/images/studio.dds";
@@ -75,6 +91,11 @@ void Player::Initialize()
 
 void Player::Finalize()
 {
+	for (auto& sprite: sprites_)
+	{
+		sprite.reset();
+	}
+
 	for (auto& bullet : pBullets_)
 	{
 		bullet->SetIsDead(true);
@@ -223,6 +244,10 @@ void Player::Draw()
 
 void Player::Draw2D()
 {
+	for(auto& sprite: sprites_)
+	{
+		sprite->Draw();
+	}
 }
 
 void Player::ImGuiDraw()
@@ -252,6 +277,45 @@ void Player::ImGuiDraw()
 	}
 
 #endif // USE_IMGUI
+}
+
+void Player::UpdateHPBar()
+{
+	auto camera = CameraManager::GetInstance().GetActiveCamera();
+	
+	if (!camera or sprites_.empty())
+	{
+		return;
+	}
+
+	// 目標HPを計算
+	float targetRatio = 1.0f;
+	if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
+
+	// 補間
+	const float dt = TimeManager::Instance().GetDeltaTime();
+	// 補間係数
+	float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
+	hpRatio_ += (targetRatio - hpRatio_) * t;
+
+	// スクリーン位置計算
+	Vector3 worldCenter = position_ + hpBarOffset_;
+	Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+	// 左寄せに合わせて左端位置を決める
+	float baseWidth = hpBarSize_.x;
+	Vector2 leftPos = screenCenter;
+	leftPos.x = screenCenter.x - (baseWidth * 0.5f);
+
+	// 幅を決める
+	Vector2 newSize = hpBarSize_;
+	newSize.x = baseWidth * hpRatio_;
+
+	// 反映
+	sprites_[0]->SetPosition(leftPos);
+	sprites_[0]->SetSize(newSize);
+	sprites_[0]->Update();
+
 }
 
 void Player::Move()

@@ -51,6 +51,11 @@ public:
 	/// <param name="_pState">新しいステートのポインタ</param>
 	void ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pState);
 
+private:
+
+	// HPバー更新
+	void UpdateHPBar();
+
 private: // 衝突判定
 
 	/// <summary>
@@ -123,6 +128,17 @@ private:
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
+
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
+	uint32_t spriteNum_ = 1;
+
+	// HPバー
+	Vector2 hpBarSize_ = { 100.0f, 20.0f };
+	float maxHP_ = 100.0f;
+	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
+	float hpRatio_ = 1.0f;
+	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;

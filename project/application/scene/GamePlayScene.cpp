@@ -55,11 +55,6 @@ void GamePlayScene::Initialize()
 		{
 			sprite->Initialize("playUI.png", { 0,600 }, color_, { 0,0 });
 		}
-		else if (i == 1)
-		{
-			sprite->Initialize("uvChecker.png", { 0,0 }, color_, { 0.5f,0.5f });
-			sprite->SetSize({ 100.0f, 20.0f });
-		}
 
 		sprites_.push_back(std::move(sprite));
 	}
@@ -285,6 +280,9 @@ void GamePlayScene::Update()
 	// カメラマネージャーの更新
 	cameraManager.UpdateAll();
 
+	// プレイヤーのHPバー更新(カメラの更新後に呼び出したい)
+	pPlayer_->UpdateHPBar();
+
 	// エネミーの更新
 	pEnemyManager_->Update();
 
@@ -300,16 +298,6 @@ void GamePlayScene::Update()
 	// ゴールの更新
 	pGoal_->Update();
 	pGoal_->SetBarrierDestroyed(pEnemyManager_->IsAllEnemyDefeated());
-
-	// 追尾スプライトの更新
-	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		// プレイヤーにオフセット
-		Vector3 worldHeadPos = pPlayer_->GetPosition() + Vector3{ 0.0f, 1.6f, 1.5f };
-		Vector2 screen = activeCamera->WorldToScreen(worldHeadPos);
-		sprites_[1]->SetPosition(screen);
-	}
 
 	// スプライトの更新
 	for (auto& sprite : sprites_)
@@ -379,6 +367,8 @@ void GamePlayScene::Draw()
 	}
 
 	pPlayer_->Draw2D();
+
+	pEnemyManager_->Draw2D();
 
 	// トランジション描画
 	if (isTransitioning_ && blockTransition_)

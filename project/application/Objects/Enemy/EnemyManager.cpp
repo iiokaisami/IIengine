@@ -170,6 +170,22 @@ void EnemyManager::Draw()
 
 }
 
+void EnemyManager::Draw2D()
+{
+	for (auto& enemy : pNormalEnemies_)
+	{
+		enemy->Draw2D();
+	}
+	for (auto& enemy : pTrapEnemies_)
+	{
+		enemy->Draw2D();
+	}
+	for(auto& corruptor : pCorruptors_)
+	{
+		corruptor->Draw2D();
+	}
+}
+
 void EnemyManager::ImGuiDraw()
 {
 #ifdef USE_IMGUI
