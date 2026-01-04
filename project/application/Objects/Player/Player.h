@@ -41,6 +41,9 @@ public:
 
 	// HPバー更新
 	void UpdateHPBar();
+
+	// ターゲットエネミークリア
+	void ClearTargetEnemy();
 	
 	/// <summary>
 	/// デスモーション開始
@@ -63,6 +66,9 @@ private: // 内部処理
 
 	// 回避
 	void Evade();
+
+	// 最も近い敵インジケーター更新
+	void UpdateNearEnemyIndicator();
 
 	// 死亡演出
 	void DeadEffect();
@@ -127,6 +133,12 @@ public: // セッター
 	/// <param name="_isCanMove">移動可能フラグ</param>
 	bool SetIsCanMove(bool _isCanMove) { return isCanMove_ = _isCanMove; }
 
+	/// <summary>
+	/// ターゲットエネミーの位置設定
+	/// </summary>
+	/// <param name="_targetPos">ターゲットエネミーの位置ベクトル</param>
+	void SetTargetEnemyPosition(const Vector3& _targetPos) { targetEnemyPosition_ = _targetPos; hasTarget_ = true; }
+
 private:
 
 	// デフォルトフレームレート
@@ -137,7 +149,7 @@ private:
 
 	// スプライト
 	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 2;
 
 	// HPバー
 	Vector2 hpBarSize_ = { 100.0f, 20.0f };
@@ -145,6 +157,14 @@ private:
 	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
 	float hpRatio_ = 1.0f;
 	float hpLerpSpeed_ = 10.0f;
+
+	// 最も近い敵
+	Vector3 targetEnemyPosition_ = { 0.0f,0.0f,0.0f };
+	bool hasTarget_ = false;
+	float indicatorSpinAngle_ = 0.0f;
+	float indicatorSpinSpeed_ = 2.0f;
+	float indicatorRadius_ = 60.0f;
+	float indicatorMaxDetectRange_ = 400.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;

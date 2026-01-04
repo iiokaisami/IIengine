@@ -285,6 +285,16 @@ void GamePlayScene::Update()
 
 	// エネミーの更新
 	pEnemyManager_->Update();
+	// 最も近いエネミーの位置を取得してプレイヤーにセット
+	Vector3 nearest;
+	if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest)) 
+	{
+		pPlayer_->SetTargetEnemyPosition(nearest);
+	}
+	else 
+	{
+		pPlayer_->ClearTargetEnemy();
+	}
 
 	// フィールドの更新
 	pField_->Update();

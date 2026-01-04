@@ -36,6 +36,10 @@ void Player::Initialize()
 			sprite->SetSize(hpBarSize_);
 		
 		}
+		else if (i == 1)
+		{
+			sprite->Initialize("nearEnemy.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.0f,0.0f });
+		}
 
 		sprites_.push_back(std::move(sprite));
 	}
@@ -229,6 +233,9 @@ void Player::Update()
 			isEvading_ = false;
 		}
 	}
+
+	// 最も近い敵インジケーター更新
+	UpdateNearEnemyIndicator();
 }
 
 void Player::Draw()
@@ -316,6 +323,12 @@ void Player::UpdateHPBar()
 	sprites_[0]->SetSize(newSize);
 	sprites_[0]->Update();
 
+}
+
+void Player::ClearTargetEnemy()
+{
+	hasTarget_ = false;
+	targetEnemyPosition_ = { 0.0f,0.0f,0.0f };
 }
 
 void Player::Move()
@@ -470,6 +483,74 @@ void Player::Evade()
 			rotation_.x = evadeStartRotationX_;
 		}
 	}
+}
+
+void Player::UpdateNearEnemyIndicator()
+{
+	auto camera = CameraManager::GetInstance().GetActiveCamera();
+	if (!camera)
+	{
+		return;
+	}
+
+	// ターゲットがセットされていない場合は非表示
+	if (!hasTarget_)
+	{
+		sprites_[1]->SetPosition({ -10000.0f, -10000.0f });
+		sprites_[1]->Update();
+		return;
+	}
+
+	// スクリーン上の中心
+	Vector3 worldCenter = position_;
+	Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+	// ターゲットをスクリーンに投影
+	Vector2 enemyScreen = camera->WorldToScreen(targetEnemyPosition_);
+
+	// スクリーン差分
+	float dx = enemyScreen.x - screenCenter.x;
+	float dy = enemyScreen.y - screenCenter.y;
+
+	// targetAngleの計算
+	float targetAngle = std::atan2f(dx, -dy);
+	
+	// インジケーターの回転角度を徐々に変化させる
+	const float TWO_PI = 6.28318530717958647692f;
+	if (indicatorSpinAngle_ < 0.0f)
+	{
+		indicatorSpinAngle_ += TWO_PI;
+	}
+
+	// 位置角
+	float posAngle = targetAngle;
+
+	float sx = screenCenter.x + std::sinf(posAngle) * indicatorRadius_;
+	float sy = screenCenter.y - std::cosf(posAngle) * indicatorRadius_;
+
+	// スプライトの回転
+	float arrowOffset = 0.0f;
+	float spriteRotation = targetAngle + arrowOffset;
+
+	// 距離に基づくサイズと透明度
+	Vector3 diffWorld = targetEnemyPosition_ - position_;
+	float worldDist = std::sqrt(diffWorld.x * diffWorld.x + diffWorld.y * diffWorld.y + diffWorld.z * diffWorld.z);
+	float norm = std::clamp(worldDist / indicatorMaxDetectRange_, 0.0f, 1.0f);
+	float sizeScale = std::lerp(1.2f, 0.6f, norm);
+	float alpha = std::lerp(1.0f, 0.4f, norm);
+
+	// 反映
+	sprites_[1]->SetPosition({ sx, sy });
+	sprites_[1]->SetRotation(spriteRotation);
+	sprites_[1]->SetSize(Vector2{ 24.0f * sizeScale, 24.0f * sizeScale });
+
+	// 色のアルファを反映
+	Vector4 col = sprites_[1]->GetColor();
+	col.w = alpha;
+	sprites_[1]->SetColorChange(col);
+
+	sprites_[1]->Update();
+
 }
 
 void Player::DeadEffect()
