@@ -72,6 +72,14 @@ public:
 	/// <param name="_pState">新しいステート</param>
 	void ChangeState(std::unique_ptr<EnemyWaveState>_pState);
 
+	/// <summary>
+	/// 最も近い敵の位置を取得
+	/// </summary>
+	/// <param name="from">基準位置</param>
+	/// <param name="outPos">最も近い敵の位置</param>
+	/// <returns>最も近い敵が存在するかどうか</returns>
+	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
+
 public: // ゲッター
 
 	// プレイヤーとの距離のゲッター

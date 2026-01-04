@@ -38,9 +38,9 @@ void Player::Initialize()
 		}
 		else if (i == 1)
 		{
-			sprite->Initialize("nearEnemy.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.0f,0.0f });
+			sprite->Initialize("nearEnemy.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.5f,1.0f });
 		}
-
+		
 		sprites_.push_back(std::move(sprite));
 	}
 	// 最大HP保存
@@ -524,7 +524,7 @@ void Player::UpdateNearEnemyIndicator()
 
 	// 位置角
 	float posAngle = targetAngle;
-
+	Vector2 size = sprites_[1]->GetSize();
 	float sx = screenCenter.x + std::sinf(posAngle) * indicatorRadius_;
 	float sy = screenCenter.y - std::cosf(posAngle) * indicatorRadius_;
 
@@ -542,7 +542,7 @@ void Player::UpdateNearEnemyIndicator()
 	// 反映
 	sprites_[1]->SetPosition({ sx, sy });
 	sprites_[1]->SetRotation(spriteRotation);
-	sprites_[1]->SetSize(Vector2{ 24.0f * sizeScale, 24.0f * sizeScale });
+	sprites_[1]->SetSize(Vector2{ 62.0f * sizeScale, 62.0f * sizeScale });
 
 	// 色のアルファを反映
 	Vector4 col = sprites_[1]->GetColor();
@@ -562,7 +562,7 @@ void Player::DeadEffect()
 
 	uint32_t frame = deathMotion_.count;
 
-	// まずは「ぷるぷる」フェーズ：frame < shakeFrames
+	// ぷるぷるフェーズ
 	if (frame < deathMotion_.shakeFrames)
 	{
 		// 正規化 t [0,1]
@@ -650,7 +650,7 @@ void Player::ClearSceneUpdate()
 {
 	isCanMove_ = false;
 
-	// unscaled delta
+	// delta
 	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
 
 	constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
@@ -662,7 +662,7 @@ void Player::ClearSceneUpdate()
 	static float currentAngle = 0.2f;        // 現在角度（初期オフセット含む）
 	static bool clockwise = false;           // 回転方向
 
-	// other poyo params...
+	// パラメータ
 	static float poyoAmp = 0.2f;
 	static float poyoAmpZ = 0.2f;
 	static float poyoAmpY = 0.2f;
@@ -700,14 +700,14 @@ void Player::ClearSceneUpdate()
 	} 
 	else
 	{
-		// atan2(x,z) を使って yaw を得る（プロジェクト内の回転軸と合わせてください）
+		// atan2(x,z) を使って yaw を得る
 		lastYaw = std::atan2(velX, velZ);
 	}
 	clearMotion_.rotation.x = 0.0f;
 	clearMotion_.rotation.y = lastYaw;
 	clearMotion_.rotation.z = 0.0f;
 
-	// スケール (X, Z は既存ロジック。Y を追加して体積維持 or 独立制御を可能にする)
+	// スケール
 	float omegaXZ = 2.0f * 3.14159265358979323846f * poyoFreq;
 	float sXZ = std::sin(omegaXZ * totalTime + poyoPhase);
 	float sx = 1.0f + poyoAmp * sXZ;
@@ -716,7 +716,7 @@ void Player::ClearSceneUpdate()
 	float sz;
 	if (maintainArea)
 	{
-		// 面積維持（XZ面）
+		// 面積維持
 		sz = 1.0f / sx;
 		sz = std::clamp(sz, 0.05f, 5.0f);
 	} 
@@ -726,11 +726,11 @@ void Player::ClearSceneUpdate()
 		sz = std::clamp(sz, 0.05f, 5.0f);
 	}
 
-	// Y方向（高さ）のポヨポヨ
-	float sy; // 実スケール（乗算前）
+	// Y方向
+	float sy; // 実スケール
 	if (maintainVolume)
 	{
-		// 3D体積維持：相対スケールの積を1に近づける -> sy_rel = 1 / (sx_rel * sz_rel)
+		
 		float sx_rel = std::max(0.01f, sx);
 		float sz_rel = std::max(0.01f, sz);
 		float sy_rel = 1.0f / (sx_rel * sz_rel);
@@ -750,7 +750,7 @@ void Player::ClearSceneUpdate()
 	// baseScale を乗算して最終スケールを出す
 	clearMotion_.scale.x = baseScale.x * sx; // 横方向
 	clearMotion_.scale.y = sy;               // 高さも変化させる
-	clearMotion_.scale.z = baseScale.z * sz; // 縦方向（top-down だと視覚的に z を使う）
+	clearMotion_.scale.z = baseScale.z * sz; // 縦方向
 
 	object_->SetPosition(clearMotion_.position);
 	object_->SetRotate(clearMotion_.rotation);

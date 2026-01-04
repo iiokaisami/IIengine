@@ -371,3 +371,52 @@ void EnemyManager::ChangeState(std::unique_ptr<EnemyWaveState> _pState)
 	pState_ = std::move(_pState);
 	pState_->Initialize();
 }
+
+bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const
+{
+	// 最も近い敵の位置を探す
+	bool found = false;
+	float bestDist2 = FLT_MAX;
+
+	// コンテナ内の敵を検討するラムダ関数
+	auto consider = [&](const auto& container)
+		{
+			// 各敵を検討
+			for (const auto& ePtr : container)
+			{
+				// 敵が存在しない場合はスキップ
+				if (!ePtr)
+				{
+					continue;
+				}
+
+				// 敵が死んでいる場合はスキップ
+				if (ePtr->IsDead())
+				{
+					continue;
+				}
+
+				// 距離の二乗を計算
+				Vector3 pos = ePtr->GetPosition();
+				float dx = pos.x - from.x;
+				float dy = pos.y - from.y;
+				float dz = pos.z - from.z;
+				float d2 = dx * dx + dy * dy + dz * dz;
+
+				// 最小距離を更新
+				if (d2 < bestDist2)
+				{
+					bestDist2 = d2;
+					outPos = pos;
+					found = true;
+				}
+			}
+		};
+
+	// 各コンテナを検討
+	consider(pNormalEnemies_);
+	consider(pTrapEnemies_);
+	consider(pCorruptors_);
+
+	return found;
+}
