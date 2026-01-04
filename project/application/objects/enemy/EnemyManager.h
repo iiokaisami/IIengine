@@ -31,6 +31,9 @@ public:
 	// 描画
 	void Draw();
 
+	// スプライト描画
+	void Draw2D();
+
 	// ImGui
 	void ImGuiDraw();
 
