@@ -23,7 +23,7 @@ public:
     /// </summary>
 	/// <param name="name">モーション名</param>
 	/// <param name="func">モーション生成関数</param>
-    static void Register(const std::string& name, MotionFunc func);
+    static void Register(const std::string& name,const MotionFunc& func);
 
 	/// <summary>
 	/// パーティクルの生成

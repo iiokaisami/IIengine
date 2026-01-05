@@ -7,7 +7,7 @@
 std::unordered_map<std::string, ParticleMotion::MotionFunc> ParticleMotion::motions_;
 std::string ParticleMotion::direction_;
 
-void ParticleMotion::Register(const std::string& name, MotionFunc func)
+void ParticleMotion::Register(const std::string& name, const MotionFunc& func)
 {
 	motions_[name] = func;
 }

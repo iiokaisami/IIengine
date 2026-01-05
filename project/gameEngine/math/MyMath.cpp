@@ -363,7 +363,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 }
 
 // 線形補間
-float Lerp(const float& v1, const float& v2, float t)
+float Lerp(float v1, float v2, float t)
 {
 	float result;
 	result = v1 + t * (v2 - v1);

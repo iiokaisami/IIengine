@@ -200,7 +200,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 /// <param name="v2">終わりの値</param>
 /// <param name="t">補間係数(0.0~1.0)</param>
 /// <returns>補間後の値</returns>
-float Lerp(const float& v1, const float& v2, float t);
+float Lerp(float v1, float v2, float t);
 /// <summary>
 /// ベクトルの線形補間
 /// </summary>
