@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 #include <cstdint>
+#include <algorithm>
 
 using TimerId = uint64_t;
 
@@ -124,7 +125,7 @@ public: // セッター
 	/// <param name="timeScale">新しいタイムスケール</param>
 	void SetTimeScale(float scale)
 	{
-		timeScale_ = std::max(0.0f, scale);
+		timeScale_ = (std::max)(0.0f, scale);
 		smoothingEnabled_ = false;
 		for (auto& cb : timeScaleCallbacks_) if (cb) cb(timeScale_);
 	}

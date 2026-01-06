@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "BaseEnemy.h"
 #include "bullet/VignetteTrap.h"
 #include "bullet/TimeBomb.h"
 #include "behaviorState/trapEnemyState/TrapEnemyBehaviorState.h"
@@ -8,13 +8,12 @@
 #include "../../../gameEngine/particle/ParticleEmitter.h"
 
 #include <Object3d.h>
-#include <Sprite.h>
 #include <Framework.h>
 
 /// <summary>
 /// 罠を設置してくる敵
 /// </summary>
-class TrapEnemy : public GameObject
+class TrapEnemy : public BaseEnemy
 {
 public:
 
@@ -40,7 +39,7 @@ public:
 	void ImGuiDraw();
 
 	// 移動
-	void Move();
+	void Move() override;
 
 	// 罠初期化
 	void TrapInit();
@@ -53,8 +52,8 @@ public:
 
 private:
 
-	// HPバー更新
-	void UpdateHPBar();
+	// 弾削除
+	void RemoveBullets();
 
 private: // 衝突判定
 
@@ -124,21 +123,8 @@ public: // セッター
 
 private:
 
-	static constexpr float kDefaultFrameRate = 60.0f;
-
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
-	uint32_t spriteNum_ = 1;
-
-	// HPバー
-	Vector2 hpBarSize_ = { 100.0f, 20.0f };
-	float maxHP_ = 100.0f;
-	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
-	float hpRatio_ = 1.0f;
-	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -150,9 +136,6 @@ private:
 	Vector3 moveVelocity_{};
 	float moveSpeed_ = 0.05f;
 
-	// プレイヤーの位置
-	Vector3 playerPosition_{};
-	Vector3 toPlayer_{};
 	// 追尾停止距離
 	const float kTooCloseDistance = 6.0f;
 	// 追尾開始距離

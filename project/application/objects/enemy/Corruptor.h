@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "BaseEnemy.h"
 #include "behaviorState/corruptorState/CorruptorBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
@@ -12,7 +12,7 @@
 /// <summary>
 /// トラップエネミー死亡時に出現する敵
 /// </summary>
-class Corruptor : public GameObject
+class Corruptor : public BaseEnemy
 {
 public:
 
@@ -38,7 +38,7 @@ public:
 	void ImGuiDraw();
 
 	// 移動
-	void Move();
+	void Move() override;
 
 	/// <summary>
 	/// 行動ステート切り替え
@@ -114,28 +114,14 @@ public: // セッター
 
 private:
 
-	// デフォルトフレームレート
-	static constexpr float kDefaultFrameRate = 60.0f;
-
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
-	
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
 	Collider collider_;
 	AABB aabb_;
 	Collider::ColliderDesc desc = {};
-
-	// 移動速度
-	Vector3 moveVelocity_{};
-	float moveSpeed_ = 0.05f;
-
-	// プレイヤーの位置
-	Vector3 playerPosition_{};
-	Vector3 toPlayer_{};
 
 	// 行動ステート
 	std::unique_ptr<CorruptorBehaviorState> pBehaviorState_ = nullptr;

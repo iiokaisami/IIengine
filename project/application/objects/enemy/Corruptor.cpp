@@ -9,6 +9,9 @@
 
 void Corruptor::Initialize()
 {
+	// BaseEnemy::Initialize を呼び出し共通プロパティを初期化
+	BaseEnemy::Initialize("Corruptor", { 1.0f, 1.0f, 1.0f }, 1.0f);
+
 	// 3Dオブジェクト生成
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("bomb.obj");
@@ -21,15 +24,9 @@ void Corruptor::Initialize()
 	// ライト設定
 	object_->SetLighting(true);
 
-	// ステータス
-	isDead_ = false;
-	hp_ = 1.0f;
 
 	// コライダー設定
 	colliderManager_ = ColliderManager::GetInstance();
-
-	objectName_ = "Corruptor";
-
 	desc = 
 	{
 		.owner = this,
@@ -61,6 +58,9 @@ void Corruptor::Finalize()
 
 void Corruptor::Update()
 {
+	// 基底クラスの共通更新処理を呼び出し
+	BaseEnemy::Update();
+
 	// デルタタイム取得
 	const float dt = TimeManager::Instance().GetDeltaTime();
 
@@ -124,13 +124,10 @@ void Corruptor::Move()
 	// デルタタイム取得
 	const float dt = TimeManager::Instance().GetDeltaTime();
 
-	// プレイヤー方向ベクトル計算
+	// 基底クラスの補間処理を使用
 	toPlayer_ = playerPosition_ - position_;
 	Vector3 direction = Normalize(toPlayer_);
-	moveVelocity_ = Normalize(moveVelocity_);
-
-	// 近づく
-	moveVelocity_ = Slerp(moveVelocity_, direction, 0.1f);
+	moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
 
 	// Y軸回転を進行方向に合わせる
 	rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);

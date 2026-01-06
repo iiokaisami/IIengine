@@ -313,6 +313,7 @@
     <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
     <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
     <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
+    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -589,6 +590,7 @@
     <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
     <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
     <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
+    <ClInclude Include="application\objects\enemy\BaseEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

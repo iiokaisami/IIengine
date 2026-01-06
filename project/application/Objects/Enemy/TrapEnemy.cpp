@@ -11,6 +11,9 @@
 
 void TrapEnemy::Initialize()
 {
+    // BaseEnemy::Initialize を呼び出し共通プロパティを初期化
+    BaseEnemy::Initialize("TrapEnemy", { 1.0f, 1.0f, 1.0f }, 3.0f);
+
     // --- 3Dオブジェクト ---
     object_ = std::make_unique<Object3d>();
     object_->Initialize("trapEnemy.obj");
@@ -24,32 +27,22 @@ void TrapEnemy::Initialize()
     // ライト設定
     object_->SetLighting(true);
 
-    // ステータス
-    hp_ = 3;
-    isDead_ = false;
-
-    // スプライト
+    // スプライトの初期化
     for (uint32_t i = 0; i < spriteNum_; ++i)
     {
         auto sprite = std::make_unique<Sprite>();
 
         if (i == 0)
         {
-            sprite->Initialize("white.png", { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f }, { 0.0f,0.5f });
+            sprite->Initialize("white.png", { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.5f });
             sprite->SetSize(hpBarSize_);
-
         }
 
         sprites_.push_back(std::move(sprite));
     }
-    // 最大HP保存
-    maxHP_ = hp_;
 
 	// 当たり判定
     colliderManager_ = ColliderManager::GetInstance();
-
-    objectName_ = "TrapEnemy";
-
     desc =
     {
         //ここに設定
@@ -88,39 +81,13 @@ void TrapEnemy::Finalize()
 		trap->Finalize();
 	}
 
-	pTimeBomb_.erase(
-		std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pTimeBomb_.end()
-	);
-
     for (auto& trap : pVignetteTrap_)
     {
 		trap->SetIsDead(true);
 		trap->Finalize();
     }
 
-	pVignetteTrap_.erase(
-		std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pVignetteTrap_.end()
-	);
+    RemoveBullets();
 
 
     colliderManager_->DeleteCollider(&collider_);
@@ -128,6 +95,9 @@ void TrapEnemy::Finalize()
 
 void TrapEnemy::Update()
 {
+    // 基底クラスの共通更新処理を呼び出し
+    BaseEnemy::Update();
+
     // アクティブフラグに代入
     isActive_ = !isInvincible_;
 
@@ -164,33 +134,7 @@ void TrapEnemy::Update()
     }
 
     // 罠の削除
-	pTimeBomb_.erase(
-		std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pTimeBomb_.end()
-	);
-
-	pVignetteTrap_.erase(
-		std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pVignetteTrap_.end()
-	);
+    RemoveBullets();
 
     // 罠の更新
 	for (auto& trap : pTimeBomb_)
@@ -329,44 +273,36 @@ void TrapEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _rot
     object_->SetScale(_scale);
 }
 
-void TrapEnemy::UpdateHPBar()
+void TrapEnemy::RemoveBullets()
 {
-    auto camera = CameraManager::GetInstance().GetActiveCamera();
+	// 罠の削除
+    pTimeBomb_.erase(
+        std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
+            {
+                if (trap->IsDead())
+                {
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    trap->Finalize();
+                    return true;
+                }
+                return false;
+            }),
+        pTimeBomb_.end()
+    );
 
-    if (!camera or sprites_.empty())
-    {
-        return;
-    }
-
-    // 目標HPを計算
-    float targetRatio = 1.0f;
-    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
-
-    // 補間
-    const float dt = TimeManager::Instance().GetDeltaTime();
-    // 補間係数
-    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
-    hpRatio_ += (targetRatio - hpRatio_) * t;
-
-    // スクリーン位置計算
-    Vector3 worldCenter = position_ + hpBarOffset_;
-    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
-
-    // 左寄せに合わせて左端位置を決める
-    float baseWidth = hpBarSize_.x;
-    Vector2 leftPos = screenCenter;
-    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
-
-    // 幅を決める
-    Vector2 newSize = hpBarSize_;
-    newSize.x = baseWidth * hpRatio_;
-
-    // 反映
-    sprites_[0]->SetPosition(leftPos);
-    sprites_[0]->SetSize(newSize);
-    sprites_[0]->Update();
-
-
+    pVignetteTrap_.erase(
+        std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
+            {
+                if (trap->IsDead())
+                {
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    trap->Finalize();
+                    return true;
+                }
+                return false;
+            }),
+        pVignetteTrap_.end()
+    );
 }
 
 void TrapEnemy::OnCollisionTrigger(const Collider* _other)

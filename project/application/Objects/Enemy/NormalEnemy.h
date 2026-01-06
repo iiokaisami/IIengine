@@ -1,20 +1,19 @@
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "BaseEnemy.h"
 #include "bullet/EnemyBullet.h"
 #include "behaviorState/normalEnemyState/EnemyBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
 
 #include <Object3d.h>
-#include <Sprite.h>
 #include <Framework.h>
 
 /// <summary>
 /// 通常敵
 /// 行動ステートを持つ
 /// </summary>
-class NormalEnemy : public GameObject
+class NormalEnemy : public BaseEnemy
 {
 public:
 
@@ -40,7 +39,7 @@ public:
 	void ImGuiDraw();
 
 	// 移動
-	void Move();
+	void Move() override;
 
 	// 攻撃
 	void Attack();
@@ -53,8 +52,8 @@ public:
 
 private: // 内部処理
 
-	// HPバー更新
-	void UpdateHPBar();
+	// 弾削除
+	void RemoveBullets();
 
 private: // 衝突判定
 
@@ -106,8 +105,6 @@ public: // セッター
 	/// <param name="_scale">スケール</param>
 	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
 
-	/// 以下1つづつセット ///
-	
 	// オブジェクトのpositionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
 	// オブジェクトのrotationをセット
@@ -115,24 +112,10 @@ public: // セッター
 	// オブジェクトのscaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
-
 private:
-
-	static constexpr float kDefaultFrameRate = 60.0f;
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
-	uint32_t spriteNum_ = 1;
-
-	// HPバー
-	Vector2 hpBarSize_ = { 100.0f, 20.0f };
-	float maxHP_ = 100.0f;
-	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
-	float hpRatio_ = 1.0f;
-	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -140,13 +123,6 @@ private:
 	AABB aabb_;
 	Collider::ColliderDesc desc = {};
 
-	// 移動速度
-	Vector3 moveVelocity_{};
-	float moveSpeed_ = 0.05f;
-
-	// プレイヤーの位置
-	Vector3 playerPosition_{};
-	Vector3 toPlayer_{};
 	// 追尾停止距離
 	const float kStopChasingDistance = 15.0f;
 

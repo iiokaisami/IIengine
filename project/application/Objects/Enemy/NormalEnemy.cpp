@@ -13,40 +13,33 @@
 
 void NormalEnemy::Initialize()
 {
+    // BaseEnemy::Initialize を呼び出し共通プロパティを初期化
+    BaseEnemy::Initialize("NormalEnemy", { 1.0f, 1.0f, 1.0f }, 3.0f);
+
     // --- 3Dオブジェクト ---
     object_ = std::make_unique<Object3d>();
     object_->Initialize("normalEnemy.obj");
 
-    moveVelocity_ = { 0.1f,0.1f,0.0f };
-
     object_->SetPosition(position_);
     object_->SetRotate(rotation_);
-    // 仮置き
-    scale_ = { 1.0f,1.0f,1.0f };
-	object_->SetScale(scale_);
-    // ライト設定
-    object_->SetLighting(true);
+    object_->SetScale(scale_);
 
-    // ステータス
-    hp_ = 3;
-    isDead_ = false;
+    // ステートの設定
+    ChangeBehaviorState(std::make_unique<EnemyBehaviorSpawn>(this));
 
-    // スプライト
+    // スプライトの初期化
     for (uint32_t i = 0; i < spriteNum_; ++i)
     {
         auto sprite = std::make_unique<Sprite>();
 
         if (i == 0)
         {
-            sprite->Initialize("white.png", { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f }, { 0.0f,0.5f });
+            sprite->Initialize("white.png", { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.5f });
             sprite->SetSize(hpBarSize_);
-
         }
 
         sprites_.push_back(std::move(sprite));
     }
-    // 最大HP保存
-    maxHP_ = hp_;
 
 	// 当たり判定
     colliderManager_ = ColliderManager::GetInstance();
@@ -91,24 +84,17 @@ void NormalEnemy::Finalize()
 		bullet->Finalize();
 	}
 
-    pBullets_.erase(
-        std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr<EnemyBullet>& bullet)
-            {
-                if (bullet->IsDead())
-                {
-                    bullet->Finalize();
-                    return true;
-                }
-                return false;
-            }),
-        pBullets_.end()
-    );
+    // 弾の削除
+    RemoveBullets();
 
     colliderManager_->DeleteCollider(&collider_);
 }
 
 void NormalEnemy::Update()
 {
+    // 基底クラスの共通更新処理を呼び出し
+    BaseEnemy::Update();
+
 	// 各行動ステートの更新
 	pBehaviorState_->Update();
 
@@ -129,19 +115,8 @@ void NormalEnemy::Update()
 		isFarFromPlayer_ = false;
 	}
 
-	// 敵の弾の削除
-    pBullets_.erase(
-        std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr<EnemyBullet>& bullet)
-            {
-                if (bullet->IsDead())
-                {
-                    bullet->Finalize();
-                    return true;
-                }
-                return false;
-            }),
-        pBullets_.end()
-    );
+	// 弾の削除
+    RemoveBullets();
 
     // 弾の更新
     for (auto& bullet : pBullets_)
@@ -149,14 +124,14 @@ void NormalEnemy::Update()
         bullet->Update();
     }
 
-	// aabbの更新
-    aabb_.min = position_ - object_->GetScale();
-    aabb_.max = position_ + object_->GetScale();
-    aabb_.max.y += 1.0f;
-    collider_.SetPosition(position_);
-
 	// 暗闇処理(エネミーは動かなくさせる)
     HitVignetteTrap();
+
+
+    // コライダー情報の更新
+    aabb_.min = position_ - scale_;
+    aabb_.max = position_ + scale_;
+    collider_.SetPosition(position_);
 }
 
 void NormalEnemy::Draw()
@@ -215,9 +190,6 @@ void NormalEnemy::ImGuiDraw()
 
 void NormalEnemy::Move()
 {
-
-	const float dt = TimeManager::Instance().GetDeltaTime();
-
     if (isFarFromPlayer_)
     {
         // プレイヤーとの距離が一定以下の場合、追尾を停止(0にするとまずかった)
@@ -226,25 +198,15 @@ void NormalEnemy::Move()
     }
     else
     {
-        // 敵弾から自キャラへのベクトルを計算
+        // 基底クラスの補間処理を活用
         toPlayer_ = playerPosition_ - position_;
+        Vector3 direction = Normalize(toPlayer_);
+        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
 
-        // ベクトルを正規化する
-        toPlayer_ = Normalize(toPlayer_);
-        moveVelocity_ = Normalize(moveVelocity_);
-
-        // 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
-        moveVelocity_ = 1.0f * (Slerp(moveVelocity_, toPlayer_, 0.1f));
-
-        // 進行方向に見た目の回転を合わせる
-        // Y軸周り角度(θy)
-        rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
-        rotation_.x = 0.0f;
-
+        // 標準的な移動の挙動
         moveVelocity_ /= 20.0f;
-
         moveVelocity_.y = 0.0f;
-        position_ += moveVelocity_ * (dt * kDefaultFrameRate);
+        BaseEnemy::Move();
 
 		SetPosition(position_);
 		SetRotation(rotation_);
@@ -301,44 +263,21 @@ void NormalEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _r
     object_->SetScale(_scale);
 }
 
-void NormalEnemy::UpdateHPBar()
+void NormalEnemy::RemoveBullets()
 {
-    auto camera = CameraManager::GetInstance().GetActiveCamera();
-
-    if (!camera or sprites_.empty())
-    {
-        return;
-    }
-
-    // 目標HPを計算
-    float targetRatio = 1.0f;
-    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
-
-    // 補間
-    const float dt = TimeManager::Instance().GetDeltaTime();
-    // 補間係数
-    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
-    hpRatio_ += (targetRatio - hpRatio_) * t;
-
-    // スクリーン位置計算
-    Vector3 worldCenter = position_ + hpBarOffset_;
-    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
-
-    // 左寄せに合わせて左端位置を決める
-    float baseWidth = hpBarSize_.x;
-    Vector2 leftPos = screenCenter;
-    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
-
-    // 幅を決める
-    Vector2 newSize = hpBarSize_;
-    newSize.x = baseWidth * hpRatio_;
-
-    // 反映
-    sprites_[0]->SetPosition(leftPos);
-    sprites_[0]->SetSize(newSize);
-    sprites_[0]->Update();
-
-
+    // 敵の弾の削除
+    pBullets_.erase(
+        std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr<EnemyBullet>& bullet)
+            {
+                if (bullet->IsDead())
+                {
+                    bullet->Finalize();
+                    return true;
+                }
+                return false;
+            }),
+        pBullets_.end()
+    );
 }
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)

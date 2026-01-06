@@ -122,6 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
     <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
     <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
+    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\FadeTransition.cpp" />
@@ -221,6 +222,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\FollowController.h" />
     <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
     <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
+    <ClInclude Include="application\objects\enemy\BaseEnemy.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />
     <ClInclude Include="gameEngine\transition\FadeTransition.h" />
