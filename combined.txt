@@ -60,6 +60,8 @@
     └── └──     └── Player.h
     └── ├── objects/
     └── └── └── enemy/
+    └── └──     ├── BaseEnemy.cpp
+    └── └──     ├── BaseEnemy.h
     └── └──     ├── Corruptor.cpp
     └── └──     ├── Corruptor.h
     └── └──     ├── EnemyManager.cpp
@@ -372,6 +374,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
     <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
     <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
+    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\FadeTransition.cpp" />
@@ -471,6 +474,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\FollowController.h" />
     <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
     <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
+    <ClInclude Include="application\objects\enemy\BaseEnemy.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />
     <ClInclude Include="gameEngine\transition\FadeTransition.h" />
@@ -951,18 +955,45 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="gameEngine\transition\TransitionManager.cpp">
       <Filter>gameEngine\transition</Filter>
     </ClCompile>
-    <ClCompile Include="application\objects\enemy\Corruptor.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp" />
-    <ClCompile Include="gameEngine\time\TimeManager.cpp" />
-    <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
-    <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
-    <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
-    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
-    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
-    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
+    <ClCompile Include="application\objects\enemy\Corruptor.cpp">
+      <Filter>application\objects\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp">
+      <Filter>application\objects\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\FollowController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\SceneCamera.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\ShakeController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\time\TimeManager.cpp">
+      <Filter>gameEngine\time</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1226,19 +1257,48 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="gameEngine\transition\TransitionManager.h">
       <Filter>gameEngine\transition</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\Corruptor.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h" />
-    <ClInclude Include="gameEngine\time\TimeManager.h" />
-    <ClInclude Include="application\scene\cameraController\ICameraController.h" />
-    <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
-    <ClInclude Include="application\scene\cameraController\FollowController.h" />
-    <ClInclude Include="application\scene\cameraController\ShakeController.h" />
-    <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
-    <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
-    <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
+    <ClInclude Include="application\objects\enemy\Corruptor.h">
+      <Filter>application\objects\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\BaseEnemy.h">
+      <Filter>application\objects\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\ClearCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\DeathCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\FollowController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\ICameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\SceneCamera.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\ShakeController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\StartCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\time\TimeManager.h">
+      <Filter>gameEngine\time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -1377,6 +1437,15 @@ File Path: project/MyGame.vcxproj.filters
     </Filter>
     <Filter Include="gameEngine\transition">
       <UniqueIdentifier>{5585ca46-951a-45d4-be99-d785e70caa30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\objects\enemy\behaviorState\corruptorState">
+      <UniqueIdentifier>{54ffdec5-d399-48f7-8ee2-0d161b13e5da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\scene\cameraController">
+      <UniqueIdentifier>{c54f8d43-c5fa-41f0-9f27-3415f62579b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gameEngine\time">
+      <UniqueIdentifier>{8eac755d-2123-4816-9b9c-c9312d079d59}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
@@ -2571,6 +2640,13 @@ void TimeBomb::Update()
 		isWallCollision_ = false;
 	}
 
+	// 時間経過でデス
+	deathRemainingSeconds_ -= dt;
+	if (deathRemainingSeconds_ <= 0.0f)
+	{
+		deathMotion_.isActive = true;
+	}
+
 	// 消滅モーション更新
 	DeadMotion();
 
@@ -2950,6 +3026,10 @@ private:
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
 
+	//寿命
+	static const int32_t kLifeTime = 60 * 12;
+	// デスタイマー
+	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 
 };
 
@@ -3063,6 +3143,13 @@ void VignetteTrap::Update()
 		ReflectOnWallCollision();
 		wallCollisionCooldown_ = 1;
 		isWallCollision_ = false;
+	}
+
+	// 時間経過でデス
+	deathRemainingSeconds_ -= dt;
+	if (deathRemainingSeconds_ <= 0.0f)
+	{
+		deathMotion_.isActive = true;
 	}
 
 	// 消滅モーション更新
@@ -3357,8 +3444,12 @@ private:
 	bool isLaunchingTrap_ = false;
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
-	
-	
+
+	//寿命
+	static const int32_t kLifeTime = 60 * 12;
+	// デスタイマー
+	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
+
 };
 
 
@@ -3961,40 +4052,33 @@ File Path: project/application/Objects/Enemy/NormalEnemy.cpp
 
 void NormalEnemy::Initialize()
 {
+    // BaseEnemy::Initialize を呼び出し共通プロパティを初期化
+    BaseEnemy::Initialize("NormalEnemy", { 1.0f, 1.0f, 1.0f }, 3.0f);
+
     // --- 3Dオブジェクト ---
     object_ = std::make_unique<Object3d>();
     object_->Initialize("normalEnemy.obj");
 
-    moveVelocity_ = { 0.1f,0.1f,0.0f };
-
     object_->SetPosition(position_);
     object_->SetRotate(rotation_);
-    // 仮置き
-    scale_ = { 1.0f,1.0f,1.0f };
-	object_->SetScale(scale_);
-    // ライト設定
-    object_->SetLighting(true);
+    object_->SetScale(scale_);
 
-    // ステータス
-    hp_ = 3;
-    isDead_ = false;
+    // ステートの設定
+    ChangeBehaviorState(std::make_unique<EnemyBehaviorSpawn>(this));
 
-    // スプライト
+    // スプライトの初期化
     for (uint32_t i = 0; i < spriteNum_; ++i)
     {
         auto sprite = std::make_unique<Sprite>();
 
         if (i == 0)
         {
-            sprite->Initialize("white.png", { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f }, { 0.0f,0.5f });
+            sprite->Initialize("white.png", { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.5f });
             sprite->SetSize(hpBarSize_);
-
         }
 
         sprites_.push_back(std::move(sprite));
     }
-    // 最大HP保存
-    maxHP_ = hp_;
 
 	// 当たり判定
     colliderManager_ = ColliderManager::GetInstance();
@@ -4039,24 +4123,17 @@ void NormalEnemy::Finalize()
 		bullet->Finalize();
 	}
 
-    pBullets_.erase(
-        std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr<EnemyBullet>& bullet)
-            {
-                if (bullet->IsDead())
-                {
-                    bullet->Finalize();
-                    return true;
-                }
-                return false;
-            }),
-        pBullets_.end()
-    );
+    // 弾の削除
+    RemoveBullets();
 
     colliderManager_->DeleteCollider(&collider_);
 }
 
 void NormalEnemy::Update()
 {
+    // 基底クラスの共通更新処理を呼び出し
+    BaseEnemy::Update();
+
 	// 各行動ステートの更新
 	pBehaviorState_->Update();
 
@@ -4077,19 +4154,8 @@ void NormalEnemy::Update()
 		isFarFromPlayer_ = false;
 	}
 
-	// 敵の弾の削除
-    pBullets_.erase(
-        std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr<EnemyBullet>& bullet)
-            {
-                if (bullet->IsDead())
-                {
-                    bullet->Finalize();
-                    return true;
-                }
-                return false;
-            }),
-        pBullets_.end()
-    );
+	// 弾の削除
+    RemoveBullets();
 
     // 弾の更新
     for (auto& bullet : pBullets_)
@@ -4097,14 +4163,14 @@ void NormalEnemy::Update()
         bullet->Update();
     }
 
-	// aabbの更新
-    aabb_.min = position_ - object_->GetScale();
-    aabb_.max = position_ + object_->GetScale();
-    aabb_.max.y += 1.0f;
-    collider_.SetPosition(position_);
-
 	// 暗闇処理(エネミーは動かなくさせる)
     HitVignetteTrap();
+
+
+    // コライダー情報の更新
+    aabb_.min = position_ - scale_;
+    aabb_.max = position_ + scale_;
+    collider_.SetPosition(position_);
 }
 
 void NormalEnemy::Draw()
@@ -4163,9 +4229,6 @@ void NormalEnemy::ImGuiDraw()
 
 void NormalEnemy::Move()
 {
-
-	const float dt = TimeManager::Instance().GetDeltaTime();
-
     if (isFarFromPlayer_)
     {
         // プレイヤーとの距離が一定以下の場合、追尾を停止(0にするとまずかった)
@@ -4174,25 +4237,15 @@ void NormalEnemy::Move()
     }
     else
     {
-        // 敵弾から自キャラへのベクトルを計算
+        // 基底クラスの補間処理を活用
         toPlayer_ = playerPosition_ - position_;
+        Vector3 direction = Normalize(toPlayer_);
+        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
 
-        // ベクトルを正規化する
-        toPlayer_ = Normalize(toPlayer_);
-        moveVelocity_ = Normalize(moveVelocity_);
-
-        // 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
-        moveVelocity_ = 1.0f * (Slerp(moveVelocity_, toPlayer_, 0.1f));
-
-        // 進行方向に見た目の回転を合わせる
-        // Y軸周り角度(θy)
-        rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
-        rotation_.x = 0.0f;
-
+        // 標準的な移動の挙動
         moveVelocity_ /= 20.0f;
-
         moveVelocity_.y = 0.0f;
-        position_ += moveVelocity_ * (dt * kDefaultFrameRate);
+        BaseEnemy::Move();
 
 		SetPosition(position_);
 		SetRotation(rotation_);
@@ -4249,44 +4302,21 @@ void NormalEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _r
     object_->SetScale(_scale);
 }
 
-void NormalEnemy::UpdateHPBar()
+void NormalEnemy::RemoveBullets()
 {
-    auto camera = CameraManager::GetInstance().GetActiveCamera();
-
-    if (!camera or sprites_.empty())
-    {
-        return;
-    }
-
-    // 目標HPを計算
-    float targetRatio = 1.0f;
-    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
-
-    // 補間
-    const float dt = TimeManager::Instance().GetDeltaTime();
-    // 補間係数
-    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
-    hpRatio_ += (targetRatio - hpRatio_) * t;
-
-    // スクリーン位置計算
-    Vector3 worldCenter = position_ + hpBarOffset_;
-    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
-
-    // 左寄せに合わせて左端位置を決める
-    float baseWidth = hpBarSize_.x;
-    Vector2 leftPos = screenCenter;
-    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
-
-    // 幅を決める
-    Vector2 newSize = hpBarSize_;
-    newSize.x = baseWidth * hpRatio_;
-
-    // 反映
-    sprites_[0]->SetPosition(leftPos);
-    sprites_[0]->SetSize(newSize);
-    sprites_[0]->Update();
-
-
+    // 敵の弾の削除
+    pBullets_.erase(
+        std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr<EnemyBullet>& bullet)
+            {
+                if (bullet->IsDead())
+                {
+                    bullet->Finalize();
+                    return true;
+                }
+                return false;
+            }),
+        pBullets_.end()
+    );
 }
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)
@@ -4394,21 +4424,20 @@ File Path: project/application/Objects/Enemy/NormalEnemy.h
 ============================================================
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "BaseEnemy.h"
 #include "bullet/EnemyBullet.h"
 #include "behaviorState/normalEnemyState/EnemyBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
 
 #include <Object3d.h>
-#include <Sprite.h>
 #include <Framework.h>
 
 /// <summary>
 /// 通常敵
 /// 行動ステートを持つ
 /// </summary>
-class NormalEnemy : public GameObject
+class NormalEnemy : public BaseEnemy
 {
 public:
 
@@ -4434,7 +4463,7 @@ public:
 	void ImGuiDraw();
 
 	// 移動
-	void Move();
+	void Move() override;
 
 	// 攻撃
 	void Attack();
@@ -4447,8 +4476,8 @@ public:
 
 private: // 内部処理
 
-	// HPバー更新
-	void UpdateHPBar();
+	// 弾削除
+	void RemoveBullets();
 
 private: // 衝突判定
 
@@ -4500,8 +4529,6 @@ public: // セッター
 	/// <param name="_scale">スケール</param>
 	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
 
-	/// 以下1つづつセット ///
-	
 	// オブジェクトのpositionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
 	// オブジェクトのrotationをセット
@@ -4509,24 +4536,10 @@ public: // セッター
 	// オブジェクトのscaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
-
 private:
-
-	static constexpr float kDefaultFrameRate = 60.0f;
 
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
-	uint32_t spriteNum_ = 1;
-
-	// HPバー
-	Vector2 hpBarSize_ = { 100.0f, 20.0f };
-	float maxHP_ = 100.0f;
-	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
-	float hpRatio_ = 1.0f;
-	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -4534,13 +4547,6 @@ private:
 	AABB aabb_;
 	Collider::ColliderDesc desc = {};
 
-	// 移動速度
-	Vector3 moveVelocity_{};
-	float moveSpeed_ = 0.05f;
-
-	// プレイヤーの位置
-	Vector3 playerPosition_{};
-	Vector3 toPlayer_{};
 	// 追尾停止距離
 	const float kStopChasingDistance = 15.0f;
 
@@ -4587,6 +4593,9 @@ File Path: project/application/Objects/Enemy/TrapEnemy.cpp
 
 void TrapEnemy::Initialize()
 {
+    // BaseEnemy::Initialize を呼び出し共通プロパティを初期化
+    BaseEnemy::Initialize("TrapEnemy", { 1.0f, 1.0f, 1.0f }, 3.0f);
+
     // --- 3Dオブジェクト ---
     object_ = std::make_unique<Object3d>();
     object_->Initialize("trapEnemy.obj");
@@ -4600,32 +4609,22 @@ void TrapEnemy::Initialize()
     // ライト設定
     object_->SetLighting(true);
 
-    // ステータス
-    hp_ = 3;
-    isDead_ = false;
-
-    // スプライト
+    // スプライトの初期化
     for (uint32_t i = 0; i < spriteNum_; ++i)
     {
         auto sprite = std::make_unique<Sprite>();
 
         if (i == 0)
         {
-            sprite->Initialize("white.png", { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f }, { 0.0f,0.5f });
+            sprite->Initialize("white.png", { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.5f });
             sprite->SetSize(hpBarSize_);
-
         }
 
         sprites_.push_back(std::move(sprite));
     }
-    // 最大HP保存
-    maxHP_ = hp_;
 
 	// 当たり判定
     colliderManager_ = ColliderManager::GetInstance();
-
-    objectName_ = "TrapEnemy";
-
     desc =
     {
         //ここに設定
@@ -4664,39 +4663,13 @@ void TrapEnemy::Finalize()
 		trap->Finalize();
 	}
 
-	pTimeBomb_.erase(
-		std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pTimeBomb_.end()
-	);
-
     for (auto& trap : pVignetteTrap_)
     {
 		trap->SetIsDead(true);
 		trap->Finalize();
     }
 
-	pVignetteTrap_.erase(
-		std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pVignetteTrap_.end()
-	);
+    RemoveBullets();
 
 
     colliderManager_->DeleteCollider(&collider_);
@@ -4704,6 +4677,9 @@ void TrapEnemy::Finalize()
 
 void TrapEnemy::Update()
 {
+    // 基底クラスの共通更新処理を呼び出し
+    BaseEnemy::Update();
+
     // アクティブフラグに代入
     isActive_ = !isInvincible_;
 
@@ -4740,33 +4716,7 @@ void TrapEnemy::Update()
     }
 
     // 罠の削除
-	pTimeBomb_.erase(
-		std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pTimeBomb_.end()
-	);
-
-	pVignetteTrap_.erase(
-		std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
-			{
-				if (trap->IsDead())
-				{
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
-					trap->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pVignetteTrap_.end()
-	);
+    RemoveBullets();
 
     // 罠の更新
 	for (auto& trap : pTimeBomb_)
@@ -4905,44 +4855,36 @@ void TrapEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _rot
     object_->SetScale(_scale);
 }
 
-void TrapEnemy::UpdateHPBar()
+void TrapEnemy::RemoveBullets()
 {
-    auto camera = CameraManager::GetInstance().GetActiveCamera();
+	// 罠の削除
+    pTimeBomb_.erase(
+        std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
+            {
+                if (trap->IsDead())
+                {
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    trap->Finalize();
+                    return true;
+                }
+                return false;
+            }),
+        pTimeBomb_.end()
+    );
 
-    if (!camera or sprites_.empty())
-    {
-        return;
-    }
-
-    // 目標HPを計算
-    float targetRatio = 1.0f;
-    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
-
-    // 補間
-    const float dt = TimeManager::Instance().GetDeltaTime();
-    // 補間係数
-    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
-    hpRatio_ += (targetRatio - hpRatio_) * t;
-
-    // スクリーン位置計算
-    Vector3 worldCenter = position_ + hpBarOffset_;
-    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
-
-    // 左寄せに合わせて左端位置を決める
-    float baseWidth = hpBarSize_.x;
-    Vector2 leftPos = screenCenter;
-    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
-
-    // 幅を決める
-    Vector2 newSize = hpBarSize_;
-    newSize.x = baseWidth * hpRatio_;
-
-    // 反映
-    sprites_[0]->SetPosition(leftPos);
-    sprites_[0]->SetSize(newSize);
-    sprites_[0]->Update();
-
-
+    pVignetteTrap_.erase(
+        std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
+            {
+                if (trap->IsDead())
+                {
+                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    trap->Finalize();
+                    return true;
+                }
+                return false;
+            }),
+        pVignetteTrap_.end()
+    );
 }
 
 void TrapEnemy::OnCollisionTrigger(const Collider* _other)
@@ -5019,7 +4961,7 @@ File Path: project/application/Objects/Enemy/TrapEnemy.h
 ============================================================
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "BaseEnemy.h"
 #include "bullet/VignetteTrap.h"
 #include "bullet/TimeBomb.h"
 #include "behaviorState/trapEnemyState/TrapEnemyBehaviorState.h"
@@ -5027,13 +4969,12 @@ File Path: project/application/Objects/Enemy/TrapEnemy.h
 #include "../../../gameEngine/particle/ParticleEmitter.h"
 
 #include <Object3d.h>
-#include <Sprite.h>
 #include <Framework.h>
 
 /// <summary>
 /// 罠を設置してくる敵
 /// </summary>
-class TrapEnemy : public GameObject
+class TrapEnemy : public BaseEnemy
 {
 public:
 
@@ -5059,7 +5000,7 @@ public:
 	void ImGuiDraw();
 
 	// 移動
-	void Move();
+	void Move() override;
 
 	// 罠初期化
 	void TrapInit();
@@ -5072,8 +5013,8 @@ public:
 
 private:
 
-	// HPバー更新
-	void UpdateHPBar();
+	// 弾削除
+	void RemoveBullets();
 
 private: // 衝突判定
 
@@ -5143,21 +5084,8 @@ public: // セッター
 
 private:
 
-	static constexpr float kDefaultFrameRate = 60.0f;
-
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
-	uint32_t spriteNum_ = 1;
-
-	// HPバー
-	Vector2 hpBarSize_ = { 100.0f, 20.0f };
-	float maxHP_ = 100.0f;
-	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
-	float hpRatio_ = 1.0f;
-	float hpLerpSpeed_ = 10.0f;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -5169,9 +5097,6 @@ private:
 	Vector3 moveVelocity_{};
 	float moveSpeed_ = 0.05f;
 
-	// プレイヤーの位置
-	Vector3 playerPosition_{};
-	Vector3 toPlayer_{};
 	// 追尾停止距離
 	const float kTooCloseDistance = 6.0f;
 	// 追尾開始距離
@@ -6272,7 +6197,6 @@ void PlayerBullet::Initialize()
 	scale_ = { 0.5f,0.5f,0.5f };
 	object_->SetScale(scale_);
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
 
 	// 当たり判定
@@ -6442,11 +6366,10 @@ private: // メンバ変数
 	// 速度
 	Vector3 velocity_{};
 
-	//寿命<frm>
+	// 寿命
 	static const int32_t kLifeTime = 60 * 5;
 
-	//デスタイマー
-	//int32_t deathTimer_ = kLifeTime;
+	// デスタイマー
 	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 };
 
@@ -6561,19 +6484,7 @@ void Player::Finalize()
 		bullet->Finalize();
 	}
 
-	pBullets_.erase(
-		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
-			{
-				if (bullet->IsDead())
-				{
-					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
-					bullet->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pBullets_.end()
-	);
+	RemoveBullets();
 
 	colliderManager_->DeleteCollider(&collider_);
 }
@@ -6581,57 +6492,13 @@ void Player::Finalize()
 void Player::Update()
 {
 	// 死亡モーションがアクティブなら移動入力等を無視して DeadEffect を更新
-	if (deathMotion_.isActive)
-	{
-		DeadEffect();
-		return;
-	}
+	UpdateDeathMotion();
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-	object_->Update();
+	// トランスフォーム更新
+	UpdateTransform();
 
-	if (isAutoControl_)
-	{
-		// オート移動
-		AutoMove();
-		// オート攻撃
-		AutoAttack();
-
-		isActive_ = false;
-
-		if (isDead_)
-		{
-			isDead_ = false;
-
-			hp_ = 8;
-		}
-
-	}
-	else if(isCanMove_)
- 	{
-		// 回避処理
-		Evade();
-		// アクティブフラグに回避フラグを入れる
-		isActive_ = isEvading_;
-
-		// 回避中は移動・攻撃を無効化
-		if (!isEvading_ && !isDead_)
-		{
-			Move();
-			Attack();
-		}
-	}
-	else
-	{
-		if (isDead_)
-		{
-			isDead_ = false;
-
-			hp_ = 8;
-		}
-	}
+	// 操作更新
+	UpdateControl();
 
 	// 死亡したらy軸回転を徐々に0にする
 	if (isDead_)
@@ -6640,19 +6507,7 @@ void Player::Update()
 	}
 
 	// 弾の削除
-	pBullets_.erase(
-		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
-			{
-				if (bullet->IsDead())
-				{
-					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
-					bullet->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pBullets_.end()
-	);
+	RemoveBullets();
 
 	// 弾更新
 	for (auto& bullet : pBullets_)
@@ -6669,25 +6524,8 @@ void Player::Update()
 	// 暗闇処理
 	HitVignetteTrap();
 
-	// クールダウン系
-	if (countCoolDownFrame_ > 0)
-	{
-		countCoolDownFrame_--;
-	}
-	
-	// Evade 時間管理
-	if (isEvading_)
-	{
-		if (evadeFrame_ > 0)
-		{
-			evadeFrame_--;
-
-		}
-		else
-		{
-			isEvading_ = false;
-		}
-	}
+	// ステータス更新
+	UpdateStatus();
 
 	// 最も近い敵インジケーター更新
 	UpdateNearEnemyIndicator();
@@ -7217,6 +7055,108 @@ void Player::ClearSceneUpdate()
 
 }
 
+bool Player::UpdateDeathMotion()
+{
+	// 死亡モーションがアクティブなら更新
+	if (deathMotion_.isActive)
+	{
+		DeadEffect();
+		return true;
+	}
+
+	return false;
+}
+
+void Player::UpdateTransform()
+{
+	// 反映
+	object_->SetPosition(position_);
+	object_->SetRotate(rotation_);
+	object_->SetScale(scale_);
+	object_->Update();
+}
+
+void Player::UpdateControl()
+{
+	if (isAutoControl_)
+	{
+		// オート移動
+		AutoMove();
+		// オート攻撃
+		AutoAttack();
+
+		isActive_ = false;
+
+		if (isDead_)
+		{
+			isDead_ = false;
+
+			hp_ = 8;
+		}
+
+	} else if (isCanMove_)
+	{
+		// 回避処理
+		Evade();
+		// アクティブフラグに回避フラグを入れる
+		isActive_ = isEvading_;
+
+		// 回避中は移動・攻撃を無効化
+		if (!isEvading_ && !isDead_)
+		{
+			Move();
+			Attack();
+		}
+	} else
+	{
+		if (isDead_)
+		{
+			isDead_ = false;
+
+			hp_ = 8;
+		}
+	}
+}
+
+void Player::RemoveBullets()
+{
+	pBullets_.erase(
+		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
+			{
+				if (bullet->IsDead())
+				{
+					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
+					bullet->Finalize();
+					return true;
+				}
+				return false;
+			}),
+		pBullets_.end()
+	);
+}
+
+void Player::UpdateStatus()
+{
+	// クールダウン系
+	if (countCoolDownFrame_ > 0)
+	{
+		countCoolDownFrame_--;
+	}
+
+	// Evade 時間管理
+	if (isEvading_)
+	{
+		if (evadeFrame_ > 0)
+		{
+			evadeFrame_--;
+
+		} else
+		{
+			isEvading_ = false;
+		}
+	}
+}
+
 void Player::AutoMove()
 {
 	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
@@ -7533,6 +7473,21 @@ public:
 
 private: // 内部処理
 
+	// 死亡演出更新
+	bool UpdateDeathMotion();
+
+	// 形状更新
+	void UpdateTransform();
+
+	// 操作更新
+	void UpdateControl();
+
+	// 弾削除
+	void RemoveBullets();
+
+	// ステータス更新
+	void UpdateStatus();
+
 	// 移動
 	void Move();
 	
@@ -7750,6 +7705,162 @@ private:
 };
 
 ============================================================
+File Path: project/application/objects/enemy/BaseEnemy.cpp
+============================================================
+#include "BaseEnemy.h"
+
+#include "TimeManager.h"
+#include "CameraManager.h"
+#include "MyMath.h"
+
+void BaseEnemy::Initialize(const std::string& objectName, const Vector3& scale, float initialHP)
+{
+    objectName_ = objectName;
+    scale_ = scale;
+    hp_ = initialHP;
+
+    isDead_ = false;
+    moveVelocity_ = { 0.1f, 0.0f, 0.1f };
+    moveSpeed_ = 0.05f;
+
+    // 最大HP保存
+    maxHP_ = hp_;
+}
+
+void BaseEnemy::Update()
+{
+
+}
+
+void BaseEnemy::Move() 
+{
+    // デルタタイム取得
+    const float dt = TimeManager::Instance().GetDeltaTime();
+
+    // プレイヤー方向ベクトル計算
+    toPlayer_ = playerPosition_ - position_;
+    moveVelocity_ = Normalize(toPlayer_);  // 基本ではプレイヤーに向かう
+
+    // Y軸回転を進行方向に合わせる
+    rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
+
+    // デフォルトの位置更新
+    position_ += moveVelocity_ * moveSpeed_ * dt * kDefaultFrameRate;
+
+}
+
+void BaseEnemy::UpdateHPBar()
+{
+    auto camera = CameraManager::GetInstance().GetActiveCamera();
+
+    if (!camera or sprites_.empty())
+    {
+        return;
+    }
+
+    // 目標HPを計算
+    float targetRatio = 1.0f;
+    if (maxHP_ > 0.0f) targetRatio = std::clamp(hp_ / maxHP_, 0.0f, 1.0f);
+
+    // 補間
+    const float dt = TimeManager::Instance().GetDeltaTime();
+    // 補間係数
+    float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
+    hpRatio_ += (targetRatio - hpRatio_) * t;
+
+    // スクリーン位置計算
+    Vector3 worldCenter = position_ + hpBarOffset_;
+    Vector2 screenCenter = camera->WorldToScreen(worldCenter);
+
+    // 左寄せに合わせて左端位置を決める
+    float baseWidth = hpBarSize_.x;
+    Vector2 leftPos = screenCenter;
+    leftPos.x = screenCenter.x - (baseWidth * 0.5f);
+
+    // 幅を決める
+    Vector2 newSize = hpBarSize_;
+    newSize.x = baseWidth * hpRatio_;
+
+    // 反映
+    sprites_[0]->SetPosition(leftPos);
+    sprites_[0]->SetSize(newSize);
+    sprites_[0]->Update();
+}
+
+Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
+{
+    return Normalize(Slerp(currentVelocity, targetDirection, interpolationRate));
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/BaseEnemy.h
+============================================================
+#pragma once
+
+#include "../../baseObject/GameObject.h"
+
+#include <memory>
+#include <functional>
+#include <Vector3.h>
+#include <Sprite.h>
+
+/// <summary>
+/// 敵の基底クラス
+/// </summary>
+class BaseEnemy : public GameObject
+{
+public:
+
+	BaseEnemy() = default;
+	virtual ~BaseEnemy() = default;
+
+	// 初期化
+	virtual void Initialize(const std::string& objectName, const Vector3& scale, float initialHP);
+
+	// 更新
+	virtual void Update() override;
+	
+	// 移動
+	virtual void Move();
+
+	// HPバー更新
+	virtual void UpdateHPBar();
+
+protected:
+
+	// 進行方向の補間処理
+	Vector3 InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate);
+
+protected:
+
+    // 移動関連
+    Vector3 moveVelocity_;
+    float moveSpeed_;
+
+    // プレイヤー関連
+    Vector3 playerPosition_;
+    Vector3 toPlayer_;
+
+    // フレームレート補助
+    static constexpr float kDefaultFrameRate = 60.0f;
+
+	// HPバー
+	Vector2 hpBarSize_ = { 100.0f, 20.0f };
+	float maxHP_ = 100.0f;
+	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
+	float hpRatio_ = 1.0f;
+	float hpLerpSpeed_ = 10.0f;
+
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> sprites_;
+	uint32_t spriteNum_ = 1;
+
+};
+
+
+
+============================================================
 File Path: project/application/objects/enemy/Corruptor.cpp
 ============================================================
 #include "Corruptor.h"
@@ -7763,6 +7874,9 @@ File Path: project/application/objects/enemy/Corruptor.cpp
 
 void Corruptor::Initialize()
 {
+	// BaseEnemy::Initialize を呼び出し共通プロパティを初期化
+	BaseEnemy::Initialize("Corruptor", { 1.0f, 1.0f, 1.0f }, 1.0f);
+
 	// 3Dオブジェクト生成
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("bomb.obj");
@@ -7775,15 +7889,9 @@ void Corruptor::Initialize()
 	// ライト設定
 	object_->SetLighting(true);
 
-	// ステータス
-	isDead_ = false;
-	hp_ = 1.0f;
 
 	// コライダー設定
 	colliderManager_ = ColliderManager::GetInstance();
-
-	objectName_ = "Corruptor";
-
 	desc = 
 	{
 		.owner = this,
@@ -7815,6 +7923,9 @@ void Corruptor::Finalize()
 
 void Corruptor::Update()
 {
+	// 基底クラスの共通更新処理を呼び出し
+	BaseEnemy::Update();
+
 	// デルタタイム取得
 	const float dt = TimeManager::Instance().GetDeltaTime();
 
@@ -7878,13 +7989,10 @@ void Corruptor::Move()
 	// デルタタイム取得
 	const float dt = TimeManager::Instance().GetDeltaTime();
 
-	// プレイヤー方向ベクトル計算
+	// 基底クラスの補間処理を使用
 	toPlayer_ = playerPosition_ - position_;
 	Vector3 direction = Normalize(toPlayer_);
-	moveVelocity_ = Normalize(moveVelocity_);
-
-	// 近づく
-	moveVelocity_ = Slerp(moveVelocity_, direction, 0.1f);
+	moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
 
 	// Y軸回転を進行方向に合わせる
 	rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
@@ -7970,7 +8078,7 @@ File Path: project/application/objects/enemy/Corruptor.h
 ============================================================
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "BaseEnemy.h"
 #include "behaviorState/corruptorState/CorruptorBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
@@ -7982,7 +8090,7 @@ File Path: project/application/objects/enemy/Corruptor.h
 /// <summary>
 /// トラップエネミー死亡時に出現する敵
 /// </summary>
-class Corruptor : public GameObject
+class Corruptor : public BaseEnemy
 {
 public:
 
@@ -8008,7 +8116,7 @@ public:
 	void ImGuiDraw();
 
 	// 移動
-	void Move();
+	void Move() override;
 
 	/// <summary>
 	/// 行動ステート切り替え
@@ -8084,28 +8192,14 @@ public: // セッター
 
 private:
 
-	// デフォルトフレームレート
-	static constexpr float kDefaultFrameRate = 60.0f;
-
 	// 3Dオブジェクト
 	std::unique_ptr<Object3d> object_ = nullptr;
-	
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
 	Collider collider_;
 	AABB aabb_;
 	Collider::ColliderDesc desc = {};
-
-	// 移動速度
-	Vector3 moveVelocity_{};
-	float moveSpeed_ = 0.05f;
-
-	// プレイヤーの位置
-	Vector3 playerPosition_{};
-	Vector3 toPlayer_{};
 
 	// 行動ステート
 	std::unique_ptr<CorruptorBehaviorState> pBehaviorState_ = nullptr;
@@ -22794,7 +22888,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 }
 
 // 線形補間
-float Lerp(const float& v1, const float& v2, float t)
+float Lerp(float v1, float v2, float t)
 {
 	float result;
 	result = v1 + t * (v2 - v1);
@@ -23069,7 +23163,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 /// <param name="v2">終わりの値</param>
 /// <param name="t">補間係数(0.0~1.0)</param>
 /// <returns>補間後の値</returns>
-float Lerp(const float& v1, const float& v2, float t);
+float Lerp(float v1, float v2, float t);
 /// <summary>
 /// ベクトルの線形補間
 /// </summary>
@@ -25668,7 +25762,7 @@ File Path: project/gameEngine/particle/ParticleMotion.cpp
 std::unordered_map<std::string, ParticleMotion::MotionFunc> ParticleMotion::motions_;
 std::string ParticleMotion::direction_;
 
-void ParticleMotion::Register(const std::string& name, MotionFunc func)
+void ParticleMotion::Register(const std::string& name, const MotionFunc& func)
 {
 	motions_[name] = func;
 }
@@ -26303,7 +26397,7 @@ public:
     /// </summary>
 	/// <param name="name">モーション名</param>
 	/// <param name="func">モーション生成関数</param>
-    static void Register(const std::string& name, MotionFunc func);
+    static void Register(const std::string& name,const MotionFunc& func);
 
 	/// <summary>
 	/// パーティクルの生成
@@ -27110,6 +27204,7 @@ File Path: project/gameEngine/time/TimeManager.h
 #include <functional>
 #include <vector>
 #include <cstdint>
+#include <algorithm>
 
 using TimerId = uint64_t;
 
@@ -27230,7 +27325,7 @@ public: // セッター
 	/// <param name="timeScale">新しいタイムスケール</param>
 	void SetTimeScale(float scale)
 	{
-		timeScale_ = std::max(0.0f, scale);
+		timeScale_ = (std::max)(0.0f, scale);
 		smoothingEnabled_ = false;
 		for (auto& cb : timeScaleCallbacks_) if (cb) cb(timeScale_);
 	}
