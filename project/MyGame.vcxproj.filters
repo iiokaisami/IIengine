@@ -301,19 +301,45 @@
     <ClCompile Include="gameEngine\transition\TransitionManager.cpp">
       <Filter>gameEngine\transition</Filter>
     </ClCompile>
-    <ClCompile Include="application\objects\enemy\Corruptor.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp" />
-    <ClCompile Include="gameEngine\time\TimeManager.cpp" />
-    <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
-    <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
-    <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
-    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
-    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
-    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
-    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp" />
+    <ClCompile Include="application\objects\enemy\Corruptor.cpp">
+      <Filter>application\objects\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp">
+      <Filter>application\objects\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\FollowController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\SceneCamera.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\ShakeController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\time\TimeManager.cpp">
+      <Filter>gameEngine\time</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -577,20 +603,48 @@
     <ClInclude Include="gameEngine\transition\TransitionManager.h">
       <Filter>gameEngine\transition</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\Corruptor.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h" />
-    <ClInclude Include="gameEngine\time\TimeManager.h" />
-    <ClInclude Include="application\scene\cameraController\ICameraController.h" />
-    <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
-    <ClInclude Include="application\scene\cameraController\FollowController.h" />
-    <ClInclude Include="application\scene\cameraController\ShakeController.h" />
-    <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
-    <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
-    <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
-    <ClInclude Include="application\objects\enemy\BaseEnemy.h" />
+    <ClInclude Include="application\objects\enemy\Corruptor.h">
+      <Filter>application\objects\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h">
+      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\BaseEnemy.h">
+      <Filter>application\objects\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\ClearCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\DeathCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\FollowController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\ICameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\SceneCamera.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\ShakeController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\StartCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\time\TimeManager.h">
+      <Filter>gameEngine\time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -729,6 +783,15 @@
     </Filter>
     <Filter Include="gameEngine\transition">
       <UniqueIdentifier>{5585ca46-951a-45d4-be99-d785e70caa30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\objects\enemy\behaviorState\corruptorState">
+      <UniqueIdentifier>{54ffdec5-d399-48f7-8ee2-0d161b13e5da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\scene\cameraController">
+      <UniqueIdentifier>{c54f8d43-c5fa-41f0-9f27-3415f62579b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gameEngine\time">
+      <UniqueIdentifier>{8eac755d-2123-4816-9b9c-c9312d079d59}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
