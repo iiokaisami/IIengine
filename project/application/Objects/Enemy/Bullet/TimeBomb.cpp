@@ -121,6 +121,13 @@ void TimeBomb::Update()
 		isWallCollision_ = false;
 	}
 
+	// 時間経過でデス
+	deathRemainingSeconds_ -= dt;
+	if (deathRemainingSeconds_ <= 0.0f)
+	{
+		deathMotion_.isActive = true;
+	}
+
 	// 消滅モーション更新
 	DeadMotion();
 

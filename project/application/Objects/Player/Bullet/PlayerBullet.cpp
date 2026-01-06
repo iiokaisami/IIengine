@@ -12,7 +12,6 @@ void PlayerBullet::Initialize()
 	scale_ = { 0.5f,0.5f,0.5f };
 	object_->SetScale(scale_);
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
 
 	// 当たり判定

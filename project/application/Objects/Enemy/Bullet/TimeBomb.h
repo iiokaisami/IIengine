@@ -153,6 +153,10 @@ private:
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
 
+	//寿命
+	static const int32_t kLifeTime = 60 * 12;
+	// デスタイマー
+	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 
 };
 

@@ -106,19 +106,7 @@ void Player::Finalize()
 		bullet->Finalize();
 	}
 
-	pBullets_.erase(
-		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
-			{
-				if (bullet->IsDead())
-				{
-					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
-					bullet->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pBullets_.end()
-	);
+	RemoveBullets();
 
 	colliderManager_->DeleteCollider(&collider_);
 }
@@ -126,57 +114,13 @@ void Player::Finalize()
 void Player::Update()
 {
 	// 死亡モーションがアクティブなら移動入力等を無視して DeadEffect を更新
-	if (deathMotion_.isActive)
-	{
-		DeadEffect();
-		return;
-	}
+	UpdateDeathMotion();
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-	object_->Update();
+	// トランスフォーム更新
+	UpdateTransform();
 
-	if (isAutoControl_)
-	{
-		// オート移動
-		AutoMove();
-		// オート攻撃
-		AutoAttack();
-
-		isActive_ = false;
-
-		if (isDead_)
-		{
-			isDead_ = false;
-
-			hp_ = 8;
-		}
-
-	}
-	else if(isCanMove_)
- 	{
-		// 回避処理
-		Evade();
-		// アクティブフラグに回避フラグを入れる
-		isActive_ = isEvading_;
-
-		// 回避中は移動・攻撃を無効化
-		if (!isEvading_ && !isDead_)
-		{
-			Move();
-			Attack();
-		}
-	}
-	else
-	{
-		if (isDead_)
-		{
-			isDead_ = false;
-
-			hp_ = 8;
-		}
-	}
+	// 操作更新
+	UpdateControl();
 
 	// 死亡したらy軸回転を徐々に0にする
 	if (isDead_)
@@ -185,19 +129,7 @@ void Player::Update()
 	}
 
 	// 弾の削除
-	pBullets_.erase(
-		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
-			{
-				if (bullet->IsDead())
-				{
-					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
-					bullet->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pBullets_.end()
-	);
+	RemoveBullets();
 
 	// 弾更新
 	for (auto& bullet : pBullets_)
@@ -214,25 +146,8 @@ void Player::Update()
 	// 暗闇処理
 	HitVignetteTrap();
 
-	// クールダウン系
-	if (countCoolDownFrame_ > 0)
-	{
-		countCoolDownFrame_--;
-	}
-	
-	// Evade 時間管理
-	if (isEvading_)
-	{
-		if (evadeFrame_ > 0)
-		{
-			evadeFrame_--;
-
-		}
-		else
-		{
-			isEvading_ = false;
-		}
-	}
+	// ステータス更新
+	UpdateStatus();
 
 	// 最も近い敵インジケーター更新
 	UpdateNearEnemyIndicator();
@@ -760,6 +675,108 @@ void Player::ClearSceneUpdate()
 	// パーティクル
 	ParticleEmitter::Emit("walk", clearMotion_.position, 1);
 
+}
+
+bool Player::UpdateDeathMotion()
+{
+	// 死亡モーションがアクティブなら更新
+	if (deathMotion_.isActive)
+	{
+		DeadEffect();
+		return true;
+	}
+
+	return false;
+}
+
+void Player::UpdateTransform()
+{
+	// 反映
+	object_->SetPosition(position_);
+	object_->SetRotate(rotation_);
+	object_->SetScale(scale_);
+	object_->Update();
+}
+
+void Player::UpdateControl()
+{
+	if (isAutoControl_)
+	{
+		// オート移動
+		AutoMove();
+		// オート攻撃
+		AutoAttack();
+
+		isActive_ = false;
+
+		if (isDead_)
+		{
+			isDead_ = false;
+
+			hp_ = 8;
+		}
+
+	} else if (isCanMove_)
+	{
+		// 回避処理
+		Evade();
+		// アクティブフラグに回避フラグを入れる
+		isActive_ = isEvading_;
+
+		// 回避中は移動・攻撃を無効化
+		if (!isEvading_ && !isDead_)
+		{
+			Move();
+			Attack();
+		}
+	} else
+	{
+		if (isDead_)
+		{
+			isDead_ = false;
+
+			hp_ = 8;
+		}
+	}
+}
+
+void Player::RemoveBullets()
+{
+	pBullets_.erase(
+		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
+			{
+				if (bullet->IsDead())
+				{
+					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
+					bullet->Finalize();
+					return true;
+				}
+				return false;
+			}),
+		pBullets_.end()
+	);
+}
+
+void Player::UpdateStatus()
+{
+	// クールダウン系
+	if (countCoolDownFrame_ > 0)
+	{
+		countCoolDownFrame_--;
+	}
+
+	// Evade 時間管理
+	if (isEvading_)
+	{
+		if (evadeFrame_ > 0)
+		{
+			evadeFrame_--;
+
+		} else
+		{
+			isEvading_ = false;
+		}
+	}
 }
 
 void Player::AutoMove()

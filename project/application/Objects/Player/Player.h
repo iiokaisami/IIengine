@@ -58,6 +58,21 @@ public:
 
 private: // 内部処理
 
+	// 死亡演出更新
+	bool UpdateDeathMotion();
+
+	// 形状更新
+	void UpdateTransform();
+
+	// 操作更新
+	void UpdateControl();
+
+	// 弾削除
+	void RemoveBullets();
+
+	// ステータス更新
+	void UpdateStatus();
+
 	// 移動
 	void Move();
 	
