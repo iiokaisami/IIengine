@@ -32,9 +32,6 @@ public:
 	// 描画
 	void Draw() override;
 
-	// スプライト描画
-	void Draw2D();
-
 	// ImGui
 	void ImGuiDraw();
 
@@ -42,7 +39,7 @@ public:
 	void Move() override;
 
 	// 攻撃
-	void Attack();
+	void Attack() override;
 
 	/// <summary>
 	/// 行動ステート切り替え
@@ -61,13 +58,13 @@ private: // 衝突判定
 	/// 衝突時の処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollisionTrigger(const Collider* _other);
+	void OnCollisionTrigger(const Collider* _other)override;
 
 	/// <summary>
 	/// 衝突中の処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollision(const Collider* _other);
+	void OnCollision(const Collider* _other)override;
 
 	// 暗闇トラップに衝突したときの処理
 	void HitVignetteTrap();
@@ -113,15 +110,6 @@ public: // セッター
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
 private:
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
 
 	// 追尾停止距離
 	const float kStopChasingDistance = 15.0f;

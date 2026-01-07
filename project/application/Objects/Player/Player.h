@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "../../baseObject/Character.h"
 #include "bullet/PlayerBullet.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 
@@ -14,7 +14,7 @@
 /// プレイヤークラス
 /// プレイヤーの移動、攻撃、回避、当たり判定などを管理
 /// </summary>
-class Player : public GameObject
+class Player : public Character
 {
 public:
 
@@ -33,14 +33,8 @@ public:
 	// 描画
 	void Draw() override;
 	
-	// スプライト描画
-	void Draw2D();
-	
 	// ImGui
 	void ImGuiDraw();
-
-	// HPバー更新
-	void UpdateHPBar();
 
 	// ターゲットエネミークリア
 	void ClearTargetEnemy();
@@ -61,9 +55,6 @@ private: // 内部処理
 	// 死亡演出更新
 	bool UpdateDeathMotion();
 
-	// 形状更新
-	void UpdateTransform();
-
 	// 操作更新
 	void UpdateControl();
 
@@ -74,10 +65,10 @@ private: // 内部処理
 	void UpdateStatus();
 
 	// 移動
-	void Move();
+	void Move() override;
 	
 	// 攻撃
-	void Attack();
+	void Attack() override;
 
 	// 回避
 	void Evade();
@@ -103,13 +94,13 @@ private: // 衝突判定
 	/// 衝突時の処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollisionTrigger(const Collider* _other);
+	void OnCollisionTrigger(const Collider* _other)override;
 	
 	/// <summary>
 	/// 衝突中の処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollision(const Collider* _other);
+	void OnCollision(const Collider* _other)override;
 
 	// 暗闇トラップに衝突したときの処理
 	void HitVignetteTrap();
@@ -156,23 +147,6 @@ public: // セッター
 
 private:
 
-	// デフォルトフレームレート
-	static constexpr float kDefaultFrameRate = 60.0f;
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_ = {};
-	uint32_t spriteNum_ = 2;
-
-	// HPバー
-	Vector2 hpBarSize_ = { 100.0f, 20.0f };
-	float maxHP_ = 100.0f;
-	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
-	float hpRatio_ = 1.0f;
-	float hpLerpSpeed_ = 10.0f;
-
 	// 最も近い敵
 	Vector3 targetEnemyPosition_ = { 0.0f,0.0f,0.0f };
 	bool hasTarget_ = false;
@@ -180,12 +154,6 @@ private:
 	float indicatorSpinSpeed_ = 2.0f;
 	float indicatorRadius_ = 60.0f;
 	float indicatorMaxDetectRange_ = 400.0f;
-
-	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
 
 	// 弾
 	std::vector<std::unique_ptr<PlayerBullet>> pBullets_ = {};

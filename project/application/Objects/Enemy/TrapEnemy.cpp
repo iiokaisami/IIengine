@@ -11,14 +11,8 @@
 
 void TrapEnemy::Initialize()
 {
-    // BaseEnemy::Initialize を呼び出し共通プロパティを初期化
-    BaseEnemy::Initialize("TrapEnemy", { 1.0f, 1.0f, 1.0f }, 3.0f);
-
-    // --- 3Dオブジェクト ---
-    object_ = std::make_unique<Object3d>();
-    object_->Initialize("trapEnemy.obj");
-
-    moveVelocity_ = { 0.1f,0.1f,0.0f };
+    // Initialize を呼び出し共通プロパティを初期化
+    BaseEnemy::Initialize("trapEnemy.obj","TrapEnemy", 3.0f);
 
     object_->SetPosition(position_);
     object_->SetRotate(rotation_);
@@ -40,22 +34,6 @@ void TrapEnemy::Initialize()
 
         sprites_.push_back(std::move(sprite));
     }
-
-	// 当たり判定
-    colliderManager_ = ColliderManager::GetInstance();
-    desc =
-    {
-        //ここに設定
-        .owner = this,
-        .colliderID = objectName_,
-        .shape = Shape::AABB,
-        .shapeData = &aabb_,
-        .attribute = colliderManager_->GetNewAttribute(objectName_),
-        .onCollision = std::bind(&TrapEnemy::OnCollision, this, std::placeholders::_1),
-        .onCollisionTrigger = std::bind(&TrapEnemy::OnCollisionTrigger, this, std::placeholders::_1),
-    };
-    collider_.MakeAABBDesc(desc);
-    colliderManager_->RegisterCollider(&collider_);
 
     // 行動ステート
     ChangeBehaviorState(std::make_unique<TrapEnemyBehaviorSpawn>(this));
@@ -104,6 +82,7 @@ void TrapEnemy::Update()
     // 各行動ステートの更新
     pBehaviorState_->Update();
 
+    // モデル変形の更新
     object_->Update();
 
 	// HPバー更新
@@ -147,17 +126,11 @@ void TrapEnemy::Update()
 		trap->Update();
 	}
 
-    // aabbの更新
-    aabb_.min = position_ - object_->GetScale();
-    aabb_.max = position_ + object_->GetScale();
-    aabb_.max.y += 1.0f;
-    collider_.SetPosition(position_);
-
 }
 
 void TrapEnemy::Draw()
 {
-    object_->Draw();
+    Character::Draw();
 
 	// 罠の描画
 	for (auto& trap : pTimeBomb_)
@@ -167,14 +140,6 @@ void TrapEnemy::Draw()
 	for (auto& trap : pVignetteTrap_)
 	{
 		trap->Draw();
-	}
-}
-
-void TrapEnemy::Draw2D()
-{
-    for (auto& sprite : sprites_)
-    {
-        sprite->Draw();
 	}
 }
 

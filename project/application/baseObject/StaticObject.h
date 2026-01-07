@@ -6,6 +6,7 @@
 #include <memory>
 #include <Object3d.h>
 
+
 /// <summary>
 /// 静的オブジェクト基底クラス
 /// </summary>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../baseObject/GameObject.h"
+#include "../../../baseObject/Character.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
 
@@ -9,7 +9,7 @@
 /// <summary>
 /// 時限爆弾
 /// </summary>
-class TimeBomb : public GameObject
+class TimeBomb : public Character
 {
 public:
 

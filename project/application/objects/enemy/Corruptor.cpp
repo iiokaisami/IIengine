@@ -9,37 +9,14 @@
 
 void Corruptor::Initialize()
 {
-	// BaseEnemy::Initialize を呼び出し共通プロパティを初期化
-	BaseEnemy::Initialize("Corruptor", { 1.0f, 1.0f, 1.0f }, 1.0f);
-
-	// 3Dオブジェクト生成
-	object_ = std::make_unique<Object3d>();
-	object_->Initialize("bomb.obj");
-
-	moveVelocity_ = { 0.1f,0.1f,0.1f };
+	// Initialize を呼び出し共通プロパティを初期化
+	BaseEnemy::Initialize("bomb.obj","Corruptor", 1.0f);
 
 	object_->SetRotate(rotation_);
 	scale_ = { 1.0f,1.0f,1.0f };
 	object_->SetScale(scale_);
 	// ライト設定
 	object_->SetLighting(true);
-
-
-	// コライダー設定
-	colliderManager_ = ColliderManager::GetInstance();
-	desc = 
-	{
-		.owner = this,
-		.colliderID = objectName_,
-		.shape = Shape::AABB,
-		.shapeData = &aabb_,
-		.attribute = colliderManager_->GetNewAttribute(objectName_),
-		.onCollision = std::bind(&Corruptor::OnCollision, this, std::placeholders::_1),
-		.onCollisionTrigger = std::bind(&Corruptor::OnCollisionTrigger, this, std::placeholders::_1),
-	};
-	collider_.MakeAABBDesc(desc);
-	colliderManager_->RegisterCollider(&collider_);
-
 
 	// 行動ステート
 	pBehaviorState_ = std::make_unique<CorruptorBehaviorSpawn>(this);
@@ -67,22 +44,18 @@ void Corruptor::Update()
 	// アクティブフラグ
 	isActive_ = !isInvincible_;
 
-	object_->Update();
-
 	// 行動ステート更新
 	pBehaviorState_->Update();
+	
+	// モデル変形の更新
+	object_->Update();
+
 
 	// プレイヤーとの距離更新
 	float distanceToPlayer = position_.Distance(playerPosition_);
 
 	// プレイヤーとの距離が一定以上かどうかのフラグ更新
 	isFarFromPlayer_ = (distanceToPlayer < 2.5f);
-
-	// aabbの更新
-	aabb_.min = position_ - object_->GetScale();
-	aabb_.max = position_ + object_->GetScale();
-	aabb_.max.y += 1.0f;
-	collider_.SetPosition(position_);
 
 	if (isExploded_)
 	{
@@ -96,12 +69,8 @@ void Corruptor::Draw()
 {
 	if (!isExploded_)
 	{
-		object_->Draw();
+		Character::Draw();
 	}
-}
-
-void Corruptor::Draw2D()
-{
 }
 
 void Corruptor::ImGuiDraw()

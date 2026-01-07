@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../baseObject/GameObject.h"
+#include "../../../baseObject/Character.h"
 #include "../../../../gameEngine/collider/ColliderManager.h"
 #include "../../../../gameEngine/particle/ParticleEmitter.h"
 
@@ -10,7 +10,7 @@
 /// <summary>
 /// プレイヤー弾クラス
 /// </summary>
-class PlayerBullet : public GameObject
+class PlayerBullet : public Character
 {
 public:
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../baseObject/GameObject.h"
+#include "../../../baseObject/Character.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
 
 #include <Object3d.h>
@@ -9,7 +9,7 @@
 /// ヴィネットトラップ
 /// プレイヤーの周囲に放物線を描いて飛んでいきプレイヤーに衝突すると爆発する罠
 /// </summary>
-class VignetteTrap : public GameObject
+class VignetteTrap : public Character
 {
 public:
 

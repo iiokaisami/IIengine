@@ -13,16 +13,15 @@
 
 void NormalEnemy::Initialize()
 {
-    // BaseEnemy::Initialize を呼び出し共通プロパティを初期化
-    BaseEnemy::Initialize("NormalEnemy", { 1.0f, 1.0f, 1.0f }, 3.0f);
-
-    // --- 3Dオブジェクト ---
-    object_ = std::make_unique<Object3d>();
-    object_->Initialize("normalEnemy.obj");
+    // Initialize を呼び出し共通プロパティを初期化
+    BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", 3.0f);
 
     object_->SetPosition(position_);
     object_->SetRotate(rotation_);
     object_->SetScale(scale_);
+
+    // ライト設定
+    object_->SetLighting(true);
 
     // ステートの設定
     ChangeBehaviorState(std::make_unique<EnemyBehaviorSpawn>(this));
@@ -40,25 +39,6 @@ void NormalEnemy::Initialize()
 
         sprites_.push_back(std::move(sprite));
     }
-
-	// 当たり判定
-    colliderManager_ = ColliderManager::GetInstance();
-
-    objectName_ = "NormalEnemy";
-
-    desc =
-    {
-        //ここに設定
-        .owner = this,
-        .colliderID = objectName_,
-        .shape = Shape::AABB,
-        .shapeData = &aabb_,
-        .attribute = colliderManager_->GetNewAttribute(objectName_),
-        .onCollision = std::bind(&NormalEnemy::OnCollision, this, std::placeholders::_1),
-        .onCollisionTrigger = std::bind(&NormalEnemy::OnCollisionTrigger, this, std::placeholders::_1),
-    };
-    collider_.MakeAABBDesc(desc);
-    colliderManager_->RegisterCollider(&collider_);
 
     // 行動ステート
     ChangeBehaviorState(std::make_unique<EnemyBehaviorSpawn>(this));
@@ -98,6 +78,7 @@ void NormalEnemy::Update()
 	// 各行動ステートの更新
 	pBehaviorState_->Update();
 
+    // モデル変形の更新
     object_->Update();
 
     // HPバー更新
@@ -127,30 +108,17 @@ void NormalEnemy::Update()
 	// 暗闇処理(エネミーは動かなくさせる)
     HitVignetteTrap();
 
-
-    // コライダー情報の更新
-    aabb_.min = position_ - scale_;
-    aabb_.max = position_ + scale_;
-    collider_.SetPosition(position_);
 }
 
 void NormalEnemy::Draw()
 {
-    object_->Draw();
+	Character::Draw();
 
 	// 弾描画
 	for (auto& bullet : pBullets_)
 	{
 		bullet->Draw();
 	}
-}
-
-void NormalEnemy::Draw2D()
-{
-    for (auto& sprite : sprites_)
-    {
-        sprite->Draw();
-    }
 }
 
 void NormalEnemy::ImGuiDraw()
@@ -177,6 +145,9 @@ void NormalEnemy::ImGuiDraw()
     if (ImGui::SliderFloat3("object scale", &objScale.x, 0.0f, 10.0f)) {
         object_->SetScale(objScale);
     }
+
+    // HP
+	ImGui::SliderFloat("HP", &hp_, 0.0f, maxHP_);
 
     ImGui::End();
 

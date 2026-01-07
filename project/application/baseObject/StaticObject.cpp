@@ -1,10 +1,10 @@
 #include "StaticObject.h"
 
-void StaticObject::Initialize(const std::string& modelFileName, const std::string& _objectName)
+void StaticObject::Initialize(const std::string& _modelFileName, const std::string& _objectName)
 {
     // Object3d の初期化
     object_ = std::make_unique<Object3d>();
-    object_->Initialize(modelFileName);
+    object_->Initialize(_modelFileName);
 
     // 初期位置、回転、スケールを設定
     object_->SetPosition(position_);

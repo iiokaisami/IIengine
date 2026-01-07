@@ -1,16 +1,16 @@
 #pragma once
 
-#include "GameObject.h"
+#include "Character.h"
 
 #include <memory>
 #include <functional>
 #include <Vector3.h>
-#include <Sprite.h>
+#include <Framework.h>
 
 /// <summary>
 /// 敵の基底クラス
 /// </summary>
-class BaseEnemy : public GameObject
+class BaseEnemy : public Character
 {
 public:
 
@@ -18,16 +18,13 @@ public:
 	virtual ~BaseEnemy() = default;
 
 	// 初期化
-	virtual void Initialize(const std::string& objectName, const Vector3& scale, float initialHP);
+	virtual void Initialize(const std::string& _modelFileName, const std::string& _objectName, float _initialHP);
 
 	// 更新
 	virtual void Update() override;
 	
 	// 移動
-	virtual void Move();
-
-	// HPバー更新
-	virtual void UpdateHPBar();
+	virtual void Move() override;
 
 protected:
 
@@ -46,17 +43,6 @@ protected:
 
     // フレームレート補助
     static constexpr float kDefaultFrameRate = 60.0f;
-
-	// HPバー
-	Vector2 hpBarSize_ = { 100.0f, 20.0f };
-	float maxHP_ = 100.0f;
-	Vector3 hpBarOffset_ = { 0.0f, 1.6f, 1.5f };
-	float hpRatio_ = 1.0f;
-	float hpLerpSpeed_ = 10.0f;
-
-	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_;
-	uint32_t spriteNum_ = 1;
 
 };
 
