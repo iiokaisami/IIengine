@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BaseEnemy.h"
+#include "../../baseObject/BaseEnemy.h"
 #include "bullet/EnemyBullet.h"
 #include "behaviorState/normalEnemyState/EnemyBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"

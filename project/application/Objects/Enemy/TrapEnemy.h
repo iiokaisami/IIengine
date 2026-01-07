@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BaseEnemy.h"
+#include "../../baseObject/BaseEnemy.h"
 #include "bullet/VignetteTrap.h"
 #include "bullet/TimeBomb.h"
 #include "behaviorState/trapEnemyState/TrapEnemyBehaviorState.h"

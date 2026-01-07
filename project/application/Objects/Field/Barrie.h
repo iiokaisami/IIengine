@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "../../baseObject/StaticObject.h"
 #include "../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
 
@@ -12,7 +12,7 @@
 /// バリア
 /// プレイヤーを守るバリアオブジェクト
 /// </summary>
-class Barrie : public GameObject
+class Barrie : public StaticObject
 {
 public:
 
@@ -22,14 +22,8 @@ public:
 	// 初期化
 	void Initialize() override;
 
-	// 終了
-	void Finalize() override;
-
 	// 更新
 	void Update() override;
-
-	// 描画
-	void Draw() override;
 
 
 public: // セッター
@@ -49,15 +43,6 @@ private: // 衝突判定
 	void OnCollisionTrigger(const Collider* _other);
 
 private:
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
 
 	// バリア破壊フラグ
 	bool isBarrierDestroyed_ = false;

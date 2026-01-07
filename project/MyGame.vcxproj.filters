@@ -316,7 +316,7 @@
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp">
       <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
     </ClCompile>
-    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp">
+    <ClCompile Include="application\baseObject\BaseEnemy.cpp">
       <Filter>application\objects\enemy</Filter>
     </ClCompile>
     <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp">
@@ -340,6 +340,9 @@
     <ClCompile Include="gameEngine\time\TimeManager.cpp">
       <Filter>gameEngine\time</Filter>
     </ClCompile>
+    <ClCompile Include="application\baseObject\StaticObject.cpp" />
+    <ClCompile Include="application\baseObject\Character.cpp" />
+    <ClCompile Include="application\baseObject\BaseBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -618,7 +621,7 @@
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h">
       <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\BaseEnemy.h">
+    <ClInclude Include="application\baseObject\BaseEnemy.h">
       <Filter>application\objects\enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\scene\cameraController\ClearCameraController.h">
@@ -645,6 +648,9 @@
     <ClInclude Include="gameEngine\time\TimeManager.h">
       <Filter>gameEngine\time</Filter>
     </ClInclude>
+    <ClInclude Include="application\baseObject\StaticObject.h" />
+    <ClInclude Include="application\baseObject\Character.h" />
+    <ClInclude Include="application\baseObject\BaseBullet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

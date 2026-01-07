@@ -2,9 +2,9 @@
 
 void Wall::Initialize()
 {
-	// --- 3Dオブジェクト ---
-	object_ = std::make_unique<Object3d>();
-	object_->Initialize("wall.obj");
+	// 基底クラス初期化
+	StaticObject::Initialize("wall.obj", "Wall");
+
 	position_ = { 0.0f,0.0f,-0.5f };
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
@@ -12,50 +12,8 @@ void Wall::Initialize()
 	object_->SetScale(scale_);
 	
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
 
-	// 当たり判定
-	colliderManager_ = ColliderManager::GetInstance();
-
-	objectName_ = "Wall";
-	desc =
-	{
-		//ここに設定
-		.owner = this,
-		.colliderID = objectName_,
-		.shape = Shape::AABB,
-		.shapeData = &aabb_,
-		.attribute = colliderManager_->GetNewAttribute(objectName_),
-	};
-	
-	collider_.MakeAABBDesc(desc);
-	colliderManager_->RegisterCollider(&collider_);
-}
-
-void Wall::Finalize()
-{
-	colliderManager_->DeleteCollider(&collider_);
-}
-
-void Wall::Update()
-{
-	// オブジェクトの更新
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-	object_->Update();
-
-	// 当たり判定更新
-	aabb_.min = position_ - object_->GetScale();
-	aabb_.max = position_ + object_->GetScale();
-	aabb_.max.y += 1.0f; // 見た目よりも縦に大きく
-	collider_.SetPosition(position_);
-}
-
-void Wall::Draw()
-{
-	object_->Draw();
 }
 
 void Wall::ImGuiDraw()

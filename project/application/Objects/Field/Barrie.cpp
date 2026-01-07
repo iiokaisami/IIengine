@@ -2,60 +2,24 @@
 
 void Barrie::Initialize()
 {
-	// --- 3Dオブジェクト ---
-	object_ = std::make_unique<Object3d>();
-	object_->Initialize("barrie.obj");
-	object_->SetRotate(rotation_);
+	// 基底クラス初期化
+	StaticObject::Initialize("barrie.obj","Barrie");
 
 	// 大きさセット
 	scale_ = defaultScale_;
 	targetScale_ = defaultScale_;
 	object_->SetScale(scale_);
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
 
-	// 当たり判定
-	colliderManager_ = ColliderManager::GetInstance();
-	objectName_ = "Barrie";
-	desc =
-	{
-		//ここに設定
-		.owner = this,
-		.colliderID = objectName_,
-		.shape = Shape::AABB,
-		.shapeData = &aabb_,
-		.attribute = colliderManager_->GetNewAttribute(objectName_),
-		.onCollisionTrigger = std::bind(&Barrie::OnCollisionTrigger, this, std::placeholders::_1),
-	};
-	collider_.MakeAABBDesc(desc);
-	colliderManager_->RegisterCollider(&collider_);
 
-}
-
-void Barrie::Finalize()
-{
-	colliderManager_->DeleteCollider(&collider_);
 }
 
 void Barrie::Update()
 {
-	// オブジェクトの更新
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-	object_->Update();
 
-	// 当たり判定更新
-	aabb_.min = position_ - object_->GetScale();
-	aabb_.max = position_ + object_->GetScale();
-	aabb_.max.y += 1.0f; // 見た目よりも縦に大きく
-	collider_.SetPosition(position_);
-
-
-	// スケールを補間して元に戻す
-	/*scale_ += (targetScale_ - scale_) * scaleLerpSpeed_;
-	object_->SetScale(scale_);*/
+	// 基底クラス更新
+	StaticObject::Update();
 
 	// バリア破壊処理
 	if (isBarrierDestroyed_ && !isExploding_)
@@ -116,11 +80,6 @@ void Barrie::Update()
 		// パーティクル
 		ParticleEmitter::Emit("spark", { position_.x,position_.y + 3.0f,position_.z }, 1);
 	}
-}
-
-void Barrie::Draw()
-{
-	object_->Draw();
 }
 
 void Barrie::OnCollisionTrigger(const Collider* _other)

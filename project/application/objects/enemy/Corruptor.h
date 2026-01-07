@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BaseEnemy.h"
+#include "../../baseObject/BaseEnemy.h"
 #include "behaviorState/corruptorState/CorruptorBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"

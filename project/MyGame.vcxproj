@@ -122,7 +122,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\FollowController.cpp" />
     <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp" />
     <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp" />
-    <ClCompile Include="application\objects\enemy\BaseEnemy.cpp" />
+    <ClCompile Include="application\baseObject\BaseEnemy.cpp" />
+    <ClCompile Include="application\baseObject\Character.cpp" />
+    <ClCompile Include="application\baseObject\BaseBullet.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\FadeTransition.cpp" />
@@ -206,6 +208,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\SceneCamera.cpp" />
     <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
     <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
+    <ClCompile Include="application\baseObject\StaticObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -222,7 +225,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\FollowController.h" />
     <ClInclude Include="application\scene\cameraController\DeathCameraController.h" />
     <ClInclude Include="application\scene\cameraController\ClearCameraController.h" />
-    <ClInclude Include="application\objects\enemy\BaseEnemy.h" />
+    <ClInclude Include="application\baseObject\BaseEnemy.h" />
+    <ClInclude Include="application\baseObject\Character.h" />
+    <ClInclude Include="application\baseObject\BaseBullet.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />
     <ClInclude Include="gameEngine\transition\FadeTransition.h" />
@@ -309,6 +314,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\SceneCamera.h" />
     <ClInclude Include="application\scene\cameraController\ShakeController.h" />
     <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
+    <ClInclude Include="application\baseObject\StaticObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

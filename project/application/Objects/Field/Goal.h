@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "../../baseObject/StaticObject.h"
 #include "../../../gameEngine/collider/ColliderManager.h"
 #include "Barrie.h"
 
@@ -11,12 +11,9 @@
 /// <summary>
 /// ゴール
 /// </summary>
-class Goal : public GameObject
+class Goal : public StaticObject
 {
 public:
-
-	Goal() = default;
-	~Goal() = default;
 
 	// 初期化
 	void Initialize() override;
@@ -57,17 +54,8 @@ private: // 衝突判定
 
 private:
 
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
-
 	// バリア
 	std::unique_ptr<Barrie> pBarrie_ = nullptr;
-
-	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
 
 	// クリアフラグ
 	bool isCleared_ = false;

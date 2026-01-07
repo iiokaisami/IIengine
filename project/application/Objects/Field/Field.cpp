@@ -2,53 +2,16 @@
 
 void Field::Initialize()
 {
-	// --- 3Dオブジェクト ---
-	object_ = std::make_unique<Object3d>();
-	object_->Initialize("field.obj");
 	
+	// 基底クラス初期化
+	StaticObject::Initialize("field.obj", "Field");
+
 	position_ = { 0.0f,0.0f,0.0f };
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
 	scale_ = { 100.0f,0.1f,100.0f };
 	object_->SetScale(scale_);
 
-	// 当たり判定
-	colliderManager_ = ColliderManager::GetInstance();
-	objectName_ = "Field";
-	desc =
-	{
-		//ここに設定
-		.owner = this,
-		.colliderID = objectName_,
-		.shape = Shape::AABB,
-		.shapeData = &aabb_,
-		.attribute = colliderManager_->GetNewAttribute(objectName_),
-	};
-	collider_.MakeAABBDesc(desc);
-	colliderManager_->RegisterCollider(&collider_);
-}
-
-void Field::Finalize()
-{
-	colliderManager_->DeleteCollider(&collider_);
-}
-
-void Field::Update()
-{
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-	object_->Update();
-
-	aabb_.min = position_ - object_->GetScale();
-	aabb_.max = position_ + object_->GetScale();
-	aabb_.max.y += 1.0f;
-	collider_.SetPosition(position_);
-}
-
-void Field::Draw()
-{
-	object_->Draw();
 }
 
 void Field::ImGuiDraw()

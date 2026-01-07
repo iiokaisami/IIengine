@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../baseObject/GameObject.h"
+#include "GameObject.h"
 
 #include <memory>
 #include <functional>
