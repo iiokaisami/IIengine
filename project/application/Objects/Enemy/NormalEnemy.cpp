@@ -65,7 +65,7 @@ void NormalEnemy::Finalize()
 	}
 
     // 弾の削除
-    RemoveBullets();
+    RemoveDeadBullets<EnemyBullet>(pBullets_);
 
     colliderManager_->DeleteCollider(&collider_);
 }
@@ -97,7 +97,7 @@ void NormalEnemy::Update()
 	}
 
 	// 弾の削除
-    RemoveBullets();
+    RemoveDeadBullets<EnemyBullet>(pBullets_);
 
     // 弾の更新
     for (auto& bullet : pBullets_)
@@ -232,23 +232,6 @@ void NormalEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _r
     object_->SetPosition(_position);
     object_->SetRotate(_rotation);
     object_->SetScale(_scale);
-}
-
-void NormalEnemy::RemoveBullets()
-{
-    // 敵の弾の削除
-    pBullets_.erase(
-        std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr<EnemyBullet>& bullet)
-            {
-                if (bullet->IsDead())
-                {
-                    bullet->Finalize();
-                    return true;
-                }
-                return false;
-            }),
-        pBullets_.end()
-    );
 }
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)

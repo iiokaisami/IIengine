@@ -83,8 +83,10 @@ void Player::Finalize()
 		bullet->SetIsDead(true);
 		bullet->Finalize();
 	}
-
-	RemoveBullets();
+	
+	RemoveDeadBullets<PlayerBullet>(pBullets_, [](const PlayerBullet& b) {
+		ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
+		});
 
 	colliderManager_->DeleteCollider(&collider_);
 }
@@ -107,7 +109,10 @@ void Player::Update()
 	}
 
 	// 弾の削除
-	RemoveBullets();
+	RemoveDeadBullets<PlayerBullet>(pBullets_, [](const PlayerBullet& b)
+		{
+		ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
+		});
 
 	// 弾更新
 	for (auto& bullet : pBullets_)
@@ -655,23 +660,6 @@ void Player::UpdateControl()
 			hp_ = 8;
 		}
 	}
-}
-
-void Player::RemoveBullets()
-{
-	pBullets_.erase(
-		std::remove_if(pBullets_.begin(), pBullets_.end(), [](std::unique_ptr < PlayerBullet>& bullet)
-			{
-				if (bullet->IsDead())
-				{
-					ParticleEmitter::Emit("BltReaction", bullet->GetPosition(), 1);
-					bullet->Finalize();
-					return true;
-				}
-				return false;
-			}),
-		pBullets_.end()
-	);
 }
 
 void Player::UpdateStatus()

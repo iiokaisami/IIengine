@@ -47,11 +47,6 @@ public:
 	/// <param name="_pState">新しいステートポインタ</param>
 	void ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pState);
 
-private: // 内部処理
-
-	// 弾削除
-	void RemoveBullets();
-
 private: // 衝突判定
 
 	/// <summary>

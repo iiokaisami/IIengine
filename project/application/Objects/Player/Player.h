@@ -58,9 +58,6 @@ private: // 内部処理
 	// 操作更新
 	void UpdateControl();
 
-	// 弾削除
-	void RemoveBullets();
-
 	// ステータス更新
 	void UpdateStatus();
 

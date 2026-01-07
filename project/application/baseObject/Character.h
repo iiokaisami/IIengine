@@ -5,6 +5,8 @@
 
 #include <memory>
 #include <string>
+#include <algorithm>
+#include <functional>
 #include <Object3d.h>
 #include <Sprite.h>
 
@@ -40,6 +42,37 @@ public:
 
 	// HPバー更新
 	virtual void UpdateHPBar();
+
+	/// <summary>
+	/// まとめて削除するユーティリティ
+	/// </summary>
+	/// <typeparam name="BulletT">弾クラスの型（PlayerBullet / EnemyBullet 等）</typeparam>
+	/// <param name="bullets">削除対象のベクタ（unique_ptr の vector）</param>
+	/// <param name="onDead">削除前に実行するコールバック</param>
+	template<typename BulletT>
+	void RemoveDeadBullets(std::vector<std::unique_ptr<BulletT>>& bullets,std::function<void(const BulletT&)> onDead = nullptr)
+	{
+		bullets.erase(
+			std::remove_if(bullets.begin(), bullets.end(),
+				[&](std::unique_ptr<BulletT>& bullet) -> bool
+				{
+					if (!bullet) return true;
+					if (bullet->IsDead())
+					{
+						// 任意の追加処理
+						if (onDead)
+						{
+							onDead(*bullet);
+						}
+						// リソース解放・後処理
+						bullet->Finalize();
+						return true;
+					}
+					return false;
+				}),
+			bullets.end()
+		);
+	}
 
 public: // ゲッター
 
