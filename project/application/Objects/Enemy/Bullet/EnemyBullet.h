@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../baseObject/Character.h"
+#include "../../../baseObject/BaseBullet.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
 #include "../../../../gameEngine/particle/ParticleEmitter.h"
 
@@ -9,7 +9,7 @@
 /// <summary>
 /// 敵の弾クラス
 /// </summary>
-class EnemyBullet : public Character
+class EnemyBullet : public BaseBullet
 {
 public:
 	EnemyBullet() = default;
@@ -58,27 +58,10 @@ public: // セッター
 	}
 
 private: // メンバ変数
-
-	// デフォルトフレームレート
-	static constexpr float kDefaultFrameRate = 60.0f;
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
-	
-	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
-	
-	// 速度
-	Vector3 velocity_{};
 	
 	// 寿命
 	static const uint32_t kLifeTime = 60 * 3;
 
-	// デスタイマー
-	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 
 };
 

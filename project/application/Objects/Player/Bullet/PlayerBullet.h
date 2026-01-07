@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../baseObject/Character.h"
+#include "../../../baseObject/BaseBullet.h"
 #include "../../../../gameEngine/collider/ColliderManager.h"
 #include "../../../../gameEngine/particle/ParticleEmitter.h"
 
@@ -10,7 +10,7 @@
 /// <summary>
 /// プレイヤー弾クラス
 /// </summary>
-class PlayerBullet : public Character
+class PlayerBullet : public BaseBullet
 {
 public:
 
@@ -43,7 +43,7 @@ private: // 衝突判定
 	/// <param name="_other">衝突相手のコライダー</param>
 	void OnCollisionTrigger(const Collider* _other);
 
-public: // ゲッター
+public: // セッター
 
 	/// <summary>
 	/// 速度取得
@@ -55,28 +55,9 @@ public: // ゲッター
 		return velocity_; 
 	}
 
-public: // セッター
-
-
 private: // メンバ変数
-
-	static constexpr float kDefaultFrameRate = 60.0f;
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
-
-	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
-
-	// 速度
-	Vector3 velocity_{};
 
 	// 寿命
 	static const int32_t kLifeTime = 60 * 5;
 
-	// デスタイマー
-	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 };

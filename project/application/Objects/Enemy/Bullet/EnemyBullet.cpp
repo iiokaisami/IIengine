@@ -44,6 +44,8 @@ void EnemyBullet::Update()
 
 	UpdateModel();
 
+	BaseBullet::Update();
+
 	rotation_ += { 0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f };
 	position_ += velocity_ * dt;
 
@@ -55,13 +57,6 @@ void EnemyBullet::Update()
 	float lifeRatio = std::clamp(deathRemainingSeconds_ / (kLifeTime / kDefaultFrameRate), 0.0f, 1.0f);
 	scale_ = { 0.7f * lifeRatio, 0.7f * lifeRatio, 0.7f * lifeRatio };
 
-
-	//時間経過でデス
-	deathRemainingSeconds_ -= dt;
-	if (deathRemainingSeconds_ <= 0.0f)
-	{
-		isDead_ = true;
-	}
 }
 
 void EnemyBullet::Draw()

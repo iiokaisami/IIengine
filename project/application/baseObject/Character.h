@@ -78,8 +78,6 @@ public: // ゲッター
 
 	// HP取得
 	virtual float   GetHP() const { return hp_; };
-	// デスフラグ
-	virtual bool IsDead() const { return isDead_; }
 	
 
 public: // セッター
@@ -88,15 +86,7 @@ public: // セッター
 	/// HP設定
 	/// </summary>
 	/// <param name="_hp">HP</param>
-	virtual void SetHP(float _hp) { hp_ = _hp; };
-
-	/// <summary>
-	/// デスフラグ設定
-	/// </summary>
-	/// <param name="_isDead">デスフラグ</param>
-	virtual void SetIsDead(bool _isDead) { isDead_ = _isDead; };
-
-	
+	virtual void SetHP(float _hp) { hp_ = _hp; };	
 
 protected: // 動作処理
 
@@ -179,8 +169,7 @@ protected:
 
 	// HP
 	float hp_;
-	// デスフラグ
-	bool isDead_ = false;
+	
 	
 };
 

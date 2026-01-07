@@ -33,6 +33,7 @@ void PlayerBullet::Initialize()
 	colliderManager_->RegisterCollider(&collider_);
 
 
+
 }
 
 void PlayerBullet::Finalize()
@@ -44,11 +45,9 @@ void PlayerBullet::Update()
 {
 	const float dt = TimeManager::Instance().GetDeltaTime();
 
-	object_->Update();
+	BaseBullet::Update();
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
+	UpdateModel();
 
 	rotation_.y += 1.0f * dt * PlayerBullet::kDefaultFrameRate;
 	position_ += velocity_ * dt;
@@ -59,15 +58,6 @@ void PlayerBullet::Update()
 
 	// パーティクル
 	ParticleEmitter::Emit("slash", position_, 1);
-
-	//時間経過でデス
-	deathRemainingSeconds_ -= dt;
-	if (deathRemainingSeconds_ <= 0.0f)
-	{
-		isDead_ = true;
-	}
-
-
 }
 
 void PlayerBullet::Draw()

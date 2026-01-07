@@ -40,6 +40,9 @@ public: // ゲッター
 		return isActive_;
 	}
 
+	// デスフラグ
+	virtual bool IsDead() const { return isDead_; }
+
 public: // セッター
 
 	/// <summary>
@@ -66,6 +69,12 @@ public: // セッター
 	/// <param name="_isActive">アクティブかどうか</param>
 	virtual void SetIsActive(bool _isActive) { isActive_ = _isActive; };
 
+	/// <summary>
+	/// デスフラグ設定
+	/// </summary>
+	/// <param name="_isDead">デスフラグ</param>
+	virtual void SetIsDead(bool _isDead) { isDead_ = _isDead; };
+
 protected: // メンバー
 
     std::string objectName_;
@@ -74,4 +83,6 @@ protected: // メンバー
     Vector3 position_;
 	// オブジェクトがアクティブかどうか(回避中など判定を付けたくない場合等)
 	bool isActive_ = false;
+	// デスフラグ
+	bool isDead_ = false;
 };
