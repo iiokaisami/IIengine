@@ -31,15 +31,14 @@ void Player::Initialize()
 
 		if (i == 0)
 		{
-			sprite->Initialize("hp.png", {0.0f,0.0f}, { 1.0f,1.0f,1.0f,1.0f }, { 0.0f,0.5f });
+			sprite->Initialize("hp.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.0f,0.5f });
 			sprite->SetSize(hpBarSize_);
-		
-		}
-		else if (i == 1)
+
+		} else if (i == 1)
 		{
 			sprite->Initialize("nearEnemy.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.5f,1.0f });
 		}
-		
+
 		sprites_.push_back(std::move(sprite));
 	}
 
@@ -59,7 +58,7 @@ void Player::Initialize()
 	deathMotion_.isActive = false;
 	deathMotion_.isComplete = false;
 	deathMotion_.count = 0;
-	deathMotion_.shakeFrames = 40;     // ぷるぷる時間（フレーム）
+	deathMotion_.shakeFrames = 40;     // ぷるぷる時間
 	deathMotion_.wobbleAmplitude = 0.10f;
 	deathMotion_.wobbleFreq = 10.0f;
 	deathMotion_.popScale = 2.0f;
@@ -73,7 +72,7 @@ void Player::Initialize()
 
 void Player::Finalize()
 {
-	for (auto& sprite: sprites_)
+	for (auto& sprite : sprites_)
 	{
 		sprite.reset();
 	}
@@ -83,7 +82,7 @@ void Player::Finalize()
 		bullet->SetIsDead(true);
 		bullet->Finalize();
 	}
-	
+
 	RemoveDeadBullets<PlayerBullet>(pBullets_, [](const PlayerBullet& b) {
 		ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
 		});
@@ -111,7 +110,7 @@ void Player::Update()
 	// 弾の削除
 	RemoveDeadBullets<PlayerBullet>(pBullets_, [](const PlayerBullet& b)
 		{
-		ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
+			ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
 		});
 
 	// 弾更新
@@ -207,7 +206,7 @@ void Player::Move()
 	{
 		// 正規化された方向ベクトル
 		Vector3 normalizedDir = moveVelocity_;
-		
+
 		normalizedDir = normalizedDir.Normalize();
 
 		// Y軸回りの目標回転角度を計算
@@ -235,36 +234,18 @@ void Player::Move()
 
 void Player::Attack()
 {
-	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
-
-	// ローカル持続クールダウン
-	static float shootCooldownSec = 0.0f;
-	// 既存のフレームベース定数を秒に変換して利用
-	const float shootCooldownDuration = static_cast<float>(kShootCoolDownFrame_) / kDefaultFrameRate;
-
-	// クールダウンを進める
-	if (shootCooldownSec > 0.0f)
-	{
-		shootCooldownSec -= dt;
-		if (shootCooldownSec < 0.0f)
-		{
-			shootCooldownSec = 0.0f;
-		}
-	}
-
 	if (Input::GetInstance()->PushKey(DIK_SPACE))
 	{
-		// プレイヤーの向きに合わせて弾の速度を変更
-		Vector3 bulletVelocity =
+		if (countCoolDownFrame_ == 0)
 		{
-			std::cosf(rotation_.x) * std::sinf(rotation_.y),     // x
-			std::sinf(-rotation_.x),                             // y
-			std::cosf(rotation_.x) * std::cosf(rotation_.y)      // z
-		};
+			// プレイヤーの向きに合わせて弾の速度を変更
+			Vector3 bulletVelocity =
+			{
+				std::cosf(rotation_.x) * std::sinf(rotation_.y),     // x
+				std::sinf(-rotation_.x),                             // y
+				std::cosf(rotation_.x) * std::cosf(rotation_.y)      // z
+			};
 
-		if (shootCooldownSec <= 0)
-		{
 			// 弾を生成し、初期化
 			auto newBullet = std::make_unique<PlayerBullet>();
 
@@ -275,7 +256,8 @@ void Player::Attack()
 			// 弾を登録する
 			pBullets_.push_back(std::move(newBullet));
 
-			shootCooldownSec = shootCooldownDuration;
+			// フレームベースでクールダウンを設定
+			countCoolDownFrame_ = kShootCoolDownFrame_;
 		}
 	}
 }
@@ -289,7 +271,7 @@ void Player::Evade()
 	if (!isEvading_ && Input::GetInstance()->PushKey(DIK_LSHIFT))
 	{
 		// 移動方向がある場合のみ回避
-		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f) 
+		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
 		{
 			isEvading_ = true;
 			evadeFrame_ = kEvadeDuration_;
@@ -297,14 +279,14 @@ void Player::Evade()
 			evadeDirection_ = moveVelocity_;
 			// 正規化
 			float len = std::sqrt(evadeDirection_.x * evadeDirection_.x + evadeDirection_.z * evadeDirection_.z);
-			if (len > 0.0f) 
+			if (len > 0.0f)
 			{
 				evadeDirection_.x /= len;
 				evadeDirection_.z /= len;
 			}
 			// 回避開始時のx軸角度を保存
 			evadeStartRotationX_ = rotation_.x;
-			// 目標角度を設定（1回転分加算）
+			// 目標角度を設定
 			evadeTargetRotationX_ = evadeStartRotationX_ + kEvadeRotateAngle_;
 		}
 	}
@@ -312,16 +294,21 @@ void Player::Evade()
 	if (isEvading_)
 	{
 		// 回避移動
-		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } * dt;
+		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } *dt;
 
 		// 移動制限
 		ClampPosition();
 
-		// 回避中のx軸回転（線形補間で速めに回す）
+		// 回避中のx軸回転
 		float t = 1.0f - static_cast<float>(evadeFrame_) / static_cast<float>(kEvadeDuration_);
 		rotation_.x = evadeStartRotationX_ + (evadeTargetRotationX_ - evadeStartRotationX_) * t * dt * kDefaultFrameRate;
 
-		evadeFrame_--;
+		// フレーム制御を行う
+		if (evadeFrame_ > 0)
+		{
+			evadeFrame_--;
+		}
+
 		if (evadeFrame_ <= 0)
 		{
 			isEvading_ = false;
@@ -360,7 +347,7 @@ void Player::UpdateNearEnemyIndicator()
 
 	// targetAngleの計算
 	float targetAngle = std::atan2f(dx, -dy);
-	
+
 	// インジケーターの回転角度を徐々に変化させる
 	const float TWO_PI = 6.28318530717958647692f;
 	if (indicatorSpinAngle_ < 0.0f)
@@ -463,7 +450,7 @@ void Player::DeadEffect()
 	// パーティクルを発生させる
 	ParticleEmitter::Emit("rupture", position_, 20);
 
-	// モーション終了扱いにする(isActive=false)
+	// モーション終了扱いにする
 	deathMotion_.isActive = false;
 	deathMotion_.isComplete = true;
 }
@@ -543,8 +530,7 @@ void Player::ClearSceneUpdate()
 	if (std::abs(velX) < 1e-6f && std::abs(velZ) < 1e-6f)
 	{
 		// 速度がほぼ0なら角度は更新しない
-	} 
-	else
+	} else
 	{
 		// atan2(x,z) を使って yaw を得る
 		lastYaw = std::atan2(velX, velZ);
@@ -565,8 +551,7 @@ void Player::ClearSceneUpdate()
 		// 面積維持
 		sz = 1.0f / sx;
 		sz = std::clamp(sz, 0.05f, 5.0f);
-	} 
-	else
+	} else
 	{
 		sz = 1.0f + poyoAmpZ * std::sin(omegaXZ * totalTime + poyoPhase + 3.14159265f / 2.0f);
 		sz = std::clamp(sz, 0.05f, 5.0f);
@@ -576,14 +561,13 @@ void Player::ClearSceneUpdate()
 	float sy; // 実スケール
 	if (maintainVolume)
 	{
-		
+
 		float sx_rel = std::max(0.01f, sx);
 		float sz_rel = std::max(0.01f, sz);
 		float sy_rel = 1.0f / (sx_rel * sz_rel);
 		sy_rel = std::clamp(sy_rel, 0.05f, 5.0f);
 		sy = baseScale.y * sy_rel;
-	} 
-	else
+	} else
 	{
 		// Yは独立して振動させる
 		float omegaY = 2.0f * 3.14159265358979323846f * poyoFreqY;
@@ -664,24 +648,12 @@ void Player::UpdateControl()
 
 void Player::UpdateStatus()
 {
-	// クールダウン系
+	// クールダウン
 	if (countCoolDownFrame_ > 0)
 	{
 		countCoolDownFrame_--;
 	}
 
-	// Evade 時間管理
-	if (isEvading_)
-	{
-		if (evadeFrame_ > 0)
-		{
-			evadeFrame_--;
-
-		} else
-		{
-			isEvading_ = false;
-		}
-	}
 }
 
 void Player::AutoMove()
@@ -708,22 +680,22 @@ void Player::AutoMove()
 	}
 	moveTimer--;
 
-	// 壁際判定：端に近づいたら(今の進行方向が外に向かっていたら)強制的に内向きにリダイレクト
+	// 端に近づいたら強制的に内向きにリダイレクト
 	bool redirected = false;
 	Vector3 nextPos = position_ + Vector3{ autoDir.x * moveSpeed_.x, 0.0f, autoDir.z * moveSpeed_.z };
 
-	if (nextPos.x < minX or nextPos.x > maxX) 
+	if (nextPos.x < minX or nextPos.x > maxX)
 	{
 		autoDir.x = -autoDir.x;
 		redirected = true;
 	}
-	if (nextPos.z < minZ or nextPos.z > maxZ) 
+	if (nextPos.z < minZ or nextPos.z > maxZ)
 	{
 		autoDir.z = -autoDir.z;
 		redirected = true;
 	}
 
-	if (redirected) 
+	if (redirected)
 	{
 		// 端で方向反転したら新たにmoveTimerを設定し、即座に再ランダム化しない
 		moveTimer = 60 + rand() % 90;
@@ -771,12 +743,11 @@ void Player::AutoAttack()
 		newBullet->SetPosition(position_);
 		newBullet->Initialize();
 		newBullet->SetVelocity(bulletVelocity);
-		
+
 		// 弾を登録する
 		pBullets_.push_back(std::move(newBullet));
 		attackCooldown = attackInterval;
-	}
-	else
+	} else
 	{
 		attackCooldown--;
 	}
@@ -803,14 +774,13 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isHitMoment_ = true;
 
 			ParticleEmitter::Emit("HitReaction", position_, 5);
-		}
-		else
+		} else
 		{
 			isDead_ = true;
 		}
 
-		
-	} 
+
+	}
 
 	if (!isEvading_ && (_other->GetColliderID() == "ExplosionTimeBomb" or
 		_other->GetColliderID() == "Corruptor"))
@@ -822,8 +792,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			{
 				hp_ -= 1.5f;
 				ParticleEmitter::Emit("HitReaction", position_, 8);
-			}
-			else
+			} else
 			{
 				isDead_ = true;
 			}
@@ -845,13 +814,13 @@ void Player::OnCollisionTrigger(const Collider* _other)
 void Player::OnCollision(const Collider* _other)
 {
 	if (_other->GetColliderID() == "Wall" or
-		_other->GetColliderID() == "Barrie" or 
+		_other->GetColliderID() == "Barrie" or
 		_other->GetColliderID() == "NormalEnemy")
 	{
 		// 相手のAABBを取得
 		const AABB* otherAABB = _other->GetAABB();
-		
-		if (otherAABB) 
+
+		if (otherAABB)
 		{
 			// 自分のAABBと位置を渡して補正
 			CorrectOverlap(*otherAABB, aabb_, position_);
@@ -903,8 +872,7 @@ void Player::HitVignetteTrap()
 			float t = (1.0f - static_cast<float>(kMaxVignetteTime - vignetteTime_) / 30.0f) * dt * kDefaultFrameRate;
 			t = std::clamp(t, 0.0f, 1.0f);
 			vignetteStrength_ = std::lerp(1.8f, 0.0f, t);
-		}
-		else
+		} else
 		{
 			vignetteStrength_ = 1.8f;
 		}
@@ -925,8 +893,7 @@ void Player::HitVignetteTrap()
 		if (vignetteTime_ > 0)
 		{
 			vignetteTime_--;
-		}
-		else
+		} else
 		{
 			// 明るくする準備
 			isHitVignetteTrap_ = false;
