@@ -233,7 +233,7 @@ void MyGame::Update()
 	if (ImGui::CollapsingHeader("TimeManager"))
 	{
 		// 現在のタイムスケールを取得
-		float currentScale = TimeManager::Instance().GetTimeScale();
+		float currentScale = IIEngine::TimeManager::Instance().GetTimeScale();
 
 		// スライダーの表示値（ユーザー操作時に優先して反映）
 		static float timeScaleSlider = currentScale;
@@ -246,23 +246,23 @@ void MyGame::Update()
 		// スライダーで直接変更
 		if (ImGui::SliderFloat("Time Scale", &timeScaleSlider, 0.0f, 2.0f))
 		{
-			TimeManager::Instance().SetTimeScale(timeScaleSlider);
+			IIEngine::TimeManager::Instance().SetTimeScale(timeScaleSlider);
 		}
 
 		// 一時停止 / 再開 ボタン
 		if (ImGui::Button("Pause"))
 		{
-			TimeManager::Instance().Pause();
+			IIEngine::TimeManager::Instance().Pause();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Resume"))
 		{
-			TimeManager::Instance().Resume();
+			IIEngine::TimeManager::Instance().Resume();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Reset"))
 		{
-			TimeManager::Instance().SetTimeScale(1.0f);
+			IIEngine::TimeManager::Instance().SetTimeScale(1.0f);
 			timeScaleSlider = 1.0f;
 		}
 
@@ -275,7 +275,7 @@ void MyGame::Update()
 		if (ImGui::Button("Smooth To Target"))
 		{
 			// duration が負にならないように保護
-			TimeManager::Instance().SmoothTimeScale(smoothTarget, std::max(0.0f, smoothDuration));
+			IIEngine::TimeManager::Instance().SmoothTimeScale(smoothTarget, std::max(0.0f, smoothDuration));
 		}
 
 		// ステップ実行
@@ -283,7 +283,7 @@ void MyGame::Update()
 		ImGui::InputFloat("Step Seconds", &stepSeconds, 0.001f, 0.1f, "%.3f");
 		if (ImGui::Button("Step"))
 		{
-			TimeManager::Instance().Step(stepSeconds);
+			IIEngine::TimeManager::Instance().Step(stepSeconds);
 		}
 
 		// 現在の値を表示
