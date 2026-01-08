@@ -7,10 +7,8 @@ void EnemyBullet::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("enemyBullet.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.7f,0.7f,0.7f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 
 	object_->SetLighting(true);
 
@@ -42,7 +40,7 @@ void EnemyBullet::Update()
 {
 	const float dt = TimeManager::Instance().GetDeltaTime();
 
-	UpdateModel();
+	SyncObjectTransform();
 
 	BaseBullet::Update();
 
@@ -81,15 +79,6 @@ void EnemyBullet::ImGuiDraw()
 	ImGui::End();
 
 #endif // USE_IMGUI
-}
-
-void EnemyBullet::UpdateModel()
-{
-	object_->Update();
-
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
 }
 
 void EnemyBullet::OnCollisionTrigger(const Collider* _other)

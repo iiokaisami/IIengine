@@ -7,10 +7,8 @@ void PlayerBullet::Initialize()
   	object_ = std::make_unique<Object3d>();
 	object_->Initialize("playerBullet.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.5f,0.5f,0.5f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -47,7 +45,7 @@ void PlayerBullet::Update()
 
 	BaseBullet::Update();
 
-	UpdateModel();
+	SyncObjectTransform();
 
 	rotation_.y += 1.0f * dt * PlayerBullet::kDefaultFrameRate;
 	position_ += velocity_ * dt;

@@ -10,10 +10,8 @@ void TimeBomb::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("bomb.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.7f, 0.7f, 0.7f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
@@ -132,7 +130,7 @@ void TimeBomb::Update()
 	DeadMotion();
 
 	// モデル更新
-	UpdateModel();
+	SyncObjectTransform();
 	
 	// 回転更新
 	rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
@@ -160,14 +158,6 @@ void TimeBomb::ImGuiDraw()
 {
 }
 
-void TimeBomb::UpdateModel()
-{
-	object_->Update();
-
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-}
 
 void TimeBomb::LaunchTrap()
 {

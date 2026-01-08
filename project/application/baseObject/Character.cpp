@@ -9,9 +9,7 @@ void Character::Initialize(const std::string& _modelFileName, const std::string&
     object_->Initialize(_modelFileName);
 
     // 初期位置、回転、スケールを設定
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
+	SyncObjectTransform();
 
     // 当たり判定の初期化
     colliderManager_ = ColliderManager::GetInstance();
@@ -45,10 +43,7 @@ void Character::Finalize()
 void Character::Update()
 {
 	// Object3d更新
-    object_->SetPosition(position_);
-    object_->SetScale(scale_);
-    object_->SetRotate(rotation_);
-    object_->Update();
+    SyncObjectTransform();
 
 	// collider更新
     aabb_.min = position_ - scale_;
@@ -109,14 +104,6 @@ void Character::UpdateHPBar()
     sprites_[0]->SetPosition(leftPos);
     sprites_[0]->SetSize(newSize);
     sprites_[0]->Update();
-}
-
-void Character::UpdateModel()
-{
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
-    object_->Update();
 }
 
 void Character::CorrectOverlap(const AABB& otherAABB, AABB& selfAABB, Vector3& position)

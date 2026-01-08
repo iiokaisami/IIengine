@@ -10,10 +10,8 @@ void VignetteTrap::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("vignette.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.7f,0.7f,0.7f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -115,7 +113,7 @@ void VignetteTrap::Update()
 	// 消滅モーション更新
 	DeadMotion();
 
-	UpdateModel();
+	SyncObjectTransform();
 
 	rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
 
@@ -131,15 +129,6 @@ void VignetteTrap::Draw()
 
 void VignetteTrap::ImGuiDraw()
 {
-}
-
-void VignetteTrap::UpdateModel()
-{
-	object_->Update();
-
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
 }
 
 void VignetteTrap::LaunchTrap()

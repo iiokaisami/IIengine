@@ -16,10 +16,7 @@ void BaseBullet::Update()
 	// モデル更新
 	if (object_)
 	{
-		object_->SetPosition(position_);
-		object_->SetRotate(rotation_);
-		object_->SetScale(scale_);
-		object_->Update();
+		SyncObjectTransform();
 	}
 }
 
@@ -28,17 +25,6 @@ void BaseBullet::Draw()
 	if (object_)
 	{
 		object_->Draw();
-	}
-}
-
-void BaseBullet::UpdateModel()
-{
-	if (object_)
-	{
-		object_->SetPosition(position_);
-		object_->SetRotate(rotation_);
-		object_->SetScale(scale_);
-		object_->Update();
 	}
 }
 

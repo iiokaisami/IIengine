@@ -30,9 +30,6 @@ public:
 	// 描画
 	virtual void Draw() override;
 
-	// モデル変形の更新ユーティリティ
-	void UpdateModel();
-
 	// 速度設定
 	virtual Vector3 SetVelocity(const Vector3 _velocity);
 
@@ -48,9 +45,6 @@ protected:
 
 	// デフォルトフレームレート
 	static constexpr float kDefaultFrameRate = 60.0f;
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;

@@ -8,7 +8,7 @@ void Barrie::Initialize()
 	// 大きさセット
 	scale_ = defaultScale_;
 	targetScale_ = defaultScale_;
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -47,7 +47,7 @@ void Barrie::Update()
 
 		// スケール適用
 		scale_ = defaultScale_ * scale;
-		object_->SetScale(scale_);
+		SyncObjectTransform();
 
 		// カウンタ更新
 		explodeCount_++;
@@ -56,7 +56,7 @@ void Barrie::Update()
 		if (explodeCount_ >= explodeMaxCount_)
 		{
 			scale_ = { 0.0f, 0.0f, 0.0f };
-			object_->SetScale(scale_);
+			SyncObjectTransform();
 			isExploding_ = false;
 
 			// 破壊フラグをリセット

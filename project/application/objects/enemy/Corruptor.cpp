@@ -12,9 +12,8 @@ void Corruptor::Initialize()
 	// Initialize を呼び出し共通プロパティを初期化
 	BaseEnemy::Initialize("bomb.obj","Corruptor", 1.0f);
 
-	object_->SetRotate(rotation_);
 	scale_ = { 1.0f,1.0f,1.0f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 

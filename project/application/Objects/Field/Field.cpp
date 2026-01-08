@@ -7,11 +7,8 @@ void Field::Initialize()
 	StaticObject::Initialize("field.obj", "Field");
 
 	position_ = { 0.0f,0.0f,0.0f };
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 100.0f,0.1f,100.0f };
-	object_->SetScale(scale_);
-
+	SyncObjectTransform();
 }
 
 void Field::ImGuiDraw()

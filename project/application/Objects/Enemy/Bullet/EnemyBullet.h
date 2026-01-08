@@ -33,8 +33,6 @@ public:
 	// ImGui
 	void ImGuiDraw();
 
-	// モデル更新
-	void UpdateModel();
 
 private: // 衝突判定
 	

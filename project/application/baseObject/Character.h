@@ -99,11 +99,6 @@ protected: // 動作処理
 	/// </summary>
 	virtual void Attack() {};
 
-	/// <summary>
-	/// モデル変形の更新
-	/// </summary>
-	void UpdateModel();
-
 protected: // 衝突判定
 
 	/// <summary>

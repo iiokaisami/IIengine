@@ -6,11 +6,8 @@ void Wall::Initialize()
 	StaticObject::Initialize("wall.obj", "Wall");
 
 	position_ = { 0.0f,0.0f,-0.5f };
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 1.5f,3.0f,1.0f };
-	object_->SetScale(scale_);
-	
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 

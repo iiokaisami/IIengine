@@ -16,9 +16,7 @@ void NormalEnemy::Initialize()
     // Initialize を呼び出し共通プロパティを初期化
     BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", 3.0f);
 
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
+	SyncObjectTransform();
 
     // ライト設定
     object_->SetLighting(true);
@@ -213,7 +211,7 @@ void NormalEnemy::Attack()
         bullet->Initialize();
         bullet->SetPosition({ position_.x,position_.y + 0.5f,position_.z }); // 敵の位置より少し上を初期位置に設定
         bullet->SetVelocity(bulletDirection * 0.2f);
-        bullet->UpdateModel();
+        bullet->SyncObjectTransform();
 
         // 弾をリストに追加
         pBullets_.push_back(std::move(bullet));

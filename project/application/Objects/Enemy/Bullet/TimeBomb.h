@@ -31,9 +31,6 @@ public:
 	// ImGui
 	void ImGuiDraw();
 
-	// モデル更新
-	void UpdateModel();
-
 	// 放物線上に発射
 	void LaunchTrap();
 
@@ -107,9 +104,6 @@ private:
 
 	// デフォルトのフレームレート
 	const float kDefaultFrameRate = 60.0f;
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;

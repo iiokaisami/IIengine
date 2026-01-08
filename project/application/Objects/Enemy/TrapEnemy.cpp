@@ -14,10 +14,7 @@ void TrapEnemy::Initialize()
     // Initialize を呼び出し共通プロパティを初期化
     BaseEnemy::Initialize("trapEnemy.obj","TrapEnemy", 3.0f);
 
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    scale_ = { 1.0f,1.0f,1.0f };
-    object_->SetScale(scale_);
+	SyncObjectTransform();
     // ライト設定
     object_->SetLighting(true);
 
@@ -209,7 +206,7 @@ void TrapEnemy::TrapInit()
         timeBomb->SetPosition(position_);
         timeBomb->SetTrapLandingPosition(playerPosition_);
         timeBomb->LaunchTrap();
-        timeBomb->UpdateModel();
+        timeBomb->SyncObjectTransform();
         pTimeBomb_.push_back(std::move(timeBomb));
     } 
 	else if (!isNextTrapTimeBomb_ && isTrapCooldownComplete_)
@@ -220,7 +217,7 @@ void TrapEnemy::TrapInit()
         vignetteTrap->SetPosition(position_);
         vignetteTrap->SetTrapLandingPosition(playerPosition_);
         vignetteTrap->LaunchTrap();
-        vignetteTrap->UpdateModel();
+        vignetteTrap->SyncObjectTransform();
         pVignetteTrap_.push_back(std::move(vignetteTrap));
     }
 }

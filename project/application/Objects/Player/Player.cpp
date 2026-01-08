@@ -10,10 +10,8 @@ void Player::Initialize()
 	Character::Initialize("player.obj", "Player", 12.0f);
 
 	position_ = { 0.2f,0.7f,-1.2f };
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 1.0f,1.5f,1.0f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 
 	// ライト設定
 	object_->SetLighting(true);
@@ -426,10 +424,7 @@ void Player::DeadEffect()
 		// 反映
 		if (object_)
 		{
-			object_->SetPosition(position_);
-			object_->SetRotate(rotation_);
-			object_->SetScale(scale_);
-			object_->Update();
+			SyncObjectTransform();
 		}
 
 		deathMotion_.count++;
@@ -443,8 +438,7 @@ void Player::DeadEffect()
 
 	if (object_)
 	{
-		object_->SetScale(scale_);
-		object_->Update();
+		SyncObjectTransform();
 	}
 
 	// パーティクルを発生させる
@@ -472,10 +466,7 @@ void Player::StartDeathMotion()
 	// 反映
 	if (object_)
 	{
-		object_->SetPosition(position_);
-		object_->SetRotate(rotation_);
-		object_->SetScale(scale_);
-		object_->Update();
+		SyncObjectTransform();
 	}
 }
 
@@ -582,10 +573,11 @@ void Player::ClearSceneUpdate()
 	clearMotion_.scale.y = sy;               // 高さも変化させる
 	clearMotion_.scale.z = baseScale.z * sz; // 縦方向
 
-	object_->SetPosition(clearMotion_.position);
-	object_->SetRotate(clearMotion_.rotation);
-	object_->SetScale(clearMotion_.scale);
-	object_->Update();
+	position_ = clearMotion_.position;
+	rotation_ = clearMotion_.rotation;
+	scale_ = clearMotion_.scale;
+
+	SyncObjectTransform();
 
 	// パーティクル
 	ParticleEmitter::Emit("walk", clearMotion_.position, 1);

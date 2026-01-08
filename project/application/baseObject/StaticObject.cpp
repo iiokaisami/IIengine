@@ -7,9 +7,7 @@ void StaticObject::Initialize(const std::string& _modelFileName, const std::stri
     object_->Initialize(_modelFileName);
 
     // 初期位置、回転、スケールを設定
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
+	SyncObjectTransform();
 
     // 当たり判定の初期化
     colliderManager_ = ColliderManager::GetInstance();
@@ -38,10 +36,7 @@ void StaticObject::Finalize()
 void StaticObject::Update()
 {
     // 固定オブジェクトとして標準では更新処理なし
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-    object_->Update();
+	SyncObjectTransform();
 
     aabb_.min = position_ - object_->GetScale();
     aabb_.max = position_ + object_->GetScale();
