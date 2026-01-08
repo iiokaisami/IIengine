@@ -1485,12 +1485,28 @@ GameObject::GameObject()
     position_ = { 0.0f, 0.0f, 0.0f };
 }
 
+void GameObject::SyncObjectTransform()
+{
+	if (!object_)
+	{
+		return;
+	}
+
+	// GameObjectのtransformをobject_に反映
+	object_->SetPosition(position_);
+	object_->SetRotate(rotation_);
+	object_->SetScale(scale_);
+	// Update
+	object_->Update();
+}
+
 ============================================================
 File Path: project/application/BaseObject/GameObject.h
 ============================================================
 #pragma once
 
 #include <Vector3.h>
+#include <Object3d.h>
 #include <string>
 
 #include "../../gameEngine/Collider/Shape.h"
@@ -1504,6 +1520,8 @@ public:
 
     GameObject();
     virtual ~GameObject() {};
+
+	void SyncObjectTransform();
 
 public: // 仮想関数
 
@@ -1566,6 +1584,9 @@ public: // セッター
 	virtual void SetIsDead(bool _isDead) { isDead_ = _isDead; };
 
 protected: // メンバー
+
+	// 描画用の3Dオブジェクト
+	std::unique_ptr<Object3d> object_ = nullptr;
 
     std::string objectName_;
     Vector3 scale_;
@@ -2274,10 +2295,8 @@ void EnemyBullet::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("enemyBullet.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.7f,0.7f,0.7f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 
 	object_->SetLighting(true);
 
@@ -2307,9 +2326,9 @@ void EnemyBullet::Finalize()
 
 void EnemyBullet::Update()
 {
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
-	UpdateModel();
+	SyncObjectTransform();
 
 	BaseBullet::Update();
 
@@ -2348,15 +2367,6 @@ void EnemyBullet::ImGuiDraw()
 	ImGui::End();
 
 #endif // USE_IMGUI
-}
-
-void EnemyBullet::UpdateModel()
-{
-	object_->Update();
-
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
 }
 
 void EnemyBullet::OnCollisionTrigger(const Collider* _other)
@@ -2412,8 +2422,6 @@ public:
 	// ImGui
 	void ImGuiDraw();
 
-	// モデル更新
-	void UpdateModel();
 
 private: // 衝突判定
 	
@@ -2461,10 +2469,8 @@ void TimeBomb::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("bomb.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.7f, 0.7f, 0.7f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
@@ -2518,7 +2524,7 @@ void TimeBomb::Finalize()
 void TimeBomb::Update()
 {
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 着弾していなければ判定を付けない
 	isActive_ = !isLaunchingTrap_;
@@ -2583,7 +2589,7 @@ void TimeBomb::Update()
 	DeadMotion();
 
 	// モデル更新
-	UpdateModel();
+	SyncObjectTransform();
 	
 	// 回転更新
 	rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
@@ -2611,14 +2617,6 @@ void TimeBomb::ImGuiDraw()
 {
 }
 
-void TimeBomb::UpdateModel()
-{
-	object_->Update();
-
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-}
 
 void TimeBomb::LaunchTrap()
 {
@@ -2647,7 +2645,7 @@ void TimeBomb::DeadMotion()
 	}
 
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// タイマー更新
 	deathMotion_.timer += dt;
@@ -2729,7 +2727,7 @@ void TimeBomb::Explode()
 	if (isExploded_)
 	{
 		// デルタタイム取得
-		const float dt = TimeManager::Instance().GetDeltaTime();
+		const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 		// scaleを徐々に大きくして判定を広げる
 		elapsedTime += dt;
@@ -2836,9 +2834,6 @@ public:
 	// ImGui
 	void ImGuiDraw();
 
-	// モデル更新
-	void UpdateModel();
-
 	// 放物線上に発射
 	void LaunchTrap();
 
@@ -2913,9 +2908,6 @@ private:
 	// デフォルトのフレームレート
 	const float kDefaultFrameRate = 60.0f;
 
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
-
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
 	// 設置判定
@@ -2982,10 +2974,8 @@ void VignetteTrap::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("vignette.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.7f,0.7f,0.7f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -3022,7 +3012,7 @@ void VignetteTrap::Finalize()
 void VignetteTrap::Update()
 {
 	// デルタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 着弾していなければ判定を付けない
 	isActive_ = !isLaunchingTrap_;
@@ -3087,7 +3077,7 @@ void VignetteTrap::Update()
 	// 消滅モーション更新
 	DeadMotion();
 
-	UpdateModel();
+	SyncObjectTransform();
 
 	rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
 
@@ -3103,15 +3093,6 @@ void VignetteTrap::Draw()
 
 void VignetteTrap::ImGuiDraw()
 {
-}
-
-void VignetteTrap::UpdateModel()
-{
-	object_->Update();
-
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
 }
 
 void VignetteTrap::LaunchTrap()
@@ -3141,7 +3122,7 @@ void VignetteTrap::DeadMotion()
 	}
 
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// タイマー更新
 	deathMotion_.timer += dt;
@@ -3287,9 +3268,6 @@ public:
 	// ImGui
 	void ImGuiDraw();
 
-	// モデル更新
-	void UpdateModel();
-
 	// 放物線上に発射
 	void LaunchTrap();
 
@@ -3351,9 +3329,6 @@ private:
 
 	// デフォルトのフレームレート
 	const float kDefaultFrameRate = 60.0f;
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -3428,7 +3403,7 @@ void EnemyManager::Finalize()
 void EnemyManager::Update()
 {
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	// アップデートするフレーム数計算
 	const int framesThisUpdate = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
 
@@ -3987,9 +3962,7 @@ void NormalEnemy::Initialize()
     // Initialize を呼び出し共通プロパティを初期化
     BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", 3.0f);
 
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
+	SyncObjectTransform();
 
     // ライト設定
     object_->SetLighting(true);
@@ -4154,7 +4127,7 @@ void NormalEnemy::Move()
 		SetRotation(rotation_);
 		SetScale(scale_);
 
-		ObjectTransformSet(position_, rotation_, scale_);
+		SyncObjectTransform();
 
 		ParticleEmitter::Emit("enemyWalk", position_, 1);
     }
@@ -4184,7 +4157,7 @@ void NormalEnemy::Attack()
         bullet->Initialize();
         bullet->SetPosition({ position_.x,position_.y + 0.5f,position_.z }); // 敵の位置より少し上を初期位置に設定
         bullet->SetVelocity(bulletDirection * 0.2f);
-        bullet->UpdateModel();
+        bullet->SyncObjectTransform();
 
         // 弾をリストに追加
         pBullets_.push_back(std::move(bullet));
@@ -4196,13 +4169,6 @@ void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pStat
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();
-}
-
-void NormalEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale)
-{
-    object_->SetPosition(_position);
-    object_->SetRotate(_rotation);
-    object_->SetScale(_scale);
 }
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)
@@ -4399,13 +4365,8 @@ public: // セッター
 	// 被弾フラグをセット
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
 
-	/// <summary>
-	/// objectのtransformをセット
-	/// </summary>
-	/// <param name="_position">位置</param>
-	/// <param name="_rotation">回転</param>
-	/// <param name="_scale">スケール</param>
-	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
+	
+	// --- ステートでのTransform操作用関数(引数あり) ---
 
 	// オブジェクトのpositionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
@@ -4465,10 +4426,7 @@ void TrapEnemy::Initialize()
     // Initialize を呼び出し共通プロパティを初期化
     BaseEnemy::Initialize("trapEnemy.obj","TrapEnemy", 3.0f);
 
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    scale_ = { 1.0f,1.0f,1.0f };
-    object_->SetScale(scale_);
+	SyncObjectTransform();
     // ライト設定
     object_->SetLighting(true);
 
@@ -4612,7 +4570,7 @@ void TrapEnemy::ImGuiDraw()
 void TrapEnemy::Move()
 {
 	// デルタタイム取得
-    const float dt = TimeManager::Instance().GetDeltaTime();
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
     toPlayer_ = playerPosition_ - position_;
     Vector3 direction = Normalize(toPlayer_);
@@ -4644,7 +4602,7 @@ void TrapEnemy::Move()
     moveVelocity_.y = 0.0f;
     position_ += moveVelocity_ * (dt * kDefaultFrameRate);
 
-    ObjectTransformSet(position_, rotation_, scale_);
+	SyncObjectTransform();
 
     ParticleEmitter::Emit("enemyWalk", position_, 1);
 }
@@ -4660,7 +4618,7 @@ void TrapEnemy::TrapInit()
         timeBomb->SetPosition(position_);
         timeBomb->SetTrapLandingPosition(playerPosition_);
         timeBomb->LaunchTrap();
-        timeBomb->UpdateModel();
+        timeBomb->SyncObjectTransform();
         pTimeBomb_.push_back(std::move(timeBomb));
     } 
 	else if (!isNextTrapTimeBomb_ && isTrapCooldownComplete_)
@@ -4671,7 +4629,7 @@ void TrapEnemy::TrapInit()
         vignetteTrap->SetPosition(position_);
         vignetteTrap->SetTrapLandingPosition(playerPosition_);
         vignetteTrap->LaunchTrap();
-        vignetteTrap->UpdateModel();
+        vignetteTrap->SyncObjectTransform();
         pVignetteTrap_.push_back(std::move(vignetteTrap));
     }
 }
@@ -4680,13 +4638,6 @@ void TrapEnemy::ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pSt
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();
-}
-
-void TrapEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale)
-{
-    object_->SetPosition(_position);
-    object_->SetRotate(_rotation);
-    object_->SetScale(_scale);
 }
 
 void TrapEnemy::RemoveBullets()
@@ -4904,14 +4855,6 @@ public: // セッター
 	void SetIsTrapCooldownComplete(bool _isTrapCooldownComplete) { isTrapCooldownComplete_ = _isTrapCooldownComplete; }
 	// 次の罠がTimeBombかVignetteTrapかのフラグ反転
 	void ChangeIsNextTrapTimeBomb() { isNextTrapTimeBomb_ = !isNextTrapTimeBomb_; }
-
-	/// <summary>
-	/// objectのtransformをセット
-	/// </summary>
-	/// <param name="_position">位置</param>
-	/// <param name="_rotation">回転</param>
-	/// <param name="_scale">スケール</param>
-	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
 
 private:
 
@@ -5325,7 +5268,7 @@ void Barrie::Initialize()
 	// 大きさセット
 	scale_ = defaultScale_;
 	targetScale_ = defaultScale_;
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -5364,7 +5307,7 @@ void Barrie::Update()
 
 		// スケール適用
 		scale_ = defaultScale_ * scale;
-		object_->SetScale(scale_);
+		SyncObjectTransform();
 
 		// カウンタ更新
 		explodeCount_++;
@@ -5373,7 +5316,7 @@ void Barrie::Update()
 		if (explodeCount_ >= explodeMaxCount_)
 		{
 			scale_ = { 0.0f, 0.0f, 0.0f };
-			object_->SetScale(scale_);
+			SyncObjectTransform();
 			isExploding_ = false;
 
 			// 破壊フラグをリセット
@@ -5494,11 +5437,8 @@ void Field::Initialize()
 	StaticObject::Initialize("field.obj", "Field");
 
 	position_ = { 0.0f,0.0f,0.0f };
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 100.0f,0.1f,100.0f };
-	object_->SetScale(scale_);
-
+	SyncObjectTransform();
 }
 
 void Field::ImGuiDraw()
@@ -5570,10 +5510,8 @@ void Goal::Initialize()
 	StaticObject::Initialize("goal.obj", "Goal");
 
 	position_ = { 0.0f,0.0f,-3.5f };
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 1.0f,1.0f,1.0f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -5715,11 +5653,8 @@ void Wall::Initialize()
 	StaticObject::Initialize("wall.obj", "Wall");
 
 	position_ = { 0.0f,0.0f,-0.5f };
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 1.5f,3.0f,1.0f };
-	object_->SetScale(scale_);
-	
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -5795,10 +5730,8 @@ void PlayerBullet::Initialize()
   	object_ = std::make_unique<Object3d>();
 	object_->Initialize("playerBullet.obj");
 
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 0.5f,0.5f,0.5f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -5831,11 +5764,11 @@ void PlayerBullet::Finalize()
 
 void PlayerBullet::Update()
 {
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	BaseBullet::Update();
 
-	UpdateModel();
+	SyncObjectTransform();
 
 	rotation_.y += 1.0f * dt * PlayerBullet::kDefaultFrameRate;
 	position_ += velocity_ * dt;
@@ -5962,10 +5895,8 @@ void Player::Initialize()
 	Character::Initialize("player.obj", "Player", 12.0f);
 
 	position_ = { 0.2f,0.7f,-1.2f };
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
 	scale_ = { 1.0f,1.5f,1.0f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 
 	// ライト設定
 	object_->SetLighting(true);
@@ -6131,7 +6062,7 @@ void Player::ClearTargetEnemy()
 void Player::Move()
 {
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	moveVelocity_ = {};
 
@@ -6217,7 +6148,7 @@ void Player::Attack()
 void Player::Evade()
 {
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 回避入力
 	if (!isEvading_ && Input::GetInstance()->PushKey(DIK_LSHIFT))
@@ -6378,10 +6309,7 @@ void Player::DeadEffect()
 		// 反映
 		if (object_)
 		{
-			object_->SetPosition(position_);
-			object_->SetRotate(rotation_);
-			object_->SetScale(scale_);
-			object_->Update();
+			SyncObjectTransform();
 		}
 
 		deathMotion_.count++;
@@ -6395,8 +6323,7 @@ void Player::DeadEffect()
 
 	if (object_)
 	{
-		object_->SetScale(scale_);
-		object_->Update();
+		SyncObjectTransform();
 	}
 
 	// パーティクルを発生させる
@@ -6424,10 +6351,7 @@ void Player::StartDeathMotion()
 	// 反映
 	if (object_)
 	{
-		object_->SetPosition(position_);
-		object_->SetRotate(rotation_);
-		object_->SetScale(scale_);
-		object_->Update();
+		SyncObjectTransform();
 	}
 }
 
@@ -6436,7 +6360,7 @@ void Player::ClearSceneUpdate()
 	isCanMove_ = false;
 
 	// delta
-	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
 
 	constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
 
@@ -6534,10 +6458,11 @@ void Player::ClearSceneUpdate()
 	clearMotion_.scale.y = sy;               // 高さも変化させる
 	clearMotion_.scale.z = baseScale.z * sz; // 縦方向
 
-	object_->SetPosition(clearMotion_.position);
-	object_->SetRotate(clearMotion_.rotation);
-	object_->SetScale(clearMotion_.scale);
-	object_->Update();
+	position_ = clearMotion_.position;
+	rotation_ = clearMotion_.rotation;
+	scale_ = clearMotion_.scale;
+
+	SyncObjectTransform();
 
 	// パーティクル
 	ParticleEmitter::Emit("walk", clearMotion_.position, 1);
@@ -6610,7 +6535,7 @@ void Player::UpdateStatus()
 
 void Player::AutoMove()
 {
-	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
 
 	static int moveTimer = 0;
 	static Vector3 autoDir = { 0.0f, 0.0f, 1.0f }; // 初期は前進
@@ -6783,7 +6708,7 @@ void Player::OnCollision(const Collider* _other)
 void Player::HitVignetteTrap()
 {
 	// デルタタイム
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// フェードアウト中の処理
 	if (isFadingOut_)
@@ -7136,10 +7061,7 @@ void BaseBullet::Update()
 	// モデル更新
 	if (object_)
 	{
-		object_->SetPosition(position_);
-		object_->SetRotate(rotation_);
-		object_->SetScale(scale_);
-		object_->Update();
+		SyncObjectTransform();
 	}
 }
 
@@ -7148,17 +7070,6 @@ void BaseBullet::Draw()
 	if (object_)
 	{
 		object_->Draw();
-	}
-}
-
-void BaseBullet::UpdateModel()
-{
-	if (object_)
-	{
-		object_->SetPosition(position_);
-		object_->SetRotate(rotation_);
-		object_->SetScale(scale_);
-		object_->Update();
 	}
 }
 
@@ -7171,7 +7082,7 @@ Vector3 BaseBullet::SetVelocity(const Vector3 _velocity)
 
 void BaseBullet::UpdateLifetime()
 {
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	if (deathRemainingSeconds_ > 0.0f)
 	{
 		deathRemainingSeconds_ -= dt;
@@ -7227,9 +7138,6 @@ public:
 	// 描画
 	virtual void Draw() override;
 
-	// モデル変形の更新ユーティリティ
-	void UpdateModel();
-
 	// 速度設定
 	virtual Vector3 SetVelocity(const Vector3 _velocity);
 
@@ -7245,9 +7153,6 @@ protected:
 
 	// デフォルトフレームレート
 	static constexpr float kDefaultFrameRate = 60.0f;
-
-	// 3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
 
 	// 当たり判定関係
 	ColliderManager* colliderManager_ = nullptr;
@@ -7294,7 +7199,7 @@ void BaseEnemy::Update()
 void BaseEnemy::Move() 
 {
     // デルタタイム取得
-    const float dt = TimeManager::Instance().GetDeltaTime();
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
     // プレイヤー方向ベクトル計算
     toPlayer_ = playerPosition_ - position_;
@@ -7381,9 +7286,7 @@ void Character::Initialize(const std::string& _modelFileName, const std::string&
     object_->Initialize(_modelFileName);
 
     // 初期位置、回転、スケールを設定
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
+	SyncObjectTransform();
 
     // 当たり判定の初期化
     colliderManager_ = ColliderManager::GetInstance();
@@ -7417,10 +7320,7 @@ void Character::Finalize()
 void Character::Update()
 {
 	// Object3d更新
-    object_->SetPosition(position_);
-    object_->SetScale(scale_);
-    object_->SetRotate(rotation_);
-    object_->Update();
+    SyncObjectTransform();
 
 	// collider更新
     aabb_.min = position_ - scale_;
@@ -7459,7 +7359,7 @@ void Character::UpdateHPBar()
     }
 
     // 補間
-    const float dt = TimeManager::Instance().GetDeltaTime();
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
     // 補間係数
     float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
     hpRatio_ += (targetRatio - hpRatio_) * t;
@@ -7481,14 +7381,6 @@ void Character::UpdateHPBar()
     sprites_[0]->SetPosition(leftPos);
     sprites_[0]->SetSize(newSize);
     sprites_[0]->Update();
-}
-
-void Character::UpdateModel()
-{
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
-    object_->Update();
 }
 
 void Character::CorrectOverlap(const AABB& otherAABB, AABB& selfAABB, Vector3& position)
@@ -7545,7 +7437,6 @@ File Path: project/application/baseObject/Character.h
 #include <string>
 #include <algorithm>
 #include <functional>
-#include <Object3d.h>
 #include <Sprite.h>
 
 /// <summary>
@@ -7638,11 +7529,6 @@ protected: // 動作処理
 	/// </summary>
 	virtual void Attack() {};
 
-	/// <summary>
-	/// モデル変形の更新
-	/// </summary>
-	void UpdateModel();
-
 protected: // 衝突判定
 
 	/// <summary>
@@ -7674,9 +7560,6 @@ protected: // 衝突判定
 	bool IsAABBOverlap(const AABB& a, const AABB& b);
 
 protected:
-
-	// 3D 描画用のオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
 
 	// 衝突判定用
 	ColliderManager* colliderManager_ = nullptr;
@@ -7725,9 +7608,7 @@ void StaticObject::Initialize(const std::string& _modelFileName, const std::stri
     object_->Initialize(_modelFileName);
 
     // 初期位置、回転、スケールを設定
-    object_->SetPosition(position_);
-    object_->SetRotate(rotation_);
-    object_->SetScale(scale_);
+	SyncObjectTransform();
 
     // 当たり判定の初期化
     colliderManager_ = ColliderManager::GetInstance();
@@ -7756,10 +7637,7 @@ void StaticObject::Finalize()
 void StaticObject::Update()
 {
     // 固定オブジェクトとして標準では更新処理なし
-	object_->SetPosition(position_);
-	object_->SetRotate(rotation_);
-	object_->SetScale(scale_);
-    object_->Update();
+	SyncObjectTransform();
 
     aabb_.min = position_ - object_->GetScale();
     aabb_.max = position_ + object_->GetScale();
@@ -7781,7 +7659,6 @@ File Path: project/application/baseObject/StaticObject.h
 #include "../../gameEngine/collider/ColliderManager.h"
 
 #include <memory>
-#include <Object3d.h>
 
 
 /// <summary>
@@ -7813,8 +7690,7 @@ protected:
 
 protected:
 
-    // 描画用の3Dオブジェクト
-    std::unique_ptr<Object3d> object_ = nullptr;   
+    
     // 衝突判定管理
     ColliderManager* colliderManager_ = nullptr; 
     // 衝突判定データ
@@ -7843,9 +7719,8 @@ void Corruptor::Initialize()
 	// Initialize を呼び出し共通プロパティを初期化
 	BaseEnemy::Initialize("bomb.obj","Corruptor", 1.0f);
 
-	object_->SetRotate(rotation_);
 	scale_ = { 1.0f,1.0f,1.0f };
-	object_->SetScale(scale_);
+	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
 
@@ -7870,7 +7745,7 @@ void Corruptor::Update()
 	BaseEnemy::Update();
 
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// アクティブフラグ
 	isActive_ = !isInvincible_;
@@ -7922,7 +7797,7 @@ void Corruptor::ImGuiDraw()
 void Corruptor::Move()
 {
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 基底クラスの補間処理を使用
 	toPlayer_ = playerPosition_ - position_;
@@ -7937,7 +7812,7 @@ void Corruptor::Move()
 	moveVelocity_.y = 0.0f;
 	position_ += moveVelocity_ * dt * kDefaultFrameRate;
 
-	ObjectTransformSet(position_, rotation_, scale_);
+	SyncObjectTransform();
 
 	ParticleEmitter::Emit("enemyWalk", position_, 1);
 
@@ -7947,14 +7822,6 @@ void Corruptor::ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState> _pSt
 {
 	pBehaviorState_ = std::move(_pState);
 	pBehaviorState_->Initialize();
-}
-
-void Corruptor::ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale)
-{
-	object_->SetPosition(_position);
-	object_->SetRotate(_rotation);
-	object_->SetScale(_scale);
-	object_->Update();
 }
 
 void Corruptor::OnCollisionTrigger(const Collider* _other)
@@ -8105,16 +7972,9 @@ public: // セッター
 	/// <param name="_isExploded">爆発フラグ</param>
 	void SetIsExploded(bool _isExploded) { isExploded_ = _isExploded; }
 
-	/// <summary>
-	/// objectのtransformをセット
-	/// </summary>
-	/// <param name="_position">位置</param>
-	/// <param name="_rotation">回転</param>
-	/// <param name="_scale">スケール</param>
-	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
+	
 
-	/// 以下1つづつセット ///
-
+	// --- ステートでのTransform操作用関数(引数あり) ---
 	// オブジェクトのpositionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
 	// オブジェクトのrotationをセット
@@ -8185,7 +8045,7 @@ void EnemyManager::Finalize()
 void EnemyManager::Update()
 {
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	// アップデートするフレーム数計算
 	const int framesThisUpdate = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
 
@@ -10101,7 +9961,7 @@ void ClearScene::Update()
 	}
 
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// カメラ更新
 	camera_->Update(dt);
@@ -10151,7 +10011,7 @@ void ClearScene::Update()
 		transition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("TITLE");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
 			});
 	}
 
@@ -10163,7 +10023,7 @@ void ClearScene::Update()
 		transition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 			});
 	}
 }
@@ -10379,7 +10239,7 @@ void GameOverScene::Update()
 	}
 
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// カメラ更新
 	camera_->Update(dt);
@@ -10440,7 +10300,7 @@ void GameOverScene::Update()
 		transition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("TITLE");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
 			});
 	}
 
@@ -10452,7 +10312,7 @@ void GameOverScene::Update()
 		transition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 			});
 	}
 
@@ -10819,7 +10679,7 @@ void GamePlayScene::Update()
 	}
 	
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -10925,7 +10785,7 @@ void GamePlayScene::Update()
 		fadeTransition_->Start([]
 			{
 			// シーン切り替え
-			SceneManager::GetInstance()->ChangeScene("CLEAR");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("CLEAR");
 			});
 	}
 	if (Input::GetInstance()->TriggerKey(DIK_DOWN) or (pPlayer_->IsDeathMotionComplete() && !isTransitioning_))
@@ -10936,7 +10796,7 @@ void GamePlayScene::Update()
 		blockTransition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("GAMEOVER");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEOVER");
 			});
 	}
 }
@@ -11354,7 +11214,7 @@ void TitleScene::Update()
 	}
 
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -11461,7 +11321,7 @@ void TitleScene::Update()
 		transition_->Start([]
 			{
 				// フェードアウト後にシーン切り替え
-				SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 			});
 	}
 
@@ -17959,7 +17819,7 @@ void Framework::Run()
 		}
 
 		// 時間管理
-		TimeManager::Instance().Tick();
+		IIEngine::TimeManager::Instance().Tick();
 
 #ifdef USE_IMGUI
 		// ImGui開始
@@ -18010,7 +17870,7 @@ void Framework::Initialize()
 	audio->Initialize();
 
 	// シーンマネージャ
-	sceneManager_ = SceneManager::GetInstance();
+	sceneManager_ = IIEngine::SceneManager::GetInstance();
 
 	// スプライト共通部分の初期化
 	spriteCommon = SpriteCommon::GetInstance();
@@ -18225,7 +18085,7 @@ protected:
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 
-	SceneManager* sceneManager_ = nullptr;
+	IIEngine::SceneManager* sceneManager_ = nullptr;
 	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 
 	SpriteCommon* spriteCommon = nullptr;
@@ -20395,7 +20255,7 @@ File Path: project/gameEngine/baseScene/BaseScene.h
 ============================================================
 #pragma once
 
-class SceneManager;
+namespace IIEngine {class SceneManager;}
 
 /// <summary>
 /// シーンの基底クラス
@@ -20433,12 +20293,12 @@ public:
 	/// シーンマネージャのセット
     /// </summary>
     /// <param name="sceneManager">シーン管理を行うSceneManagerのポインタ</param>
-    virtual void SetSceneManager(SceneManager* sceneManager) { sceneManager_ = sceneManager; }
+    virtual void SetSceneManager(IIEngine::SceneManager* sceneManager) { sceneManager_ = sceneManager; }
 
 protected:
 
     // シーンマネージャ
-    SceneManager* sceneManager_ = nullptr;
+    IIEngine::SceneManager* sceneManager_ = nullptr;
 };
 
 ============================================================
@@ -20454,17 +20314,17 @@ void MyGame::Initialize()
 
 	// シーンマネージャに最初のシーンをセット
 	sceneFactory_ = std::make_unique<SceneFactory>();
-	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
+	IIEngine::SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 
 	// 最初のシーンを設定
-	SceneManager::GetInstance()->ChangeScene("TITLE");
+	IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
 
 
 	// モデルの読み込み処理をスレッドで実行
 	std::thread loadModelThread(&MyGame::LoadModel, this);
 	std::thread loadAudioThread(&MyGame::LoadSound, this);
 
-	// スレッドの終了を待つ
+	// スレッドの終了を待つ(実装途中)
 	loadModelThread.join(); 
 	loadAudioThread.join();
 
@@ -20865,67 +20725,70 @@ File Path: project/gameEngine/baseScene/SceneManager.cpp
 #include "SceneManager.h"
 #include <cassert>
 
-SceneManager* SceneManager::GetInstance()
-{
-    static SceneManager instance;
-    return &instance;
-}
+namespace IIEngine {
 
-void SceneManager::Finalize()
-{
-    if (scene_) 
+    SceneManager* SceneManager::GetInstance()
     {
-        scene_->Finalize();
-        scene_.reset();
+        static SceneManager instance;
+        return &instance;
     }
-}
 
-void SceneManager::Update()
-{
-    if (nextScene_)
+    void SceneManager::Finalize()
     {
-        // 旧シーン終了
         if (scene_)
         {
             scene_->Finalize();
             scene_.reset();
         }
-
-        // シーン切り替え
-        scene_ = std::move(nextScene_);
-        nextScene_.reset();
-
-        // シーンマネージャをセット
-        scene_->SetSceneManager(this);
-
-        // 次のシーンを初期化
-        scene_->Initialize();
     }
 
-    // 実行中シーンを更新する
-    if (scene_) 
+    void SceneManager::Update()
     {
-        scene_->Update();
-    }
-}
+        if (nextScene_)
+        {
+            // 旧シーン終了
+            if (scene_)
+            {
+                scene_->Finalize();
+                scene_.reset();
+            }
 
-void SceneManager::Draw()
-{
-    // 実行中シーンを描画する
-    if (scene_)
+            // シーン切り替え
+            scene_ = std::move(nextScene_);
+            nextScene_.reset();
+
+            // シーンマネージャをセット
+            scene_->SetSceneManager(this);
+
+            // 次のシーンを初期化
+            scene_->Initialize();
+        }
+
+        // 実行中シーンを更新する
+        if (scene_)
+        {
+            scene_->Update();
+        }
+    }
+
+    void SceneManager::Draw()
     {
-        scene_->Draw();
+        // 実行中シーンを描画する
+        if (scene_)
+        {
+            scene_->Draw();
+        }
     }
-}
 
-void SceneManager::ChangeScene(const std::string& sceneName)
-{
-    assert(sceneFactory_);
-    assert(nextScene_ == nullptr);
+    void SceneManager::ChangeScene(const std::string& sceneName)
+    {
+        assert(sceneFactory_);
+        assert(nextScene_ == nullptr);
 
-    // 次のシーンを生成
-    nextScene_ = sceneFactory_->CreateScene(sceneName);
-}
+        // 次のシーンを生成
+        nextScene_ = sceneFactory_->CreateScene(sceneName);
+    }
+} // namespace IIEngine
 
 ============================================================
 File Path: project/gameEngine/baseScene/SceneManager.h
@@ -20938,59 +20801,61 @@ File Path: project/gameEngine/baseScene/SceneManager.h
 #include "BaseScene.h"
 #include "AbstractSceneFactory.h"
 
-/// <summary>
-/// シーンマネージャ
-/// ここでシーンの更新、描画を行う
-/// </summary>
-class SceneManager
-{
+namespace IIEngine {
+	
+	/// <summary>
+	/// シーンマネージャ
+	/// ここでシーンの更新、描画を行う
+	/// </summary>
+	class SceneManager
+	{
 #pragma region シングルトンインスタンス
-private:
+	private:
 
-	SceneManager() = default;
-	~SceneManager() = default;
-	SceneManager(SceneManager&) = delete;
-	SceneManager& operator = (SceneManager&) = delete;
+		SceneManager() = default;
+		~SceneManager() = default;
+		SceneManager(SceneManager&) = delete;
+		SceneManager& operator = (SceneManager&) = delete;
 
-public:
-	// シングルトンインスタンスの取得
-	static SceneManager* GetInstance();
-	// 終了
-	void Finalize();
+	public:
+		// シングルトンインスタンスの取得
+		static SceneManager* GetInstance();
+		// 終了
+		void Finalize();
 #pragma endregion シングルトンインスタンス
-public:
+	public:
 
-	// 更新
-	void Update();
+		// 更新
+		void Update();
 
-	// 描画
-	void Draw();
+		// 描画
+		void Draw();
 
-	/// <summary>
-	/// シーン変更
-	/// </summary>
-	/// <param name="sceneName">次のシーン名</param>
-	void ChangeScene(const std::string& sceneName);
+		/// <summary>
+		/// シーン変更
+		/// </summary>
+		/// <param name="sceneName">次のシーン名</param>
+		void ChangeScene(const std::string& sceneName);
 
-	/// <summary>
-	/// シーンファクトリーを設定
-	/// </summary>
-	/// <param name="sceneFactory">シーンファクトリーのポインタ</param>
-	void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; }
+		/// <summary>
+		/// シーンファクトリーを設定
+		/// </summary>
+		/// <param name="sceneFactory">シーンファクトリーのポインタ</param>
+		void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; }
 
-private:
+	private:
 
-	// 今のシーン
-	std::unique_ptr<BaseScene> scene_ = nullptr;
+		// 今のシーン
+		std::unique_ptr<BaseScene> scene_ = nullptr;
 
-	// 次のシーン
-	std::unique_ptr<BaseScene> nextScene_ = nullptr;
+		// 次のシーン
+		std::unique_ptr<BaseScene> nextScene_ = nullptr;
 
-	// シーンファクトリー
-	AbstractSceneFactory* sceneFactory_ = nullptr;
-};
+		// シーンファクトリー
+		AbstractSceneFactory* sceneFactory_ = nullptr;
+	};
 
-
+}
 
 ============================================================
 File Path: project/gameEngine/imgui/ImGuiManager.cpp
@@ -25104,7 +24969,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 void ParticleManager::Update()
 {
 	// TimeManagerからデルタタイムを取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	
     camera_ = object3dCommon_->GetDefaultCamera();
 
@@ -26929,6 +26794,8 @@ File Path: project/gameEngine/time/TimeManager.cpp
 #include "TimeManager.h"
 #include <algorithm>
 
+using IIEngine::TimeManager;
+
 TimeManager& TimeManager::Instance()
 {
 	// シングルトンインスタンスの取得
@@ -27132,217 +26999,219 @@ File Path: project/gameEngine/time/TimeManager.h
 #include <cstdint>
 #include <algorithm>
 
-using TimerId = uint64_t;
+namespace IIEngine {
 
-class TimeManager
-{
-public:
+	using TimerId = uint64_t;
 
-	// シングルトン
-	static TimeManager& Instance();
-
-	/// <summary>
-	/// タイムマネージャーの更新
-	/// 呼び出しごとにデルタタイムを計算し、タイマーやタイムスケールの更新を行う
-	/// </summary>
-	void Tick();
-
-	/// <summary>
-	/// スムーズなタイムスケール変更をキャンセルする
-	/// </summary>
-	void CancelSmoothTimeScale();
-
-	/// <summary>
-	/// 時間の一時停止
-	/// </summary>
-	void Pause();
-	/// <summary>
-	/// 時間の再開
-	/// </summary>
-	void Resume();
-	/// <summary>
-	/// 一時停止中でも時間を進めるステップ実行
-	/// </summary>
-	/// <param name="seconds">進める秒数</param>
-	void Step(float seconds);
-
-	/// <summary>
-	/// タイマーのキャンセル
-	/// </summary>
-	/// <param name="id">キャンセルするタイマーのID</param>
-	void CancelTimer(TimerId id);
-
-	/// <summary>
-	/// スムーズなタイムスケール変更の設定
-	/// </summary>
-	/// <param name="toScale">目標のタイムスケール</param>
-	/// <param name="durationSeconds">変更にかける時間(秒)</param>
-	void SmoothTimeScale(float toScale, float durationSeconds);
-
-	/// <summary>
-	/// タイムスケール変更コールバックの追加
-	/// </summary>
-	using TimeScaleCallback = std::function<void(float newScale)>;
-	/// <summary>
-	/// タイムスケール変更コールバックの追加
-	/// </summary>
-	/// <param name="cb">コールバック関数</param>
-	void AddTimeScaleCallback(TimeScaleCallback cb);
-
-public: // セッター
-
-	/// <summary>
-	/// 固定デルタタイムの設定
-	/// </summary>
-	/// <param name="dt">固定デルタタイム</param>
-	void SetFixedDeltaTime(float dt)
+	class TimeManager
 	{
-		fixedDeltaTime_ = dt;
-	}
-	/// <summary>
-	/// 固定デルタタイムがタイムスケールの影響を受けるかどうかの設定
-	/// </summary>
-	/// <param name="useScaled">影響を受けるならtrue</param>
-	void SetFixedUsesScaled(bool useScaled)
-	{
-		fixedUsesScaled_ = useScaled;
-	}
+	public:
 
-	/// <summary>
-	/// タイマーの設定
-	/// </summary>
-	/// <param name="cb">コールバック関数</param>
-	/// <param name="seconds">遅延時間(秒)</param>
-	/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
-	/// <returns>タイマーID</returns>
-	TimerId SetTimeout(std::function<void()> cb, float seconds, bool useUnscaled = false)
-	{
-		Timer t;
-		t.id = nextTimerId_++;
-		t.cb = std::move(cb);
-		t.remaining = seconds;
-		t.interval = 0.0f;
-		t.useUnscaled = useUnscaled;
-		timers_.push_back(std::move(t));
-		return t.id;
-	}
-	/// <summary>
-	/// インターバルタイマーの設定
-	/// </summary>
-	/// <param name="cb">コールバック関数</param>
-	/// <param name="seconds">遅延時間(秒)</param>
-	/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
-	/// <returns>タイマーID</returns>
-	TimerId SetInterval(std::function<void()> cb, float seconds, bool useUnscaled = false)
-	{
-		Timer t;
-		t.id = nextTimerId_++;
-		t.cb = std::move(cb);
-		t.remaining = seconds;
-		t.interval = seconds;
-		t.useUnscaled = useUnscaled;
-		timers_.push_back(std::move(t));
-		return t.id;
-	}
+		// シングルトン
+		static TimeManager& Instance();
 
-	/// <summary>
-	/// タイムスケールの設定
-	/// </summary>
-	/// <param name="timeScale">新しいタイムスケール</param>
-	void SetTimeScale(float scale)
-	{
-		timeScale_ = (std::max)(0.0f, scale);
-		smoothingEnabled_ = false;
-		for (auto& cb : timeScaleCallbacks_) if (cb) cb(timeScale_);
-	}
-	
+		/// <summary>
+		/// タイムマネージャーの更新
+		/// 呼び出しごとにデルタタイムを計算し、タイマーやタイムスケールの更新を行う
+		/// </summary>
+		void Tick();
 
-public: // ゲッター
+		/// <summary>
+		/// スムーズなタイムスケール変更をキャンセルする
+		/// </summary>
+		void CancelSmoothTimeScale();
 
-	/// <summary>
-	/// 時間が一時停止中かどうか
-	/// </summary>
-	/// <returns>停止中ならtrue</returns>
-	bool IsPaused() const
-	{
-		return paused_;
-	}
+		/// <summary>
+		/// 時間の一時停止
+		/// </summary>
+		void Pause();
+		/// <summary>
+		/// 時間の再開
+		/// </summary>
+		void Resume();
+		/// <summary>
+		/// 一時停止中でも時間を進めるステップ実行
+		/// </summary>
+		/// <param name="seconds">進める秒数</param>
+		void Step(float seconds);
 
-	// デルタタイム取得
-	float GetDeltaTime() const { return deltaTime_; }
-	// スケールされていないデルタタイム取得
-	float GetUnscaledDeltaTime() const { return unscaledDeltaTime_; }
+		/// <summary>
+		/// タイマーのキャンセル
+		/// </summary>
+		/// <param name="id">キャンセルするタイマーのID</param>
+		void CancelTimer(TimerId id);
 
-	// タイムスケール操作
-	float GetTimeScale() const { return timeScale_; }
+		/// <summary>
+		/// スムーズなタイムスケール変更の設定
+		/// </summary>
+		/// <param name="toScale">目標のタイムスケール</param>
+		/// <param name="durationSeconds">変更にかける時間(秒)</param>
+		void SmoothTimeScale(float toScale, float durationSeconds);
 
-	// 固定デルタタイム操作
-	float GetFixedDeltaTime() const { return fixedUsesScaled_ ? fixedDeltaTime_ * timeScale_ : fixedDeltaTime_; }
-	// 固定デルタタイムがスケールの影響を受けるかどうか
-	bool GetFixedUsesScaled() const { return fixedUsesScaled_; }
+		/// <summary>
+		/// タイムスケール変更コールバックの追加
+		/// </summary>
+		using TimeScaleCallback = std::function<void(float newScale)>;
+		/// <summary>
+		/// タイムスケール変更コールバックの追加
+		/// </summary>
+		/// <param name="cb">コールバック関数</param>
+		void AddTimeScaleCallback(TimeScaleCallback cb);
 
-private:
+	public: // セッター
 
-	// コンストラクタ(シングルトン)
-	TimeManager();
-	// タイムスケールの更新
-	void UpdateTimers(float scaledDT, float unscaledDT);
-	
-	// デルタタイムの更新
-	struct Timer
-	{
-		TimerId id = 0;
-		std::function<void()> cb;
-		float remaining = 0.0f;
-		float interval = 0.0f;
-		bool useUnscaled = false;
-		bool cancelled = false;
+		/// <summary>
+		/// 固定デルタタイムの設定
+		/// </summary>
+		/// <param name="dt">固定デルタタイム</param>
+		void SetFixedDeltaTime(float dt)
+		{
+			fixedDeltaTime_ = dt;
+		}
+		/// <summary>
+		/// 固定デルタタイムがタイムスケールの影響を受けるかどうかの設定
+		/// </summary>
+		/// <param name="useScaled">影響を受けるならtrue</param>
+		void SetFixedUsesScaled(bool useScaled)
+		{
+			fixedUsesScaled_ = useScaled;
+		}
+
+		/// <summary>
+		/// タイマーの設定
+		/// </summary>
+		/// <param name="cb">コールバック関数</param>
+		/// <param name="seconds">遅延時間(秒)</param>
+		/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
+		/// <returns>タイマーID</returns>
+		TimerId SetTimeout(std::function<void()> cb, float seconds, bool useUnscaled = false)
+		{
+			Timer t;
+			t.id = nextTimerId_++;
+			t.cb = std::move(cb);
+			t.remaining = seconds;
+			t.interval = 0.0f;
+			t.useUnscaled = useUnscaled;
+			timers_.push_back(std::move(t));
+			return t.id;
+		}
+		/// <summary>
+		/// インターバルタイマーの設定
+		/// </summary>
+		/// <param name="cb">コールバック関数</param>
+		/// <param name="seconds">遅延時間(秒)</param>
+		/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
+		/// <returns>タイマーID</returns>
+		TimerId SetInterval(std::function<void()> cb, float seconds, bool useUnscaled = false)
+		{
+			Timer t;
+			t.id = nextTimerId_++;
+			t.cb = std::move(cb);
+			t.remaining = seconds;
+			t.interval = seconds;
+			t.useUnscaled = useUnscaled;
+			timers_.push_back(std::move(t));
+			return t.id;
+		}
+
+		/// <summary>
+		/// タイムスケールの設定
+		/// </summary>
+		/// <param name="timeScale">新しいタイムスケール</param>
+		void SetTimeScale(float scale)
+		{
+			timeScale_ = (std::max)(0.0f, scale);
+			smoothingEnabled_ = false;
+			for (auto& cb : timeScaleCallbacks_) if (cb) cb(timeScale_);
+		}
+
+
+	public: // ゲッター
+
+		/// <summary>
+		/// 時間が一時停止中かどうか
+		/// </summary>
+		/// <returns>停止中ならtrue</returns>
+		bool IsPaused() const
+		{
+			return paused_;
+		}
+
+		// デルタタイム取得
+		float GetDeltaTime() const { return deltaTime_; }
+		// スケールされていないデルタタイム取得
+		float GetUnscaledDeltaTime() const { return unscaledDeltaTime_; }
+
+		// タイムスケール操作
+		float GetTimeScale() const { return timeScale_; }
+
+		// 固定デルタタイム操作
+		float GetFixedDeltaTime() const { return fixedUsesScaled_ ? fixedDeltaTime_ * timeScale_ : fixedDeltaTime_; }
+		// 固定デルタタイムがスケールの影響を受けるかどうか
+		bool GetFixedUsesScaled() const { return fixedUsesScaled_; }
+
+	private:
+
+		// コンストラクタ(シングルトン)
+		TimeManager();
+		// タイムスケールの更新
+		void UpdateTimers(float scaledDT, float unscaledDT);
+
+		// デルタタイムの更新
+		struct Timer
+		{
+			TimerId id = 0;
+			std::function<void()> cb;
+			float remaining = 0.0f;
+			float interval = 0.0f;
+			bool useUnscaled = false;
+			bool cancelled = false;
+		};
+
+		// スムーズなタイムスケール変更の状態
+		bool smoothingEnabled_ = false;
+		// スムーズ変更の開始時のタイムスケール
+		float smoothStart_ = 1.0f;
+		// スムーズ変更の目標タイムスケール
+		float smoothTarget_ = 1.0f;
+		// スムーズ変更にかける時間(秒)
+		float smoothDuration_ = 0.0f;
+		// スムーズ変更の経過時間(秒)
+		float smoothElapsed_ = 0.0f;
+
+		// 現在のタイムスケール
+		float timeScale_ = 1.0f;
+		// デルタタイム
+		float deltaTime_ = 1.0f / 60.0f;
+		// スケールされていないデルタタイム
+		float unscaledDeltaTime_ = 1.0f / 60.0f;
+
+		// 固定デルタタイム
+		float fixedDeltaTime_ = 1.0f / 60.0f;
+		// 固定デルタタイムがタイムスケールの影響を受けるかどうか
+		bool fixedUsesScaled_ = true;
+
+		// 一時停止中かどうか
+		bool paused_ = false;
+		// ステップ実行用の時間蓄積
+		float stepAccumulator_ = 0.0f;
+
+		// 前回の更新時間
+		std::chrono::steady_clock::time_point lastTime_;
+		// 初期化済みかどうか
+		bool initialized_ = false;
+
+		// 登録されているタイマー
+		std::vector<Timer> timers_;
+		// 次に割り当てるタイマーID
+		TimerId nextTimerId_ = 1;
+
+		// タイムスケール変更コールバック群
+		std::vector<TimeScaleCallback> timeScaleCallbacks_;
+
 	};
 
-	// スムーズなタイムスケール変更の状態
-	bool smoothingEnabled_ = false;
-	// スムーズ変更の開始時のタイムスケール
-	float smoothStart_ = 1.0f;
-	// スムーズ変更の目標タイムスケール
-	float smoothTarget_ = 1.0f;
-	// スムーズ変更にかける時間(秒)
-	float smoothDuration_ = 0.0f;
-	// スムーズ変更の経過時間(秒)
-	float smoothElapsed_ = 0.0f;
-
-	// 現在のタイムスケール
-	float timeScale_ = 1.0f;
-	// デルタタイム
-	float deltaTime_ = 1.0f / 60.0f;
-	// スケールされていないデルタタイム
-	float unscaledDeltaTime_ = 1.0f / 60.0f;
-
-	// 固定デルタタイム
-	float fixedDeltaTime_ = 1.0f / 60.0f;
-	// 固定デルタタイムがタイムスケールの影響を受けるかどうか
-	bool fixedUsesScaled_ = true;
-
-	// 一時停止中かどうか
-	bool paused_ = false;
-	// ステップ実行用の時間蓄積
-	float stepAccumulator_ = 0.0f;
-
-	// 前回の更新時間
-	std::chrono::steady_clock::time_point lastTime_;
-	// 初期化済みかどうか
-	bool initialized_ = false;
-
-	// 登録されているタイマー
-	std::vector<Timer> timers_;
-	// 次に割り当てるタイマーID
-	TimerId nextTimerId_ = 1;
-
-	// タイムスケール変更コールバック群
-	std::vector<TimeScaleCallback> timeScaleCallbacks_;
-
-};
-
-
+}
 
 ============================================================
 File Path: project/gameEngine/transition/BaseTransition.cpp
