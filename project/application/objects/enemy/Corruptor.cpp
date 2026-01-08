@@ -106,7 +106,7 @@ void Corruptor::Move()
 	moveVelocity_.y = 0.0f;
 	position_ += moveVelocity_ * dt * kDefaultFrameRate;
 
-	ObjectTransformSet(position_, rotation_, scale_);
+	SyncObjectTransform();
 
 	ParticleEmitter::Emit("enemyWalk", position_, 1);
 
@@ -116,14 +116,6 @@ void Corruptor::ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState> _pSt
 {
 	pBehaviorState_ = std::move(_pState);
 	pBehaviorState_->Initialize();
-}
-
-void Corruptor::ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale)
-{
-	object_->SetPosition(_position);
-	object_->SetRotate(_rotation);
-	object_->SetScale(_scale);
-	object_->Update();
 }
 
 void Corruptor::OnCollisionTrigger(const Collider* _other)

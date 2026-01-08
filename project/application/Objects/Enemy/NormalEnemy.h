@@ -89,13 +89,8 @@ public: // セッター
 	// 被弾フラグをセット
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
 
-	/// <summary>
-	/// objectのtransformをセット
-	/// </summary>
-	/// <param name="_position">位置</param>
-	/// <param name="_rotation">回転</param>
-	/// <param name="_scale">スケール</param>
-	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
+	
+	// --- ステートでのTransform操作用関数(引数あり) ---
 
 	// オブジェクトのpositionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }

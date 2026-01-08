@@ -183,7 +183,7 @@ void NormalEnemy::Move()
 		SetRotation(rotation_);
 		SetScale(scale_);
 
-		ObjectTransformSet(position_, rotation_, scale_);
+		SyncObjectTransform();
 
 		ParticleEmitter::Emit("enemyWalk", position_, 1);
     }
@@ -225,13 +225,6 @@ void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pStat
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();
-}
-
-void NormalEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale)
-{
-    object_->SetPosition(_position);
-    object_->SetRotate(_rotation);
-    object_->SetScale(_scale);
 }
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)

@@ -7,7 +7,6 @@
 #include <string>
 #include <algorithm>
 #include <functional>
-#include <Object3d.h>
 #include <Sprite.h>
 
 /// <summary>
@@ -136,9 +135,6 @@ protected: // 衝突判定
 	bool IsAABBOverlap(const AABB& a, const AABB& b);
 
 protected:
-
-	// 3D 描画用のオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
 
 	// 衝突判定用
 	ColliderManager* colliderManager_ = nullptr;

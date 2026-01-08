@@ -110,14 +110,6 @@ public: // セッター
 	// 次の罠がTimeBombかVignetteTrapかのフラグ反転
 	void ChangeIsNextTrapTimeBomb() { isNextTrapTimeBomb_ = !isNextTrapTimeBomb_; }
 
-	/// <summary>
-	/// objectのtransformをセット
-	/// </summary>
-	/// <param name="_position">位置</param>
-	/// <param name="_rotation">回転</param>
-	/// <param name="_scale">スケール</param>
-	void ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale);
-
 private:
 
 	// 追尾停止距離

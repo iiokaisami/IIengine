@@ -4,7 +4,6 @@
 #include "../../gameEngine/collider/ColliderManager.h"
 
 #include <memory>
-#include <Object3d.h>
 
 
 /// <summary>
@@ -36,8 +35,7 @@ protected:
 
 protected:
 
-    // 描画用の3Dオブジェクト
-    std::unique_ptr<Object3d> object_ = nullptr;   
+    
     // 衝突判定管理
     ColliderManager* colliderManager_ = nullptr; 
     // 衝突判定データ

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Vector3.h>
+#include <Object3d.h>
 #include <string>
 
 #include "../../gameEngine/Collider/Shape.h"
@@ -14,6 +15,8 @@ public:
 
     GameObject();
     virtual ~GameObject() {};
+
+	void SyncObjectTransform();
 
 public: // 仮想関数
 
@@ -76,6 +79,9 @@ public: // セッター
 	virtual void SetIsDead(bool _isDead) { isDead_ = _isDead; };
 
 protected: // メンバー
+
+	// 描画用の3Dオブジェクト
+	std::unique_ptr<Object3d> object_ = nullptr;
 
     std::string objectName_;
     Vector3 scale_;

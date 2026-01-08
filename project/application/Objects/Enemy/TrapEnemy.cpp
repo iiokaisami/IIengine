@@ -193,7 +193,7 @@ void TrapEnemy::Move()
     moveVelocity_.y = 0.0f;
     position_ += moveVelocity_ * (dt * kDefaultFrameRate);
 
-    ObjectTransformSet(position_, rotation_, scale_);
+	SyncObjectTransform();
 
     ParticleEmitter::Emit("enemyWalk", position_, 1);
 }
@@ -229,13 +229,6 @@ void TrapEnemy::ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pSt
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();
-}
-
-void TrapEnemy::ObjectTransformSet(const Vector3& _position, const Vector3& _rotation, const Vector3& _scale)
-{
-    object_->SetPosition(_position);
-    object_->SetRotate(_rotation);
-    object_->SetScale(_scale);
 }
 
 void TrapEnemy::RemoveBullets()
