@@ -13,7 +13,7 @@ void Framework::Run()
 		}
 
 		// 時間管理
-		TimeManager::Instance().Tick();
+		IIEngine::TimeManager::Instance().Tick();
 
 #ifdef USE_IMGUI
 		// ImGui開始
@@ -64,7 +64,7 @@ void Framework::Initialize()
 	audio->Initialize();
 
 	// シーンマネージャ
-	sceneManager_ = SceneManager::GetInstance();
+	sceneManager_ = IIEngine::SceneManager::GetInstance();
 
 	// スプライト共通部分の初期化
 	spriteCommon = SpriteCommon::GetInstance();

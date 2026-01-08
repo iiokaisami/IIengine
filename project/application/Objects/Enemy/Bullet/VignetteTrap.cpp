@@ -48,7 +48,7 @@ void VignetteTrap::Finalize()
 void VignetteTrap::Update()
 {
 	// デルタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 着弾していなければ判定を付けない
 	isActive_ = !isLaunchingTrap_;
@@ -158,7 +158,7 @@ void VignetteTrap::DeadMotion()
 	}
 
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// タイマー更新
 	deathMotion_.timer += dt;

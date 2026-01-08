@@ -86,7 +86,7 @@ protected:
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 
-	SceneManager* sceneManager_ = nullptr;
+	IIEngine::SceneManager* sceneManager_ = nullptr;
 	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 
 	SpriteCommon* spriteCommon = nullptr;

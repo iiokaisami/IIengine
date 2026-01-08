@@ -227,7 +227,7 @@ void GamePlayScene::Update()
 	}
 	
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -333,7 +333,7 @@ void GamePlayScene::Update()
 		fadeTransition_->Start([]
 			{
 			// シーン切り替え
-			SceneManager::GetInstance()->ChangeScene("CLEAR");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("CLEAR");
 			});
 	}
 	if (Input::GetInstance()->TriggerKey(DIK_DOWN) or (pPlayer_->IsDeathMotionComplete() && !isTransitioning_))
@@ -344,7 +344,7 @@ void GamePlayScene::Update()
 		blockTransition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("GAMEOVER");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEOVER");
 			});
 	}
 }

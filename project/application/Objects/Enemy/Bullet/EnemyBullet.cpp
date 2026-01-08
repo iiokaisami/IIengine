@@ -38,7 +38,7 @@ void EnemyBullet::Finalize()
 
 void EnemyBullet::Update()
 {
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	SyncObjectTransform();
 

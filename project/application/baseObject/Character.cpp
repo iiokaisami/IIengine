@@ -82,7 +82,7 @@ void Character::UpdateHPBar()
     }
 
     // 補間
-    const float dt = TimeManager::Instance().GetDeltaTime();
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
     // 補間係数
     float t = std::clamp(hpLerpSpeed_ * dt, 0.0f, 1.0f);
     hpRatio_ += (targetRatio - hpRatio_) * t;

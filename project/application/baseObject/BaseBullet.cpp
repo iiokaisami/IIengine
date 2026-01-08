@@ -37,7 +37,7 @@ Vector3 BaseBullet::SetVelocity(const Vector3 _velocity)
 
 void BaseBullet::UpdateLifetime()
 {
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	if (deathRemainingSeconds_ > 0.0f)
 	{
 		deathRemainingSeconds_ -= dt;

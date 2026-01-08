@@ -41,7 +41,7 @@ void PlayerBullet::Finalize()
 
 void PlayerBullet::Update()
 {
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	BaseBullet::Update();
 

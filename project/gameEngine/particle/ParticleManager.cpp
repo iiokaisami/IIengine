@@ -280,7 +280,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 void ParticleManager::Update()
 {
 	// TimeManagerからデルタタイムを取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	
     camera_ = object3dCommon_->GetDefaultCamera();
 

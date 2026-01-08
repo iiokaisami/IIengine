@@ -65,7 +65,7 @@ void TimeBomb::Finalize()
 void TimeBomb::Update()
 {
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 着弾していなければ判定を付けない
 	isActive_ = !isLaunchingTrap_;
@@ -186,7 +186,7 @@ void TimeBomb::DeadMotion()
 	}
 
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// タイマー更新
 	deathMotion_.timer += dt;
@@ -268,7 +268,7 @@ void TimeBomb::Explode()
 	if (isExploded_)
 	{
 		// デルタタイム取得
-		const float dt = TimeManager::Instance().GetDeltaTime();
+		const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 		// scaleを徐々に大きくして判定を広げる
 		elapsedTime += dt;

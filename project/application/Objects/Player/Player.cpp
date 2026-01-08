@@ -177,7 +177,7 @@ void Player::ClearTargetEnemy()
 void Player::Move()
 {
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	moveVelocity_ = {};
 
@@ -263,7 +263,7 @@ void Player::Attack()
 void Player::Evade()
 {
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 回避入力
 	if (!isEvading_ && Input::GetInstance()->PushKey(DIK_LSHIFT))
@@ -475,7 +475,7 @@ void Player::ClearSceneUpdate()
 	isCanMove_ = false;
 
 	// delta
-	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
 
 	constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
 
@@ -650,7 +650,7 @@ void Player::UpdateStatus()
 
 void Player::AutoMove()
 {
-	const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
 
 	static int moveTimer = 0;
 	static Vector3 autoDir = { 0.0f, 0.0f, 1.0f }; // 初期は前進
@@ -823,7 +823,7 @@ void Player::OnCollision(const Collider* _other)
 void Player::HitVignetteTrap()
 {
 	// デルタタイム
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// フェードアウト中の処理
 	if (isFadingOut_)

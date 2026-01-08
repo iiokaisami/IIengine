@@ -23,7 +23,7 @@ void BaseEnemy::Update()
 void BaseEnemy::Move() 
 {
     // デルタタイム取得
-    const float dt = TimeManager::Instance().GetDeltaTime();
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
     // プレイヤー方向ベクトル計算
     toPlayer_ = playerPosition_ - position_;

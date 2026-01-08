@@ -109,7 +109,7 @@ void GameOverScene::Update()
 	}
 
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// カメラ更新
 	camera_->Update(dt);
@@ -170,7 +170,7 @@ void GameOverScene::Update()
 		transition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("TITLE");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
 			});
 	}
 
@@ -182,7 +182,7 @@ void GameOverScene::Update()
 		transition_->Start([]
 			{
 				// シーン切り替え
-				SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 			});
 	}
 

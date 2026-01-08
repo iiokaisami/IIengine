@@ -1,6 +1,6 @@
 #pragma once
 
-class SceneManager;
+namespace IIEngine {class SceneManager;}
 
 /// <summary>
 /// シーンの基底クラス
@@ -38,10 +38,10 @@ public:
 	/// シーンマネージャのセット
     /// </summary>
     /// <param name="sceneManager">シーン管理を行うSceneManagerのポインタ</param>
-    virtual void SetSceneManager(SceneManager* sceneManager) { sceneManager_ = sceneManager; }
+    virtual void SetSceneManager(IIEngine::SceneManager* sceneManager) { sceneManager_ = sceneManager; }
 
 protected:
 
     // シーンマネージャ
-    SceneManager* sceneManager_ = nullptr;
+    IIEngine::SceneManager* sceneManager_ = nullptr;
 };

@@ -132,7 +132,7 @@ void TitleScene::Update()
 	}
 
 	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -239,7 +239,7 @@ void TitleScene::Update()
 		transition_->Start([]
 			{
 				// フェードアウト後にシーン切り替え
-				SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 			});
 	}
 

@@ -38,7 +38,7 @@ void Corruptor::Update()
 	BaseEnemy::Update();
 
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// アクティブフラグ
 	isActive_ = !isInvincible_;
@@ -90,7 +90,7 @@ void Corruptor::ImGuiDraw()
 void Corruptor::Move()
 {
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 基底クラスの補間処理を使用
 	toPlayer_ = playerPosition_ - position_;

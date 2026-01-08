@@ -1,6 +1,8 @@
 #include "TimeManager.h"
 #include <algorithm>
 
+using IIEngine::TimeManager;
+
 TimeManager& TimeManager::Instance()
 {
 	// シングルトンインスタンスの取得

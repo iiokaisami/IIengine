@@ -6,55 +6,58 @@
 #include "BaseScene.h"
 #include "AbstractSceneFactory.h"
 
-/// <summary>
-/// シーンマネージャ
-/// ここでシーンの更新、描画を行う
-/// </summary>
-class SceneManager
-{
+namespace IIEngine {
+	
+	/// <summary>
+	/// シーンマネージャ
+	/// ここでシーンの更新、描画を行う
+	/// </summary>
+	class SceneManager
+	{
 #pragma region シングルトンインスタンス
-private:
+	private:
 
-	SceneManager() = default;
-	~SceneManager() = default;
-	SceneManager(SceneManager&) = delete;
-	SceneManager& operator = (SceneManager&) = delete;
+		SceneManager() = default;
+		~SceneManager() = default;
+		SceneManager(SceneManager&) = delete;
+		SceneManager& operator = (SceneManager&) = delete;
 
-public:
-	// シングルトンインスタンスの取得
-	static SceneManager* GetInstance();
-	// 終了
-	void Finalize();
+	public:
+		// シングルトンインスタンスの取得
+		static SceneManager* GetInstance();
+		// 終了
+		void Finalize();
 #pragma endregion シングルトンインスタンス
-public:
+	public:
 
-	// 更新
-	void Update();
+		// 更新
+		void Update();
 
-	// 描画
-	void Draw();
+		// 描画
+		void Draw();
 
-	/// <summary>
-	/// シーン変更
-	/// </summary>
-	/// <param name="sceneName">次のシーン名</param>
-	void ChangeScene(const std::string& sceneName);
+		/// <summary>
+		/// シーン変更
+		/// </summary>
+		/// <param name="sceneName">次のシーン名</param>
+		void ChangeScene(const std::string& sceneName);
 
-	/// <summary>
-	/// シーンファクトリーを設定
-	/// </summary>
-	/// <param name="sceneFactory">シーンファクトリーのポインタ</param>
-	void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; }
+		/// <summary>
+		/// シーンファクトリーを設定
+		/// </summary>
+		/// <param name="sceneFactory">シーンファクトリーのポインタ</param>
+		void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; }
 
-private:
+	private:
 
-	// 今のシーン
-	std::unique_ptr<BaseScene> scene_ = nullptr;
+		// 今のシーン
+		std::unique_ptr<BaseScene> scene_ = nullptr;
 
-	// 次のシーン
-	std::unique_ptr<BaseScene> nextScene_ = nullptr;
+		// 次のシーン
+		std::unique_ptr<BaseScene> nextScene_ = nullptr;
 
-	// シーンファクトリー
-	AbstractSceneFactory* sceneFactory_ = nullptr;
-};
+		// シーンファクトリー
+		AbstractSceneFactory* sceneFactory_ = nullptr;
+	};
 
+}

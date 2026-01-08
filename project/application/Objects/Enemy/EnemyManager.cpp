@@ -37,7 +37,7 @@ void EnemyManager::Finalize()
 void EnemyManager::Update()
 {
 	// デルタタイム取得
-	const float dt = TimeManager::Instance().GetDeltaTime();
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	// アップデートするフレーム数計算
 	const int framesThisUpdate = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
 

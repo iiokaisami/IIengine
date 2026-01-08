@@ -8,17 +8,17 @@ void MyGame::Initialize()
 
 	// シーンマネージャに最初のシーンをセット
 	sceneFactory_ = std::make_unique<SceneFactory>();
-	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
+	IIEngine::SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 
 	// 最初のシーンを設定
-	SceneManager::GetInstance()->ChangeScene("TITLE");
+	IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
 
 
 	// モデルの読み込み処理をスレッドで実行
 	std::thread loadModelThread(&MyGame::LoadModel, this);
 	std::thread loadAudioThread(&MyGame::LoadSound, this);
 
-	// スレッドの終了を待つ
+	// スレッドの終了を待つ(実装途中)
 	loadModelThread.join(); 
 	loadAudioThread.join();
 

@@ -158,7 +158,7 @@ void TrapEnemy::ImGuiDraw()
 void TrapEnemy::Move()
 {
 	// デルタタイム取得
-    const float dt = TimeManager::Instance().GetDeltaTime();
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
     toPlayer_ = playerPosition_ - position_;
     Vector3 direction = Normalize(toPlayer_);
