@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-namespace Logger
+namespace IIEngine::Logger
 {
 	void Logger::Log(const std::string& message)
 	{

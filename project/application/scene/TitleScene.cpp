@@ -91,7 +91,7 @@ void TitleScene::Initialize()
 	));
 		
 	// シーン開始時にフェードイン
-	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
+	transition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
 	transition_->Start(nullptr);
 }
@@ -231,10 +231,10 @@ void TitleScene::Update()
 
 	
 
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN))
 	{
 		// トランジション開始
-		transition_ = std::make_unique<BlockRiseTransition>();
+		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
 		isTransitioning_ = true;
 		transition_->Start([]
 			{
@@ -243,11 +243,11 @@ void TitleScene::Update()
 			});
 	}
 
-	if (Input::GetInstance()->TriggerKey(DIK_Q))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_Q))
 	{
 		Audio::GetInstance()->SoundStop(soundData_);
 	}
-	if (Input::GetInstance()->TriggerKey(DIK_E))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_E))
 	{
 		Audio::GetInstance()->SoundStop(soundData2_);
 	}

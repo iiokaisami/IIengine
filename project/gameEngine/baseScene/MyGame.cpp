@@ -45,7 +45,7 @@ void MyGame::Initialize()
 	particleManager->CreateParticleGroup("BltReaction", "resources/images/gradationLine.png", "plane.obj", "Ring", "BltReaction");
 
 	// Cylinderを出すときに向き指定する
-	ParticleMotion::SetDirection("UP");
+	IIEngine::ParticleMotion::SetDirection("UP");
 
 	useExampleGroup_ = true;
 
@@ -78,70 +78,6 @@ void MyGame::Update()
 
 	// Skyboxの更新
 	skybox->Update();
-
-	if (time > 9.0f)
-	{
-		time = 0.0f;
-	}
-
-	time += 1.0f / 60.0f;
-
-
-	if (Input::GetInstance()->TriggerKey(DIK_1))
-	{
-		particleManager->Emit("sparkBurst", { 0.0f,2.0f,0.0f }, 3);
-	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_2))
-	{
-		particleManager->Emit("laserGroup", { 0.0f,1.0f,0.0f }, 3);
-	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_3))
-	{
-		particleManager->Emit("petalGroup", { 0.0f,1.0f,0.0f }, 10);
-		isPetal_ = !isPetal_;
-	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_4))
-	{
-		particleManager->Emit("homingGroup", { 0.0f,1.0f,0.0f }, 3);
-		isHoming_ = !isHoming_;
-	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_5))
-	{
-		particleManager->Emit("flameGroup", { 0.0f,1.0f,0.0f }, 5);
-		isFlame_ = !isFlame_;
-	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_6))
-	{
-		particleManager->Emit("explosionGroup", { 0.0f,1.0f,0.0f }, 3);
-		isExplosion_ = !isExplosion_;
-	}
-
-	if (std::fmod(time, 0.8f) < 0.1f && isPetal_)
-	{
-		particleManager->Emit("petalGroup", { 0.0f,1.0f,0.0f }, 8);
-	}
-
-	if (std::fmod(time, 1.0f) < 0.1f && isHoming_)
-	{
-		particleManager->Emit("homingGroup", { 0.0f,1.0f,0.0f }, 3);
-	}
-
-	if (std::fmod(time, 0.8f) < 0.1f && isFlame_)
-	{
-		particleManager->Emit("flameGroup", { 0.0f,1.0f,0.0f }, 5);
-	}
-
-	if (std::fmod(time, 1.0f) < 0.1f && isExplosion_)
-	{
-		particleManager->Emit("explosionGroup", { 0.0f,1.0f,0.0f }, 3);
-	}
-
-
 
 
 #ifdef USE_IMGUI

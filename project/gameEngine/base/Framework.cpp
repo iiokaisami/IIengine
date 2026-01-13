@@ -56,7 +56,7 @@ void Framework::Initialize()
 	modelCommon->Initialize(dxCommon.get());
 
 	// キーボード入力
-	input = Input::GetInstance();
+	input = IIEngine::Input::GetInstance();
 	input->Initialize(winApp.get());
 
 	// オーディオ
@@ -107,7 +107,7 @@ void Framework::Initialize()
 	
 
 	// パーティクル	
-	particleManager = ParticleManager::GetInstance();
+	particleManager = IIEngine::ParticleManager::GetInstance();
 	particleManager->Initialize(dxCommon.get(),srvManager.get(),modelCommon.get());
 
 	inputSrv = renderTexture->GetSRVHandle();
@@ -115,7 +115,7 @@ void Framework::Initialize()
 	state = renderTexture->GetCurrentState();
 
 	// Skybox
-	skybox = std::make_unique<Skybox>();
+	skybox = std::make_unique<IIEngine::Skybox>();
 	skybox->Initialize(dxCommon.get(), srvManager.get());
 
 #ifdef USE_IMGUI

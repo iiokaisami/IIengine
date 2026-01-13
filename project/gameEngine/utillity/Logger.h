@@ -3,7 +3,7 @@
 
 
 // ログ出力
-namespace Logger
+namespace IIEngine::Logger
 {
 	/// <summary>
 	/// 指定されたメッセージをログに記録します。

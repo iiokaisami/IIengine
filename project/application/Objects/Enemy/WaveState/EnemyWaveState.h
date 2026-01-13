@@ -35,7 +35,7 @@ public: // セッター
 	/// エディタセット
 	/// </summary>
 	/// <param name="_levelData">レベルデータローダー</param>
-	void SetLevelData(std::shared_ptr<LevelData> _levelData) { levelData_ = _levelData; }
+	void SetLevelData(std::shared_ptr<IIEngine::LevelData> _levelData) { levelData_ = _levelData; }
 
 protected:
 
@@ -65,7 +65,7 @@ protected:
 	uint32_t enemyWaitingTimer_ = 9;
 
 	// レベルデータローダー
-	std::shared_ptr<LevelData> levelData_ = nullptr;
+	std::shared_ptr<IIEngine::LevelData> levelData_ = nullptr;
 
 	// 現在のウェーブ
 	uint32_t currentWave_ = 1;

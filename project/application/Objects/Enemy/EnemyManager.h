@@ -92,7 +92,7 @@ public: // ゲッター
 	bool IsAllEnemyDefeated() const { return isAllEnemyDefeated_; }
 
 	// レベルエディタ
-	std::shared_ptr<LevelData> GetLevelData() const { return levelData_; }
+	std::shared_ptr<IIEngine::LevelData> GetLevelData() const { return levelData_; }
 
 public: // セッター
 
@@ -112,7 +112,7 @@ public: // セッター
 	/// エディタセット
 	/// </summary>
 	/// <param name="_levelData">レベルデータローダー</param>
-	void SetLevelData(std::shared_ptr<LevelData> _levelData) { levelData_ = _levelData; }
+	void SetLevelData(std::shared_ptr<IIEngine::LevelData> _levelData) { levelData_ = _levelData; }
 
 private:
 
@@ -142,7 +142,7 @@ private:
 	bool isAllEnemyDefeated_ = false;
 
 	// レベルデータローダー
-	std::shared_ptr<LevelData> levelData_ = nullptr;
+	std::shared_ptr<IIEngine::LevelData> levelData_ = nullptr;
 
 };
 

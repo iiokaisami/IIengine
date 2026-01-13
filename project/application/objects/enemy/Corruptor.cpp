@@ -24,7 +24,7 @@ void Corruptor::Initialize()
 	isInvincible_ = true;
 
 	// パーティクル
-	ParticleEmitter::Emit("laserGroup", position_, 2);
+	IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
 }
 
 void Corruptor::Finalize()
@@ -107,7 +107,7 @@ void Corruptor::Move()
 
 	SyncObjectTransform();
 
-	ParticleEmitter::Emit("enemyWalk", position_, 1);
+	IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
 
 }
 

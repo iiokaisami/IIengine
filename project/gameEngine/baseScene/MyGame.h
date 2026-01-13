@@ -42,10 +42,4 @@ private:
 
 	// Vignetteの強度
 	float vignetteRadius_ = 0.5f;
-
-	float time = 0.0f;
-	bool isPetal_ = false;
-	bool isHoming_ = false;
-	bool isFlame_ = false;
-	bool isExplosion_ = false;
 };

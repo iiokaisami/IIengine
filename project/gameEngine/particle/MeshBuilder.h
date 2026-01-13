@@ -2,79 +2,83 @@
 
 #include <Model.h>
 
-/// <summary>
-/// メッシュ作成クラス
-/// メッシュを頂点とインデックスで作成する
-/// </summary>
-class MeshBuilder
+namespace IIEngine
 {
-public:
 
 	/// <summary>
-	/// Ring作成(円状)
+	/// メッシュ作成クラス
+	/// メッシュを頂点とインデックスで作成する
 	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildRing(Model* model);
+	class MeshBuilder
+	{
+	public:
 
-	/// <summary>
-	/// Cylinder作成(円柱状上下ふた無)
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildCylinder(Model* model);
+		/// <summary>
+		/// Ring作成(円状)
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildRing(Model* model);
 
-	/// <summary>
-	/// Cone作成(円錐)
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildCone(Model* model);
+		/// <summary>
+		/// Cylinder作成(円柱状上下ふた無)
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildCylinder(Model* model);
 
-	/// <summary>
-	/// Spiral作成(ねじれ線)
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildSpiral(Model* model);
+		/// <summary>
+		/// Cone作成(円錐)
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildCone(Model* model);
 
-	/// <summary>
-	/// Torus作成(ドーナツ)
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildTorus(Model* model);
+		/// <summary>
+		/// Spiral作成(ねじれ線)
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildSpiral(Model* model);
 
-	/// <summary>
-	/// Helix作成(ばね状)
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildHelix(Model* model);
+		/// <summary>
+		/// Torus作成(ドーナツ)
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildTorus(Model* model);
 
-	/// <summary>
-	/// 小さい球
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildSphere(Model* model);
+		/// <summary>
+		/// Helix作成(ばね状)
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildHelix(Model* model);
 
-	/// <summary>
-	/// 花びら
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildPetal(Model* model);
+		/// <summary>
+		/// 小さい球
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildSphere(Model* model);
 
-	/// <summary>
-	/// ペラペラな三角形
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildTriangle(Model* model);
+		/// <summary>
+		/// 花びら
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildPetal(Model* model);
 
-	/// <summary>
-	/// 小さい立方体
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildCube(Model* model);
+		/// <summary>
+		/// ペラペラな三角形
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildTriangle(Model* model);
 
-	/// <summary>
-	/// 線形状
-	/// </summary>
-	/// <param name="model">モデルポインタ</param>
-	static void BuildLine(Model* model);
+		/// <summary>
+		/// 小さい立方体
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildCube(Model* model);
 
-};
+		/// <summary>
+		/// 線形状
+		/// </summary>
+		/// <param name="model">モデルポインタ</param>
+		static void BuildLine(Model* model);
 
+	};
+
+}

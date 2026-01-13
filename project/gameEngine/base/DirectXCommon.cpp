@@ -130,7 +130,7 @@ void DirectXCommon::InitializeDevice()
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
 		{
 			//採用したアダプタの情報をログに出力。wstringの方なので注意
-			Logger::Log(StringUtility::ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
+			IIEngine::Logger::Log(IIEngine::StringUtility::ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
 		useAdapter = nullptr;
@@ -154,13 +154,13 @@ void DirectXCommon::InitializeDevice()
 		if (SUCCEEDED(result))
 		{
 			//生成できたのでログ出力を行ってループを抜ける
-			Logger::Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
+			IIEngine::Logger::Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
 			break;
 		}
 	}
 	//デバイスの生成がうまくいかなかったので起動できない
 	assert(device_ != nullptr);
-	Logger::Log("Complete create D3D12Device!!!");//初期化完了のログを出す
+	IIEngine::Logger::Log("Complete create D3D12Device!!!");//初期化完了のログを出す
 
 
 
@@ -570,7 +570,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	//hlslファイルを読む
 
 	//これからシェーダーをコンパイルする旨をログに出す
-	Logger::Log(StringUtility::ConvertString(std::format(L"Begin CompileSharder, path:{}, profile:{}\n", filePath, profile)));
+	IIEngine::Logger::Log(IIEngine::StringUtility::ConvertString(std::format(L"Begin CompileSharder, path:{}, profile:{}\n", filePath, profile)));
 	//hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
 	result = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
@@ -615,7 +615,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
 	{
-		Logger::Log(shaderError->GetStringPointer());
+		IIEngine::Logger::Log(shaderError->GetStringPointer());
 		//警告・エラーダメ絶対
 		assert(SUCCEEDED(false));
 	}
@@ -629,7 +629,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	result = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(result));
 	//成功したログを出す
-	Logger::Log(StringUtility::ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	IIEngine::Logger::Log(IIEngine::StringUtility::ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 	//もう使わないリソースを解放
 	shaderSource->Release();
 	shaderResult->Release();
@@ -721,7 +721,7 @@ DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath)
 {
 	//テクスチャファイルを読んでプログラムで扱えるようにする
 	DirectX::ScratchImage image{};
-	std::wstring filePathW = StringUtility::ConvertString(filePath);
+	std::wstring filePathW = IIEngine::StringUtility::ConvertString(filePath);
 	HRESULT hr;
 	if (filePathW.ends_with(L".dds"))
 	{
@@ -885,7 +885,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateUploadBuffer(size_t 
 		IID_PPV_ARGS(&buffer));
 
 	if (FAILED(hr)) {
-		Logger::Log("Failed to create upload buffer!");
+		IIEngine::Logger::Log("Failed to create upload buffer!");
 		return nullptr;
 	}
 

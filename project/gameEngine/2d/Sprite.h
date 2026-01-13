@@ -10,9 +10,9 @@
 
 #include "MyMath.h"
 #include "TextureManager.h"
+#include <Vector2.h>
 
 class SpriteCommon;
-
 
 /// <summary>
 /// スプライト

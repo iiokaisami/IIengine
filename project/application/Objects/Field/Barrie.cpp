@@ -63,7 +63,7 @@ void Barrie::Update()
 			isBarrierDestroyed_ = false;
 
 			// パーティクル
-			ParticleEmitter::Emit("sparkBurst", position_ , 8);
+			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , 8);
 
 		}
 
@@ -78,7 +78,7 @@ void Barrie::Update()
 	if (scale_.x >= 0.1f)
 	{
 		// パーティクル
-		ParticleEmitter::Emit("spark", { position_.x,position_.y + 3.0f,position_.z }, 1);
+		IIEngine::ParticleEmitter::Emit("spark", { position_.x,position_.y + 3.0f,position_.z }, 1);
 	}
 }
 

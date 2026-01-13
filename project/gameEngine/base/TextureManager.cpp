@@ -34,7 +34,7 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 
 	//テクスチャファイルを読んでプログラムで扱えるようにする
 	DirectX::ScratchImage image{};
-	std::wstring filePathW = StringUtility::ConvertString(filePath);
+	std::wstring filePathW = IIEngine::StringUtility::ConvertString(filePath);
 	HRESULT hr;
 	if (filePathW.ends_with(L".dds"))
 	{
@@ -145,7 +145,7 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 	auto it = textureDatas.find(filePath);
 	if (it == textureDatas.end()) {
 		// なかったらエラーメッセージ
-		Logger::Log("Error: Texture not found for filePath: " + filePath);
+		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
 	}
 
@@ -161,7 +161,7 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 	auto it = textureDatas.find(filePath);
 	if (it == textureDatas.end()) {
 		// なかったらエラーメッセージ
-		Logger::Log("Error: Texture not found for filePath: " + filePath);
+		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
 	}
 
@@ -177,7 +177,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 	auto it = textureDatas.find(filePath);
 	if (it == textureDatas.end()) {
 		// なかったらエラーメッセージ
-		Logger::Log("Error: Texture not found for filePath: " + filePath);
+		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
 	}
 

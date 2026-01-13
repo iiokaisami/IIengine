@@ -50,7 +50,7 @@ void ClearScene::Initialize()
 	}
 
 	// シーン開始時にフェードイン
-	transition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
+	transition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
 	transition_->Start(nullptr);
 
@@ -110,8 +110,8 @@ void ClearScene::Update()
 	pField_->Update();
 
 	// パーティクル
-	ParticleEmitter::Emit("goal", particlePosition_, 1);
-	ParticleEmitter::Emit("petalGroup", petalPosition_, 1);
+	IIEngine::ParticleEmitter::Emit("goal", particlePosition_, 1);
+	IIEngine::ParticleEmitter::Emit("petalGroup", petalPosition_, 1);
 
 
 #ifdef USE_IMGUI
@@ -131,10 +131,10 @@ void ClearScene::Update()
 #endif // USE_IMGUI
 
 
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN))
 	{
 		// トランジション開始
-		transition_ = std::make_unique<BlockRiseTransition>();
+		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
 		isTransitioning_ = true;
 		transition_->Start([]
 			{
@@ -143,10 +143,10 @@ void ClearScene::Update()
 			});
 	}
 
-	if (Input::GetInstance()->TriggerKey(DIK_R))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_R))
 	{
 		// トランジション開始
-		transition_ = std::make_unique<BlockRiseTransition>();
+		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
 		isTransitioning_ = true;
 		transition_->Start([]
 			{

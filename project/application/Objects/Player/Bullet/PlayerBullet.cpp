@@ -55,7 +55,7 @@ void PlayerBullet::Update()
 	collider_.SetPosition(position_);
 
 	// パーティクル
-	ParticleEmitter::Emit("slash", position_, 1);
+	IIEngine::ParticleEmitter::Emit("slash", position_, 1);
 }
 
 void PlayerBullet::Draw()

@@ -60,7 +60,7 @@ void GamePlayScene::Initialize()
 	}
 
 	// レベルデータの読み込み
-	levelData_ = LevelDataLoader::LoadLevelData("wallSetting");
+	levelData_ = IIEngine::LevelDataLoader::LoadLevelData("wallSetting");
 	if (levelData_)
 	{
 		// レベルデータに基づいて壁を配置
@@ -158,7 +158,7 @@ void GamePlayScene::Initialize()
 	}
 
 	// シーン開始時遷移演出
-	blockTransition_ = std::make_unique<BlockRiseTransition>(BlockRiseTransition::Mode::DropOnly);
+	blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
 	blockTransition_->Start(nullptr);
 
@@ -325,10 +325,10 @@ void GamePlayScene::Update()
 #endif // USE_IMGUI
 
 
-	if (Input::GetInstance()->TriggerKey(DIK_UP) or (isClearFadeStart_ && !isTransitioning_))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_UP) or (isClearFadeStart_ && !isTransitioning_))
 	{
 		// トランジション開始
-		fadeTransition_ = std::make_unique<FadeTransition>();
+		fadeTransition_ = std::make_unique<IIEngine::FadeTransition>();
 		isTransitioning_ = true;
 		fadeTransition_->Start([]
 			{
@@ -336,10 +336,10 @@ void GamePlayScene::Update()
 				IIEngine::SceneManager::GetInstance()->ChangeScene("CLEAR");
 			});
 	}
-	if (Input::GetInstance()->TriggerKey(DIK_DOWN) or (pPlayer_->IsDeathMotionComplete() && !isTransitioning_))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_DOWN) or (pPlayer_->IsDeathMotionComplete() && !isTransitioning_))
 	{
 		// トランジション開始
-		blockTransition_ = std::make_unique<BlockRiseTransition>();
+		blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();
 		isTransitioning_ = true;
 		blockTransition_->Start([]
 			{

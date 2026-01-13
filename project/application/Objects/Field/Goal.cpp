@@ -41,7 +41,7 @@ void Goal::Update()
 
 	if (isCleared_)
 	{
-		ParticleEmitter::Emit("goal", position_, 2);
+		IIEngine::ParticleEmitter::Emit("goal", position_, 2);
 	}
 
 }

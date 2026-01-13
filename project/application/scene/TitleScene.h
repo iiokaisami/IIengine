@@ -48,7 +48,7 @@ private:
 	Vector3 cameraRotate_{};
 
 	// 遷移
-	std::unique_ptr<BlockRiseTransition> transition_ = nullptr;
+	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
 	bool isTransitioning_ = false;
 
 	// 2Dスプライト

@@ -50,9 +50,9 @@ void CorruptorBehaviorSelfDestruct::Update()
 		pCorruptor_->SetIsDead(true);
 
 		// パーティクル
-		ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 15);
-		ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
-		ParticleEmitter::Emit("BltReaction", motion_.transform.position, 1);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 15);
+		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
+		IIEngine::ParticleEmitter::Emit("BltReaction", motion_.transform.position, 1);
 	}
 
 }

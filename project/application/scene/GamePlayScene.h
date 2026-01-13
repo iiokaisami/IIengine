@@ -63,8 +63,8 @@ private:
 	uint32_t spriteNum_ = 1;
 
 	// 遷移
-	std::unique_ptr<BlockRiseTransition> blockTransition_ = nullptr;
-	std::unique_ptr<FadeTransition> fadeTransition_ = nullptr;
+	std::unique_ptr<IIEngine::BlockRiseTransition> blockTransition_ = nullptr;
+	std::unique_ptr<IIEngine::FadeTransition> fadeTransition_ = nullptr;
 	bool isTransitioning_ = false;
 
 	// 衝突判定
@@ -91,7 +91,7 @@ private:
 	bool cameraIsResting_ = true;
 
 	// レベルデータローダー
-	std::unique_ptr<LevelData> levelData_ = nullptr;
+	std::unique_ptr<IIEngine::LevelData> levelData_ = nullptr;
 
 	// スタートカメラ演出変数
 	bool isStartCamera_ = false;

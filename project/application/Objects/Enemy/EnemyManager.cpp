@@ -8,8 +8,8 @@
 void EnemyManager::Initialize()
 {
 	// エディタ読み込み
-	auto levelData = std::make_shared<LevelData>();
-	levelData = LevelDataLoader::LoadLevelData("enemySpawn");
+	auto levelData = std::make_shared<IIEngine::LevelData>();
+	levelData = IIEngine::LevelDataLoader::LoadLevelData("enemySpawn");
 	SetLevelData(levelData);
 
 	// ウェーブステート

@@ -90,7 +90,7 @@ void EnemyBullet::OnCollisionTrigger(const Collider* _other)
 		_other->GetColliderID() == "TrapEnemy" or
 		_other->GetColliderID() == "Barrie"))
 	{
-		ParticleEmitter::Emit("BltReaction", position_, 1);
+		IIEngine::ParticleEmitter::Emit("BltReaction", position_, 1);
 		isDead_ = true;
 	} 
 }

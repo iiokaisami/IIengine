@@ -39,7 +39,7 @@ void TrapEnemy::Initialize()
     isInvincible_ = true;
     
 	// パーティクル
-    ParticleEmitter::Emit("laserGroup", position_, 2);
+    IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
 }
 
 void TrapEnemy::Finalize()
@@ -192,7 +192,7 @@ void TrapEnemy::Move()
 
 	SyncObjectTransform();
 
-    ParticleEmitter::Emit("enemyWalk", position_, 1);
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
 }
 
 
@@ -236,7 +236,7 @@ void TrapEnemy::RemoveBullets()
             {
                 if (trap->IsDead())
                 {
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
                     trap->Finalize();
                     return true;
                 }
@@ -250,7 +250,7 @@ void TrapEnemy::RemoveBullets()
             {
                 if (trap->IsDead())
                 {
-                    ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
                     trap->Finalize();
                     return true;
                 }

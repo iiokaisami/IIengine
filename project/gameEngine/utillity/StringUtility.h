@@ -4,7 +4,7 @@
 
 
 // 文字コードユーティリティ
-namespace StringUtility
+namespace IIEngine::StringUtility
 {
 	/// <summary>
 	/// stringを wstringに変換する

@@ -47,7 +47,7 @@ private:
 	uint32_t spriteNum_ = 3;
 
 	// 遷移
-	std::unique_ptr<BlockRiseTransition> transition_ = nullptr;
+	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
 	bool isTransitioning_ = false;
 
 	// プレイヤー

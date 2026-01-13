@@ -46,7 +46,7 @@ void NormalEnemy::Initialize()
 
 
 	// パーティクル
-	ParticleEmitter::Emit("laserGroup", position_, 2);
+    IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
 }
 
 void NormalEnemy::Finalize()
@@ -183,7 +183,7 @@ void NormalEnemy::Move()
 
 		SyncObjectTransform();
 
-		ParticleEmitter::Emit("enemyWalk", position_, 1);
+        IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
     }
 }
 
@@ -304,7 +304,7 @@ void NormalEnemy::HitVignetteTrap()
     if (isHitVignetteTrap_)
     {
         // パーティクルを生成
-        ParticleEmitter::Emit("vignetteGroup", { position_.x, position_.y + 1.0f,position_.z }, 3);
+        IIEngine::ParticleEmitter::Emit("vignetteGroup", { position_.x, position_.y + 1.0f,position_.z }, 3);
 
         // タイマー更新
         if (vignetteTime_ > 0)

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <Vector3.h>
 
+
 // 前方宣言
 class Corruptor;
 

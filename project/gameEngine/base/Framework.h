@@ -83,7 +83,7 @@ protected:
 	std::unique_ptr<DirectXCommon> dxCommon = nullptr;
 	std::unique_ptr<SrvManager> srvManager = nullptr;
 	std::unique_ptr<ModelCommon> modelCommon = nullptr;
-	Input* input = nullptr;
+	IIEngine::Input* input = nullptr;
 	Audio* audio = nullptr;
 
 	IIEngine::SceneManager* sceneManager_ = nullptr;
@@ -103,13 +103,13 @@ protected:
 	std::unique_ptr<BoxFilterPass> boxFilterPass = nullptr;
 	std::unique_ptr<GaussianFilterPass> gaussianFilterPass = nullptr;
 
-	ParticleManager* particleManager = nullptr;
+	IIEngine::ParticleManager* particleManager = nullptr;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE inputSrv;
 	Microsoft::WRL::ComPtr<ID3D12Resource> inputRes;
 	D3D12_RESOURCE_STATES state;
 
-	std::unique_ptr<Skybox> skybox = nullptr;
+	std::unique_ptr<IIEngine::Skybox> skybox = nullptr;
 
 #ifdef USE_IMGUI
 

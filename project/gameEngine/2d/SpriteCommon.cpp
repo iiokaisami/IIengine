@@ -134,7 +134,7 @@ void SpriteCommon::CreateRootSignature()
 	result = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(result))
 	{
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		IIEngine::Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	//バイナリをもとに生成

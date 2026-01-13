@@ -3,6 +3,7 @@
 #include <Camera.h>
 #include <CameraManager.h>
 
+
 SceneCamera::SceneCamera()
 	: camera_(std::make_shared<Camera>()),
 	  cameraManager_(CameraManager::GetInstance())

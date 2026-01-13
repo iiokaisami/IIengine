@@ -1,7 +1,7 @@
 #include "StringUtility.h"
 
 
-namespace StringUtility
+namespace IIEngine::StringUtility
 {
     std::wstring StringUtility::ConvertString(const std::string& str)
     {

@@ -82,7 +82,7 @@ void Player::Finalize()
 	}
 
 	RemoveDeadBullets<PlayerBullet>(pBullets_, [](const PlayerBullet& b) {
-		ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
+		IIEngine::ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
 		});
 
 	colliderManager_->DeleteCollider(&collider_);
@@ -108,7 +108,7 @@ void Player::Update()
 	// 弾の削除
 	RemoveDeadBullets<PlayerBullet>(pBullets_, [](const PlayerBullet& b)
 		{
-			ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
+			IIEngine::ParticleEmitter::Emit("BltReaction", b.GetPosition(), 1);
 		});
 
 	// 弾更新
@@ -182,19 +182,19 @@ void Player::Move()
 	moveVelocity_ = {};
 
 	// 画面上の見た目通りに移動（カメラ回転なし）
-	if (Input::GetInstance()->PushKey(DIK_W))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_W))
 	{
 		moveVelocity_.z += moveSpeed_.z;
 	}
-	if (Input::GetInstance()->PushKey(DIK_S))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_S))
 	{
 		moveVelocity_.z -= moveSpeed_.z;
 	}
-	if (Input::GetInstance()->PushKey(DIK_A))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_A))
 	{
 		moveVelocity_.x -= moveSpeed_.x;
 	}
-	if (Input::GetInstance()->PushKey(DIK_D))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_D))
 	{
 		moveVelocity_.x += moveSpeed_.x;
 	}
@@ -227,12 +227,12 @@ void Player::Move()
 	ClampPosition();
 
 	// パーティクル
-	ParticleEmitter::Emit("walk", position_, 1);
+	IIEngine::ParticleEmitter::Emit("walk", position_, 1);
 }
 
 void Player::Attack()
 {
-	if (Input::GetInstance()->PushKey(DIK_SPACE))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_SPACE))
 	{
 		if (countCoolDownFrame_ == 0)
 		{
@@ -266,7 +266,7 @@ void Player::Evade()
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 回避入力
-	if (!isEvading_ && Input::GetInstance()->PushKey(DIK_LSHIFT))
+	if (!isEvading_ && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
 	{
 		// 移動方向がある場合のみ回避
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
@@ -442,7 +442,7 @@ void Player::DeadEffect()
 	}
 
 	// パーティクルを発生させる
-	ParticleEmitter::Emit("rupture", position_, 20);
+	IIEngine::ParticleEmitter::Emit("rupture", position_, 20);
 
 	// モーション終了扱いにする
 	deathMotion_.isActive = false;
@@ -580,7 +580,7 @@ void Player::ClearSceneUpdate()
 	SyncObjectTransform();
 
 	// パーティクル
-	ParticleEmitter::Emit("walk", clearMotion_.position, 1);
+	IIEngine::ParticleEmitter::Emit("walk", clearMotion_.position, 1);
 
 }
 
@@ -713,7 +713,7 @@ void Player::AutoMove()
 	ClampPosition();
 
 	// パーティクル
-	ParticleEmitter::Emit("walk", position_, 1);
+	IIEngine::ParticleEmitter::Emit("walk", position_, 1);
 }
 
 void Player::AutoAttack()
@@ -765,7 +765,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 
 			isHitMoment_ = true;
 
-			ParticleEmitter::Emit("HitReaction", position_, 5);
+			IIEngine::ParticleEmitter::Emit("HitReaction", position_, 5);
 		} else
 		{
 			isDead_ = true;
@@ -783,7 +783,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			if (hp_ > 0.3)
 			{
 				hp_ -= 1.5f;
-				ParticleEmitter::Emit("HitReaction", position_, 8);
+				IIEngine::ParticleEmitter::Emit("HitReaction", position_, 8);
 			} else
 			{
 				isDead_ = true;
@@ -873,7 +873,7 @@ void Player::HitVignetteTrap()
 		PostEffectManager::GetInstance()->SetActiveEffect("Vignette", isHitVignetteTrap_);
 		PostEffectManager::GetInstance()->GetPassAs<VignettePass>("Vignette")->SetStrength(vignetteStrength_);
 
-		ParticleEmitter::Emit("debuff", position_, 2);
+		IIEngine::ParticleEmitter::Emit("debuff", position_, 2);
 
 		environmentStrength_ = 1.0f;
 

@@ -7,6 +7,7 @@
 #include "MyMath.h"
 #include "TextureManager.h"
 
+// 前方宣言
 class ModelCommon;
 
 /// <summary>

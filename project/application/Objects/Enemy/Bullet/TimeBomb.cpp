@@ -258,7 +258,7 @@ void TimeBomb::OnExplosionTrigger(const Collider* _other)
 	{
 		isDead_ = true;
 		// パーティクル起動
-		ParticleEmitter::Emit("explosionGroup", position_, 6);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", position_, 6);
 	}
 }
 
