@@ -9908,15 +9908,15 @@ void ClearScene::Initialize()
 		
 		if (i == 0)
 		{
-			sprite->Initialize("clearLogo.png", { -10,0 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("clearLogo.png", { 0,0 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		} 
 		else if (i == 1)
 		{
-			sprite->Initialize("gameOverReTry.png", { 0,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("reTry.png", rePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		} 
 		else if (i == 2)
 		{
-			sprite->Initialize("gameOverToTitle.png", { -70,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("toTitle.png", toPos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		}
 		
 		sprites_.push_back(std::move(sprite));
@@ -9968,6 +9968,26 @@ void ClearScene::Update()
 	camera_->Update(dt);
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
+
+
+	// rePos_とtoPos_を範囲で往復させる
+	{
+		static float timer = 0.0f;
+		const float speed = 2.0f; // 速さ
+		const float minX = 0.0f;
+		const float maxX = 30.0f;
+		const float mid = (minX + maxX) * 0.5f;
+		const float amp = (maxX - minX) * 0.5f;
+
+		timer += dt;
+		const float x1 = mid + amp * std::sinf(timer * speed);
+		const float x2 = mid + amp * std::sinf(timer * speed + 3.14159265358979f); // 逆位相
+
+		rePos_.x = x1;
+		toPos_.x = x2;
+	}
+	sprites_[1]->SetPosition(rePos_);
+	sprites_[2]->SetPosition(toPos_);
 
 
 	// スプライト更新
@@ -10108,6 +10128,9 @@ private:
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 3;
 
+	Vector2 rePos_ = { 0,620 };
+	Vector2 toPos_ = { 0,620 };
+
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
 	bool isTransitioning_ = false;
@@ -10159,15 +10182,15 @@ void GameOverScene::Initialize()
 		
 		if (i == 0)
 		{
-			sprite->Initialize("gameOverLogo.png", { -10,0 }, {1.0f,1.0f,1.0f,1.0f}, { 0,0 });
+			sprite->Initialize("gameOverLogo.png", { 0,0 }, {1.0f,1.0f,1.0f,1.0f}, { 0,0 });
 		}
 		else if (i == 1)
 		{
-			sprite->Initialize("gameOverReTry.png", { 0,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("reTry.png", rePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		}
 		else if (i == 2)
 		{
-			sprite->Initialize("gameOverToTitle.png", { -70,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("toTitle.png", toPos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		}
 
 		sprites_.push_back(std::move(sprite));
@@ -10246,6 +10269,26 @@ void GameOverScene::Update()
 	camera_->Update(dt);
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
+
+	// rePos_とtoPos_を範囲で往復させる
+	{
+		static float timer = 0.0f;
+		const float speed = 2.0f; // 速さ
+		const float minX = 0.0f;
+		const float maxX = 30.0f;
+		const float mid = (minX + maxX) * 0.5f;
+		const float amp = (maxX - minX) * 0.5f;
+
+		timer += dt;
+		const float x1 = mid + amp * std::sinf(timer * speed);
+		const float x2 = mid + amp * std::sinf(timer * speed + 3.14159265358979f); // 逆位相
+
+		rePos_.x = x1;
+		toPos_.x = x2;
+	}
+	sprites_[1]->SetPosition(rePos_);
+	sprites_[2]->SetPosition(toPos_);
+
 
 	for (auto& sprite : sprites_)
 	{
@@ -10431,6 +10474,9 @@ private:
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 3;
 
+	Vector2 rePos_ = { 0,620 };
+	Vector2 toPos_ = { 0,620 };
+
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
 	bool isTransitioning_ = false;
@@ -10507,6 +10553,26 @@ void GamePlayScene::Initialize()
 		if (i == 0)
 		{
 			sprite->Initialize("playUI.png", { 0,600 }, color_, { 0,0 });
+		}
+		if (i == 1)
+		{
+			sprite->Initialize("playSPACE.png", spacePos_, color_, { 0,0 });
+		}
+		if (i == 2)
+		{
+			sprite->Initialize("playW.png", wPos_, color_, { 0,0 });
+		}
+		if (i == 3)
+		{
+			sprite->Initialize("playA.png", aPos_, color_, { 0,0 });
+		}
+		if (i == 4)
+		{
+			sprite->Initialize("playS.png", sPos_, color_, { 0,0 });
+		}
+		if (i == 5)
+		{
+			sprite->Initialize("playD.png", dPos_, color_, { 0,0 });
 		}
 
 		sprites_.push_back(std::move(sprite));
@@ -10681,6 +10747,43 @@ void GamePlayScene::Update()
 	
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	{
+		// sprite の順序: space, W, A, S, D の 5 つを順番に動かす
+		static float seqTimer = 0.0f;
+		constexpr int kCount = 5;
+		const float slotDuration = 0.2f; // 各スロットの所要時間
+		const float totalDuration = slotDuration * kCount;
+
+		seqTimer += dt;
+		// 0..totalDuration に折り返す
+		if (seqTimer >= totalDuration) seqTimer = std::fmod(seqTimer, totalDuration);
+
+		auto calcY = [&](int index) -> float
+			{
+				const float tLocal = seqTimer - (index * slotDuration);
+				// 有効範囲
+				if (tLocal < 0.0f || tLocal >= slotDuration) return 0.0f;
+				// 進行度
+				const float p = tLocal / slotDuration;
+				return -3.0f * std::sinf(p * static_cast<float>(M_PI));
+			};
+
+		spacePos_.y = calcY(0);
+		wPos_.y = calcY(1);
+		aPos_.y = calcY(2);
+		sPos_.y = calcY(3);
+		dPos_.y = calcY(4);
+
+		if (sprites_.size() >= 6)
+		{
+			sprites_[1]->SetPosition({ spacePos_.x, spacePos_.y });
+			sprites_[2]->SetPosition({ wPos_.x, wPos_.y });
+			sprites_[3]->SetPosition({ aPos_.x, aPos_.y });
+			sprites_[4]->SetPosition({ sPos_.x, sPos_.y });
+			sprites_[5]->SetPosition({ dPos_.x, dPos_.y });
+		}
+	}
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
@@ -10968,9 +11071,17 @@ private:
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
-	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 color_ = { 0.0f,0.0f,0.0f,1.0f };
+	// 変更後の色(薄めの赤)
+	Vector4 usedColor_ = { 1.0f,0.5f,0.5f,1.0f };
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 6;
+
+	Vector2 spacePos_ = { 0.0f,0.0f };
+	Vector2 wPos_ = { 0.0f,0.0f };
+	Vector2 aPos_ = { 0.0f,0.0f };
+	Vector2 sPos_ = { 0.0f,0.0f };
+	Vector2 dPos_ = { 0.0f,0.0f };
 
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> blockTransition_ = nullptr;
@@ -11156,8 +11267,13 @@ void TitleScene::Initialize()
 		if (i == 0)
 		{
 			
+			sprite->Initialize("titleLogo.png", { 0,0 }, {1.0f,1.0f,1.0f,1.0f}, {0,0});
+		}
+		if(i == 1)
+		{
 			sprite->Initialize("titleUI.png", { 0,0 }, color_, { 0,0 });
 		}
+
 		sprites_.push_back(std::move(sprite));
 
 	}
@@ -11240,6 +11356,13 @@ void TitleScene::Update()
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
+
+	// 透明度の上下
+	const float alphaSpeed = 4.0f;
+	time_ += dt;
+	color_.w = 0.5f * (1.0f + std::sinf(time_ * alphaSpeed)); 
+
+
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
 
@@ -11264,9 +11387,9 @@ void TitleScene::Update()
 	{
 		sprite->Update();
 
-		sprite->SetColor(color_);
-
 	}
+
+	sprites_[1]->SetColor(color_);
 
 
 
@@ -11387,6 +11510,7 @@ void TitleScene::Draw()
 	
 }
 
+
 ============================================================
 File Path: project/application/scene/TitleScene.h
 ============================================================
@@ -11446,7 +11570,7 @@ private:
 	// 2Dスプライト
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 2;
 
 	// 衝突判定
 	ColliderManager* colliderManager_ = nullptr;
@@ -19177,7 +19301,7 @@ public:
 public:
 
 	//クライアント領域のサイズ
-	static const int32_t kClientWidth = 1200;
+	static const int32_t kClientWidth = 1280;
 	static const int32_t kClientHeight = 720;
 
 
