@@ -50,8 +50,8 @@ void TrapEnemyBehaviorDead::Update()
 		pTrapEnemy_->SetIsDead(true);
 
 		// パーティクル
-		ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 6);
-		ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 6);
+		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
 	}
 }
 

@@ -322,10 +322,33 @@ void GamePlayScene::Update()
 
 	AllImGui();
 
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_UP))
+	{
+		// トランジション開始
+		fadeTransition_ = std::make_unique<IIEngine::FadeTransition>();
+		isTransitioning_ = true;
+		fadeTransition_->Start([]
+			{
+				// シーン切り替え
+				IIEngine::SceneManager::GetInstance()->ChangeScene("CLEAR");
+			});
+	}
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_DOWN))
+	{
+		// トランジション開始
+		blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();
+		isTransitioning_ = true;
+		blockTransition_->Start([]
+			{
+				// シーン切り替え
+				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEOVER");
+			});
+	}
+
 #endif // USE_IMGUI
 
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_UP) or (isClearFadeStart_ && !isTransitioning_))
+	if (isClearFadeStart_ && !isTransitioning_)
 	{
 		// トランジション開始
 		fadeTransition_ = std::make_unique<IIEngine::FadeTransition>();
@@ -336,7 +359,7 @@ void GamePlayScene::Update()
 				IIEngine::SceneManager::GetInstance()->ChangeScene("CLEAR");
 			});
 	}
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_DOWN) or (pPlayer_->IsDeathMotionComplete() && !isTransitioning_))
+	if (pPlayer_->IsDeathMotionComplete() && !isTransitioning_)
 	{
 		// トランジション開始
 		blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();
