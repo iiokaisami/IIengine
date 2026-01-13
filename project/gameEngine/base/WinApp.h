@@ -31,7 +31,7 @@ public:
 public:
 
 	//クライアント領域のサイズ
-	static const int32_t kClientWidth = 1200;
+	static const int32_t kClientWidth = 1280;
 	static const int32_t kClientHeight = 720;
 
 

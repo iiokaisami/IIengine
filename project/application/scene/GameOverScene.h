@@ -52,6 +52,9 @@ private:
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 3;
 
+	Vector2 rePos_ = { 0,620 };
+	Vector2 toPos_ = { 0,620 };
+
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
 	bool isTransitioning_ = false;

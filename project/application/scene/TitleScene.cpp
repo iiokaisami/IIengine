@@ -50,8 +50,13 @@ void TitleScene::Initialize()
 		if (i == 0)
 		{
 			
+			sprite->Initialize("titleLogo.png", { 0,0 }, {1.0f,1.0f,1.0f,1.0f}, {0,0});
+		}
+		if(i == 1)
+		{
 			sprite->Initialize("titleUI.png", { 0,0 }, color_, { 0,0 });
 		}
+
 		sprites_.push_back(std::move(sprite));
 
 	}
@@ -134,6 +139,13 @@ void TitleScene::Update()
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
+
+	// 透明度の上下
+	const float alphaSpeed = 4.0f;
+	time_ += dt;
+	color_.w = 0.5f * (1.0f + std::sinf(time_ * alphaSpeed)); 
+
+
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();
 
@@ -158,9 +170,9 @@ void TitleScene::Update()
 	{
 		sprite->Update();
 
-		sprite->SetColor(color_);
-
 	}
+
+	sprites_[1]->SetColor(color_);
 
 
 

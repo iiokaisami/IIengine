@@ -55,6 +55,26 @@ void GamePlayScene::Initialize()
 		{
 			sprite->Initialize("playUI.png", { 0,600 }, color_, { 0,0 });
 		}
+		if (i == 1)
+		{
+			sprite->Initialize("playSPACE.png", spacePos_, color_, { 0,0 });
+		}
+		if (i == 2)
+		{
+			sprite->Initialize("playW.png", wPos_, color_, { 0,0 });
+		}
+		if (i == 3)
+		{
+			sprite->Initialize("playA.png", aPos_, color_, { 0,0 });
+		}
+		if (i == 4)
+		{
+			sprite->Initialize("playS.png", sPos_, color_, { 0,0 });
+		}
+		if (i == 5)
+		{
+			sprite->Initialize("playD.png", dPos_, color_, { 0,0 });
+		}
 
 		sprites_.push_back(std::move(sprite));
 	}
@@ -228,6 +248,43 @@ void GamePlayScene::Update()
 	
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	{
+		// sprite の順序: space, W, A, S, D の 5 つを順番に動かす
+		static float seqTimer = 0.0f;
+		constexpr int kCount = 5;
+		const float slotDuration = 0.2f; // 各スロットの所要時間
+		const float totalDuration = slotDuration * kCount;
+
+		seqTimer += dt;
+		// 0..totalDuration に折り返す
+		if (seqTimer >= totalDuration) seqTimer = std::fmod(seqTimer, totalDuration);
+
+		auto calcY = [&](int index) -> float
+			{
+				const float tLocal = seqTimer - (index * slotDuration);
+				// 有効範囲
+				if (tLocal < 0.0f || tLocal >= slotDuration) return 0.0f;
+				// 進行度
+				const float p = tLocal / slotDuration;
+				return -3.0f * std::sinf(p * static_cast<float>(M_PI));
+			};
+
+		spacePos_.y = calcY(0);
+		wPos_.y = calcY(1);
+		aPos_.y = calcY(2);
+		sPos_.y = calcY(3);
+		dPos_.y = calcY(4);
+
+		if (sprites_.size() >= 6)
+		{
+			sprites_[1]->SetPosition({ spacePos_.x, spacePos_.y });
+			sprites_[2]->SetPosition({ wPos_.x, wPos_.y });
+			sprites_[3]->SetPosition({ aPos_.x, aPos_.y });
+			sprites_[4]->SetPosition({ sPos_.x, sPos_.y });
+			sprites_[5]->SetPosition({ dPos_.x, dPos_.y });
+		}
+	}
 
 	// 当たり判定チェック
 	colliderManager_->CheckAllCollision();

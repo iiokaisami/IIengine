@@ -54,7 +54,7 @@ private:
 	// 2Dスプライト
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 2;
 
 	// 衝突判定
 	ColliderManager* colliderManager_ = nullptr;

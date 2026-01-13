@@ -58,9 +58,17 @@ private:
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
-	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 color_ = { 0.0f,0.0f,0.0f,1.0f };
+	// 変更後の色(薄めの赤)
+	Vector4 usedColor_ = { 1.0f,0.5f,0.5f,1.0f };
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 1;
+	uint32_t spriteNum_ = 6;
+
+	Vector2 spacePos_ = { 0.0f,0.0f };
+	Vector2 wPos_ = { 0.0f,0.0f };
+	Vector2 aPos_ = { 0.0f,0.0f };
+	Vector2 sPos_ = { 0.0f,0.0f };
+	Vector2 dPos_ = { 0.0f,0.0f };
 
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> blockTransition_ = nullptr;

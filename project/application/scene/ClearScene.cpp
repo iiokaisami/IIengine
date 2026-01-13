@@ -35,15 +35,15 @@ void ClearScene::Initialize()
 		
 		if (i == 0)
 		{
-			sprite->Initialize("clearLogo.png", { -10,0 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("clearLogo.png", { 0,0 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		} 
 		else if (i == 1)
 		{
-			sprite->Initialize("gameOverReTry.png", { 0,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("reTry.png", rePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		} 
 		else if (i == 2)
 		{
-			sprite->Initialize("gameOverToTitle.png", { -70,620 }, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("toTitle.png", toPos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
 		}
 		
 		sprites_.push_back(std::move(sprite));
@@ -95,6 +95,26 @@ void ClearScene::Update()
 	camera_->Update(dt);
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
+
+
+	// rePos_とtoPos_を範囲で往復させる
+	{
+		static float timer = 0.0f;
+		const float speed = 2.0f; // 速さ
+		const float minX = 0.0f;
+		const float maxX = 30.0f;
+		const float mid = (minX + maxX) * 0.5f;
+		const float amp = (maxX - minX) * 0.5f;
+
+		timer += dt;
+		const float x1 = mid + amp * std::sinf(timer * speed);
+		const float x2 = mid + amp * std::sinf(timer * speed + 3.14159265358979f); // 逆位相
+
+		rePos_.x = x1;
+		toPos_.x = x2;
+	}
+	sprites_[1]->SetPosition(rePos_);
+	sprites_[2]->SetPosition(toPos_);
 
 
 	// スプライト更新
