@@ -77,18 +77,18 @@ private: // 構造体
 	// テクスチャ1枚分のデータ
 	struct TextureData
 	{
-		DirectX::TexMetadata metadata;
+		DirectX::TexMetadata metadata{};
 		Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource> intermediate;
-		uint32_t srvIndex;
-		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
-		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+		uint32_t srvIndex{};
+		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU{};
+		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU{};
 	};
 
 private:
 
 	// テクスチャデータ
-	std::unordered_map<std::string, TextureData> textureDatas;
+	std::unordered_map<std::string, TextureData> textureDates;
 
 	DirectXCommon* dxCommon_ = nullptr;
 

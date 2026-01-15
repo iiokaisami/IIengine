@@ -41,7 +41,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	model->Initialize(modelCommon_.get(), directory, fileName);
 
-	// モデルをmapコンテナに格納する
+	// モデルを mapコンテナに格納する
 	models.insert(std::make_pair(fileName, std::move(model))); // 所有権を譲渡
 }
 
@@ -49,7 +49,7 @@ Model* ModelManager::FindModel(const std::string& filePath)
 {
 	// 読み込み済みモデルを検索
 	if (models.contains(filePath)) {
-		// 読み込みモデルを戻り値としてreturn
+		// 読み込みモデルを戻り値として return
 		return models.at(filePath).get();
 	}
 	// ファイル名一致無し

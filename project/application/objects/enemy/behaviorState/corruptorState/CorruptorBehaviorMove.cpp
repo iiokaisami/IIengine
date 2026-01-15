@@ -18,7 +18,7 @@ void CorruptorBehaviorMove::Initialize()
 
 void CorruptorBehaviorMove::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pCorruptor_);
 	
 	// 動く前に切り替え処理

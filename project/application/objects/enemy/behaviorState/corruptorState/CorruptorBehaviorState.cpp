@@ -11,7 +11,8 @@ void CorruptorBehaviorState::MotionCount(Motion& _motion)
 	if (_motion.count < _motion.maxCount)
 	{
 		_motion.count++;
-	} else
+	} 
+	else
 	{
 		// モーション終了 カウントリセット
 		_motion.isActive = false;

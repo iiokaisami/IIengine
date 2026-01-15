@@ -41,7 +41,7 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 // -----行列-----
 // 行列の積
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {
@@ -53,7 +53,7 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 // 平行移動行列
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	result.m[0][0] = 1;
 	result.m[0][1] = 0;
@@ -193,9 +193,9 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 
 // 逆行列
 Matrix4x4 Inverse(const Matrix4x4& m) {
-	Matrix4x4 result;
-	float a;
-	Matrix4x4 b;
+	Matrix4x4 result{};
+	float a{};
+	Matrix4x4 b{};
 
 	a = 1 /
 		(m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2] - m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1] -
@@ -262,7 +262,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 }
 // 転置行列
 Matrix4x4 Transpose(const Matrix4x4& m) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {
@@ -285,7 +285,7 @@ Matrix4x4 InverseTranspose(const Matrix4x4& m)
 }
 // 単位行列の作成
 Matrix4x4 MakeIdentity4x4() {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {

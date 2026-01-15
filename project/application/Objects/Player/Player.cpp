@@ -689,7 +689,7 @@ void Player::AutoMove()
 
 	if (redirected)
 	{
-		// 端で方向反転したら新たにmoveTimerを設定し、即座に再ランダム化しない
+		// 端で方向反転したら新たに moveTimerを設定し、即座に再ランダム化しない
 		moveTimer = 60 + rand() % 90;
 	}
 

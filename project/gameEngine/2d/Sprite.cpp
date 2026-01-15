@@ -10,7 +10,7 @@ void Sprite::Initialize(std::string textureFilePath,
 	spriteCommon_ = SpriteCommon::GetInstance();
 
 	std::ifstream file;
-	// 基本パスを指定（"Resources/images/"）
+	// 基本パスを指定("Resources/images/")
 	std::string basePath = "resources/images/";
 	std::string fullPath = basePath + textureFilePath;
 	textureFilePath_ = fullPath;

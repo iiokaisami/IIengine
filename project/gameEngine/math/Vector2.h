@@ -39,7 +39,7 @@ public:
     }
 
     /// ===========
-    /// calcuration
+    /// calculation
     /// ===========
 
     /// <summary>

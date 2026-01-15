@@ -268,7 +268,7 @@
     <ClCompile Include="application\Objects\Enemy\TrapEnemy.cpp">
       <Filter>application\objects\enemy</Filter>
     </ClCompile>
-    <ClCompile Include="application\Objects\Field\Barrie.cpp">
+    <ClCompile Include="application\Objects\Field\Barrier.cpp">
       <Filter>application\objects\field</Filter>
     </ClCompile>
     <ClCompile Include="application\Objects\Field\Field.cpp">
@@ -570,7 +570,7 @@
     <ClInclude Include="application\Objects\Enemy\TrapEnemy.h">
       <Filter>application\objects\enemy</Filter>
     </ClInclude>
-    <ClInclude Include="application\Objects\Field\Barrie.h">
+    <ClInclude Include="application\Objects\Field\Barrier.h">
       <Filter>application\objects\field</Filter>
     </ClInclude>
     <ClInclude Include="application\Objects\Field\Field.h">

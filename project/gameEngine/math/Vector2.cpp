@@ -2,7 +2,7 @@
 #include <cmath>
 
 /// ===========
-/// calcuration
+/// calculation
 /// ===========
 
 float Vector2::Dot(const Vector2& _v) const
@@ -161,7 +161,7 @@ Vector2& Vector2::operator*=(const Vector2& _v)
 }
 
 /// =========
-/// overscope
+/// overScope
 /// =========
 
 Vector2 operator*(const float _f, const Vector2& _v)

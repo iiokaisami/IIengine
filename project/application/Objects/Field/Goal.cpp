@@ -12,15 +12,15 @@ void Goal::Initialize()
 	object_->SetLighting(true);
 
 	// バリア
-	pBarrie_ = std::make_unique<Barrie>();
-	pBarrie_->SetPosition(position_);
-	pBarrie_->Initialize();
+	pBarrier_ = std::make_unique<Barrier>();
+	pBarrier_->SetPosition(position_);
+	pBarrier_->Initialize();
 }
 
 void Goal::Finalize()
 {
 	colliderManager_->DeleteCollider(&collider_);
-	pBarrie_->Finalize();
+	pBarrier_->Finalize();
 }
 
 void Goal::Update()
@@ -28,12 +28,12 @@ void Goal::Update()
 	StaticObject::Update();
 
 	// バリアの更新
-	pBarrie_->Update();
+	pBarrier_->Update();
 
 	// バリア破壊の状態が変わったときだけ伝える
 	if (isBarrierDestroyed_ && !wasBarrierDestroyed_)
 	{
-		pBarrie_->SetBarrierDestroyed(true);
+		pBarrier_->SetBarrierDestroyed(true);
 	}
 	
 	// 状態を保存
@@ -50,7 +50,7 @@ void Goal::Draw()
 {
 	object_->Draw();
 	
-	pBarrie_->Draw();
+	pBarrier_->Draw();
 }
 
 void Goal::ImGuiDraw()

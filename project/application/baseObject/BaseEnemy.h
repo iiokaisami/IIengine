@@ -43,7 +43,7 @@ protected:
 	Vector3 InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate);
 
 	// 障害物回避用パス計算
-	//std::vector<Vector3> CalculatePath(const Vector3& start, const Vector3& goal, const std::vector<Vector3>& obstacles);
+	std::vector<Vector3> CalculatePath(const Vector3& start, const Vector3& goal, const std::vector<Vector3>& obstacles);
 
 	// 障害物の近傍ノードを取得
 	std::vector<Vector3> GetNeighbors(const Vector3& node);
@@ -54,12 +54,12 @@ protected:
 protected:
 
     // 移動関連
-    Vector3 moveVelocity_;
-    float moveSpeed_;
+	Vector3 moveVelocity_ = {};
+    float moveSpeed_ = 0.0f;
 
     // プレイヤー関連
-    Vector3 playerPosition_;
-    Vector3 toPlayer_;
+	Vector3 playerPosition_ = {};
+	Vector3 toPlayer_ = {};
 
     // フレームレート補助
     static constexpr float kDefaultFrameRate = 60.0f;

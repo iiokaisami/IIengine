@@ -19,14 +19,14 @@ void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager)
 	srvManager_ = srvManager;
 
 	// SRVの数と同数
-	textureDatas.reserve(DirectXCommon::kMaxSRVCount);
+	textureDates.reserve(DirectXCommon::kMaxSRVCount);
 }
 
 void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 {
 	// 読み込み済みテクスチャを検索
-	if (textureDatas.contains(filePath)) {
-		// 読み込み済みなら早期return
+	if (textureDates.contains(filePath)) {
+		// 読み込み済みなら早期 return
 		return;
 	}
 	// テクスチャ枚数上限チェック
@@ -69,7 +69,7 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 	meta;
 	forceCubeMap;
 
-	// ★ ここでmetaの内容を出力
+	// ここで metaの内容を出力
 	const auto& meta2 = mipImages.GetMetadata();
 	OutputDebugStringA(std::format(
 		"meta2: IsCubemap={}, arraySize={}, mipLevels={}\n",
@@ -78,7 +78,7 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 
 	// テクスチャデータを追加
 	// 追加したテクスチャデータの参照を取得する
-	TextureData& textureData = textureDatas[filePath];
+	TextureData& textureData = textureDates[filePath];
 
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
@@ -142,8 +142,8 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)
 {
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
@@ -158,8 +158,8 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 {
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
@@ -174,8 +174,8 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 {
 
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);

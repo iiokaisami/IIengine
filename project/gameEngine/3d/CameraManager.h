@@ -50,14 +50,6 @@ public:
     /// <param name="magnitude">シェイクの強さ</param>
     void ShakeSpecificCamera(uint32_t index, float duration, float magnitude);
 
-    // アクティブカメラのシェイクを開始
-    // 軽い衝撃のシェイク
-    // cameraManager.StartShakeActiveCamera(0.2f, 0.3f);
-    // 中規模の爆発のシェイク
-    // cameraManager.StartShakeActiveCamera(0.5f, 0.8f);
-    // 大規模な爆発のシェイク
-    // cameraManager.StartShakeActiveCamera(1.0f, 1.5f);
-
     /// <summary>
     /// アクティブカメラのシェイクを開始
     /// 軽い衝撃のシェイク

@@ -19,7 +19,7 @@ void EnemyBehaviorHitReact::Initialize()
 
 void EnemyBehaviorHitReact::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	Vector3 shakeOffset =

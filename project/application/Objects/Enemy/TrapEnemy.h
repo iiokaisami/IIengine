@@ -98,11 +98,11 @@ public: // セッター
 	/// <param name="_isHit">被弾フラグ</param>
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
 
-	// オブジェクトのpositionをセット
+	// オブジェクトの positionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
-	// オブジェクトのrotationをセット
+	// オブジェクトの rotationをセット
 	void SetObjectRotation(const Vector3& _rotation) { object_->SetRotate(_rotation); }
-	// オブジェクトのscaleをセット
+	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
 	// 罠設置完了フラグセット

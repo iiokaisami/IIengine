@@ -60,7 +60,7 @@ protected:
 	// モーションのカウント
 	void MotionCount(Motion& _motion);
 
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	void TransformUpdate(Corruptor* _pEnemy);
 
 	std::string stateName_;

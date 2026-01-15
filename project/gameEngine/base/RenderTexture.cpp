@@ -59,7 +59,7 @@ void RenderTexture::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, 
     metadata.format = format_;
 
     srvIndex_ = srvManager_->Allocate();
-    srvManager_->CreateSRVforTexture2D(srvIndex_, texture_.Get(), format, 1, metadata);
+    srvManager_->CreateSRVForTexture2D(srvIndex_, texture_.Get(), format, 1, metadata);
 
     currentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
 }

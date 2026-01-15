@@ -57,7 +57,7 @@ protected:
 	void MotionCount(Motion& _motion);
 
 	/// <summary>
-	/// 敵のトランスフォームをmotion_.transformにセット
+	/// 敵のトランスフォームを motion_.transformにセット
 	/// </summary>
 	/// <param name="_pEnemy">通常敵ポインタ</param>
 	void TransformUpdate(NormalEnemy* _pEnemy);

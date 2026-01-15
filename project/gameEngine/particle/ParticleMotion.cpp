@@ -404,14 +404,14 @@ namespace IIEngine
         float offsetX = std::cos(angle) * radius;
         float offsetZ = std::sin(angle) * radius;
 
-        // Y座標はtranslate.yそのまま
+        // Y座標は translate.yそのまま
         Vector3 pos = translate + Vector3(offsetX, 1.0f, offsetZ);
 
         Particle p;
         p.transform.translate = pos;
         p.transform.scale = { 1.0f, 1.0f, 1.0f };
         p.transform.rotate = { 0.0f, 0.0f, 0.0f };
-        // 徐々に下がる（Y方向に負の速度）
+        // 徐々に下がる(Y方向に負の速度)
         std::uniform_real_distribution<float> distVelY(-0.03f, -0.01f);
         p.velocity = { 0.0f, distVelY(rand), 0.0f };
         // 徐々に大きくなる

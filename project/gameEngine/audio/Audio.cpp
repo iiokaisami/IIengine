@@ -38,7 +38,7 @@ SoundData Audio::LoadWav(const char* filename)
 	assert(file.is_open());
 
 	// RIFFヘッダーの読み込み
-	RiffHeader riff;
+	RiffHeader riff{};
 	file.read((char*)&riff, sizeof(riff));
 	// ファイルがRIFFかチェック
 	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) 
@@ -52,7 +52,7 @@ SoundData Audio::LoadWav(const char* filename)
 	}
 
 	// チャンクのループを開始
-	ChunkHeader chunkHeader;
+	ChunkHeader chunkHeader{};
 	FormatChunk format = {};
 	while (file.read((char*)&chunkHeader, sizeof(chunkHeader))) {
 		// チャンクIDが "fmt" か確認
@@ -78,7 +78,7 @@ SoundData Audio::LoadWav(const char* filename)
 
 
 	// Dataチャンクの読み込みとスキップ処理
-	ChunkHeader data;
+	ChunkHeader data{};
 	while (file.read((char*)&data, sizeof(data))) {
 		if (strncmp(data.id, "data", 4) == 0) {
 			break; // "data" チャンクを見つけたらループを抜ける
@@ -148,7 +148,7 @@ void Audio::PlayWave(SoundData& soundData, bool loop, float volume)
 	// ボリュームを設定
 	soundData.sourceVoice->SetVolume(volume);
 
-	// "loop" がtrueの場合ループさせる
+	// "loop" が trueの場合ループさせる
 	if (loop) {
 		buf.LoopCount = XAUDIO2_LOOP_INFINITE; // 無限ループ
 	}

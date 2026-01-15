@@ -59,7 +59,7 @@ Vector2 Camera::WorldToScreen(const Vector3& worldPos) const
 	float w = 1.0f;
 
 	// ビュープロジェクション行列をかける
-	Vector4 clip;
+	Vector4 clip{};
 	const Matrix4x4& m = viewProjectionMatrix_;
 	clip.x = x * m.m[0][0] + y * m.m[1][0] + z * m.m[2][0] + w * m.m[3][0];
 	clip.y = x * m.m[0][1] + y * m.m[1][1] + z * m.m[2][1] + w * m.m[3][1];

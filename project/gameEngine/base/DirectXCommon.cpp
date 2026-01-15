@@ -114,10 +114,10 @@ void DirectXCommon::InitializeDevice()
 	//関数が成功したかどうかをSUCCEEDEDマクロで判定できる
 	result = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
 	//初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、
-	//どうにもできない場合が多いのでassertにしておく
+	//どうにもできない場合が多いので assertにしておく
 	assert(SUCCEEDED(result));
 
-	//使用するアダプタ用の変数。最初にnullptrを入れておく
+	//使用するアダプタ用の変数。最初に nullptrを入れておく
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
 	//いい順にアダプタを頼む
 	for (UINT i = 0; dxgiFactory_->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; i++)
@@ -276,13 +276,13 @@ void DirectXCommon::CreateDepthBuffer()
 
 void DirectXCommon::CreateDescriptorHeap()
 {
-	//RTV用のヒープでディスクリプタの数は２。RTVはShader内で触るものではないので、ShaderVisibleはfalse
+	//RTV用のヒープでディスクリプタの数は２。RTVはShader内で触るものではないので、ShaderVisibleは false
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
-	//SRV用のヒープでディスクリプタの数は１２８。SRVはShader内で触るものなので、ShaderVisibleはtrue
+	//SRV用のヒープでディスクリプタの数は１２８。SRVはShader内で触るものなので、ShaderVisibleは true
 	srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 
-	//DSV用のヒープでディスクリプタの数は１。DSVはSharder内で触るものではないので、ShaderVisibleはfalse
+	//DSV用のヒープでディスクリプタの数は１。DSVは Shrader内で触るものではないので、ShaderVisibleは false
 	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 
@@ -424,30 +424,9 @@ void DirectXCommon::CreateDXCompiler()
 	result = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
 	assert(SUCCEEDED(result));
 
-	//現時点でincludeはしないが、includeに対応するための設定を行っておく
+	//現時点で includeはしないが、includeに対応するための設定を行っておく
 	result = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
 	assert(SUCCEEDED(result));
-}
-
-void DirectXCommon::InitializeImGui()
-{
-#ifdef USE_IMGUI
-
-	//ImGuiの初期化
-	/*IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp_->GetHwnd());
-	ImGui_ImplDX12_Init(
-		device_.Get(),
-		swapChainDesc_.BufferCount,
-		rtvDesc_.Format,
-		srvDescriptorHeap_.Get(),
-		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
-		srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
-	);*/
-
-#endif // USE_IMGUI
 }
 
 void DirectXCommon::PreDraw()
@@ -463,7 +442,7 @@ void DirectXCommon::PreDraw()
 	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	//バリアを張る対称のリソース。現在のバックバッファに対して行う
 	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-	//遷移前（現在）のresourceState
+	//遷移前(現在)の resourceState
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	//遷移後のResourceState
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -492,12 +471,6 @@ void DirectXCommon::PreDraw()
 		nullptr
 	);
 
-	//描画用のDescriptorHeapの設定
-	//もろもろの描画処理が終わったタイミングでImGuiの描画コマンドを積む
-	//Guiは画面の最前面に映すので、一番最後の描画として行う
-	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap_ };
-	//commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-
 	commandList_->RSSetViewports(1, &viewport_);
 	commandList_->RSSetScissorRects(1, &scissorRect_);
 }
@@ -519,7 +492,7 @@ void DirectXCommon::PostDraw()
 	barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
 
-	//TransitonのBarrierを張る
+	//TransitionのBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
 
 
@@ -577,7 +550,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	//読めなかったら止める
 	assert(SUCCEEDED(result));
 	//読み込んだファイルの内容を設定する
-	DxcBuffer shaderSourceBuffer;
+	DxcBuffer shaderSourceBuffer{};
 	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;		//UTF8の文字コードであることを通知
@@ -585,9 +558,9 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	//コンパイルする
 
 	LPCWSTR arguments[] = {
-		filePath.c_str(),				//コンパイル対称のhlslファイル名
-		L"-E", L"main",					//エントリーポイントの指定。基本的にmain以外にはしない
-		L"-T", profile,					//Sharderprofileの設定
+		filePath.c_str(),				//コンパイル対称の hlslファイル名
+		L"-E", L"main",					//エントリーポイントの指定。基本的に main以外にはしない
+		L"-T", profile,					//ShraderProfileの設定
 		L"-Zi", L"-Qembed_debug",		//デバッグ用の情報を埋め込む
 		L"-Od",							//最適化を外しておく
 		L"-Zpr",						//メモリレイアウトは行優先
@@ -602,22 +575,22 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 		includeHandler_,
 		IID_PPV_ARGS(&shaderResult)
 	);
-	//コンパイルエラーではなくdxcで起動できないなど致命的な状況
+	//コンパイルエラーではなく dxcで起動できないなど致命的な状況
 	assert(SUCCEEDED(result));
-
-
-
-	//警告・エラーが出ていないか確認する
-
 
 	//警告・エラーが出てたらログに出して止める
 	IDxcBlobUtf8* shaderError = nullptr;
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+	IDxcBlobWide* dummyOutputName = nullptr;
+	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), &dummyOutputName);
+	if (dummyOutputName)
+	{
+		dummyOutputName->Release();
+	}
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
 	{
 		IIEngine::Logger::Log(shaderError->GetStringPointer());
 		//警告・エラーダメ絶対
-		assert(SUCCEEDED(false));
+		assert(false);
 	}
 
 
@@ -626,7 +599,11 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 
 	//コンパイル結果から実行用のバイナリ部分を取得
 	IDxcBlob* shaderBlob = nullptr;
-	result = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	result = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), &dummyOutputName);
+	if (dummyOutputName)
+	{
+		dummyOutputName->Release();
+	}
 	assert(SUCCEEDED(result));
 	//成功したログを出す
 	IIEngine::Logger::Log(IIEngine::StringUtility::ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));

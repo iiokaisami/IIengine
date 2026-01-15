@@ -22,7 +22,7 @@ public:
 	/// <param name="camera">カメラ</param>
 	/// <param name="targetPos">追尾対象の位置を返す関数</param>
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
-	/// <param name="raotationLerp">回転の補間値(0.0f~1.0f)</param>
+	/// <param name="rotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
 	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
 

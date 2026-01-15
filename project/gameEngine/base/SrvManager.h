@@ -26,7 +26,7 @@ public:
 	/// SRV確保確認
 	/// </summary>
 	/// <returns>確保済みか</returns>
-	bool IsAllocate();
+	bool IsAllocate() const;
 
 	// 計算用関数
 	/// <summary>
@@ -50,7 +50,7 @@ public:
 	/// <param name="Format">フォーマット</param>
 	/// <param name="MipLevels">ミップレベル数</param>
 	/// <param name="metadata">テクスチャメタデータ</param>
-	void CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata);
+	void CreateSRVForTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata);
 	
 	/// <summary>
 	/// SRV生成(Structured Buffer用)
@@ -59,7 +59,7 @@ public:
 	/// <param name="pResource">リソースポインタ</param>
 	/// <param name="numElements">要素数</param>
 	/// <param name="structureByteStride">構造体バイトストライド</param>
-	void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
+	void CreateSRVForStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
 
 	// 描画前処理
 	void PreDraw();
@@ -113,7 +113,7 @@ private:
 	// 最大SRV数(最大テクスチャ数)
 	static const uint32_t kMaxSRVCount_;
 	//SRV用デスクリプタサイズ
-	uint32_t descriptorSize_;
+	uint32_t descriptorSize_{};
 	// SRV用デスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
 

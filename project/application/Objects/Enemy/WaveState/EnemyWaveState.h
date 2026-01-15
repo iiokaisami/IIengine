@@ -76,7 +76,7 @@ protected:
 	std::stringstream enemyPopCommands_;
 	// 敵機中フラグ
 	bool isEnemyWaiting_ = true;
-	// 確認用csv更新用カウント
+	// 確認用 csv更新用カウント
 	uint32_t debugCount_ = 9;
 };
 

@@ -6,12 +6,12 @@
 
 #include "ModelCommon.h"
 
-void Model::Initialize(ModelCommon* modelCommon, const std::string& directorypath, const std::string& filename)
+void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename)
 {
 	modelCommon_ = modelCommon;
 
 	//モデル読み込み
-	modelData_ = LoadObjFile(directorypath, filename);
+	modelData_ = LoadObjFile(directoryPath, filename);
 
 	// VertexResourceを作る
 	CreateVertexData();
@@ -39,7 +39,7 @@ void Model::Draw()
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
 
-	// SRVのDescriptorTableの先頭を設定。2はrootPatameter[2]である。
+	// SRVのDescriptorTableの先頭を設定。2は rootParameter[2]である。
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureFilePath));
 
 
@@ -160,7 +160,7 @@ void Model::CreateMaterialData()
 	materialData_->uvTransform = MakeIdentity4x4();
 	materialData_->shininess = 50.0f;
 	materialData_->phongReflection = false;
-	materialData_->halfphongReflection = false;
+	materialData_->halfPhongReflection = false;
 	materialData_->pointLight = false;
 	materialData_->spotLight = false;
 }
@@ -168,7 +168,7 @@ void Model::CreateMaterialData()
 Model::Node Model::ReadNode(aiNode* node)
 {
 	Node result;
-	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeのlocalMatrixを取得
+	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeの localMatrixを取得
 	aiLocalMatrix.Transpose(); // 行列を転置する
 	result.localMatrix.m[0][0] = aiLocalMatrix[0][0];
 	result.localMatrix.m[0][1] = aiLocalMatrix[1][0];

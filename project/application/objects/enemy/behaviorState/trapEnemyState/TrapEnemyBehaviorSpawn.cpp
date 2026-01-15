@@ -19,7 +19,7 @@ void TrapEnemyBehaviorSpawn::Initialize()
 
 void TrapEnemyBehaviorSpawn::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	// イージングの進行度

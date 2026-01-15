@@ -18,7 +18,7 @@ void GameObject::SyncObjectTransform()
 		return;
 	}
 
-	// GameObjectのtransformをobject_に反映
+	// GameObjectの transformを object_に反映
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
 	object_->SetScale(scale_);
