@@ -49,7 +49,7 @@ void EnemyManager::Update()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -221,7 +221,7 @@ void EnemyManager::TitleEnemyUpdate()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -290,7 +290,7 @@ void EnemyManager::GameOverEnemyUpdate()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
