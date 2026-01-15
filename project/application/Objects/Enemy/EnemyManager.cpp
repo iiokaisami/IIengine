@@ -323,6 +323,7 @@ void EnemyManager::NormalEnemyInit(const Vector3& pos)
 	// ノーマルエネミー
 	std::unique_ptr<NormalEnemy> enemy = std::make_unique<NormalEnemy>();
 	enemy->SetPosition(pos);
+	enemy->SetEnemyManager(this); // 自身をセット
 	enemy->Initialize();
 	enemy->SetPlayerPosition(playerPosition_);
 	enemy->Update();
@@ -339,6 +340,7 @@ void EnemyManager::TrapEnemyInit(const Vector3& pos)
 	// トラップエネミー
 	std::unique_ptr<TrapEnemy> trapEnemy = std::make_unique<TrapEnemy>();
 	trapEnemy->SetPosition(pos);
+	trapEnemy->SetEnemyManager(this); // 自身をセット
 	trapEnemy->Initialize();
 	trapEnemy->SetPlayerPosition(playerPosition_);
 	trapEnemy->Update();
@@ -355,6 +357,7 @@ void EnemyManager::CorruptorInit(const Vector3& pos)
 	// コラプター
 	std::unique_ptr<Corruptor> corruptor = std::make_unique<Corruptor>();
 	corruptor->SetPosition(pos);
+	corruptor->SetEnemyManager(this); // 自身をセット
 	corruptor->Initialize();
 	corruptor->SetPlayerPosition(playerPosition_);
 	corruptor->Update();

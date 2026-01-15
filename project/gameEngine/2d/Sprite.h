@@ -27,8 +27,8 @@ public:
 	/// <param name="textureFilePath">テクスチャファイルパス</param>
 	/// <param name="position">座標</param>
 	/// <param name="color">色</param>
-	/// <param name="anchorpoint">アンカーポイント</param>
-	void Initialize(std::string textureFilePath,Vector2 position, Vector4 color = { (1) , (1), (1), (1) }, Vector2 anchorpoint = { 0.0f,0.0f });
+	/// <param name="anchorPoint">アンカーポイント</param>
+	void Initialize(std::string textureFilePath,Vector2 position, Vector4 color = { (1) , (1), (1), (1) }, Vector2 anchorPoint = { 0.0f,0.0f });
 
 	// 更新
 	void Update();
@@ -166,7 +166,7 @@ private: // 構造体、関数
 	struct VertexData
 	{
 		Vector4 position;
-		Vector2 texcoord;
+		Vector2 texCoord;
 		Vector3 normal;
 	};
 
@@ -208,8 +208,8 @@ private:
 	Material* materialData_ = nullptr;
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 	// バッファリソースの使い道を補足するバッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_ = {};
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_ = {};
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_;

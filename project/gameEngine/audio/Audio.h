@@ -23,10 +23,10 @@ struct FormatChunk {
 };
 // 音声データ
 struct SoundData {
-	WAVEFORMATEX wfex;		// 波形フォーマット
+	WAVEFORMATEX wfex = {};		// 波形フォーマット
 	std::vector<BYTE> pBuffer;			// バッファの先頭アドレス
 	IXAudio2SourceVoice* sourceVoice = nullptr;  // ソースボイス
-	unsigned int bufferSize;// バッファサイズ
+	unsigned int bufferSize = {};// バッファサイズ
 };
 
 /// <summary>

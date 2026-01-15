@@ -105,9 +105,9 @@ protected:
 
 	IIEngine::ParticleManager* particleManager = nullptr;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE inputSrv;
+	D3D12_GPU_DESCRIPTOR_HANDLE inputSrv = {};
 	Microsoft::WRL::ComPtr<ID3D12Resource> inputRes;
-	D3D12_RESOURCE_STATES state;
+	D3D12_RESOURCE_STATES state = {};
 
 	std::unique_ptr<IIEngine::Skybox> skybox = nullptr;
 

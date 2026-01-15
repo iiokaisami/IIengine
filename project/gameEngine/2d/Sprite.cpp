@@ -5,7 +5,7 @@
 #include <fstream>
 
 void Sprite::Initialize(std::string textureFilePath,
-	Vector2 position, Vector4 color, Vector2 anchorpoint)
+	Vector2 position, Vector4 color, Vector2 anchorPoint)
 {
 	spriteCommon_ = SpriteCommon::GetInstance();
 
@@ -32,7 +32,7 @@ void Sprite::Initialize(std::string textureFilePath,
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズをインデックス6つ分のサイズ
 	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	//インデックスはuint32_tとする
+	//インデックスは uint32_tとする
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 
@@ -69,7 +69,7 @@ void Sprite::Initialize(std::string textureFilePath,
 
 	SetPosition(position);
 	SetColor(color);
-	SetAnchorPoint(anchorpoint);
+	SetAnchorPoint(anchorPoint);
 
 	color_ = color;
 }
@@ -145,19 +145,19 @@ void Sprite::Update()
 	}
 
 	vertexData_[0].position = { left,bottom,0.0f,1.0f };
-	vertexData_[0].texcoord = { tex_left,tex_bottom };
+	vertexData_[0].texCoord = { tex_left,tex_bottom };
 	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
 
 	vertexData_[1].position = { left,top,0.0f,1.0f };
-	vertexData_[1].texcoord = { tex_left,tex_top };
+	vertexData_[1].texCoord = { tex_left,tex_top };
 	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
 
 	vertexData_[2].position = { right,bottom,0.0f,1.0f };
-	vertexData_[2].texcoord = { tex_right,tex_bottom };
+	vertexData_[2].texCoord = { tex_right,tex_bottom };
 	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
 
 	vertexData_[3].position = { right,top,0.0f,1.0f };
-	vertexData_[3].texcoord = { tex_right,tex_top };
+	vertexData_[3].texCoord = { tex_right,tex_top };
 	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
 
 	indexData_[0] = 0;		indexData_[1] = 1;		indexData_[2] = 2;
@@ -195,7 +195,7 @@ void Sprite::Draw()
 	// TransformationMatrixCBufferの場所を設定
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
 
-	// SRVのDescriptorTableの先頭を設定。2はrootPatameter[2]である。
+	// SRVのDescriptorTableの先頭を設定。2は rootParameter[2]である。
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFilePath_));
 	// スプライトの描画(DrawCall//ドローコール)
 	spriteCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -223,7 +223,7 @@ void Sprite::FollowParentWorldMatrix(const Matrix4x4* parentWorldPtr, bool follo
 
 void Sprite::StopFollowing()
 {
-	// 追従ポインタをnullptrに設定
+	// 追従ポインタを nullptrに設定
 	followWorldPositionPtr_ = nullptr;
 	parentWorldMatrixPtr_ = nullptr;
 	worldToScreenFunc_ = nullptr;

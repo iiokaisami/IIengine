@@ -45,7 +45,7 @@ public:
 	/// <summary>
 	/// まとめて削除するユーティリティ
 	/// </summary>
-	/// <typeparam name="BulletT">弾クラスの型（PlayerBullet / EnemyBullet 等）</typeparam>
+	/// <param name="BulletT">弾クラスの型（PlayerBullet / EnemyBullet 等）</param>
 	/// <param name="bullets">削除対象のベクタ（unique_ptr の vector）</param>
 	/// <param name="onDead">削除前に実行するコールバック</param>
 	template<typename BulletT>
@@ -159,7 +159,7 @@ protected:
 	uint32_t spriteNum_ = 1;
 
 	// HP
-	float hp_;
+	float hp_ = 100;
 	
 	
 };

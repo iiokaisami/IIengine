@@ -80,6 +80,7 @@ public:
 	/// <returns>最も近い敵が存在するかどうか</returns>
 	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
 
+
 public: // ゲッター
 
 	// プレイヤーとの距離のゲッター
@@ -93,6 +94,9 @@ public: // ゲッター
 
 	// レベルエディタ
 	std::shared_ptr<IIEngine::LevelData> GetLevelData() const { return levelData_; }
+
+	// 障害物の位置リスト取得
+	const std::vector<Vector3>& GetObstacles() const { return obstacles_; }
 
 public: // セッター
 
@@ -113,6 +117,12 @@ public: // セッター
 	/// </summary>
 	/// <param name="_levelData">レベルデータローダー</param>
 	void SetLevelData(std::shared_ptr<IIEngine::LevelData> _levelData) { levelData_ = _levelData; }
+
+	/// <summary>
+	/// 障害物の位置リストセット
+	/// </summary>
+	/// <param name="obstacles">障害物の位置ベクトル配列</param>
+	void SetObstacles(const std::vector<Vector3>& _obstacles) { obstacles_ = _obstacles; }
 
 private:
 
@@ -143,6 +153,9 @@ private:
 
 	// レベルデータローダー
 	std::shared_ptr<IIEngine::LevelData> levelData_ = nullptr;
+
+	// 障害物の位置リスト
+	std::vector<Vector3> obstacles_ = {};
 
 };
 

@@ -95,6 +95,17 @@ void GamePlayScene::Initialize()
 		}
 	}
 
+	// 壁データの収集
+	std::vector<Vector3> wallPositions;
+	for (const auto& wall : pWalls_)
+	{
+		// 壁の位置をリストに追加
+		wallPositions.push_back(wall->GetPosition());
+	}
+	// エネミーマネージャーに壁データを渡す
+	pEnemyManager_->SetObstacles(wallPositions);
+
+
 	// カメラの追従
 	camera_->AddController(std::make_unique<FollowController>(
 		camera_->GetCamera(),

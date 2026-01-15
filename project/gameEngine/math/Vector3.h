@@ -56,10 +56,10 @@ public:
         return;
     }
 
-    inline Vector2 xy() { return Vector2(x, y); }
+    inline Vector2 xy() const { return Vector2(x, y); }
 
     /// ===========
-    /// calcuration
+    /// calculation
     /// ===========
 
 	/// <summary>
