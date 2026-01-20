@@ -106,6 +106,16 @@ void NormalEnemy::Update()
 	// 暗闇処理(エネミーは動かなくさせる)
     HitVignetteTrap();
 
+
+    if (!isFollowingPath_)
+    {
+        // プレイヤー位置が一定以上変化したらパスを再計算するフラグを立てる
+        if ((playerPosition_ - lastPlayerPos_).Length() > 1.0f)
+        {
+            pathDirty_ = true;
+            lastPlayerPos_ = playerPosition_;
+        }
+    }
 }
 
 void NormalEnemy::Draw()
@@ -159,32 +169,104 @@ void NormalEnemy::ImGuiDraw()
 
 void NormalEnemy::Move()
 {
+	// 前フレームの位置
+    Vector3 lastPosition_;
+    int stuckFrame_ = 0;
+
+    toPlayer_ = playerPosition_ - position_;
+
     if (isFarFromPlayer_)
     {
-        // プレイヤーとの距離が一定以下の場合、追尾を停止(0にするとまずかった)
-        moveVelocity_ = { 0.000001f, 0.0f, 0.0f };        
+        moveVelocity_ = { 0.0f, 0.0f, 0.0f };
         return;
     }
-    else
+
+    Vector3 direction = { 0,0,0 };
+
+    // パスが無い & 障害物があるときだけ計算
+    if (!obstaclePositions_.empty() && path_.empty())
     {
-        // 基底クラスの補間処理を活用
-        toPlayer_ = playerPosition_ - position_;
-        Vector3 direction = Normalize(toPlayer_);
-        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
-
-        // 標準的な移動の挙動
-        moveVelocity_ /= 20.0f;
-        moveVelocity_.y = 0.0f;
-        BaseEnemy::Move();
-
-		SetPosition(position_);
-		SetRotation(rotation_);
-		SetScale(scale_);
-
-		SyncObjectTransform();
-
-        IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+        path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
+        currentWaypointIndex_ = 0;
+        moveMode_ = path_.empty() ? MoveMode::Direct : MoveMode::FollowPath;
     }
+
+    // パス追従
+    if (moveMode_ == MoveMode::FollowPath && currentWaypointIndex_ < path_.size())
+    {
+        Vector3 target = path_[currentWaypointIndex_];
+        Vector3 toTarget = target - position_;
+
+        // ウェイポイント到達 
+        if (toTarget.Length() < 1.0f)
+        {
+            currentWaypointIndex_++;
+        }
+
+        if (currentWaypointIndex_ < path_.size())
+        {
+            direction = Normalize(path_[currentWaypointIndex_] - position_);
+        } else
+        {
+            // パス完走
+            path_.clear();
+            moveMode_ = MoveMode::Direct;
+        }
+    }
+
+    // 直進 
+    if (moveMode_ == MoveMode::Direct && direction.Length() < 0.001f)
+    {
+        if (toPlayer_.Length() > 0.001f)
+        {
+            direction = Normalize(toPlayer_);
+        }
+    }
+
+    // 方向が取れたときだけ更新
+    if (direction.Length() > 0.001f)
+    {
+        Vector3 currentDir = Normalize(moveVelocity_);
+        float dot = Dot(currentDir, direction);
+
+        // ほぼ同じ方向なら補間しない
+        if (dot > 0.98f)
+        {
+            moveVelocity_ = direction;
+        } 
+        else
+        {
+            moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
+        }
+
+        direction = Normalize(toPlayer_);
+        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
+    }
+    moveVelocity_.y = 0.0f;
+
+    BaseEnemy::Move();
+    SyncObjectTransform();
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+
+    if ((position_ - lastPosition_).Length() < 0.01f)
+    {
+        stuckFrame_++;
+    } else
+    {
+        stuckFrame_ = 0;
+    }
+
+    lastPosition_ = position_;
+
+    if (stuckFrame_ > 30) // 約0.5秒
+    {
+        moveMode_ = MoveMode::Direct;
+        path_.clear();
+        currentWaypointIndex_ = 0;
+        stuckFrame_ = 0;
+    }
+
+
 }
 
 void NormalEnemy::Attack()

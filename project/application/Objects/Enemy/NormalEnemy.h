@@ -99,6 +99,7 @@ public: // セッター
 	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
+	
 private:
 
 	// 追尾停止距離
@@ -125,7 +126,6 @@ private:
 	const uint32_t kMaxVignetteTime = 60 * 3;
 	// 暗闇タイマー
 	uint32_t vignetteTime_ = kMaxVignetteTime;
-
 
 };
 

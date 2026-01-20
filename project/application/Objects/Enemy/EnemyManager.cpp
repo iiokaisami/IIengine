@@ -325,6 +325,11 @@ void EnemyManager::NormalEnemyInit(const Vector3& pos)
 	enemy->SetPosition(pos);
 	enemy->Initialize();
 	enemy->SetPlayerPosition(playerPosition_);
+	// obstacles_が空でないなら障害物をセット
+	if (!obstacles_.empty())
+	{
+		enemy->SetObstaclePositions(obstacles_);
+	}
 	enemy->Update();
 
 	// 敵を登録

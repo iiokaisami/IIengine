@@ -7,9 +7,7 @@
 #include <functional>
 #include <Vector3.h>
 #include <Framework.h>
-
-// 前方宣言
-class EnemyManager;
+#include <unordered_set>
 
 /// <summary>
 /// 敵の基底クラス
@@ -30,12 +28,8 @@ public:
 	// 移動
 	virtual void Move() override;
 
-	// 障害物の取得 (EnemyManager から)
-	virtual std::vector<Vector3> GetObstacles() const;
-
-	// EnemyManager の参照をセット
-	void SetEnemyManager(EnemyManager* manager) { enemyManager_ = manager; }
-
+	// 障害物の位置リストをセット
+	void SetObstaclePositions(const std::vector<Vector3>& _obstaclePositions) { obstaclePositions_ = _obstaclePositions; }
 
 protected:
 
@@ -51,6 +45,30 @@ protected:
 	// ヒューリスティック関数
 	float Heuristic(const Vector3& a, const Vector3& b);
 
+	struct GridPos
+	{
+		int x;
+		int z;
+
+		bool operator==(const GridPos& other) const
+		{
+			return x == other.x && z == other.z;
+		}
+	};
+
+	struct GridPosHash
+	{
+		size_t operator()(const GridPos& p) const noexcept
+		{
+			return std::hash<int>()(p.x) ^ (std::hash<int>()(p.z) << 1);
+		}
+	};
+
+	GridPos ToGrid(const Vector3& v) const;
+	Vector3 ToWorld(const GridPos& g) const;
+
+	std::vector<Vector3> GetNeighborsWorld(const GridPos& node);
+	
 protected:
 
     // 移動関連
@@ -60,12 +78,33 @@ protected:
     // プレイヤー関連
 	Vector3 playerPosition_ = {};
 	Vector3 toPlayer_ = {};
+	Vector3 lastPlayerPos_ = {};
 
     // フレームレート補助
     static constexpr float kDefaultFrameRate = 60.0f;
 
-	// エネミーマネージャー
-	EnemyManager* enemyManager_ = nullptr;
+	// 障害物の位置リスト
+	std::vector<Vector3> obstaclePositions_ = {};
+
+	// 探索済みノードセット
+	std::unordered_set<GridPos, GridPosHash> closedSet_ = {};
+
+	// 現在のパス
+	std::vector<Vector3> path_;
+	// 現在のウェイポイントインデックス
+	size_t currentWaypointIndex_ = 0;
+	// パスが汚れているかどうか
+	bool pathDirty_ = true;
+	// パスに沿って移動中かどうか
+	bool isFollowingPath_ = false;
+
+	enum class MoveMode
+	{
+		Direct,   // 障害物なし
+		FollowPath // A*のパスを追従中
+	};
+	MoveMode moveMode_ = MoveMode::Direct;
+
 
 };
 

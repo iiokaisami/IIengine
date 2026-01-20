@@ -69,12 +69,6 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 	meta;
 	forceCubeMap;
 
-	// ここで metaの内容を出力
-	const auto& meta2 = mipImages.GetMetadata();
-	OutputDebugStringA(std::format(
-		"meta2: IsCubemap={}, arraySize={}, mipLevels={}\n",
-		meta2.IsCubemap(), meta2.arraySize, meta2.mipLevels
-	).c_str());
 
 	// テクスチャデータを追加
 	// 追加したテクスチャデータの参照を取得する
@@ -95,12 +89,6 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 	srvDesc.Format = textureData.metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	OutputDebugStringA(std::format(
-		"DEBUG: dimension={}, IsCubemap={}, arraySize={}\n",
-		static_cast<int>(textureData.metadata.dimension),
-		textureData.metadata.IsCubemap(),
-		textureData.metadata.arraySize
-	).c_str());
 
 	if (textureData.metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE2D && textureData.metadata.IsCubemap() && textureData.metadata.arraySize == 6)
 	{
@@ -116,27 +104,10 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 		srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 	}
 
-	// ★ ここでSRV設定内容を出力
-	OutputDebugStringA(std::format(
-		"SRV: ViewDimension={}, TextureCube.MipLevels={}\n",
-		static_cast<int>(srvDesc.ViewDimension),
-		static_cast<unsigned int>(srvDesc.TextureCube.MipLevels)
-	).c_str());
-
 
 	// 設定を基にSRVの生成
 	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-
-	// ここでSRVの内容を出力
-	OutputDebugStringA(std::format(
-		"[SRV登録] filePath={}, srvIndex={}, ViewDimension={}, IsCubemap={}, arraySize={}\n",
-		filePath,
-		textureData.srvIndex,
-		static_cast<int>(srvDesc.ViewDimension),
-		textureData.metadata.IsCubemap(),
-		textureData.metadata.arraySize
-	).c_str());
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)

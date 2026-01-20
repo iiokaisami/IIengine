@@ -317,6 +317,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\ShakeController.h" />
     <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
     <ClInclude Include="application\baseObject\StaticObject.h" />
+    <ClInclude Include="gameEngine\math\Vector3Hash.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

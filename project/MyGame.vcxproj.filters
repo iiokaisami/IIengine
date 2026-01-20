@@ -651,6 +651,7 @@
     <ClInclude Include="application\baseObject\StaticObject.h" />
     <ClInclude Include="application\baseObject\Character.h" />
     <ClInclude Include="application\baseObject\BaseBullet.h" />
+    <ClInclude Include="gameEngine\math\Vector3Hash.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
