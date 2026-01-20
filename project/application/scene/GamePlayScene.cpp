@@ -99,6 +99,7 @@ void GamePlayScene::Initialize()
 	camera_->AddController(std::make_unique<FollowController>(
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
+		[this]() -> Vector3 { return pPlayer_->GetVelocity(); }, // プレイヤー速度を供給
 		0.8f, 0.25f,
 		Vector3{ 1.4f, 0.0f, 0.0f }
 	));
@@ -135,7 +136,7 @@ void GamePlayScene::Initialize()
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
 		clearCameraDuration_, clearCameraRotations_, 0.12f, 30.0f, 0.4f);
 
-	// コールバック設定（FindController を使ってその場で取得）
+	// コールバック設定(FindController を使ってその場で取得)
 	if (auto* death = camera_->FindController<DeathCameraController>())
 	{
 		death->SetOnFinish([this]()
