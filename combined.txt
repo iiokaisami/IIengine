@@ -10598,6 +10598,7 @@ void GamePlayScene::Initialize()
 	camera_->AddController(std::make_unique<FollowController>(
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
+		[this]() -> Vector3 { return pPlayer_->GetVelocity(); }, // プレイヤー速度を供給
 		0.8f, 0.25f,
 		Vector3{ 1.4f, 0.0f, 0.0f }
 	));
@@ -10634,7 +10635,7 @@ void GamePlayScene::Initialize()
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
 		clearCameraDuration_, clearCameraRotations_, 0.12f, 30.0f, 0.4f);
 
-	// コールバック設定（FindController を使ってその場で取得）
+	// コールバック設定(FindController を使ってその場で取得)
 	if (auto* death = camera_->FindController<DeathCameraController>())
 	{
 		death->SetOnFinish([this]()
@@ -11295,6 +11296,7 @@ void TitleScene::Initialize()
 	camera_->AddController(std::make_unique<FollowController>(
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
+		[this]() -> Vector3 { return pPlayer_->GetVelocity(); }, // プレイヤーの速度を供給
 		0.8f, 0.25f,
 		Vector3{ 2.0f, 0.0f, 0.0f }
 	));
@@ -12053,41 +12055,104 @@ File Path: project/application/scene/cameraController/FollowController.cpp
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp, float rotationLerp, Vector3 targetRot)
+FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, Vector3 targetRot)
 	: camera_(camera),
       targetPos_(targetPos),
+	  targetVelocity_(targetVelocity),
       positionLerp_(positionLerp),
 	  rotationLerp_(rotationLerp),
-	  targetRot_(targetRot)
+	  targetRot_(targetRot),
+      smoothedVelocity_({ 0.0f, 0.0f, 0.0f }),
+      blendingProgress_(0.0f)
 {}
 
 void FollowController::Update(float dt)
 {
-	dt;
-	// 無効またはカメラがない場合は処理しない
-	if(!active_ or !camera_)
-	{
-		return;
-	}
+    // 無効またはカメラがない場合は処理しない
+    if (!active_ || !camera_)
+    {
+        return;
+    }
 
-	// 追尾対象の位置を取得
-	Vector3 playerPos = targetPos_();
-	// 固定のオフセット 
-	Vector3 targetPos = playerPos + offset_;
-	// 現在のカメラ位置を取得
-	Vector3 currentPos = camera_->GetPosition();
-	// 次の位置を補間で計算
-	Vector3 nextPos;
-	nextPos.Lerp(currentPos, targetPos, positionLerp_);
-	// カメラの位置を設定
-	camera_->SetPosition(nextPos);
+    // プレイヤーの現在位置と速度を取得
+    Vector3 playerPos = targetPos_();
+    Vector3 playerVelocity = targetVelocity_();
 
-	// 次の回転を補間で計算
-	Vector3 currentRot = camera_->GetRotate();
-	Vector3 nextRot;
-	nextRot.Lerp(currentRot, targetRot_, rotationLerp_);
-	// カメラの回転を設定
-	camera_->SetRotate(nextRot);
+    // 現在のカメラ位置を取得
+    Vector3 currentPos = camera_->GetPosition();
+
+    // プレイヤーが現在動いているか
+    bool isPlayerMoving = playerVelocity.Length() > 0.1f;
+
+    if (isPlayerMoving)
+    {
+        // 静止タイマーをリセットし、カメラ追尾遅延タイマーを増加
+        stopTimer_ = 0.0f;
+
+        if (!isFollowing_)
+        {
+            followTimer_ += dt;
+            if (followTimer_ >= followDelay_)
+            {
+                isFollowing_ = true;
+                blendingProgress_ = 0.0f; // 初期化
+            }
+        }
+    } 
+    else // プレイヤーが静止している場合
+    {
+        followTimer_ = 0.0f;
+        if (isFollowing_)
+        {
+            stopTimer_ += dt;
+            if (stopTimer_ >= stopDelay_) // カメラ停止遅延判定
+            {
+                isFollowing_ = false; // 追尾終了
+                lastStopPosition_ = playerPos; // 最後のプレイヤーの位置を記録する
+                blendingProgress_ = 0.0f; // Blendの初期化
+            }
+        }
+    }
+
+    // カメラ目標位置を設定
+    Vector3 targetPos;
+    if (isFollowing_)
+    {
+        if (blendingProgress_ < 1.0f)
+        {
+            // 追尾再開時徐々にカメラを移行
+            blendingProgress_ = std::min(blendingProgress_ + (dt / followDelay_), 1.0f);
+            Vector3 temp;
+            temp.Lerp(lastStopPosition_ + offset_, playerPos + offset_ - smoothedVelocity_, blendingProgress_);
+            targetPos = temp;
+        } 
+        else
+        {
+            // 通常の追尾
+            targetPos = playerPos + offset_ - smoothedVelocity_;
+        }
+    }
+    else
+    {
+        // 停止時もカメラの位置をなめらかに補間してズレを解消
+        blendingProgress_ = std::min(blendingProgress_ + dt / stopDelay_, 1.0f); // 停止補間の進行度
+        Vector3 temp;
+        temp.Lerp(camera_->GetPosition(), lastStopPosition_ + offset_, blendingProgress_); // 停止時のスムーズな追従
+        targetPos = temp;
+    }
+
+    // スムーズに現在位置から目標位置へ補間
+    Vector3 nextPos;
+    nextPos.Lerp(currentPos, targetPos, positionLerp_); // 補間を使用して動作をスムーズに
+
+    // カメラの位置を設定
+    camera_->SetPosition(nextPos);
+
+    // 次の回転を補間で計算
+    Vector3 currentRot = camera_->GetRotate();
+    Vector3 nextRot;
+    nextRot.Lerp(currentRot, targetRot_, rotationLerp_);
+    camera_->SetRotate(nextRot);
 
 }
 
@@ -12133,10 +12198,11 @@ public:
 	/// </summary>
 	/// <param name="camera">カメラ</param>
 	/// <param name="targetPos">追尾対象の位置を返す関数</param>
+	/// <param name="targetVelocity">追尾対象の速度を返す</param>
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
-	/// <param name="raotationLerp">回転の補間値(0.0f~1.0f)</param>
+	/// <param name="rotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
-	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
+	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
 
 	/// <summary>
 	/// 更新
@@ -12164,6 +12230,8 @@ private:
 	std::shared_ptr<Camera> camera_ = nullptr;
 	// 追尾対象の位置を返す関数
 	std::function<Vector3()> targetPos_ = nullptr;
+	// 追尾対象の速度を返す関数
+	std::function<Vector3()> targetVelocity_;
 	// 位置の補間値
 	float positionLerp_ = 0.8f;
 	// 回転の補間値
@@ -12173,6 +12241,25 @@ private:
 
 	const Vector3 offset_ = { 0.0f, 78.0f, -17.0f };
 	Vector3 targetRot_ = { 2.0f, 0.0f, 0.0f };
+
+
+	// 追尾対象の速度の平滑化済み値
+	Vector3 smoothedVelocity_ = { 0.0f, 0.0f, 0.0f };
+	// プレイヤー最後停止位置
+	Vector3 lastStopPosition_ = { 0.0f, 0.0f, 0.0f };         
+	// 追尾開始までの遅延時間
+	float followDelay_ = 0.5f;                                
+	// 停止までの遅延時間
+	float stopDelay_ = 0.3f;                                  
+	// 追尾タイマー
+	float followTimer_ = 0.0f;                                
+	// 停止タイマー
+	float stopTimer_ = 0.0f;                                  
+	// 現在の追尾状態
+	bool isFollowing_ = false;  
+	// 補間進行度
+	float blendingProgress_ = 0.0f;
+	
 };
 
 
