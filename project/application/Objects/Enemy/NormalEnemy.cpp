@@ -157,6 +157,10 @@ void NormalEnemy::ImGuiDraw()
     // HP
 	ImGui::SliderFloat("HP", &hp_, 0.0f, maxHP_);
 
+    // 現在のMoveMode
+	const char* moveModeStr = (moveMode_ == MoveMode::Direct) ? "Direct" : "FollowPath";
+	ImGui::Text("MoveMode: %s", moveModeStr);
+
     ImGui::End();
 
 	for (auto& bullet : pBullets_)
