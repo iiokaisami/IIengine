@@ -19,14 +19,14 @@ void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager)
 	srvManager_ = srvManager;
 
 	// SRVの数と同数
-	textureDatas.reserve(DirectXCommon::kMaxSRVCount);
+	textureDates.reserve(DirectXCommon::kMaxSRVCount);
 }
 
 void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 {
 	// 読み込み済みテクスチャを検索
-	if (textureDatas.contains(filePath)) {
-		// 読み込み済みなら早期return
+	if (textureDates.contains(filePath)) {
+		// 読み込み済みなら早期 return
 		return;
 	}
 	// テクスチャ枚数上限チェック
@@ -69,16 +69,10 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 	meta;
 	forceCubeMap;
 
-	// ★ ここでmetaの内容を出力
-	const auto& meta2 = mipImages.GetMetadata();
-	OutputDebugStringA(std::format(
-		"meta2: IsCubemap={}, arraySize={}, mipLevels={}\n",
-		meta2.IsCubemap(), meta2.arraySize, meta2.mipLevels
-	).c_str());
 
 	// テクスチャデータを追加
 	// 追加したテクスチャデータの参照を取得する
-	TextureData& textureData = textureDatas[filePath];
+	TextureData& textureData = textureDates[filePath];
 
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
@@ -95,12 +89,6 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 	srvDesc.Format = textureData.metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	OutputDebugStringA(std::format(
-		"DEBUG: dimension={}, IsCubemap={}, arraySize={}\n",
-		static_cast<int>(textureData.metadata.dimension),
-		textureData.metadata.IsCubemap(),
-		textureData.metadata.arraySize
-	).c_str());
 
 	if (textureData.metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE2D && textureData.metadata.IsCubemap() && textureData.metadata.arraySize == 6)
 	{
@@ -116,34 +104,17 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 		srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 	}
 
-	// ★ ここでSRV設定内容を出力
-	OutputDebugStringA(std::format(
-		"SRV: ViewDimension={}, TextureCube.MipLevels={}\n",
-		static_cast<int>(srvDesc.ViewDimension),
-		static_cast<unsigned int>(srvDesc.TextureCube.MipLevels)
-	).c_str());
-
 
 	// 設定を基にSRVの生成
 	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-
-	// ここでSRVの内容を出力
-	OutputDebugStringA(std::format(
-		"[SRV登録] filePath={}, srvIndex={}, ViewDimension={}, IsCubemap={}, arraySize={}\n",
-		filePath,
-		textureData.srvIndex,
-		static_cast<int>(srvDesc.ViewDimension),
-		textureData.metadata.IsCubemap(),
-		textureData.metadata.arraySize
-	).c_str());
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)
 {
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
@@ -158,8 +129,8 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 {
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
@@ -174,8 +145,8 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 {
 
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);

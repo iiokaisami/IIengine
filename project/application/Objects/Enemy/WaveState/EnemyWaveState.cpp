@@ -34,7 +34,7 @@ void EnemyWaveState::UpdateEnemyPopCommands(EnemyManager* _pEnemyManager)
             _pEnemyManager->NormalEnemyInit(enemy.position);
             enemy.isSpawned = true;
 
-            // タイマーをリセットして、次の敵のdelayカウント開始
+            // タイマーをリセットして、次の敵の delayカウント開始
             enemyWaitingTimer_ = 0;
 
             // 1フレームに複数出さないように break
@@ -50,7 +50,7 @@ void EnemyWaveState::UpdateEnemyPopCommands(EnemyManager* _pEnemyManager)
             _pEnemyManager->TrapEnemyInit(trapEnemy.position);
             trapEnemy.isSpawned = true;
            
-            // タイマーをリセットして、次の敵のdelayカウント開始
+            // タイマーをリセットして、次の敵の delayカウント開始
             enemyWaitingTimer_ = 0;
             
             // 1フレームに複数出さないように break

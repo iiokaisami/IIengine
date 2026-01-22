@@ -2,7 +2,7 @@
 
 #include "../../baseObject/StaticObject.h"
 #include "../../../gameEngine/collider/ColliderManager.h"
-#include "Barrie.h"
+#include "Barrier.h"
 
 #include <Object3d.h>
 #include <memory>
@@ -55,7 +55,7 @@ private: // 衝突判定
 private:
 
 	// バリア
-	std::unique_ptr<Barrie> pBarrie_ = nullptr;
+	std::unique_ptr<Barrier> pBarrier_ = nullptr;
 
 	// クリアフラグ
 	bool isCleared_ = false;

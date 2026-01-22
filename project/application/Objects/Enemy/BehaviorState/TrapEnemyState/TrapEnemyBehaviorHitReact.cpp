@@ -19,7 +19,7 @@ void TrapEnemyBehaviorHitReact::Initialize()
 
 void TrapEnemyBehaviorHitReact::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	Vector3 shakeOffset =

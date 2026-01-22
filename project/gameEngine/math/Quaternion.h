@@ -35,7 +35,7 @@ Quaternion IdentityQuaternion();
 Quaternion Conjugate(const Quaternion& quaternion);
 
 /// <summary>
-/// Quaternionのnormを返す
+/// Quaternionの normを返す
 /// </summary>
 /// <param name="quaternion">対象Quaternion</param>
 /// <returns>norm値</returns>

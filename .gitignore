@@ -321,3 +321,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# DirectXTex Compiled Shaders
+**/DirectXTex/Shaders/Compiled/
+project/imgui.ini
+
+# Debug symbols (C++ / DirectX)
+*.pdb

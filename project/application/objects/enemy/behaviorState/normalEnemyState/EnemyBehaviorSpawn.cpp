@@ -19,7 +19,7 @@ void EnemyBehaviorSpawn::Initialize()
 
 void EnemyBehaviorSpawn::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	// イージングの進行度（0〜1）

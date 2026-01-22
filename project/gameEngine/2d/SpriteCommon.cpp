@@ -112,7 +112,7 @@ void SpriteCommon::CreateRootSignature()
 	rootParameters[3].Descriptor.ShaderRegister = 1;
 
 
-	//Smaplerの設定
+	//Samplerの設定
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;				//バイリニアフィルタ
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;			//0～1の範囲外をリピート

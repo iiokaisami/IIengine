@@ -34,8 +34,13 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 void WinApp::Initialize()
 {
 	//COMの初期化
-	CoInitializeEx(0, COINIT_MULTITHREADED);
-
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+	{
+		// 初期化失敗時のエラーハンドリング
+		MessageBox(nullptr, L"COMの初期化に失敗しました。", L"エラー", MB_OK | MB_ICONERROR);
+		return;
+	}
 
 	
 	//ウィンドウプロシージャ
@@ -53,7 +58,7 @@ void WinApp::Initialize()
 	//ウィンドウサイズを表す構造体にクライアント領域を入れる
 	RECT wrc = { 0,0,kClientWidth,kClientHeight };
 
-	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
+	//クライアント領域をもとに実際のサイズに wrcを変更してもらう
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 
@@ -82,9 +87,6 @@ void WinApp::Initialize()
 
 void WinApp::Update()
 {
-
-
-
 }
 
 void WinApp::Finalize()

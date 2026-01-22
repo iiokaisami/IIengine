@@ -92,13 +92,14 @@ public: // セッター
 	
 	// --- ステートでのTransform操作用関数(引数あり) ---
 
-	// オブジェクトのpositionをセット
+	// オブジェクトの positionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
-	// オブジェクトのrotationをセット
+	// オブジェクトの rotationをセット
 	void SetObjectRotation(const Vector3& _rotation) { object_->SetRotate(_rotation); }
-	// オブジェクトのscaleをセット
+	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
+	
 private:
 
 	// 追尾停止距離
@@ -125,7 +126,6 @@ private:
 	const uint32_t kMaxVignetteTime = 60 * 3;
 	// 暗闇タイマー
 	uint32_t vignetteTime_ = kMaxVignetteTime;
-
 
 };
 

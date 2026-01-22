@@ -50,18 +50,18 @@ namespace IIEngine
         struct Block
         {
             std::unique_ptr<Sprite> sprite;
-            Vector2 position;
-            Vector2 scale;
-            float rotation;
-            float delay;
-            float dropDelay;
-            bool active;
-            float fallSpeed;
-            float verticalOffset;
-            bool isRising;
-            bool isDropped;
-            float riseTimer;
-            float riseDuration;
+            Vector2 position{};
+            Vector2 scale{};
+            float rotation{};
+            float delay{};
+            float dropDelay{};
+            bool active{};
+            float fallSpeed{};
+            float verticalOffset{};
+            bool isRising{};
+            bool isDropped{};
+            float riseTimer{};
+            float riseDuration{};
         };
 
         // ブロック群

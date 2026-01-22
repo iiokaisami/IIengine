@@ -76,13 +76,13 @@ public: // ゲッター
         }
         for (std::string name : std::initializer_list<std::string>{ _ignoreNames... })
         {
-            bool iscompare = false;
+            bool isCompare = false;
             for (auto& attributePair : attributeList_)
             {
                 if (name.compare(attributePair.first) == 0)
                 {
                     result ^= attributePair.second;
-                    iscompare = true;
+                    isCompare = true;
                 }
             }
         }

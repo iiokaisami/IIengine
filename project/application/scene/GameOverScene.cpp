@@ -237,10 +237,6 @@ void GameOverScene::CameraShake()
 {
 	// アクティブカメラの情報を取得
 	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		auto viewMatrix = activeCamera->GetViewMatrix();
-	}
 
 	// プレイヤーがヒットした場合にカメラをシェイク
 	if (pPlayer_->IsHitMoment())

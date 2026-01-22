@@ -136,11 +136,6 @@ public:
 	void CreateDXCompiler();
 
 	/// <summary>
-	/// ImGuiの初期化
-	/// </summary>
-	void InitializeImGui();
-
-	/// <summary>
 	/// 描画前処理
 	/// </summary>
 	void PreDraw();

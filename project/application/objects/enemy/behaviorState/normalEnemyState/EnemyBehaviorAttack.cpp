@@ -22,7 +22,7 @@ void EnemyBehaviorAttack::Initialize()
 
 void EnemyBehaviorAttack::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
     // 溜め

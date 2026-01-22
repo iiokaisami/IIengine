@@ -70,6 +70,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Debug;%(AdditionalLibraryDirectories);$(SolutionDir)..\generated\outputs\$(Configuration)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mtd.lib;imgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalOptions>/ignore:4049 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
@@ -113,7 +115,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Objects\Enemy\NormalEnemy.cpp" />
     <ClCompile Include="application\Objects\Field\Field.cpp" />
     <ClCompile Include="application\Objects\Enemy\Bullet\EnemyBullet.cpp" />
-    <ClCompile Include="application\Objects\Field\Barrie.cpp" />
+    <ClCompile Include="application\Objects\Field\Barrier.cpp" />
     <ClCompile Include="application\objects\enemy\Corruptor.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp" />
@@ -216,7 +218,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Objects\Enemy\NormalEnemy.h" />
     <ClInclude Include="application\Objects\Field\Field.h" />
     <ClInclude Include="application\Objects\Enemy\Bullet\EnemyBullet.h" />
-    <ClInclude Include="application\Objects\Field\Barrie.h" />
+    <ClInclude Include="application\Objects\Field\Barrier.h" />
     <ClInclude Include="application\objects\enemy\Corruptor.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h" />
@@ -315,6 +317,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\ShakeController.h" />
     <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
     <ClInclude Include="application\baseObject\StaticObject.h" />
+    <ClInclude Include="gameEngine\math\Vector3Hash.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

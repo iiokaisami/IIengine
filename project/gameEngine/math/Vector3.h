@@ -56,10 +56,10 @@ public:
         return;
     }
 
-    inline Vector2 xy() { return Vector2(x, y); }
+    inline Vector2 xy() const { return Vector2(x, y); }
 
     /// ===========
-    /// calcuration
+    /// calculation
     /// ===========
 
 	/// <summary>
@@ -167,59 +167,15 @@ public:
     Vector3 operator+(const Vector2& _v) const;
     Vector3 operator-(const Vector2& _v) const;
     Vector3 operator*(const Vector2& _v) const;
+
+	/// =======
+	/// equal
+	/// ======
+    bool operator==(const Vector3& other) const
+    {
+        return x == other.x && y == other.y && z == other.z;
+    }
 };
 
 Vector3 operator*(const float _f, const Vector3& _v);
 Vector3 operator/(const float _f, const Vector3& _v);
-
-namespace FMath
-{
-    /// <summary>
-	/// ベクトルの加算
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>加算結果ベクトル</returns>
-    Vector3 Add(const Vector3& _v1, const Vector3& _v2);
-	/// <summary>
-	/// ベクトルの減算
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>減算結果ベクトル</returns>
-    Vector3 Subtract(const Vector3& _v1, const Vector3& _v2);
-	/// <summary>
-	/// ベクトルのスカラー倍
-	/// </summary>
-	/// <param name="_scalar">スカラー値</param>
-	/// <param name="_v">ベクトル</param>
-	/// <returns>スカラー倍結果ベクトル</returns>
-    Vector3 Multiply(float _scalar, const Vector3& _v);
-	/// <summary>
-	/// ベクトルの内積
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>内積</returns>
-    float Dot(const Vector3& _v1, const Vector3& _v2);
-	/// <summary>
-	/// ベクトルの外積
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>外積ベクトル</returns>
-    float Length(const Vector3& _v);
-	/// <summary>
-	/// ベクトルの正規化
-	/// </summary>
-	/// <param name="_v">ベクトル</param>
-	/// <returns>正規化ベクトル</returns>
-    Vector3 Normalize(const Vector3& _v);
-	/// <summary>
-	/// ベクトルの変換
-	/// </summary>
-	/// <param name="_vector">ベクトル</param>
-	/// <param name="_matrix">変換行列</param>
-	/// <returns>変換後ベクトル</returns>
-    Vector3 Transform(const Vector3& _vector, const Matrix4x4& _matrix);
-}

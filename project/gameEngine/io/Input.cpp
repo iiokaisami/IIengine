@@ -53,7 +53,7 @@ namespace IIEngine
 		keyboard->GetDeviceState(sizeof(key), key);
 	}
 
-	bool Input::PushKey(BYTE keyNumber)
+	bool Input::PushKey(BYTE keyNumber)const
 	{
 		// 指定キーを押していれば trueを返す
 		if (key[keyNumber])
@@ -65,7 +65,7 @@ namespace IIEngine
 		return false;
 	}
 
-	bool Input::TriggerKey(BYTE keyNumber)
+	bool Input::TriggerKey(BYTE keyNumber)const
 	{
 		if (!keyPre[keyNumber] && key[keyNumber])
 		{

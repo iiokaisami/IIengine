@@ -31,11 +31,11 @@ uint32_t SrvManager::Allocate()
     uint32_t index = useIndex_;
     // 次回の為に番号を1進める
     useIndex_++;
-    // 上で記録した番号をreturn
+    // 上で記録した番号を return
     return index;
 }
 
-bool SrvManager::IsAllocate()
+bool SrvManager::IsAllocate() const
 {
     if (kMaxSRVCount_ > useIndex_) {
         return true;
@@ -58,7 +58,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUDescriptorHandle(uint32_t index)
     return handleGPU;
 }
 
-void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata)
+void SrvManager::CreateSRVForTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata)
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 
@@ -88,7 +88,7 @@ void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResou
 
 }
 
-void SrvManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride)
+void SrvManager::CreateSRVForStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride)
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 
@@ -225,7 +225,7 @@ uint32_t SrvManager::LoadTexture(const std::string& textureFilePath)
 
     // SRV作成
     uint32_t srvIndex = Allocate();
-    CreateSRVforTexture2D(srvIndex, textureResource.Get(), textureResource->GetDesc().Format, textureResource->GetDesc().MipLevels,metadata);
+    CreateSRVForTexture2D(srvIndex, textureResource.Get(), textureResource->GetDesc().Format, textureResource->GetDesc().MipLevels,metadata);
 
     // デバッグログ
     D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = GetGPUDescriptorHandle(srvIndex);

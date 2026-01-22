@@ -8,18 +8,18 @@ void BasePostEffectPass::Initialize(DirectXCommon* dxCommon, SrvManager* srvMana
     dxCommon_ = dxCommon;
     srvManager_ = srvManager;
 
-    CD3DX12_DESCRIPTOR_RANGE srvRange;
+    CD3DX12_DESCRIPTOR_RANGE srvRange{};
     srvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-    CD3DX12_DESCRIPTOR_RANGE samplerRange;
+    CD3DX12_DESCRIPTOR_RANGE samplerRange{};
     samplerRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0);
 
-    CD3DX12_ROOT_PARAMETER rootParams[3];
+	CD3DX12_ROOT_PARAMETER rootParams[3] = {};
     rootParams[0].InitAsDescriptorTable(1, &srvRange, D3D12_SHADER_VISIBILITY_PIXEL);
     rootParams[1].InitAsDescriptorTable(1, &samplerRange, D3D12_SHADER_VISIBILITY_PIXEL);
     rootParams[2].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);
 
-    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc{};
     rootSigDesc.Init(_countof(rootParams), rootParams, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
     Microsoft::WRL::ComPtr<ID3DBlob> sigBlob, errBlob;
@@ -44,16 +44,6 @@ void BasePostEffectPass::Initialize(DirectXCommon* dxCommon, SrvManager* srvMana
     psoDesc.DSVFormat = DXGI_FORMAT_UNKNOWN;
     
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    /*D3D12_BLEND_DESC blendDesc = {};
-    blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-    psoDesc.BlendState = blendDesc;*/
 
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 

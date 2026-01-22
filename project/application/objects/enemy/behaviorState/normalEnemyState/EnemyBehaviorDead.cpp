@@ -17,7 +17,7 @@ void EnemyBehaviorDead::Initialize()
 
 void EnemyBehaviorDead::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	float t = float(motion_.count) / motion_.maxCount;

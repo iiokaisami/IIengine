@@ -19,7 +19,7 @@ void EnemyBehaviorMove::Initialize()
 
 void EnemyBehaviorMove::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	// 動く前に切り替え処理

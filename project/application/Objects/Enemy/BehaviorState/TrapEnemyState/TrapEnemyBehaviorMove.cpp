@@ -21,7 +21,7 @@ void TrapEnemyBehaviorMove::Initialize()
 void TrapEnemyBehaviorMove::Update()
 {
 
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	// 0になったら元に戻す

@@ -26,7 +26,8 @@ namespace IIEngine
         {
             state_ = State::FadeIn;
             alpha_ = 1.0f;
-        } else
+        } 
+        else
         {
             state_ = State::FadeOut;
             alpha_ = 0.0f;

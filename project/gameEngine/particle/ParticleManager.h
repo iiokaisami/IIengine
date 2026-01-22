@@ -235,7 +235,7 @@ namespace IIEngine
 
 		TransformData transform_;
 		Matrix4x4 backToFrontMatrix_;
-		//modelマテリアる用のリソースを作る。今回color1つ分のサイズを用意する
+		//modelマテリアる用のリソースを作る。今回 color1つ分のサイズを用意する
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 		//マテリアルにデータを書き込む	
 		Material* materialData_ = nullptr;

@@ -24,7 +24,7 @@ public:
 	/// <param name="modelCommon">モデル共通機能管理クラスへのポインタ</param>	
 	/// <param name="directoryPath">ディレクトリパス</param>
 	/// <param name="filename">ファイル名</param>
-	void Initialize(ModelCommon* modelCommon, const std::string& directorypath, const std::string& filename);
+	void Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
 	/// 更新
@@ -87,7 +87,7 @@ private: // 構造体、関数
 		Matrix4x4 uvTransform;
 		float shininess;
 		int32_t phongReflection;
-		int32_t halfphongReflection;
+		int32_t halfPhongReflection;
 		int32_t pointLight;
 		int32_t spotLight;
 		int32_t environment;
@@ -96,7 +96,7 @@ private: // 構造体、関数
 
 	struct  Node
 	{
-		Matrix4x4 localMatrix;
+		Matrix4x4 localMatrix = {};
 		std::string name;
 		std::vector<Node> children;
 	};

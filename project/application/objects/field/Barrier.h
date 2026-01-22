@@ -12,12 +12,12 @@
 /// バリア
 /// プレイヤーを守るバリアオブジェクト
 /// </summary>
-class Barrie : public StaticObject
+class Barrier : public StaticObject
 {
 public:
 
-	Barrie() = default;
-	~Barrie() = default;
+	Barrier() = default;
+	~Barrier() = default;
 
 	// 初期化
 	void Initialize() override;

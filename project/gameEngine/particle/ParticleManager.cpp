@@ -32,7 +32,7 @@ namespace IIEngine
         // モーション登録
         ParticleMotion::Initialize();
 
-        // （Cylinder方向など必要あれば指定）
+        // (Cylinder方向など必要あれば指定)
         ParticleMotion::SetDirection("UP");
 
         // パイプライン生成
@@ -44,7 +44,7 @@ namespace IIEngine
         backToFrontMatrix_ = MakeRotateYMatrix(std::numbers::pi_v<float>);
 
         //マテリアル
-        //modelマテリアる用のリソースを作る。今回color1つ分のサイズを用意する
+        //modelマテリアる用のリソースを作る。今回 color1つ分のサイズを用意する
         materialResource_ = dxCommon_->CreateBufferResource(sizeof(Material));
         //マテリアルにデータを書き込む
         materialData_ = nullptr;
@@ -124,7 +124,7 @@ namespace IIEngine
         descriptionRootSignature_.pParameters = rootParameter;
         descriptionRootSignature_.NumParameters = _countof(rootParameter);
 
-        //Smaplerの設定
+        //Samplerの設定
         staticSamplers_[0].Filter = D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR;
         staticSamplers_[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         staticSamplers_[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
@@ -253,7 +253,7 @@ namespace IIEngine
         // インスタンス用のSRVインデックス
         particleGroups.at(name).srvIndex = srvManager_->Allocate();
         // srvを生成
-        srvManager_->CreateSRVforStructuredBuffer(particleGroups.at(name).srvIndex, particleGroups.at(name).instancingResource.Get(), MaxInstanceCount, sizeof(ParticleForGPU));
+        srvManager_->CreateSRVForStructuredBuffer(particleGroups.at(name).srvIndex, particleGroups.at(name).instancingResource.Get(), MaxInstanceCount, sizeof(ParticleForGPU));
 
         // モデルの頂点を構築
         using BuildFunc = std::function<void(Model*)>;
@@ -417,7 +417,7 @@ namespace IIEngine
 
     void ParticleManager::Emit(const std::string groupName, const Vector3& position, uint32_t count)
     {
-        // グループごとのmotionNameを使うEmit
+        // グループごとの motionNameを使うEmit
         auto it = particleGroups.find(groupName);
         if (it == particleGroups.end())
         {

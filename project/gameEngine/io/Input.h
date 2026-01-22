@@ -56,14 +56,14 @@ namespace IIEngine
 		/// </summary>
 		/// <perm name="keyNumber">キー番号( DIK_0 等)</param>
 		///<returns>押されているか</returns>
-		bool PushKey(BYTE keyNumber);
+		bool PushKey(BYTE keyNumber)const;
 
 		/// <summary>
 		/// キーのトリガーをチェック
 		/// </summary>
 		/// <param name="KeyNumber">キー番号( DIK_0 等 )</param>
 		/// <returns>トリガーか</returns>
-		bool TriggerKey(BYTE keyNumber);
+		bool TriggerKey(BYTE keyNumber)const;
 
 	private:
 

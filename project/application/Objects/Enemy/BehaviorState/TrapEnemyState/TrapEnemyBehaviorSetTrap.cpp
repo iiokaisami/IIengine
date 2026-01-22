@@ -21,7 +21,7 @@ void TrapEnemyBehaviorSetTrap::Initialize()
 
 void TrapEnemyBehaviorSetTrap::Update()
 {
-    // 敵のトランスフォームをmotion_.transformにセット
+    // 敵のトランスフォームを motion_.transformにセット
     TransformUpdate(pTrapEnemy_);
 
     const int expandTime = 15;

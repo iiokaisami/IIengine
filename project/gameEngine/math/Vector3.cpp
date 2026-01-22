@@ -5,7 +5,7 @@
 #include <cmath>
 
 /// ===========
-/// calcuration
+/// calculation
 /// ===========
 
 float Vector3::Dot(const Vector3& _v) const

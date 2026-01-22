@@ -17,7 +17,7 @@ void TrapEnemyBehaviorDead::Initialize()
 
 void TrapEnemyBehaviorDead::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	float t = float(motion_.count) / motion_.maxCount;

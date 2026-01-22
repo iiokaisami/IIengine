@@ -78,7 +78,7 @@ namespace IIEngine {
 		/// <summary>
 		/// 固定デルタタイムがタイムスケールの影響を受けるかどうかの設定
 		/// </summary>
-		/// <param name="useScaled">影響を受けるならtrue</param>
+		/// <param name="useScaled">影響を受けるなら true</param>
 		void SetFixedUsesScaled(bool useScaled)
 		{
 			fixedUsesScaled_ = useScaled;
@@ -89,7 +89,7 @@ namespace IIEngine {
 		/// </summary>
 		/// <param name="cb">コールバック関数</param>
 		/// <param name="seconds">遅延時間(秒)</param>
-		/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
+		/// <param name="useUnscaled">タイムスケールの影響を受けないなら true</param>
 		/// <returns>タイマーID</returns>
 		TimerId SetTimeout(std::function<void()> cb, float seconds, bool useUnscaled = false)
 		{
@@ -107,7 +107,7 @@ namespace IIEngine {
 		/// </summary>
 		/// <param name="cb">コールバック関数</param>
 		/// <param name="seconds">遅延時間(秒)</param>
-		/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
+		/// <param name="useUnscaled">タイムスケールの影響を受けないなら true</param>
 		/// <returns>タイマーID</returns>
 		TimerId SetInterval(std::function<void()> cb, float seconds, bool useUnscaled = false)
 		{
@@ -138,7 +138,7 @@ namespace IIEngine {
 		/// <summary>
 		/// 時間が一時停止中かどうか
 		/// </summary>
-		/// <returns>停止中ならtrue</returns>
+		/// <returns>停止中なら true</returns>
 		bool IsPaused() const
 		{
 			return paused_;

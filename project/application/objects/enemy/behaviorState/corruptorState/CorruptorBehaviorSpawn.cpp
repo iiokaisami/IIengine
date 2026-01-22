@@ -19,7 +19,7 @@ void CorruptorBehaviorSpawn::Initialize()
 
 void CorruptorBehaviorSpawn::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pCorruptor_);
 
 	// イージングの進行度

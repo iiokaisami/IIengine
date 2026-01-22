@@ -1,6 +1,6 @@
-#include "Barrie.h"
+#include "Barrier.h"
 
-void Barrie::Initialize()
+void Barrier::Initialize()
 {
 	// 基底クラス初期化
 	StaticObject::Initialize("barrie.obj","Barrie");
@@ -15,7 +15,7 @@ void Barrie::Initialize()
 
 }
 
-void Barrie::Update()
+void Barrier::Update()
 {
 
 	// 基底クラス更新
@@ -82,7 +82,7 @@ void Barrie::Update()
 	}
 }
 
-void Barrie::OnCollisionTrigger(const Collider* _other)
+void Barrier::OnCollisionTrigger(const Collider* _other)
 {
 	if (_other->GetColliderID() == "PlayerBullet" or
 		_other->GetColliderID() == "Player" or
