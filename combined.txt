@@ -44,8 +44,6 @@
     └── └── └──     ├── EnemyWaveState.cpp
     └── └── └──     └── EnemyWaveState.h
     └── └── ├── Field/
-    └── └── └── ├── Barrie.cpp
-    └── └── └── ├── Barrie.h
     └── └── └── ├── Field.cpp
     └── └── └── ├── Field.h
     └── └── └── ├── Goal.cpp
@@ -68,38 +66,41 @@
     └── └── ├── StaticObject.cpp
     └── └── └── StaticObject.h
     └── ├── objects/
-    └── └── └── enemy/
-    └── └──     ├── Corruptor.cpp
-    └── └──     ├── Corruptor.h
-    └── └──     ├── EnemyManager.cpp
-    └── └──     ├── EnemyManager.h
-    └── └──     └── behaviorState/
-    └── └──         ├── corruptorState/
-    └── └──         └── ├── CorruptorBehaviorMove.cpp
-    └── └──         └── ├── CorruptorBehaviorMove.h
-    └── └──         └── ├── CorruptorBehaviorSelfDestruct.cpp
-    └── └──         └── ├── CorruptorBehaviorSelfDestruct.h
-    └── └──         └── ├── CorruptorBehaviorSpawn.cpp
-    └── └──         └── ├── CorruptorBehaviorSpawn.h
-    └── └──         └── ├── CorruptorBehaviorState.cpp
-    └── └──         └── └── CorruptorBehaviorState.h
-    └── └──         ├── normalEnemyState/
-    └── └──         └── ├── EnemyBehaviorAttack.cpp
-    └── └──         └── ├── EnemyBehaviorAttack.h
-    └── └──         └── ├── EnemyBehaviorDead.cpp
-    └── └──         └── ├── EnemyBehaviorDead.h
-    └── └──         └── ├── EnemyBehaviorHitReact.cpp
-    └── └──         └── ├── EnemyBehaviorHitReact.h
-    └── └──         └── ├── EnemyBehaviorMove.cpp
-    └── └──         └── ├── EnemyBehaviorMove.h
-    └── └──         └── ├── EnemyBehaviorSpawn.cpp
-    └── └──         └── ├── EnemyBehaviorSpawn.h
-    └── └──         └── ├── EnemyBehaviorState.cpp
-    └── └──         └── └── EnemyBehaviorState.h
-    └── └──         └── trapEnemyState/
-    └── └──             ├── TrapEnemyBehaviorDead.cpp
-    └── └──             ├── TrapEnemyBehaviorSpawn.cpp
-    └── └──             └── TrapEnemyBehaviorState.h
+    └── └── ├── enemy/
+    └── └── └── ├── Corruptor.cpp
+    └── └── └── ├── Corruptor.h
+    └── └── └── ├── EnemyManager.cpp
+    └── └── └── ├── EnemyManager.h
+    └── └── └── └── behaviorState/
+    └── └── └──     ├── corruptorState/
+    └── └── └──     └── ├── CorruptorBehaviorMove.cpp
+    └── └── └──     └── ├── CorruptorBehaviorMove.h
+    └── └── └──     └── ├── CorruptorBehaviorSelfDestruct.cpp
+    └── └── └──     └── ├── CorruptorBehaviorSelfDestruct.h
+    └── └── └──     └── ├── CorruptorBehaviorSpawn.cpp
+    └── └── └──     └── ├── CorruptorBehaviorSpawn.h
+    └── └── └──     └── ├── CorruptorBehaviorState.cpp
+    └── └── └──     └── └── CorruptorBehaviorState.h
+    └── └── └──     ├── normalEnemyState/
+    └── └── └──     └── ├── EnemyBehaviorAttack.cpp
+    └── └── └──     └── ├── EnemyBehaviorAttack.h
+    └── └── └──     └── ├── EnemyBehaviorDead.cpp
+    └── └── └──     └── ├── EnemyBehaviorDead.h
+    └── └── └──     └── ├── EnemyBehaviorHitReact.cpp
+    └── └── └──     └── ├── EnemyBehaviorHitReact.h
+    └── └── └──     └── ├── EnemyBehaviorMove.cpp
+    └── └── └──     └── ├── EnemyBehaviorMove.h
+    └── └── └──     └── ├── EnemyBehaviorSpawn.cpp
+    └── └── └──     └── ├── EnemyBehaviorSpawn.h
+    └── └── └──     └── ├── EnemyBehaviorState.cpp
+    └── └── └──     └── └── EnemyBehaviorState.h
+    └── └── └──     └── trapEnemyState/
+    └── └── └──         ├── TrapEnemyBehaviorDead.cpp
+    └── └── └──         ├── TrapEnemyBehaviorSpawn.cpp
+    └── └── └──         └── TrapEnemyBehaviorState.h
+    └── └── └── field/
+    └── └──     ├── Barrier.cpp
+    └── └──     └── Barrier.h
     └── └── scene/
     └──     ├── ClearScene.cpp
     └──     ├── ClearScene.h
@@ -218,7 +219,8 @@
     └── └── ├── Vector2.cpp
     └── └── ├── Vector2.h
     └── └── ├── Vector3.cpp
-    └── └── └── Vector3.h
+    └── └── ├── Vector3.h
+    └── └── └── Vector3Hash.h
     └── ├── particle/
     └── └── ├── MeshBuilder.cpp
     └── └── ├── MeshBuilder.h
@@ -329,6 +331,8 @@ File Path: project/MyGame.vcxproj
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Debug;%(AdditionalLibraryDirectories);$(SolutionDir)..\generated\outputs\$(Configuration)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mtd.lib;imgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalOptions>/ignore:4049 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
@@ -372,7 +376,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Objects\Enemy\NormalEnemy.cpp" />
     <ClCompile Include="application\Objects\Field\Field.cpp" />
     <ClCompile Include="application\Objects\Enemy\Bullet\EnemyBullet.cpp" />
-    <ClCompile Include="application\Objects\Field\Barrie.cpp" />
+    <ClCompile Include="application\Objects\Field\Barrier.cpp" />
     <ClCompile Include="application\objects\enemy\Corruptor.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp" />
@@ -475,7 +479,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Objects\Enemy\NormalEnemy.h" />
     <ClInclude Include="application\Objects\Field\Field.h" />
     <ClInclude Include="application\Objects\Enemy\Bullet\EnemyBullet.h" />
-    <ClInclude Include="application\Objects\Field\Barrie.h" />
+    <ClInclude Include="application\Objects\Field\Barrier.h" />
     <ClInclude Include="application\objects\enemy\Corruptor.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h" />
@@ -574,6 +578,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\ShakeController.h" />
     <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
     <ClInclude Include="application\baseObject\StaticObject.h" />
+    <ClInclude Include="gameEngine\math\Vector3Hash.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -935,7 +940,7 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="application\Objects\Enemy\TrapEnemy.cpp">
       <Filter>application\objects\enemy</Filter>
     </ClCompile>
-    <ClCompile Include="application\Objects\Field\Barrie.cpp">
+    <ClCompile Include="application\Objects\Field\Barrier.cpp">
       <Filter>application\objects\field</Filter>
     </ClCompile>
     <ClCompile Include="application\Objects\Field\Field.cpp">
@@ -1237,7 +1242,7 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\Objects\Enemy\TrapEnemy.h">
       <Filter>application\objects\enemy</Filter>
     </ClInclude>
-    <ClInclude Include="application\Objects\Field\Barrie.h">
+    <ClInclude Include="application\Objects\Field\Barrier.h">
       <Filter>application\objects\field</Filter>
     </ClInclude>
     <ClInclude Include="application\Objects\Field\Field.h">
@@ -1318,6 +1323,7 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\baseObject\StaticObject.h" />
     <ClInclude Include="application\baseObject\Character.h" />
     <ClInclude Include="application\baseObject\BaseBullet.h" />
+    <ClInclude Include="gameEngine\math\Vector3Hash.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -1492,7 +1498,7 @@ void GameObject::SyncObjectTransform()
 		return;
 	}
 
-	// GameObjectのtransformをobject_に反映
+	// GameObjectの transformを object_に反映
 	object_->SetPosition(position_);
 	object_->SetRotate(rotation_);
 	object_->SetScale(scale_);
@@ -1620,7 +1626,7 @@ void TrapEnemyBehaviorDead::Initialize()
 
 void TrapEnemyBehaviorDead::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	float t = float(motion_.count) / motion_.maxCount;
@@ -1721,7 +1727,7 @@ void TrapEnemyBehaviorHitReact::Initialize()
 
 void TrapEnemyBehaviorHitReact::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	Vector3 shakeOffset =
@@ -1822,7 +1828,7 @@ void TrapEnemyBehaviorMove::Initialize()
 void TrapEnemyBehaviorMove::Update()
 {
 
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	// 0になったら元に戻す
@@ -1959,7 +1965,7 @@ void TrapEnemyBehaviorSetTrap::Initialize()
 
 void TrapEnemyBehaviorSetTrap::Update()
 {
-    // 敵のトランスフォームをmotion_.transformにセット
+    // 敵のトランスフォームを motion_.transformにセット
     TransformUpdate(pTrapEnemy_);
 
     const int expandTime = 15;
@@ -2105,7 +2111,7 @@ void TrapEnemyBehaviorSpawn::Initialize()
 
 void TrapEnemyBehaviorSpawn::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	// イージングの進行度
@@ -2186,7 +2192,8 @@ void TrapEnemyBehaviorState::MotionCount(Motion& _motion)
 	if (_motion.count < _motion.maxCount)
 	{
 		_motion.count++;
-	} else
+	} 
+	else
 	{
 		// モーション終了 カウントリセット
 		_motion.isActive = false;
@@ -2271,7 +2278,7 @@ protected:
 	// モーションのカウント
 	void MotionCount(Motion& _motion);
 
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	void TransformUpdate(TrapEnemy* _pEnemy);
 
 	std::string stateName_;
@@ -3415,7 +3422,7 @@ void EnemyManager::Update()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -3587,7 +3594,7 @@ void EnemyManager::TitleEnemyUpdate()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -3656,7 +3663,7 @@ void EnemyManager::GameOverEnemyUpdate()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -3691,6 +3698,11 @@ void EnemyManager::NormalEnemyInit(const Vector3& pos)
 	enemy->SetPosition(pos);
 	enemy->Initialize();
 	enemy->SetPlayerPosition(playerPosition_);
+	// obstacles_が空でないなら障害物をセット
+	if (!obstacles_.empty())
+	{
+		enemy->SetObstaclePositions(obstacles_);
+	}
 	enemy->Update();
 
 	// 敵を登録
@@ -3873,6 +3885,7 @@ public:
 	/// <returns>最も近い敵が存在するかどうか</returns>
 	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
 
+
 public: // ゲッター
 
 	// プレイヤーとの距離のゲッター
@@ -3886,6 +3899,9 @@ public: // ゲッター
 
 	// レベルエディタ
 	std::shared_ptr<IIEngine::LevelData> GetLevelData() const { return levelData_; }
+
+	// 障害物の位置リスト取得
+	const std::vector<Vector3>& GetObstacles() const { return obstacles_; }
 
 public: // セッター
 
@@ -3906,6 +3922,12 @@ public: // セッター
 	/// </summary>
 	/// <param name="_levelData">レベルデータローダー</param>
 	void SetLevelData(std::shared_ptr<IIEngine::LevelData> _levelData) { levelData_ = _levelData; }
+
+	/// <summary>
+	/// 障害物の位置リストセット
+	/// </summary>
+	/// <param name="obstacles">障害物の位置ベクトル配列</param>
+	void SetObstacles(const std::vector<Vector3>& _obstacles) { obstacles_ = _obstacles; }
 
 private:
 
@@ -3936,6 +3958,9 @@ private:
 
 	// レベルデータローダー
 	std::shared_ptr<IIEngine::LevelData> levelData_ = nullptr;
+
+	// 障害物の位置リスト
+	std::vector<Vector3> obstacles_ = {};
 
 };
 
@@ -4052,6 +4077,16 @@ void NormalEnemy::Update()
 	// 暗闇処理(エネミーは動かなくさせる)
     HitVignetteTrap();
 
+
+    if (!isFollowingPath_)
+    {
+        // プレイヤー位置が一定以上変化したらパスを再計算するフラグを立てる
+        if ((playerPosition_ - lastPlayerPos_).Length() > 1.0f)
+        {
+            pathDirty_ = true;
+            lastPlayerPos_ = playerPosition_;
+        }
+    }
 }
 
 void NormalEnemy::Draw()
@@ -4093,6 +4128,10 @@ void NormalEnemy::ImGuiDraw()
     // HP
 	ImGui::SliderFloat("HP", &hp_, 0.0f, maxHP_);
 
+    // 現在のMoveMode
+	const char* moveModeStr = (moveMode_ == MoveMode::Direct) ? "Direct" : "FollowPath";
+	ImGui::Text("MoveMode: %s", moveModeStr);
+
     ImGui::End();
 
 	for (auto& bullet : pBullets_)
@@ -4105,32 +4144,104 @@ void NormalEnemy::ImGuiDraw()
 
 void NormalEnemy::Move()
 {
+	// 前フレームの位置
+    Vector3 lastPosition_;
+    int stuckFrame_ = 0;
+
+    toPlayer_ = playerPosition_ - position_;
+
     if (isFarFromPlayer_)
     {
-        // プレイヤーとの距離が一定以下の場合、追尾を停止(0にするとまずかった)
-        moveVelocity_ = { 0.000001f, 0.0f, 0.0f };        
+        moveVelocity_ = { 0.0f, 0.0f, 0.0f };
         return;
     }
-    else
+
+    Vector3 direction = { 0,0,0 };
+
+    // パスが無い & 障害物があるときだけ計算
+    if (!obstaclePositions_.empty() && path_.empty())
     {
-        // 基底クラスの補間処理を活用
-        toPlayer_ = playerPosition_ - position_;
-        Vector3 direction = Normalize(toPlayer_);
-        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
-
-        // 標準的な移動の挙動
-        moveVelocity_ /= 20.0f;
-        moveVelocity_.y = 0.0f;
-        BaseEnemy::Move();
-
-		SetPosition(position_);
-		SetRotation(rotation_);
-		SetScale(scale_);
-
-		SyncObjectTransform();
-
-        IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+        path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
+        currentWaypointIndex_ = 0;
+        moveMode_ = path_.empty() ? MoveMode::Direct : MoveMode::FollowPath;
     }
+
+    // パス追従
+    if (moveMode_ == MoveMode::FollowPath && currentWaypointIndex_ < path_.size())
+    {
+        Vector3 target = path_[currentWaypointIndex_];
+        Vector3 toTarget = target - position_;
+
+        // ウェイポイント到達 
+        if (toTarget.Length() < 1.0f)
+        {
+            currentWaypointIndex_++;
+        }
+
+        if (currentWaypointIndex_ < path_.size())
+        {
+            direction = Normalize(path_[currentWaypointIndex_] - position_);
+        } else
+        {
+            // パス完走
+            path_.clear();
+            moveMode_ = MoveMode::Direct;
+        }
+    }
+
+    // 直進 
+    if (moveMode_ == MoveMode::Direct && direction.Length() < 0.001f)
+    {
+        if (toPlayer_.Length() > 0.001f)
+        {
+            direction = Normalize(toPlayer_);
+        }
+    }
+
+    // 方向が取れたときだけ更新
+    if (direction.Length() > 0.001f)
+    {
+        Vector3 currentDir = Normalize(moveVelocity_);
+        float dot = Dot(currentDir, direction);
+
+        // ほぼ同じ方向なら補間しない
+        if (dot > 0.98f)
+        {
+            moveVelocity_ = direction;
+        } 
+        else
+        {
+            moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
+        }
+
+        direction = Normalize(toPlayer_);
+        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
+    }
+    moveVelocity_.y = 0.0f;
+
+    BaseEnemy::Move();
+    SyncObjectTransform();
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+
+    if ((position_ - lastPosition_).Length() < 0.01f)
+    {
+        stuckFrame_++;
+    } else
+    {
+        stuckFrame_ = 0;
+    }
+
+    lastPosition_ = position_;
+
+    if (stuckFrame_ > 30) // 約0.5秒
+    {
+        moveMode_ = MoveMode::Direct;
+        path_.clear();
+        currentWaypointIndex_ = 0;
+        stuckFrame_ = 0;
+    }
+
+
 }
 
 void NormalEnemy::Attack()
@@ -4368,13 +4479,14 @@ public: // セッター
 	
 	// --- ステートでのTransform操作用関数(引数あり) ---
 
-	// オブジェクトのpositionをセット
+	// オブジェクトの positionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
-	// オブジェクトのrotationをセット
+	// オブジェクトの rotationをセット
 	void SetObjectRotation(const Vector3& _rotation) { object_->SetRotate(_rotation); }
-	// オブジェクトのscaleをセット
+	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
+	
 private:
 
 	// 追尾停止距離
@@ -4401,7 +4513,6 @@ private:
 	const uint32_t kMaxVignetteTime = 60 * 3;
 	// 暗闇タイマー
 	uint32_t vignetteTime_ = kMaxVignetteTime;
-
 
 };
 
@@ -4844,11 +4955,11 @@ public: // セッター
 	/// <param name="_isHit">被弾フラグ</param>
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
 
-	// オブジェクトのpositionをセット
+	// オブジェクトの positionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
-	// オブジェクトのrotationをセット
+	// オブジェクトの rotationをセット
 	void SetObjectRotation(const Vector3& _rotation) { object_->SetRotate(_rotation); }
-	// オブジェクトのscaleをセット
+	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
 	// 罠設置完了フラグセット
@@ -4973,8 +5084,6 @@ EnemyWaveStage2::EnemyWaveStage2(EnemyManager* _pEnemyManager) : EnemyWaveState(
 
 void EnemyWaveStage2::Initialize()
 {
-	// CSVファイルの読み込み
-	//LoadCSV("resources/csv/EnemyPop2.csv");
 
 	// EnemyManagerから共有LevelDataを受け取る
 	SetLevelData(pEnemyManager_->GetLevelData());
@@ -4984,9 +5093,6 @@ void EnemyWaveStage2::Initialize()
 
 void EnemyWaveStage2::Update()
 {
-	// 確認用csv更新
-	//UpdateCSV(pEnemyManager_);
-
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
 
@@ -5070,7 +5176,7 @@ void EnemyWaveState::UpdateEnemyPopCommands(EnemyManager* _pEnemyManager)
             _pEnemyManager->NormalEnemyInit(enemy.position);
             enemy.isSpawned = true;
 
-            // タイマーをリセットして、次の敵のdelayカウント開始
+            // タイマーをリセットして、次の敵の delayカウント開始
             enemyWaitingTimer_ = 0;
 
             // 1フレームに複数出さないように break
@@ -5086,7 +5192,7 @@ void EnemyWaveState::UpdateEnemyPopCommands(EnemyManager* _pEnemyManager)
             _pEnemyManager->TrapEnemyInit(trapEnemy.position);
             trapEnemy.isSpawned = true;
            
-            // タイマーをリセットして、次の敵のdelayカウント開始
+            // タイマーをリセットして、次の敵の delayカウント開始
             enemyWaitingTimer_ = 0;
             
             // 1フレームに複数出さないように break
@@ -5249,181 +5355,11 @@ protected:
 	std::stringstream enemyPopCommands_;
 	// 敵機中フラグ
 	bool isEnemyWaiting_ = true;
-	// 確認用csv更新用カウント
+	// 確認用 csv更新用カウント
 	uint32_t debugCount_ = 9;
 };
 
 
-
-============================================================
-File Path: project/application/Objects/Field/Barrie.cpp
-============================================================
-#include "Barrie.h"
-
-void Barrie::Initialize()
-{
-	// 基底クラス初期化
-	StaticObject::Initialize("barrie.obj","Barrie");
-
-	// 大きさセット
-	scale_ = defaultScale_;
-	targetScale_ = defaultScale_;
-	SyncObjectTransform();
-	// ライト設定
-	object_->SetLighting(true);
-
-
-}
-
-void Barrie::Update()
-{
-
-	// 基底クラス更新
-	StaticObject::Update();
-
-	// バリア破壊処理
-	if (isBarrierDestroyed_ && !isExploding_)
-	{
-		isExploding_ = true;
-		explodeCount_ = 0;
-	}
-
-	// 破裂演出処理
-	if (isExploding_)
-	{
-		uint32_t phaseLength = explodeMaxCount_ / 2;
-		float scale = 1.0f;
-
-		if (explodeCount_ < phaseLength)
-		{
-			// 膨張
-			float t = static_cast<float>(explodeCount_) / phaseLength;
-			scale = Lerp(1.0f, 2.5f, t);
-		} else if (explodeCount_ < phaseLength * 2) {
-			// 消滅
-			float t = static_cast<float>(explodeCount_ - phaseLength) / phaseLength;
-			scale = Lerp(2.5f, 0.0f, t);
-		}
-
-		// スケール適用
-		scale_ = defaultScale_ * scale;
-		SyncObjectTransform();
-
-		// カウンタ更新
-		explodeCount_++;
-
-		// 演出終了
-		if (explodeCount_ >= explodeMaxCount_)
-		{
-			scale_ = { 0.0f, 0.0f, 0.0f };
-			SyncObjectTransform();
-			isExploding_ = false;
-
-			// 破壊フラグをリセット
-			isBarrierDestroyed_ = false;
-
-			// パーティクル
-			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , 8);
-
-		}
-
-		// 補間後処理
-		if ((scale_ - defaultScale_).Length() < 0.01f)
-		{
-			targetScale_ = defaultScale_;
-		}
-
-	}
-
-	if (scale_.x >= 0.1f)
-	{
-		// パーティクル
-		IIEngine::ParticleEmitter::Emit("spark", { position_.x,position_.y + 3.0f,position_.z }, 1);
-	}
-}
-
-void Barrie::OnCollisionTrigger(const Collider* _other)
-{
-	if (_other->GetColliderID() == "PlayerBullet" or
-		_other->GetColliderID() == "Player" or
-		_other->GetColliderID() == "TrapEnemy" or
-		_other->GetColliderID() == "NormalEnemy" or
-		_other->GetColliderID() == "EnemyBullet" or
-		_other->GetColliderID() == "VignetteTrap" or
-		_other->GetColliderID() == "SetTimeBomb")
-	{
-		// 一瞬大きくし、元に戻す
-		targetScale_ = defaultScale_ * 1.5f;
-	}
-	
-}
-
-
-============================================================
-File Path: project/application/Objects/Field/Barrie.h
-============================================================
-#pragma once
-
-#include "../../baseObject/StaticObject.h"
-#include "../../../gameEngine/collider/ColliderManager.h"
-#include "../../../gameEngine/particle/ParticleEmitter.h"
-
-#include <Object3d.h>
-#include <memory>
-#include <Framework.h>
-
-/// <summary>
-/// バリア
-/// プレイヤーを守るバリアオブジェクト
-/// </summary>
-class Barrie : public StaticObject
-{
-public:
-
-	Barrie() = default;
-	~Barrie() = default;
-
-	// 初期化
-	void Initialize() override;
-
-	// 更新
-	void Update() override;
-
-
-public: // セッター
-
-	/// <summary>
-	/// バリア破壊フラグをセット
-	/// </summary>
-	/// <param name="_isDestroyed"> 破壊フラグ</param>
-	void SetBarrierDestroyed(bool _isDestroyed) { isBarrierDestroyed_ = _isDestroyed; }
-
-private: // 衝突判定
-
-	/// <summary>
-	/// 当たり判定処理
-	/// </summary>
-	/// <param name="_other"> 衝突相手のコライダー</param>
-	void OnCollisionTrigger(const Collider* _other);
-
-private:
-
-	// バリア破壊フラグ
-	bool isBarrierDestroyed_ = false;
-
-	// 元のスケール
-	Vector3 defaultScale_ = { 1.5f, 1.5f, 1.5f };
-	// 目標スケール
-	Vector3 targetScale_ = { 1.5f, 1.5f, 1.5f };  
-	float scaleLerpSpeed_ = 0.2f;
-
-	// 爆発演出用カウント
-	uint32_t explodeCount_ = 0;      
-	// 爆発演出の継続フレーム数
-	const uint32_t explodeMaxCount_ = 10; 
-	bool isExploding_ = false;
-
-};
 
 ============================================================
 File Path: project/application/Objects/Field/Field.cpp
@@ -5516,15 +5452,15 @@ void Goal::Initialize()
 	object_->SetLighting(true);
 
 	// バリア
-	pBarrie_ = std::make_unique<Barrie>();
-	pBarrie_->SetPosition(position_);
-	pBarrie_->Initialize();
+	pBarrier_ = std::make_unique<Barrier>();
+	pBarrier_->SetPosition(position_);
+	pBarrier_->Initialize();
 }
 
 void Goal::Finalize()
 {
 	colliderManager_->DeleteCollider(&collider_);
-	pBarrie_->Finalize();
+	pBarrier_->Finalize();
 }
 
 void Goal::Update()
@@ -5532,12 +5468,12 @@ void Goal::Update()
 	StaticObject::Update();
 
 	// バリアの更新
-	pBarrie_->Update();
+	pBarrier_->Update();
 
 	// バリア破壊の状態が変わったときだけ伝える
 	if (isBarrierDestroyed_ && !wasBarrierDestroyed_)
 	{
-		pBarrie_->SetBarrierDestroyed(true);
+		pBarrier_->SetBarrierDestroyed(true);
 	}
 	
 	// 状態を保存
@@ -5554,7 +5490,7 @@ void Goal::Draw()
 {
 	object_->Draw();
 	
-	pBarrie_->Draw();
+	pBarrier_->Draw();
 }
 
 void Goal::ImGuiDraw()
@@ -5578,7 +5514,7 @@ File Path: project/application/Objects/Field/Goal.h
 
 #include "../../baseObject/StaticObject.h"
 #include "../../../gameEngine/collider/ColliderManager.h"
-#include "Barrie.h"
+#include "Barrier.h"
 
 #include <Object3d.h>
 #include <memory>
@@ -5631,7 +5567,7 @@ private: // 衝突判定
 private:
 
 	// バリア
-	std::unique_ptr<Barrie> pBarrie_ = nullptr;
+	std::unique_ptr<Barrier> pBarrier_ = nullptr;
 
 	// クリアフラグ
 	bool isCleared_ = false;
@@ -6574,7 +6510,7 @@ void Player::AutoMove()
 
 	if (redirected)
 	{
-		// 端で方向反転したら新たにmoveTimerを設定し、即座に再ランダム化しない
+		// 端で方向反転したら新たに moveTimerを設定し、即座に再ランダム化しない
 		moveTimer = 60 + rand() % 90;
 	}
 
@@ -7176,9 +7112,14 @@ File Path: project/application/baseObject/BaseEnemy.cpp
 ============================================================
 #include "BaseEnemy.h"
 
+#include <unordered_map>
+#include <cmath>
+#include <limits>
+
 #include "TimeManager.h"
 #include "CameraManager.h"
 #include "MyMath.h"
+#include "Vector3Hash.h"
 
 void BaseEnemy::Initialize(const std::string& _modelFileName, const std::string& _objectName, float _initialHP)
 {
@@ -7200,22 +7141,196 @@ void BaseEnemy::Move()
 {
     // デルタタイム取得
     const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
-
-    // プレイヤー方向ベクトル計算
-    toPlayer_ = playerPosition_ - position_;
-    moveVelocity_ = Normalize(toPlayer_);  // 基本ではプレイヤーに向かう
-
-    // Y軸回転を進行方向に合わせる
-    rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
-
-    // デフォルトの位置更新
+    // 位置更新
     position_ += moveVelocity_ * moveSpeed_ * dt * kDefaultFrameRate;
+
+    // 向きは「現在の速度ベクトル」から決める
+    if (moveVelocity_.Length() > 0.05f)
+    {
+        float targetYaw = std::atan2(moveVelocity_.x, moveVelocity_.z);
+        rotation_.y = LerpAngle(rotation_.y, targetYaw, 0.2f);
+    }
 
 }
 
 Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
 {
     return Normalize(Slerp(currentVelocity, targetDirection, interpolationRate));
+}
+
+std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector3& goal, const std::vector<Vector3>& obstacles)
+{
+	// ループ回数制限
+    int loopCount = 0;
+    const int kMaxLoop = 1000;
+
+    // 優先度付きキュー
+    struct Node
+    {
+        GridPos pos;
+        float cost;
+        bool operator>(const Node& other) const { return cost > other.cost; }
+    };
+
+	// 探索済みノードセットをクリア
+    closedSet_.clear();
+
+	// スタートとゴールをグリッド座標に変換
+    GridPos startGrid = ToGrid(start);
+    GridPos goalGrid = ToGrid(goal);
+
+	// オープンセット
+    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> openSet;
+
+	// コストマップと経路マップ
+    std::unordered_map<GridPos, float, GridPosHash> gScore;
+    std::unordered_map<GridPos, GridPos, GridPosHash> cameFrom;
+    std::unordered_set<GridPos, GridPosHash> obstacleGrid;
+
+    for (const auto& o : obstacles)
+    {
+        GridPos g = ToGrid(o);
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dz = -1; dz <= 1; dz++)
+            {
+                obstacleGrid.insert({ g.x + dx, g.z + dz });
+            }
+        }
+    }
+
+	// スタートノードをオープンセットに追加
+    gScore[startGrid] = 0.0f;
+    openSet.push({ startGrid, 0.0f });
+
+	// メインループ
+    while (!openSet.empty())
+    {
+        if (++loopCount > kMaxLoop)
+        {
+            // 見つからなかった場合は諦める
+            break;
+        }
+
+		// コストの最小ノードを取得
+        Node current = openSet.top();
+        openSet.pop();
+
+        int dx = abs(current.pos.x - startGrid.x);
+        int dz = abs(current.pos.z - startGrid.z);
+
+        if (dx > 20 || dz > 20)
+        {
+            continue;
+        }
+
+		// 既に探索済みならスキップ
+        if (closedSet_.contains(current.pos))
+        {
+            continue;
+        }
+		// 探索済みノードに追加
+        closedSet_.insert(current.pos);
+
+		// ゴール判定
+        if (current.pos == goalGrid)
+        {
+            std::vector<Vector3> path;
+            GridPos node = goalGrid;
+			// 経路を逆順にたどる
+            while (cameFrom.contains(node))
+            {
+                path.push_back(ToWorld(node));
+                node = cameFrom[node];
+            }
+			// スタートノードを追加
+            std::reverse(path.begin(), path.end());
+            return path;
+        }
+
+		// 近傍ノードを取得
+        for (const Vector3& neighborWorld : GetNeighborsWorld(current.pos))
+        {
+			// 障害物ノードはスキップ
+            if (std::find(obstacles.begin(), obstacles.end(), neighborWorld) != obstacles.end())
+            {
+                continue;
+            }
+			// グリッド座標に変換
+            GridPos neighbor = ToGrid(neighborWorld);
+
+			float tentativeGScore = gScore[current.pos] + Heuristic(ToWorld(current.pos), neighborWorld);
+
+			// 障害物ノードはスキップ
+            if (obstacleGrid.contains(neighbor))
+            {
+                continue;
+            }
+
+			// より良いコストなら更新
+            if (!gScore.contains(neighbor) or tentativeGScore < gScore[neighbor])
+            {
+                gScore[neighbor] = tentativeGScore;
+                cameFrom[neighbor] = current.pos;
+
+                float fScore = tentativeGScore + Heuristic(neighborWorld, ToWorld(goalGrid));
+
+                openSet.push({ neighbor, fScore });
+            }
+        }
+    }
+
+    return {};
+}
+
+std::vector<Vector3> BaseEnemy::GetNeighbors(const Vector3& node)
+{
+    // 近傍のノードを生成(グリッド状を仮定)
+    std::vector<Vector3> neighbors = 
+    {
+        node + Vector3(1, 0, 0),
+        node + Vector3(-1, 0, 0),
+        node + Vector3(0, 0, 1),
+        node + Vector3(0, 0, -1),
+    };
+    return neighbors;
+}
+
+float BaseEnemy::Heuristic(const Vector3& a, const Vector3& b)
+{
+    return (a - b).Length(); // ユークリッド距離
+}
+
+BaseEnemy::GridPos BaseEnemy::ToGrid(const Vector3& v) const
+{
+    return 
+    {
+         static_cast<int>(std::round(v.x / 1.0f)),
+         static_cast<int>(std::round(v.z / 1.0f))
+    };
+}
+
+Vector3 BaseEnemy::ToWorld(const GridPos& g) const
+{
+    return Vector3(static_cast<float>(g.x + 0.5f) * 1.0f, 0.0f, static_cast<float>(g.z + 0.5f) * 1.0f);
+}
+
+std::vector<Vector3> BaseEnemy::GetNeighborsWorld(const GridPos& node)
+{
+    std::vector<GridPos> neighbors =
+    {
+        { node.x + 1, node.z },
+        { node.x - 1, node.z },
+        { node.x, node.z + 1 },
+        { node.x, node.z - 1 }
+    };
+
+    std::vector<Vector3> result;
+    for (const auto& n : neighbors)
+    {
+        result.push_back(ToWorld(n));
+    }
+    return result;
 }
 
 
@@ -7227,9 +7342,11 @@ File Path: project/application/baseObject/BaseEnemy.h
 #include "Character.h"
 
 #include <memory>
+#include <queue>
 #include <functional>
 #include <Vector3.h>
 #include <Framework.h>
+#include <unordered_set>
 
 /// <summary>
 /// 敵の基底クラス
@@ -7250,23 +7367,83 @@ public:
 	// 移動
 	virtual void Move() override;
 
+	// 障害物の位置リストをセット
+	void SetObstaclePositions(const std::vector<Vector3>& _obstaclePositions) { obstaclePositions_ = _obstaclePositions; }
+
 protected:
 
 	// 進行方向の補間処理
 	Vector3 InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate);
 
+	// 障害物回避用パス計算
+	std::vector<Vector3> CalculatePath(const Vector3& start, const Vector3& goal, const std::vector<Vector3>& obstacles);
+
+	// 障害物の近傍ノードを取得
+	std::vector<Vector3> GetNeighbors(const Vector3& node);
+
+	// ヒューリスティック関数
+	float Heuristic(const Vector3& a, const Vector3& b);
+
+	struct GridPos
+	{
+		int x;
+		int z;
+
+		bool operator==(const GridPos& other) const
+		{
+			return x == other.x && z == other.z;
+		}
+	};
+
+	struct GridPosHash
+	{
+		size_t operator()(const GridPos& p) const noexcept
+		{
+			return std::hash<int>()(p.x) ^ (std::hash<int>()(p.z) << 1);
+		}
+	};
+
+	GridPos ToGrid(const Vector3& v) const;
+	Vector3 ToWorld(const GridPos& g) const;
+
+	std::vector<Vector3> GetNeighborsWorld(const GridPos& node);
+	
 protected:
 
     // 移動関連
-    Vector3 moveVelocity_;
-    float moveSpeed_;
+	Vector3 moveVelocity_ = {};
+    float moveSpeed_ = 0.0f;
 
     // プレイヤー関連
-    Vector3 playerPosition_;
-    Vector3 toPlayer_;
+	Vector3 playerPosition_ = {};
+	Vector3 toPlayer_ = {};
+	Vector3 lastPlayerPos_ = {};
 
     // フレームレート補助
     static constexpr float kDefaultFrameRate = 60.0f;
+
+	// 障害物の位置リスト
+	std::vector<Vector3> obstaclePositions_ = {};
+
+	// 探索済みノードセット
+	std::unordered_set<GridPos, GridPosHash> closedSet_ = {};
+
+	// 現在のパス
+	std::vector<Vector3> path_;
+	// 現在のウェイポイントインデックス
+	size_t currentWaypointIndex_ = 0;
+	// パスが汚れているかどうか
+	bool pathDirty_ = true;
+	// パスに沿って移動中かどうか
+	bool isFollowingPath_ = false;
+
+	enum class MoveMode
+	{
+		Direct,   // 障害物なし
+		FollowPath // A*のパスを追従中
+	};
+	MoveMode moveMode_ = MoveMode::Direct;
+
 
 };
 
@@ -7475,7 +7652,7 @@ public:
 	/// <summary>
 	/// まとめて削除するユーティリティ
 	/// </summary>
-	/// <typeparam name="BulletT">弾クラスの型（PlayerBullet / EnemyBullet 等）</typeparam>
+	/// <param name="BulletT">弾クラスの型（PlayerBullet / EnemyBullet 等）</param>
 	/// <param name="bullets">削除対象のベクタ（unique_ptr の vector）</param>
 	/// <param name="onDead">削除前に実行するコールバック</param>
 	template<typename BulletT>
@@ -7589,7 +7766,7 @@ protected:
 	uint32_t spriteNum_ = 1;
 
 	// HP
-	float hp_;
+	float hp_ = 100;
 	
 	
 };
@@ -7975,11 +8152,11 @@ public: // セッター
 	
 
 	// --- ステートでのTransform操作用関数(引数あり) ---
-	// オブジェクトのpositionをセット
+	// オブジェクトの positionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
-	// オブジェクトのrotationをセット
+	// オブジェクトの rotationをセット
 	void SetObjectRotation(const Vector3& _rotation) { object_->SetRotate(_rotation); }
-	// オブジェクトのscaleをセット
+	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
 private:
@@ -8057,7 +8234,7 @@ void EnemyManager::Update()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -8229,7 +8406,7 @@ void EnemyManager::TitleEnemyUpdate()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -8298,7 +8475,7 @@ void EnemyManager::GameOverEnemyUpdate()
 		toPlayerDistance_.push_back(enemy->GetToPlayer());
 	}
 
-	// isDeat がたったら削除
+	// isDeath がたったら削除
 	pNormalEnemies_.erase(
 		std::remove_if(
 			pNormalEnemies_.begin(),
@@ -8333,6 +8510,11 @@ void EnemyManager::NormalEnemyInit(const Vector3& pos)
 	enemy->SetPosition(pos);
 	enemy->Initialize();
 	enemy->SetPlayerPosition(playerPosition_);
+	// obstacles_が空でないなら障害物をセット
+	if (!obstacles_.empty())
+	{
+		enemy->SetObstaclePositions(obstacles_);
+	}
 	enemy->Update();
 
 	// 敵を登録
@@ -8515,6 +8697,7 @@ public:
 	/// <returns>最も近い敵が存在するかどうか</returns>
 	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
 
+
 public: // ゲッター
 
 	// プレイヤーとの距離のゲッター
@@ -8528,6 +8711,9 @@ public: // ゲッター
 
 	// レベルエディタ
 	std::shared_ptr<IIEngine::LevelData> GetLevelData() const { return levelData_; }
+
+	// 障害物の位置リスト取得
+	const std::vector<Vector3>& GetObstacles() const { return obstacles_; }
 
 public: // セッター
 
@@ -8548,6 +8734,12 @@ public: // セッター
 	/// </summary>
 	/// <param name="_levelData">レベルデータローダー</param>
 	void SetLevelData(std::shared_ptr<IIEngine::LevelData> _levelData) { levelData_ = _levelData; }
+
+	/// <summary>
+	/// 障害物の位置リストセット
+	/// </summary>
+	/// <param name="obstacles">障害物の位置ベクトル配列</param>
+	void SetObstacles(const std::vector<Vector3>& _obstacles) { obstacles_ = _obstacles; }
 
 private:
 
@@ -8579,6 +8771,9 @@ private:
 	// レベルデータローダー
 	std::shared_ptr<IIEngine::LevelData> levelData_ = nullptr;
 
+	// 障害物の位置リスト
+	std::vector<Vector3> obstacles_ = {};
+
 };
 
 
@@ -8606,7 +8801,7 @@ void CorruptorBehaviorMove::Initialize()
 
 void CorruptorBehaviorMove::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pCorruptor_);
 	
 	// 動く前に切り替え処理
@@ -8710,7 +8905,7 @@ void CorruptorBehaviorSelfDestruct::Initialize()
 
 void CorruptorBehaviorSelfDestruct::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pCorruptor_);
 	
 	// イージングの進行度
@@ -8809,7 +9004,7 @@ void CorruptorBehaviorSpawn::Initialize()
 
 void CorruptorBehaviorSpawn::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pCorruptor_);
 
 	// イージングの進行度
@@ -8888,7 +9083,8 @@ void CorruptorBehaviorState::MotionCount(Motion& _motion)
 	if (_motion.count < _motion.maxCount)
 	{
 		_motion.count++;
-	} else
+	} 
+	else
 	{
 		// モーション終了 カウントリセット
 		_motion.isActive = false;
@@ -8972,7 +9168,7 @@ protected:
 	// モーションのカウント
 	void MotionCount(Motion& _motion);
 
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	void TransformUpdate(Corruptor* _pEnemy);
 
 	std::string stateName_;
@@ -9011,7 +9207,7 @@ void EnemyBehaviorAttack::Initialize()
 
 void EnemyBehaviorAttack::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
     // 溜め
@@ -9174,7 +9370,7 @@ void EnemyBehaviorDead::Initialize()
 
 void EnemyBehaviorDead::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	float t = float(motion_.count) / motion_.maxCount;
@@ -9275,7 +9471,7 @@ void EnemyBehaviorHitReact::Initialize()
 
 void EnemyBehaviorHitReact::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	Vector3 shakeOffset =
@@ -9377,7 +9573,7 @@ void EnemyBehaviorMove::Initialize()
 
 void EnemyBehaviorMove::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	// 動く前に切り替え処理
@@ -9493,7 +9689,7 @@ void EnemyBehaviorSpawn::Initialize()
 
 void EnemyBehaviorSpawn::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pNormalEnemy_);
 
 	// イージングの進行度（0〜1）
@@ -9655,7 +9851,7 @@ protected:
 	void MotionCount(Motion& _motion);
 
 	/// <summary>
-	/// 敵のトランスフォームをmotion_.transformにセット
+	/// 敵のトランスフォームを motion_.transformにセット
 	/// </summary>
 	/// <param name="_pEnemy">通常敵ポインタ</param>
 	void TransformUpdate(NormalEnemy* _pEnemy);
@@ -9691,7 +9887,7 @@ void TrapEnemyBehaviorDead::Initialize()
 
 void TrapEnemyBehaviorDead::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	float t = float(motion_.count) / motion_.maxCount;
@@ -9758,7 +9954,7 @@ void TrapEnemyBehaviorSpawn::Initialize()
 
 void TrapEnemyBehaviorSpawn::Update()
 {
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	TransformUpdate(pTrapEnemy_);
 
 	// イージングの進行度
@@ -9856,7 +10052,7 @@ protected:
 	// モーションのカウント
 	void MotionCount(Motion& _motion);
 
-	// 敵のトランスフォームをmotion_.transformにセット
+	// 敵のトランスフォームを motion_.transformにセット
 	void TransformUpdate(TrapEnemy* _pEnemy);
 
 	std::string stateName_;
@@ -9867,6 +10063,176 @@ protected:
 };
 
 
+
+============================================================
+File Path: project/application/objects/field/Barrier.cpp
+============================================================
+#include "Barrier.h"
+
+void Barrier::Initialize()
+{
+	// 基底クラス初期化
+	StaticObject::Initialize("barrie.obj","Barrie");
+
+	// 大きさセット
+	scale_ = defaultScale_;
+	targetScale_ = defaultScale_;
+	SyncObjectTransform();
+	// ライト設定
+	object_->SetLighting(true);
+
+
+}
+
+void Barrier::Update()
+{
+
+	// 基底クラス更新
+	StaticObject::Update();
+
+	// バリア破壊処理
+	if (isBarrierDestroyed_ && !isExploding_)
+	{
+		isExploding_ = true;
+		explodeCount_ = 0;
+	}
+
+	// 破裂演出処理
+	if (isExploding_)
+	{
+		uint32_t phaseLength = explodeMaxCount_ / 2;
+		float scale = 1.0f;
+
+		if (explodeCount_ < phaseLength)
+		{
+			// 膨張
+			float t = static_cast<float>(explodeCount_) / phaseLength;
+			scale = Lerp(1.0f, 2.5f, t);
+		} else if (explodeCount_ < phaseLength * 2) {
+			// 消滅
+			float t = static_cast<float>(explodeCount_ - phaseLength) / phaseLength;
+			scale = Lerp(2.5f, 0.0f, t);
+		}
+
+		// スケール適用
+		scale_ = defaultScale_ * scale;
+		SyncObjectTransform();
+
+		// カウンタ更新
+		explodeCount_++;
+
+		// 演出終了
+		if (explodeCount_ >= explodeMaxCount_)
+		{
+			scale_ = { 0.0f, 0.0f, 0.0f };
+			SyncObjectTransform();
+			isExploding_ = false;
+
+			// 破壊フラグをリセット
+			isBarrierDestroyed_ = false;
+
+			// パーティクル
+			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , 8);
+
+		}
+
+		// 補間後処理
+		if ((scale_ - defaultScale_).Length() < 0.01f)
+		{
+			targetScale_ = defaultScale_;
+		}
+
+	}
+
+	if (scale_.x >= 0.1f)
+	{
+		// パーティクル
+		IIEngine::ParticleEmitter::Emit("spark", { position_.x,position_.y + 3.0f,position_.z }, 1);
+	}
+}
+
+void Barrier::OnCollisionTrigger(const Collider* _other)
+{
+	if (_other->GetColliderID() == "PlayerBullet" or
+		_other->GetColliderID() == "Player" or
+		_other->GetColliderID() == "TrapEnemy" or
+		_other->GetColliderID() == "NormalEnemy" or
+		_other->GetColliderID() == "EnemyBullet" or
+		_other->GetColliderID() == "VignetteTrap" or
+		_other->GetColliderID() == "SetTimeBomb")
+	{
+		// 一瞬大きくし、元に戻す
+		targetScale_ = defaultScale_ * 1.5f;
+	}
+	
+}
+
+
+============================================================
+File Path: project/application/objects/field/Barrier.h
+============================================================
+#pragma once
+
+#include "../../baseObject/StaticObject.h"
+#include "../../../gameEngine/collider/ColliderManager.h"
+#include "../../../gameEngine/particle/ParticleEmitter.h"
+
+#include <Object3d.h>
+#include <memory>
+#include <Framework.h>
+
+/// <summary>
+/// バリア
+/// プレイヤーを守るバリアオブジェクト
+/// </summary>
+class Barrier : public StaticObject
+{
+public:
+
+	Barrier() = default;
+	~Barrier() = default;
+
+	// 初期化
+	void Initialize() override;
+
+	// 更新
+	void Update() override;
+
+
+public: // セッター
+
+	/// <summary>
+	/// バリア破壊フラグをセット
+	/// </summary>
+	/// <param name="_isDestroyed"> 破壊フラグ</param>
+	void SetBarrierDestroyed(bool _isDestroyed) { isBarrierDestroyed_ = _isDestroyed; }
+
+private: // 衝突判定
+
+	/// <summary>
+	/// 当たり判定処理
+	/// </summary>
+	/// <param name="_other"> 衝突相手のコライダー</param>
+	void OnCollisionTrigger(const Collider* _other);
+
+private:
+
+	// バリア破壊フラグ
+	bool isBarrierDestroyed_ = false;
+
+	// 元のスケール
+	Vector3 defaultScale_ = { 1.5f, 1.5f, 1.5f };
+	// 目標スケール
+	Vector3 targetScale_ = { 1.5f, 1.5f, 1.5f };  
+	float scaleLerpSpeed_ = 0.2f;
+
+	// 爆発演出用カウント
+	uint32_t explodeCount_ = 0;      
+	// 爆発演出の継続フレーム数
+	const uint32_t explodeMaxCount_ = 10; 
+	bool isExploding_ = false;
+
+};
 
 ============================================================
 File Path: project/application/scene/ClearScene.cpp
@@ -10391,10 +10757,6 @@ void GameOverScene::CameraShake()
 {
 	// アクティブカメラの情報を取得
 	auto activeCamera = cameraManager.GetActiveCamera();
-	if (activeCamera)
-	{
-		auto viewMatrix = activeCamera->GetViewMatrix();
-	}
 
 	// プレイヤーがヒットした場合にカメラをシェイク
 	if (pPlayer_->IsHitMoment())
@@ -10593,6 +10955,17 @@ void GamePlayScene::Initialize()
 			pWalls_.push_back(std::move(wall));
 		}
 	}
+
+	// 壁データの収集
+	std::vector<Vector3> wallPositions;
+	for (const auto& wall : pWalls_)
+	{
+		// 壁の位置をリストに追加
+		wallPositions.push_back(wall->GetPosition());
+	}
+	// エネミーマネージャーに壁データを渡す
+	pEnemyManager_->SetObstacles(wallPositions);
+
 
 	// カメラの追従
 	camera_->AddController(std::make_unique<FollowController>(
@@ -12548,7 +12921,7 @@ public:
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="camera">カメラ</param>
-	/// <param name="consumeHit">ヒットを消費する関数(ヒットがあればtrueを返す)</param>
+	/// <param name="consumeHit">ヒットを消費する関数(ヒットがあれば trueを返す)</param>
 	/// <param name="defaultDuration">シェイク継続時間</param>
 	/// <param name="defaultAmp">シェイク振幅</param>
 	ShakeController(std::shared_ptr<Camera> camera, std::function<bool()> consumeHit, float defaultDuration = 0.3f, float defaultAmp = 1.0f);
@@ -12755,12 +13128,12 @@ File Path: project/gameEngine/2d/Sprite.cpp
 #include <fstream>
 
 void Sprite::Initialize(std::string textureFilePath,
-	Vector2 position, Vector4 color, Vector2 anchorpoint)
+	Vector2 position, Vector4 color, Vector2 anchorPoint)
 {
 	spriteCommon_ = SpriteCommon::GetInstance();
 
 	std::ifstream file;
-	// 基本パスを指定（"Resources/images/"）
+	// 基本パスを指定("Resources/images/")
 	std::string basePath = "resources/images/";
 	std::string fullPath = basePath + textureFilePath;
 	textureFilePath_ = fullPath;
@@ -12782,7 +13155,7 @@ void Sprite::Initialize(std::string textureFilePath,
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズをインデックス6つ分のサイズ
 	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	//インデックスはuint32_tとする
+	//インデックスは uint32_tとする
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 
@@ -12819,7 +13192,7 @@ void Sprite::Initialize(std::string textureFilePath,
 
 	SetPosition(position);
 	SetColor(color);
-	SetAnchorPoint(anchorpoint);
+	SetAnchorPoint(anchorPoint);
 
 	color_ = color;
 }
@@ -12895,19 +13268,19 @@ void Sprite::Update()
 	}
 
 	vertexData_[0].position = { left,bottom,0.0f,1.0f };
-	vertexData_[0].texcoord = { tex_left,tex_bottom };
+	vertexData_[0].texCoord = { tex_left,tex_bottom };
 	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
 
 	vertexData_[1].position = { left,top,0.0f,1.0f };
-	vertexData_[1].texcoord = { tex_left,tex_top };
+	vertexData_[1].texCoord = { tex_left,tex_top };
 	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
 
 	vertexData_[2].position = { right,bottom,0.0f,1.0f };
-	vertexData_[2].texcoord = { tex_right,tex_bottom };
+	vertexData_[2].texCoord = { tex_right,tex_bottom };
 	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
 
 	vertexData_[3].position = { right,top,0.0f,1.0f };
-	vertexData_[3].texcoord = { tex_right,tex_top };
+	vertexData_[3].texCoord = { tex_right,tex_top };
 	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
 
 	indexData_[0] = 0;		indexData_[1] = 1;		indexData_[2] = 2;
@@ -12945,7 +13318,7 @@ void Sprite::Draw()
 	// TransformationMatrixCBufferの場所を設定
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
 
-	// SRVのDescriptorTableの先頭を設定。2はrootPatameter[2]である。
+	// SRVのDescriptorTableの先頭を設定。2は rootParameter[2]である。
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFilePath_));
 	// スプライトの描画(DrawCall//ドローコール)
 	spriteCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -12973,7 +13346,7 @@ void Sprite::FollowParentWorldMatrix(const Matrix4x4* parentWorldPtr, bool follo
 
 void Sprite::StopFollowing()
 {
-	// 追従ポインタをnullptrに設定
+	// 追従ポインタを nullptrに設定
 	followWorldPositionPtr_ = nullptr;
 	parentWorldMatrixPtr_ = nullptr;
 	worldToScreenFunc_ = nullptr;
@@ -13035,8 +13408,8 @@ public:
 	/// <param name="textureFilePath">テクスチャファイルパス</param>
 	/// <param name="position">座標</param>
 	/// <param name="color">色</param>
-	/// <param name="anchorpoint">アンカーポイント</param>
-	void Initialize(std::string textureFilePath,Vector2 position, Vector4 color = { (1) , (1), (1), (1) }, Vector2 anchorpoint = { 0.0f,0.0f });
+	/// <param name="anchorPoint">アンカーポイント</param>
+	void Initialize(std::string textureFilePath,Vector2 position, Vector4 color = { (1) , (1), (1), (1) }, Vector2 anchorPoint = { 0.0f,0.0f });
 
 	// 更新
 	void Update();
@@ -13174,7 +13547,7 @@ private: // 構造体、関数
 	struct VertexData
 	{
 		Vector4 position;
-		Vector2 texcoord;
+		Vector2 texCoord;
 		Vector3 normal;
 	};
 
@@ -13216,8 +13589,8 @@ private:
 	Material* materialData_ = nullptr;
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 	// バッファリソースの使い道を補足するバッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_ = {};
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_ = {};
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_;
@@ -13382,7 +13755,7 @@ void SpriteCommon::CreateRootSignature()
 	rootParameters[3].Descriptor.ShaderRegister = 1;
 
 
-	//Smaplerの設定
+	//Samplerの設定
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;				//バイリニアフィルタ
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;			//0～1の範囲外をリピート
@@ -13610,7 +13983,7 @@ Vector2 Camera::WorldToScreen(const Vector3& worldPos) const
 	float w = 1.0f;
 
 	// ビュープロジェクション行列をかける
-	Vector4 clip;
+	Vector4 clip{};
 	const Matrix4x4& m = viewProjectionMatrix_;
 	clip.x = x * m.m[0][0] + y * m.m[1][0] + z * m.m[2][0] + w * m.m[3][0];
 	clip.y = x * m.m[0][1] + y * m.m[1][1] + z * m.m[2][1] + w * m.m[3][1];
@@ -13895,14 +14268,6 @@ public:
     /// <param name="magnitude">シェイクの強さ</param>
     void ShakeSpecificCamera(uint32_t index, float duration, float magnitude);
 
-    // アクティブカメラのシェイクを開始
-    // 軽い衝撃のシェイク
-    // cameraManager.StartShakeActiveCamera(0.2f, 0.3f);
-    // 中規模の爆発のシェイク
-    // cameraManager.StartShakeActiveCamera(0.5f, 0.8f);
-    // 大規模な爆発のシェイク
-    // cameraManager.StartShakeActiveCamera(1.0f, 1.5f);
-
     /// <summary>
     /// アクティブカメラのシェイクを開始
     /// 軽い衝撃のシェイク
@@ -13966,12 +14331,12 @@ File Path: project/gameEngine/3d/Model.cpp
 
 #include "ModelCommon.h"
 
-void Model::Initialize(ModelCommon* modelCommon, const std::string& directorypath, const std::string& filename)
+void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename)
 {
 	modelCommon_ = modelCommon;
 
 	//モデル読み込み
-	modelData_ = LoadObjFile(directorypath, filename);
+	modelData_ = LoadObjFile(directoryPath, filename);
 
 	// VertexResourceを作る
 	CreateVertexData();
@@ -13999,7 +14364,7 @@ void Model::Draw()
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
 
-	// SRVのDescriptorTableの先頭を設定。2はrootPatameter[2]である。
+	// SRVのDescriptorTableの先頭を設定。2は rootParameter[2]である。
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureFilePath));
 
 
@@ -14120,7 +14485,7 @@ void Model::CreateMaterialData()
 	materialData_->uvTransform = MakeIdentity4x4();
 	materialData_->shininess = 50.0f;
 	materialData_->phongReflection = false;
-	materialData_->halfphongReflection = false;
+	materialData_->halfPhongReflection = false;
 	materialData_->pointLight = false;
 	materialData_->spotLight = false;
 }
@@ -14128,7 +14493,7 @@ void Model::CreateMaterialData()
 Model::Node Model::ReadNode(aiNode* node)
 {
 	Node result;
-	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeのlocalMatrixを取得
+	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeの localMatrixを取得
 	aiLocalMatrix.Transpose(); // 行列を転置する
 	result.localMatrix.m[0][0] = aiLocalMatrix[0][0];
 	result.localMatrix.m[0][1] = aiLocalMatrix[1][0];
@@ -14324,7 +14689,7 @@ public:
 	/// <param name="modelCommon">モデル共通機能管理クラスへのポインタ</param>	
 	/// <param name="directoryPath">ディレクトリパス</param>
 	/// <param name="filename">ファイル名</param>
-	void Initialize(ModelCommon* modelCommon, const std::string& directorypath, const std::string& filename);
+	void Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
 	/// 更新
@@ -14387,7 +14752,7 @@ private: // 構造体、関数
 		Matrix4x4 uvTransform;
 		float shininess;
 		int32_t phongReflection;
-		int32_t halfphongReflection;
+		int32_t halfPhongReflection;
 		int32_t pointLight;
 		int32_t spotLight;
 		int32_t environment;
@@ -14396,7 +14761,7 @@ private: // 構造体、関数
 
 	struct  Node
 	{
-		Matrix4x4 localMatrix;
+		Matrix4x4 localMatrix = {};
 		std::string name;
 		std::vector<Node> children;
 	};
@@ -14581,7 +14946,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	model->Initialize(modelCommon_.get(), directory, fileName);
 
-	// モデルをmapコンテナに格納する
+	// モデルを mapコンテナに格納する
 	models.insert(std::make_pair(fileName, std::move(model))); // 所有権を譲渡
 }
 
@@ -14589,7 +14954,7 @@ Model* ModelManager::FindModel(const std::string& filePath)
 {
 	// 読み込み済みモデルを検索
 	if (models.contains(filePath)) {
-		// 読み込みモデルを戻り値としてreturn
+		// 読み込みモデルを戻り値として return
 		return models.at(filePath).get();
 	}
 	// ファイル名一致無し
@@ -15337,7 +15702,7 @@ void Object3dCommon::CreateRootSignature()
 	descriptionRootSignature_.pParameters = rootParameters_;					//ルートパラメータ配列へのポインタ
 	descriptionRootSignature_.NumParameters = _countof(rootParameters_);		//配列の長さ
 
-	//Smaplerの設定
+	//Samplerの設定
 	staticSamplers_[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;				//バイリニアフィルタ
 	staticSamplers_[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;			//0～1の範囲外をリピート
 	staticSamplers_[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -16273,13 +16638,13 @@ public: // ゲッター
         }
         for (std::string name : std::initializer_list<std::string>{ _ignoreNames... })
         {
-            bool iscompare = false;
+            bool isCompare = false;
             for (auto& attributePair : attributeList_)
             {
                 if (name.compare(attributePair.first) == 0)
                 {
                     result ^= attributePair.second;
-                    iscompare = true;
+                    isCompare = true;
                 }
             }
         }
@@ -16475,7 +16840,7 @@ SoundData Audio::LoadWav(const char* filename)
 	assert(file.is_open());
 
 	// RIFFヘッダーの読み込み
-	RiffHeader riff;
+	RiffHeader riff{};
 	file.read((char*)&riff, sizeof(riff));
 	// ファイルがRIFFかチェック
 	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) 
@@ -16489,7 +16854,7 @@ SoundData Audio::LoadWav(const char* filename)
 	}
 
 	// チャンクのループを開始
-	ChunkHeader chunkHeader;
+	ChunkHeader chunkHeader{};
 	FormatChunk format = {};
 	while (file.read((char*)&chunkHeader, sizeof(chunkHeader))) {
 		// チャンクIDが "fmt" か確認
@@ -16515,7 +16880,7 @@ SoundData Audio::LoadWav(const char* filename)
 
 
 	// Dataチャンクの読み込みとスキップ処理
-	ChunkHeader data;
+	ChunkHeader data{};
 	while (file.read((char*)&data, sizeof(data))) {
 		if (strncmp(data.id, "data", 4) == 0) {
 			break; // "data" チャンクを見つけたらループを抜ける
@@ -16585,7 +16950,7 @@ void Audio::PlayWave(SoundData& soundData, bool loop, float volume)
 	// ボリュームを設定
 	soundData.sourceVoice->SetVolume(volume);
 
-	// "loop" がtrueの場合ループさせる
+	// "loop" が trueの場合ループさせる
 	if (loop) {
 		buf.LoopCount = XAUDIO2_LOOP_INFINITE; // 無限ループ
 	}
@@ -16643,10 +17008,10 @@ struct FormatChunk {
 };
 // 音声データ
 struct SoundData {
-	WAVEFORMATEX wfex;		// 波形フォーマット
+	WAVEFORMATEX wfex = {};		// 波形フォーマット
 	std::vector<BYTE> pBuffer;			// バッファの先頭アドレス
 	IXAudio2SourceVoice* sourceVoice = nullptr;  // ソースボイス
-	unsigned int bufferSize;// バッファサイズ
+	unsigned int bufferSize = {};// バッファサイズ
 };
 
 /// <summary>
@@ -16890,10 +17255,10 @@ void DirectXCommon::InitializeDevice()
 	//関数が成功したかどうかをSUCCEEDEDマクロで判定できる
 	result = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
 	//初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、
-	//どうにもできない場合が多いのでassertにしておく
+	//どうにもできない場合が多いので assertにしておく
 	assert(SUCCEEDED(result));
 
-	//使用するアダプタ用の変数。最初にnullptrを入れておく
+	//使用するアダプタ用の変数。最初に nullptrを入れておく
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
 	//いい順にアダプタを頼む
 	for (UINT i = 0; dxgiFactory_->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; i++)
@@ -17052,13 +17417,13 @@ void DirectXCommon::CreateDepthBuffer()
 
 void DirectXCommon::CreateDescriptorHeap()
 {
-	//RTV用のヒープでディスクリプタの数は２。RTVはShader内で触るものではないので、ShaderVisibleはfalse
+	//RTV用のヒープでディスクリプタの数は２。RTVはShader内で触るものではないので、ShaderVisibleは false
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
-	//SRV用のヒープでディスクリプタの数は１２８。SRVはShader内で触るものなので、ShaderVisibleはtrue
+	//SRV用のヒープでディスクリプタの数は１２８。SRVはShader内で触るものなので、ShaderVisibleは true
 	srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 
-	//DSV用のヒープでディスクリプタの数は１。DSVはSharder内で触るものではないので、ShaderVisibleはfalse
+	//DSV用のヒープでディスクリプタの数は１。DSVは Shrader内で触るものではないので、ShaderVisibleは false
 	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 
@@ -17200,30 +17565,9 @@ void DirectXCommon::CreateDXCompiler()
 	result = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
 	assert(SUCCEEDED(result));
 
-	//現時点でincludeはしないが、includeに対応するための設定を行っておく
+	//現時点で includeはしないが、includeに対応するための設定を行っておく
 	result = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
 	assert(SUCCEEDED(result));
-}
-
-void DirectXCommon::InitializeImGui()
-{
-#ifdef USE_IMGUI
-
-	//ImGuiの初期化
-	/*IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp_->GetHwnd());
-	ImGui_ImplDX12_Init(
-		device_.Get(),
-		swapChainDesc_.BufferCount,
-		rtvDesc_.Format,
-		srvDescriptorHeap_.Get(),
-		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
-		srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
-	);*/
-
-#endif // USE_IMGUI
 }
 
 void DirectXCommon::PreDraw()
@@ -17239,7 +17583,7 @@ void DirectXCommon::PreDraw()
 	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	//バリアを張る対称のリソース。現在のバックバッファに対して行う
 	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-	//遷移前（現在）のresourceState
+	//遷移前(現在)の resourceState
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	//遷移後のResourceState
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -17268,12 +17612,6 @@ void DirectXCommon::PreDraw()
 		nullptr
 	);
 
-	//描画用のDescriptorHeapの設定
-	//もろもろの描画処理が終わったタイミングでImGuiの描画コマンドを積む
-	//Guiは画面の最前面に映すので、一番最後の描画として行う
-	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap_ };
-	//commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-
 	commandList_->RSSetViewports(1, &viewport_);
 	commandList_->RSSetScissorRects(1, &scissorRect_);
 }
@@ -17295,7 +17633,7 @@ void DirectXCommon::PostDraw()
 	barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
 
-	//TransitonのBarrierを張る
+	//TransitionのBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
 
 
@@ -17353,7 +17691,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	//読めなかったら止める
 	assert(SUCCEEDED(result));
 	//読み込んだファイルの内容を設定する
-	DxcBuffer shaderSourceBuffer;
+	DxcBuffer shaderSourceBuffer{};
 	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;		//UTF8の文字コードであることを通知
@@ -17361,9 +17699,9 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	//コンパイルする
 
 	LPCWSTR arguments[] = {
-		filePath.c_str(),				//コンパイル対称のhlslファイル名
-		L"-E", L"main",					//エントリーポイントの指定。基本的にmain以外にはしない
-		L"-T", profile,					//Sharderprofileの設定
+		filePath.c_str(),				//コンパイル対称の hlslファイル名
+		L"-E", L"main",					//エントリーポイントの指定。基本的に main以外にはしない
+		L"-T", profile,					//ShraderProfileの設定
 		L"-Zi", L"-Qembed_debug",		//デバッグ用の情報を埋め込む
 		L"-Od",							//最適化を外しておく
 		L"-Zpr",						//メモリレイアウトは行優先
@@ -17378,22 +17716,22 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 		includeHandler_,
 		IID_PPV_ARGS(&shaderResult)
 	);
-	//コンパイルエラーではなくdxcで起動できないなど致命的な状況
+	//コンパイルエラーではなく dxcで起動できないなど致命的な状況
 	assert(SUCCEEDED(result));
-
-
-
-	//警告・エラーが出ていないか確認する
-
 
 	//警告・エラーが出てたらログに出して止める
 	IDxcBlobUtf8* shaderError = nullptr;
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+	IDxcBlobWide* dummyOutputName = nullptr;
+	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), &dummyOutputName);
+	if (dummyOutputName)
+	{
+		dummyOutputName->Release();
+	}
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
 	{
 		IIEngine::Logger::Log(shaderError->GetStringPointer());
 		//警告・エラーダメ絶対
-		assert(SUCCEEDED(false));
+		assert(false);
 	}
 
 
@@ -17402,7 +17740,11 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 
 	//コンパイル結果から実行用のバイナリ部分を取得
 	IDxcBlob* shaderBlob = nullptr;
-	result = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	result = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), &dummyOutputName);
+	if (dummyOutputName)
+	{
+		dummyOutputName->Release();
+	}
 	assert(SUCCEEDED(result));
 	//成功したログを出す
 	IIEngine::Logger::Log(IIEngine::StringUtility::ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
@@ -17840,11 +18182,6 @@ public:
 	/// DXCコンパイラの生成
 	/// </summary>
 	void CreateDXCompiler();
-
-	/// <summary>
-	/// ImGuiの初期化
-	/// </summary>
-	void InitializeImGui();
 
 	/// <summary>
 	/// 描画前処理
@@ -18343,9 +18680,9 @@ protected:
 
 	IIEngine::ParticleManager* particleManager = nullptr;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE inputSrv;
+	D3D12_GPU_DESCRIPTOR_HANDLE inputSrv = {};
 	Microsoft::WRL::ComPtr<ID3D12Resource> inputRes;
-	D3D12_RESOURCE_STATES state;
+	D3D12_RESOURCE_STATES state = {};
 
 	std::unique_ptr<IIEngine::Skybox> skybox = nullptr;
 
@@ -18422,7 +18759,7 @@ void RenderTexture::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, 
     metadata.format = format_;
 
     srvIndex_ = srvManager_->Allocate();
-    srvManager_->CreateSRVforTexture2D(srvIndex_, texture_.Get(), format, 1, metadata);
+    srvManager_->CreateSRVForTexture2D(srvIndex_, texture_.Get(), format, 1, metadata);
 
     currentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
 }
@@ -18599,11 +18936,11 @@ uint32_t SrvManager::Allocate()
     uint32_t index = useIndex_;
     // 次回の為に番号を1進める
     useIndex_++;
-    // 上で記録した番号をreturn
+    // 上で記録した番号を return
     return index;
 }
 
-bool SrvManager::IsAllocate()
+bool SrvManager::IsAllocate() const
 {
     if (kMaxSRVCount_ > useIndex_) {
         return true;
@@ -18626,7 +18963,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUDescriptorHandle(uint32_t index)
     return handleGPU;
 }
 
-void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata)
+void SrvManager::CreateSRVForTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata)
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 
@@ -18656,7 +18993,7 @@ void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResou
 
 }
 
-void SrvManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride)
+void SrvManager::CreateSRVForStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride)
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 
@@ -18793,7 +19130,7 @@ uint32_t SrvManager::LoadTexture(const std::string& textureFilePath)
 
     // SRV作成
     uint32_t srvIndex = Allocate();
-    CreateSRVforTexture2D(srvIndex, textureResource.Get(), textureResource->GetDesc().Format, textureResource->GetDesc().MipLevels,metadata);
+    CreateSRVForTexture2D(srvIndex, textureResource.Get(), textureResource->GetDesc().Format, textureResource->GetDesc().MipLevels,metadata);
 
     // デバッグログ
     D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = GetGPUDescriptorHandle(srvIndex);
@@ -18838,7 +19175,7 @@ public:
 	/// SRV確保確認
 	/// </summary>
 	/// <returns>確保済みか</returns>
-	bool IsAllocate();
+	bool IsAllocate() const;
 
 	// 計算用関数
 	/// <summary>
@@ -18862,7 +19199,7 @@ public:
 	/// <param name="Format">フォーマット</param>
 	/// <param name="MipLevels">ミップレベル数</param>
 	/// <param name="metadata">テクスチャメタデータ</param>
-	void CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata);
+	void CreateSRVForTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels, const DirectX::TexMetadata& metadata);
 	
 	/// <summary>
 	/// SRV生成(Structured Buffer用)
@@ -18871,7 +19208,7 @@ public:
 	/// <param name="pResource">リソースポインタ</param>
 	/// <param name="numElements">要素数</param>
 	/// <param name="structureByteStride">構造体バイトストライド</param>
-	void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
+	void CreateSRVForStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
 
 	// 描画前処理
 	void PreDraw();
@@ -18925,7 +19262,7 @@ private:
 	// 最大SRV数(最大テクスチャ数)
 	static const uint32_t kMaxSRVCount_;
 	//SRV用デスクリプタサイズ
-	uint32_t descriptorSize_;
+	uint32_t descriptorSize_{};
 	// SRV用デスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
 
@@ -18963,14 +19300,14 @@ void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager)
 	srvManager_ = srvManager;
 
 	// SRVの数と同数
-	textureDatas.reserve(DirectXCommon::kMaxSRVCount);
+	textureDates.reserve(DirectXCommon::kMaxSRVCount);
 }
 
 void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 {
 	// 読み込み済みテクスチャを検索
-	if (textureDatas.contains(filePath)) {
-		// 読み込み済みなら早期return
+	if (textureDates.contains(filePath)) {
+		// 読み込み済みなら早期 return
 		return;
 	}
 	// テクスチャ枚数上限チェック
@@ -19013,16 +19350,10 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 	meta;
 	forceCubeMap;
 
-	// ★ ここでmetaの内容を出力
-	const auto& meta2 = mipImages.GetMetadata();
-	OutputDebugStringA(std::format(
-		"meta2: IsCubemap={}, arraySize={}, mipLevels={}\n",
-		meta2.IsCubemap(), meta2.arraySize, meta2.mipLevels
-	).c_str());
 
 	// テクスチャデータを追加
 	// 追加したテクスチャデータの参照を取得する
-	TextureData& textureData = textureDatas[filePath];
+	TextureData& textureData = textureDates[filePath];
 
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
@@ -19039,12 +19370,6 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 	srvDesc.Format = textureData.metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	OutputDebugStringA(std::format(
-		"DEBUG: dimension={}, IsCubemap={}, arraySize={}\n",
-		static_cast<int>(textureData.metadata.dimension),
-		textureData.metadata.IsCubemap(),
-		textureData.metadata.arraySize
-	).c_str());
 
 	if (textureData.metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE2D && textureData.metadata.IsCubemap() && textureData.metadata.arraySize == 6)
 	{
@@ -19060,34 +19385,17 @@ void TextureManager::LoadTexture(const std::string& filePath, bool forceCubeMap)
 		srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 	}
 
-	// ★ ここでSRV設定内容を出力
-	OutputDebugStringA(std::format(
-		"SRV: ViewDimension={}, TextureCube.MipLevels={}\n",
-		static_cast<int>(srvDesc.ViewDimension),
-		static_cast<unsigned int>(srvDesc.TextureCube.MipLevels)
-	).c_str());
-
 
 	// 設定を基にSRVの生成
 	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-
-	// ここでSRVの内容を出力
-	OutputDebugStringA(std::format(
-		"[SRV登録] filePath={}, srvIndex={}, ViewDimension={}, IsCubemap={}, arraySize={}\n",
-		filePath,
-		textureData.srvIndex,
-		static_cast<int>(srvDesc.ViewDimension),
-		textureData.metadata.IsCubemap(),
-		textureData.metadata.arraySize
-	).c_str());
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)
 {
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
@@ -19102,8 +19410,8 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 {
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
@@ -19118,8 +19426,8 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 {
 
 	// テクスチャが存在するか確認
-	auto it = textureDatas.find(filePath);
-	if (it == textureDatas.end()) {
+	auto it = textureDates.find(filePath);
+	if (it == textureDates.end()) {
 		// なかったらエラーメッセージ
 		IIEngine::Logger::Log("Error: Texture not found for filePath: " + filePath);
 		throw std::runtime_error("Texture not found for filePath: " + filePath);
@@ -19212,18 +19520,18 @@ private: // 構造体
 	// テクスチャ1枚分のデータ
 	struct TextureData
 	{
-		DirectX::TexMetadata metadata;
+		DirectX::TexMetadata metadata{};
 		Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 		Microsoft::WRL::ComPtr<ID3D12Resource> intermediate;
-		uint32_t srvIndex;
-		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
-		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+		uint32_t srvIndex{};
+		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU{};
+		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU{};
 	};
 
 private:
 
 	// テクスチャデータ
-	std::unordered_map<std::string, TextureData> textureDatas;
+	std::unordered_map<std::string, TextureData> textureDates;
 
 	DirectXCommon* dxCommon_ = nullptr;
 
@@ -19272,8 +19580,13 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 void WinApp::Initialize()
 {
 	//COMの初期化
-	CoInitializeEx(0, COINIT_MULTITHREADED);
-
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+	{
+		// 初期化失敗時のエラーハンドリング
+		MessageBox(nullptr, L"COMの初期化に失敗しました。", L"エラー", MB_OK | MB_ICONERROR);
+		return;
+	}
 
 	
 	//ウィンドウプロシージャ
@@ -19291,7 +19604,7 @@ void WinApp::Initialize()
 	//ウィンドウサイズを表す構造体にクライアント領域を入れる
 	RECT wrc = { 0,0,kClientWidth,kClientHeight };
 
-	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
+	//クライアント領域をもとに実際のサイズに wrcを変更してもらう
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 
@@ -19320,9 +19633,6 @@ void WinApp::Initialize()
 
 void WinApp::Update()
 {
-
-
-
 }
 
 void WinApp::Finalize()
@@ -19437,18 +19747,18 @@ void BasePostEffectPass::Initialize(DirectXCommon* dxCommon, SrvManager* srvMana
     dxCommon_ = dxCommon;
     srvManager_ = srvManager;
 
-    CD3DX12_DESCRIPTOR_RANGE srvRange;
+    CD3DX12_DESCRIPTOR_RANGE srvRange{};
     srvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-    CD3DX12_DESCRIPTOR_RANGE samplerRange;
+    CD3DX12_DESCRIPTOR_RANGE samplerRange{};
     samplerRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0);
 
-    CD3DX12_ROOT_PARAMETER rootParams[3];
+	CD3DX12_ROOT_PARAMETER rootParams[3] = {};
     rootParams[0].InitAsDescriptorTable(1, &srvRange, D3D12_SHADER_VISIBILITY_PIXEL);
     rootParams[1].InitAsDescriptorTable(1, &samplerRange, D3D12_SHADER_VISIBILITY_PIXEL);
     rootParams[2].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);
 
-    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc{};
     rootSigDesc.Init(_countof(rootParams), rootParams, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
     Microsoft::WRL::ComPtr<ID3DBlob> sigBlob, errBlob;
@@ -19473,16 +19783,6 @@ void BasePostEffectPass::Initialize(DirectXCommon* dxCommon, SrvManager* srvMana
     psoDesc.DSVFormat = DXGI_FORMAT_UNKNOWN;
     
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    /*D3D12_BLEND_DESC blendDesc = {};
-    blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-    psoDesc.BlendState = blendDesc;*/
 
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 
@@ -20779,7 +21079,6 @@ void MyGame::Update()
 void MyGame::Draw()
 {
 	//ゲームの処理		描画処理
-
 	//コマンドを積み込んで確定させる
 
 	// ---------- オフスクリーン描画 ----------
@@ -21033,9 +21332,7 @@ File Path: project/gameEngine/imgui/ImGuiManager.cpp
 
 #ifdef USE_IMGUI
 
-//#include <imgui.h>
 #include "../../externals/imgui/imgui_impl_win32.h"
-//#include <imgui_impl_dx12.h>
 
 #endif // USE_IMGUI
 
@@ -21243,7 +21540,7 @@ namespace IIEngine
 		keyboard->GetDeviceState(sizeof(key), key);
 	}
 
-	bool Input::PushKey(BYTE keyNumber)
+	bool Input::PushKey(BYTE keyNumber)const
 	{
 		// 指定キーを押していれば trueを返す
 		if (key[keyNumber])
@@ -21255,7 +21552,7 @@ namespace IIEngine
 		return false;
 	}
 
-	bool Input::TriggerKey(BYTE keyNumber)
+	bool Input::TriggerKey(BYTE keyNumber)const
 	{
 		if (!keyPre[keyNumber] && key[keyNumber])
 		{
@@ -21327,14 +21624,14 @@ namespace IIEngine
 		/// </summary>
 		/// <perm name="keyNumber">キー番号( DIK_0 等)</param>
 		///<returns>押されているか</returns>
-		bool PushKey(BYTE keyNumber);
+		bool PushKey(BYTE keyNumber)const;
 
 		/// <summary>
 		/// キーのトリガーをチェック
 		/// </summary>
 		/// <param name="KeyNumber">キー番号( DIK_0 等 )</param>
 		/// <returns>トリガーか</returns>
-		bool TriggerKey(BYTE keyNumber);
+		bool TriggerKey(BYTE keyNumber)const;
 
 	private:
 
@@ -22539,7 +22836,7 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 // -----行列-----
 // 行列の積
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {
@@ -22551,7 +22848,7 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 // 平行移動行列
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	result.m[0][0] = 1;
 	result.m[0][1] = 0;
@@ -22691,9 +22988,9 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 
 // 逆行列
 Matrix4x4 Inverse(const Matrix4x4& m) {
-	Matrix4x4 result;
-	float a;
-	Matrix4x4 b;
+	Matrix4x4 result{};
+	float a{};
+	Matrix4x4 b{};
 
 	a = 1 /
 		(m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2] - m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1] -
@@ -22760,7 +23057,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 }
 // 転置行列
 Matrix4x4 Transpose(const Matrix4x4& m) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {
@@ -22783,7 +23080,7 @@ Matrix4x4 InverseTranspose(const Matrix4x4& m)
 }
 // 単位行列の作成
 Matrix4x4 MakeIdentity4x4() {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {
@@ -23185,7 +23482,7 @@ File Path: project/gameEngine/math/Quaternion.cpp
 
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs)
 {
-	Quaternion result;
+	Quaternion result{};
 	result.w = lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z;
 	result.x = lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y;
 	result.y = lhs.w * rhs.y - lhs.x * rhs.z + lhs.y * rhs.w + lhs.z * rhs.x;
@@ -23262,7 +23559,7 @@ Quaternion IdentityQuaternion();
 Quaternion Conjugate(const Quaternion& quaternion);
 
 /// <summary>
-/// Quaternionのnormを返す
+/// Quaternionの normを返す
 /// </summary>
 /// <param name="quaternion">対象Quaternion</param>
 /// <returns>norm値</returns>
@@ -23289,7 +23586,7 @@ File Path: project/gameEngine/math/Vector2.cpp
 #include <cmath>
 
 /// ===========
-/// calcuration
+/// calculation
 /// ===========
 
 float Vector2::Dot(const Vector2& _v) const
@@ -23448,7 +23745,7 @@ Vector2& Vector2::operator*=(const Vector2& _v)
 }
 
 /// =========
-/// overscope
+/// overScope
 /// =========
 
 Vector2 operator*(const float _f, const Vector2& _v)
@@ -23506,7 +23803,7 @@ public:
     }
 
     /// ===========
-    /// calcuration
+    /// calculation
     /// ===========
 
     /// <summary>
@@ -23628,7 +23925,7 @@ File Path: project/gameEngine/math/Vector3.cpp
 #include <cmath>
 
 /// ===========
-/// calcuration
+/// calculation
 /// ===========
 
 float Vector3::Dot(const Vector3& _v) const
@@ -23922,10 +24219,10 @@ public:
         return;
     }
 
-    inline Vector2 xy() { return Vector2(x, y); }
+    inline Vector2 xy() const { return Vector2(x, y); }
 
     /// ===========
-    /// calcuration
+    /// calculation
     /// ===========
 
 	/// <summary>
@@ -24033,62 +24330,42 @@ public:
     Vector3 operator+(const Vector2& _v) const;
     Vector3 operator-(const Vector2& _v) const;
     Vector3 operator*(const Vector2& _v) const;
+
+	/// =======
+	/// equal
+	/// ======
+    bool operator==(const Vector3& other) const
+    {
+        return x == other.x && y == other.y && z == other.z;
+    }
 };
 
 Vector3 operator*(const float _f, const Vector3& _v);
 Vector3 operator/(const float _f, const Vector3& _v);
 
-namespace FMath
+
+============================================================
+File Path: project/gameEngine/math/Vector3Hash.h
+============================================================
+#pragma once
+#include <functional>
+#include "Vector3.h"
+
+namespace std
 {
-    /// <summary>
-	/// ベクトルの加算
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>加算結果ベクトル</returns>
-    Vector3 Add(const Vector3& _v1, const Vector3& _v2);
-	/// <summary>
-	/// ベクトルの減算
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>減算結果ベクトル</returns>
-    Vector3 Subtract(const Vector3& _v1, const Vector3& _v2);
-	/// <summary>
-	/// ベクトルのスカラー倍
-	/// </summary>
-	/// <param name="_scalar">スカラー値</param>
-	/// <param name="_v">ベクトル</param>
-	/// <returns>スカラー倍結果ベクトル</returns>
-    Vector3 Multiply(float _scalar, const Vector3& _v);
-	/// <summary>
-	/// ベクトルの内積
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>内積</returns>
-    float Dot(const Vector3& _v1, const Vector3& _v2);
-	/// <summary>
-	/// ベクトルの外積
-	/// </summary>
-	/// <param name="_v1">ベクトル1</param>
-	/// <param name="_v2">ベクトル2</param>
-	/// <returns>外積ベクトル</returns>
-    float Length(const Vector3& _v);
-	/// <summary>
-	/// ベクトルの正規化
-	/// </summary>
-	/// <param name="_v">ベクトル</param>
-	/// <returns>正規化ベクトル</returns>
-    Vector3 Normalize(const Vector3& _v);
-	/// <summary>
-	/// ベクトルの変換
-	/// </summary>
-	/// <param name="_vector">ベクトル</param>
-	/// <param name="_matrix">変換行列</param>
-	/// <returns>変換後ベクトル</returns>
-    Vector3 Transform(const Vector3& _vector, const Matrix4x4& _matrix);
+    template<>
+    struct hash<Vector3>
+    {
+        size_t operator()(const Vector3& v) const noexcept
+        {
+            size_t h1 = std::hash<float>{}(v.x);
+            size_t h2 = std::hash<float>{}(v.y);
+            size_t h3 = std::hash<float>{}(v.z);
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
+        }
+    };
 }
+
 
 ============================================================
 File Path: project/gameEngine/particle/MeshBuilder.cpp
@@ -24920,7 +25197,7 @@ namespace IIEngine
         // モーション登録
         ParticleMotion::Initialize();
 
-        // （Cylinder方向など必要あれば指定）
+        // (Cylinder方向など必要あれば指定)
         ParticleMotion::SetDirection("UP");
 
         // パイプライン生成
@@ -24932,7 +25209,7 @@ namespace IIEngine
         backToFrontMatrix_ = MakeRotateYMatrix(std::numbers::pi_v<float>);
 
         //マテリアル
-        //modelマテリアる用のリソースを作る。今回color1つ分のサイズを用意する
+        //modelマテリアる用のリソースを作る。今回 color1つ分のサイズを用意する
         materialResource_ = dxCommon_->CreateBufferResource(sizeof(Material));
         //マテリアルにデータを書き込む
         materialData_ = nullptr;
@@ -25012,7 +25289,7 @@ namespace IIEngine
         descriptionRootSignature_.pParameters = rootParameter;
         descriptionRootSignature_.NumParameters = _countof(rootParameter);
 
-        //Smaplerの設定
+        //Samplerの設定
         staticSamplers_[0].Filter = D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR;
         staticSamplers_[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         staticSamplers_[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
@@ -25141,7 +25418,7 @@ namespace IIEngine
         // インスタンス用のSRVインデックス
         particleGroups.at(name).srvIndex = srvManager_->Allocate();
         // srvを生成
-        srvManager_->CreateSRVforStructuredBuffer(particleGroups.at(name).srvIndex, particleGroups.at(name).instancingResource.Get(), MaxInstanceCount, sizeof(ParticleForGPU));
+        srvManager_->CreateSRVForStructuredBuffer(particleGroups.at(name).srvIndex, particleGroups.at(name).instancingResource.Get(), MaxInstanceCount, sizeof(ParticleForGPU));
 
         // モデルの頂点を構築
         using BuildFunc = std::function<void(Model*)>;
@@ -25305,7 +25582,7 @@ namespace IIEngine
 
     void ParticleManager::Emit(const std::string groupName, const Vector3& position, uint32_t count)
     {
-        // グループごとのmotionNameを使うEmit
+        // グループごとの motionNameを使うEmit
         auto it = particleGroups.find(groupName);
         if (it == particleGroups.end())
         {
@@ -25727,7 +26004,7 @@ namespace IIEngine
 
 		TransformData transform_;
 		Matrix4x4 backToFrontMatrix_;
-		//modelマテリアる用のリソースを作る。今回color1つ分のサイズを用意する
+		//modelマテリアる用のリソースを作る。今回 color1つ分のサイズを用意する
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 		//マテリアルにデータを書き込む	
 		Material* materialData_ = nullptr;
@@ -26156,14 +26433,14 @@ namespace IIEngine
         float offsetX = std::cos(angle) * radius;
         float offsetZ = std::sin(angle) * radius;
 
-        // Y座標はtranslate.yそのまま
+        // Y座標は translate.yそのまま
         Vector3 pos = translate + Vector3(offsetX, 1.0f, offsetZ);
 
         Particle p;
         p.transform.translate = pos;
         p.transform.scale = { 1.0f, 1.0f, 1.0f };
         p.transform.rotate = { 0.0f, 0.0f, 0.0f };
-        // 徐々に下がる（Y方向に負の速度）
+        // 徐々に下がる(Y方向に負の速度)
         std::uniform_real_distribution<float> distVelY(-0.03f, -0.01f);
         p.velocity = { 0.0f, distVelY(rand), 0.0f };
         // 徐々に大きくなる
@@ -27291,7 +27568,7 @@ namespace IIEngine {
 		/// <summary>
 		/// 固定デルタタイムがタイムスケールの影響を受けるかどうかの設定
 		/// </summary>
-		/// <param name="useScaled">影響を受けるならtrue</param>
+		/// <param name="useScaled">影響を受けるなら true</param>
 		void SetFixedUsesScaled(bool useScaled)
 		{
 			fixedUsesScaled_ = useScaled;
@@ -27302,7 +27579,7 @@ namespace IIEngine {
 		/// </summary>
 		/// <param name="cb">コールバック関数</param>
 		/// <param name="seconds">遅延時間(秒)</param>
-		/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
+		/// <param name="useUnscaled">タイムスケールの影響を受けないなら true</param>
 		/// <returns>タイマーID</returns>
 		TimerId SetTimeout(std::function<void()> cb, float seconds, bool useUnscaled = false)
 		{
@@ -27320,7 +27597,7 @@ namespace IIEngine {
 		/// </summary>
 		/// <param name="cb">コールバック関数</param>
 		/// <param name="seconds">遅延時間(秒)</param>
-		/// <param name="useUnscaled">タイムスケールの影響を受けないならtrue</param>
+		/// <param name="useUnscaled">タイムスケールの影響を受けないなら true</param>
 		/// <returns>タイマーID</returns>
 		TimerId SetInterval(std::function<void()> cb, float seconds, bool useUnscaled = false)
 		{
@@ -27351,7 +27628,7 @@ namespace IIEngine {
 		/// <summary>
 		/// 時間が一時停止中かどうか
 		/// </summary>
-		/// <returns>停止中ならtrue</returns>
+		/// <returns>停止中なら true</returns>
 		bool IsPaused() const
 		{
 			return paused_;
@@ -27764,18 +28041,18 @@ namespace IIEngine
         struct Block
         {
             std::unique_ptr<Sprite> sprite;
-            Vector2 position;
-            Vector2 scale;
-            float rotation;
-            float delay;
-            float dropDelay;
-            bool active;
-            float fallSpeed;
-            float verticalOffset;
-            bool isRising;
-            bool isDropped;
-            float riseTimer;
-            float riseDuration;
+            Vector2 position{};
+            Vector2 scale{};
+            float rotation{};
+            float delay{};
+            float dropDelay{};
+            bool active{};
+            float fallSpeed{};
+            float verticalOffset{};
+            bool isRising{};
+            bool isDropped{};
+            float riseTimer{};
+            float riseDuration{};
         };
 
         // ブロック群
@@ -27832,7 +28109,8 @@ namespace IIEngine
         {
             state_ = State::FadeIn;
             alpha_ = 1.0f;
-        } else
+        } 
+        else
         {
             state_ = State::FadeOut;
             alpha_ = 0.0f;
