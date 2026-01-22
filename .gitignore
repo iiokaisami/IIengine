@@ -328,3 +328,7 @@ project/imgui.ini
 
 # Debug symbols (C++ / DirectX)
 *.pdb
+
+# Ignore DirectXTex Visual Studio project files
+project/externals/DirectXTex/*.vcxproj
+project/externals/DirectXTex/*.vcxproj.filters
