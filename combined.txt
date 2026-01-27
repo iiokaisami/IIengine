@@ -97,6 +97,8 @@
     └──     ├── GameOverScene.h
     └──     ├── GamePlayScene.cpp
     └──     ├── GamePlayScene.h
+    └──     ├── PauseMenu.cpp
+    └──     ├── PauseMenu.h
     └──     ├── SceneFactory.cpp
     └──     ├── SceneFactory.h
     └──     ├── TitleScene.cpp
@@ -467,6 +469,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
     <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
     <ClCompile Include="application\baseObject\StaticObject.cpp" />
+    <ClCompile Include="application\scene\PauseMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -574,6 +577,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
     <ClInclude Include="application\baseObject\StaticObject.h" />
     <ClInclude Include="gameEngine\math\Vector3Hash.h" />
+    <ClInclude Include="application\scene\PauseMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -1007,9 +1011,16 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="gameEngine\time\TimeManager.cpp">
       <Filter>gameEngine\time</Filter>
     </ClCompile>
-    <ClCompile Include="application\baseObject\StaticObject.cpp" />
-    <ClCompile Include="application\baseObject\Character.cpp" />
-    <ClCompile Include="application\baseObject\BaseBullet.cpp" />
+    <ClCompile Include="application\baseObject\StaticObject.cpp">
+      <Filter>application\baseObject</Filter>
+    </ClCompile>
+    <ClCompile Include="application\baseObject\BaseBullet.cpp">
+      <Filter>application\baseObject</Filter>
+    </ClCompile>
+    <ClCompile Include="application\baseObject\Character.cpp">
+      <Filter>application\baseObject</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\PauseMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1315,10 +1326,19 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="gameEngine\time\TimeManager.h">
       <Filter>gameEngine\time</Filter>
     </ClInclude>
-    <ClInclude Include="application\baseObject\StaticObject.h" />
-    <ClInclude Include="application\baseObject\Character.h" />
-    <ClInclude Include="application\baseObject\BaseBullet.h" />
-    <ClInclude Include="gameEngine\math\Vector3Hash.h" />
+    <ClInclude Include="gameEngine\math\Vector3Hash.h">
+      <Filter>gameEngine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="application\baseObject\StaticObject.h">
+      <Filter>application\baseObject</Filter>
+    </ClInclude>
+    <ClInclude Include="application\baseObject\Character.h">
+      <Filter>application\baseObject</Filter>
+    </ClInclude>
+    <ClInclude Include="application\baseObject\BaseBullet.h">
+      <Filter>application\baseObject</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\PauseMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -3681,32 +3701,46 @@ void NormalEnemy::Move()
 
 void NormalEnemy::Attack()
 {
-    // 弾の数と間隔角度
+	// 弾の発射設定
     const int bulletCount = 24;
     const float angleStep = 360.0f / bulletCount;
+    const float bulletCooldown = 0.0f;
 
-    for (int i = 0; i < bulletCount; ++i)
+	// クールタイム管理
+    static float cooldownTimer = 0.0f;
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+    cooldownTimer -= dt;
+
+	// 弾の発射
+    if (cooldownTimer <= 0.0f)
     {
-        // 弾の角度を計算 (ラジアンに変換)
-        float angle = DirectX::XMConvertToRadians(i * angleStep);
-
-        // 弾の方向を計算
-        Vector3 bulletDirection =
+        for (int i = 0; i < bulletCount; ++i)
         {
-            std::cos(angle), // X成分
-            0.0f,            // Y成分
-            std::sin(angle)  // Z成分
-        };
+			// 角度計算
+            float angle = DirectX::XMConvertToRadians(i * angleStep);
 
-        // 弾を生成
-        auto bullet = std::make_unique<EnemyBullet>();
-        bullet->Initialize();
-        bullet->SetPosition({ position_.x,position_.y + 0.5f,position_.z }); // 敵の位置より少し上を初期位置に設定
-        bullet->SetVelocity(bulletDirection * 0.2f);
-        bullet->SyncObjectTransform();
+			// 弾の方向ベクトル計算
+            Vector3 bulletDirection =
+            {
+                std::cos(angle), // X
+                0.0f,            // Y
+                std::sin(angle)  // Z
+            };
 
-        // 弾をリストに追加
-        pBullets_.push_back(std::move(bullet));
+			// 弾の生成と初期化
+            auto bullet = std::make_unique<EnemyBullet>();
+            bullet->Initialize();
+            bullet->SetPosition({ position_.x, position_.y + 0.5f, position_.z });
+            bullet->SetVelocity(bulletDirection * 0.2f);
+            bullet->SyncObjectTransform();
+
+			// 弾をリストに追加
+            pBullets_.push_back(std::move(bullet));
+        }
+
+		// クールタイマーリセット
+        cooldownTimer = bulletCooldown;
     }
 }
     
@@ -4028,6 +4062,9 @@ void TrapEnemy::Finalize()
 
 void TrapEnemy::Update()
 {
+	// デルタタイム取得
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
     // 基底クラスの共通更新処理を呼び出し
     BaseEnemy::Update();
 
@@ -4042,6 +4079,20 @@ void TrapEnemy::Update()
 
 	// HPバー更新
 	UpdateHPBar();
+
+	// 罠設置のクールタイム管理
+    if (!isTrapCooldownComplete_)
+    {
+		// タイマーを減少
+        trapCooldownTimer_ -= dt;
+
+        if (trapCooldownTimer_ <= 0.0f)
+        {
+			// クールタイム完了
+            isTrapCooldownComplete_ = true;
+            trapCooldownTimer_ = 0.0f;
+        }
+    }
 
     // プレイヤーとの距離を計算
     float distanceToPlayer = position_.Distance(playerPosition_);
@@ -4417,6 +4468,10 @@ private:
 	bool isTrapCooldownComplete_ = false;
 	// 次の罠がTimeBombかVignetteTrapかのフラグ
 	bool isNextTrapTimeBomb_ = true;
+
+	// トラップ設置のクールタイム管理
+	const float kTrapCooldownTime = 3.0f;
+	float trapCooldownTimer_ = 0.0f;
 
 	// 行動ステート
 	std::unique_ptr<TrapEnemyBehaviorState> pBehaviorState_ = nullptr;
@@ -8767,15 +8822,15 @@ void Player::AutoMove()
 {
 	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
 
-	static int moveTimer = 0;
+	static float moveTimer = 0.0f;  // moveTimerをfloat型に変更
 	static Vector3 autoDir = { 0.0f, 0.0f, 1.0f }; // 初期は前進
 
 	// フィールド端の範囲
 	const float minX = -15.0f, maxX = 15.0f;
 	const float minZ = -15.0f, maxZ = 15.0f;
 
-	// 一定フレームごとに新しいランダム方向を決める
-	if (moveTimer <= 0)
+	// moveTimerが0以下になったら新しいランダム方向を決める
+	if (moveTimer <= 0.0f)
 	{
 		// -1.0f～1.0fの範囲でランダムなx,zを生成
 		float randX = (float(rand()) / RAND_MAX) * 2.0f - 1.0f;
@@ -8783,9 +8838,11 @@ void Player::AutoMove()
 		Vector3 dir = { randX, 0.0f, randZ };
 		if (dir.Length() < 0.1f) dir.z = 1.0f; // ゼロベクトル対策
 		autoDir = dir.Normalize();
-		moveTimer = 60 + rand() % 90; // 1～2.5秒ごとに方向転換
+
+		// moveTimerに次の方向転換までの時間（秒）をランダムで設定
+		moveTimer = 1.0f + static_cast<float>(rand() % 150) / 60.0f; // 1秒〜2.5秒
 	}
-	moveTimer--;
+	moveTimer -= dt;  // タイマーを減算（秒単位）
 
 	// 端に近づいたら強制的に内向きにリダイレクト
 	bool redirected = false;
@@ -8805,7 +8862,7 @@ void Player::AutoMove()
 	if (redirected)
 	{
 		// 端で方向反転したら新たに moveTimerを設定し、即座に再ランダム化しない
-		moveTimer = 60 + rand() % 90;
+		moveTimer = 1.0f + static_cast<float>(rand() % 150) / 60.0f; // 1秒〜2.5秒
 	}
 
 	// 移動速度を計算
@@ -8833,10 +8890,14 @@ void Player::AutoMove()
 
 void Player::AutoAttack()
 {
+	// デルタタイムを取得
+	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
+
 	// 一定間隔で自動攻撃
-	static int attackCooldown = 0;
-	const int attackInterval = 50; // フレーム数
-	if (attackCooldown <= 0)
+	static float attackCooldown = 0.0f;
+	const float attackInterval = 0.8f;
+
+	if (attackCooldown <= 0.0f)
 	{
 		// プレイヤーの向きに合わせて弾の速度を変更
 		Vector3 bulletVelocity =
@@ -8853,10 +8914,14 @@ void Player::AutoAttack()
 
 		// 弾を登録する
 		pBullets_.push_back(std::move(newBullet));
+
+		// クールダウンをリセット
 		attackCooldown = attackInterval;
-	} else
+	} 
+	else
 	{
-		attackCooldown--;
+		// クールダウンタイマーを減算
+		attackCooldown -= dt;
 	}
 }
 
@@ -10085,6 +10150,10 @@ void GamePlayScene::Initialize()
 	camera_->SetPosition(camStart_);
 	camera_->SetRotate(camStartRot_);
 
+	// ポーズメニュー
+	pauseMenu_ = std::make_unique<PauseMenu>();
+	pauseMenu_->Initialize();
+
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
 	colliderManager_->Initialize();
@@ -10317,6 +10386,76 @@ void GamePlayScene::Update()
 		}
 	}
 	
+	// ポーズ入力
+	if (inputLock_)
+	{
+		if (!IIEngine::Input::GetInstance()->PushKey(DIK_SPACE))
+		{
+			inputLock_ = false;
+		}
+		return;
+	}
+
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE))
+	{
+		if (!isPaused_)
+		{
+			isPaused_ = true;
+			pauseMenu_->Open();
+		} 
+		else
+		{
+			isPaused_ = false;
+			pauseMenu_->Close();
+		}
+	}
+	// ポーズ中は更新しない
+	if (isPaused_)
+	{
+		pauseMenu_->Update();
+
+		switch (pauseMenu_->ConsumeSelectedOption())
+		{
+		case PauseMenu::MenuOption::Resume:
+
+			isPaused_ = false;
+			pauseMenu_->Close();
+			inputLock_ = true;
+			return;
+
+		case PauseMenu::MenuOption::Restart:
+
+			// トランジション開始
+			blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();
+			isTransitioning_ = true;
+			blockTransition_->Start([]
+				{
+					// シーン切り替え
+					IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+				});
+			break;
+
+		case PauseMenu::MenuOption::ReturnTitle:
+			
+			// トランジション開始
+			blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();
+			isTransitioning_ = true;
+			blockTransition_->Start([]
+				{
+					// シーン切り替え
+					IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
+				});
+
+			break;
+
+		default:
+			break;
+		}
+
+		return;
+	}
+
+
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
@@ -10531,6 +10670,12 @@ void GamePlayScene::Draw()
 
 	pEnemyManager_->Draw2D();
 
+	// ポーズの描画
+	if (isPaused_)
+	{
+		pauseMenu_->Draw();
+	}
+
 	// トランジション描画
 	if (isTransitioning_ && blockTransition_)
 	{
@@ -10606,6 +10751,8 @@ File Path: project/application/scene/GamePlayScene.h
 #include "cameraController/DeathCameraController.h"
 #include "cameraController/ClearCameraController.h"
 
+#include "PauseMenu.h"
+
 /// <summary>
 ///	ゲームプレイシーン
 /// プレイヤー操作、敵出現、フィールド、ゴール、衝突判定、シーン遷移
@@ -10659,6 +10806,11 @@ private:
 	std::unique_ptr<IIEngine::BlockRiseTransition> blockTransition_ = nullptr;
 	std::unique_ptr<IIEngine::FadeTransition> fadeTransition_ = nullptr;
 	bool isTransitioning_ = false;
+
+	// ポーズメニュー
+	std::unique_ptr<PauseMenu> pauseMenu_;
+	bool isPaused_ = false;
+	bool inputLock_ = false;
 
 	// 衝突判定
 	ColliderManager* colliderManager_ = nullptr;
@@ -10725,6 +10877,246 @@ private:
 	float clearTargetAngleOffset_ = 0.0f;
 
 };
+
+============================================================
+File Path: project/application/scene/PauseMenu.cpp
+============================================================
+#include "PauseMenu.h"
+
+#include "TimeManager.h"
+
+void PauseMenu::Initialize()
+{
+    options_ =
+    {
+        MenuOption::Resume,
+        MenuOption::Restart,
+        MenuOption::ReturnTitle
+    };
+
+    const char* files[] =
+    {
+        "pauseBG.png",
+        "pauseResume.png",
+        "pauseRestart.png",
+        "pauseTitle.png",
+        "pauseUI.png"
+    };
+
+    for (uint32_t i = 0; i < spriteNum_; i++)
+    {
+        Vector2 pos = { 0.0f, 0.0f };
+        basePositions_.push_back(pos);
+
+        auto sprite = std::make_unique<Sprite>();
+        sprite->Initialize(files[i], pos);
+        menuSprites_.push_back(std::move(sprite));
+    }
+}
+
+void PauseMenu::Update()
+{
+    if (!isActive_)
+    {
+        return;
+    }
+
+    auto* input = IIEngine::Input::GetInstance();
+
+    if (ignoreEscape_)
+    {
+        if (!input->PushKey(DIK_ESCAPE)) // 離されたら解除
+        {
+            ignoreEscape_ = false;
+        }
+        return;
+    }
+
+	// デルタタイム取得
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+    animeTimer_ += dt;
+
+	// アニメーションパラメータ
+    const float selectOffsetX = 20.0f;        // 右にずれる量
+    const float swayAmplitude = 5.0f;         // 揺れ幅
+    const float swaySpeed = 6.0f;              // 揺れ速度
+	// メニューインデックス定数
+    constexpr int kMenuStartIndex = 1; // Resume
+    constexpr int kMenuCount = 3; // Resume, Restart, Title
+    constexpr int kCursorIndex = 4; // pauseUI.png
+
+    // ESCでメニュー閉じる
+    if (input->TriggerKey(DIK_ESCAPE))
+    {
+        Close();
+		return;
+    }
+
+    const int menuCount = static_cast<int>(options_.size());
+
+    // 上移動
+    if (input->TriggerKey(DIK_W) or input->TriggerKey(DIK_UP))
+    {
+        selectedIndex_ = (selectedIndex_ - 1 + menuCount) % menuCount;
+    }
+
+    // 下移動
+    if (input->TriggerKey(DIK_S) or input->TriggerKey(DIK_DOWN))
+    {
+        selectedIndex_ = (selectedIndex_ + 1) % menuCount;
+    }
+
+    // 決定
+    if (input->TriggerKey(DIK_RETURN) or input->TriggerKey(DIK_SPACE))
+    {
+        selectedOption_ = options_[selectedIndex_];
+    }
+
+    // メニュー文字スプライト更新
+    for (uint32_t i = 0; i < kMenuCount; ++i)
+    {
+        const int spriteIndex = kMenuStartIndex + i;
+
+        Vector2 pos = basePositions_[spriteIndex];
+
+        if (i == selectedIndex_)
+        {
+            float sway = std::sin(animeTimer_ * swaySpeed) * swayAmplitude;
+            pos.x += selectOffsetX + sway;
+        }
+
+        menuSprites_[spriteIndex]->SetPosition(pos);
+    }
+
+
+
+	// UI位置更新
+    constexpr float kCursorSpacing = 100.0f;
+
+    Vector2 cursorPos = basePositions_[kCursorIndex];
+    cursorPos.y += kCursorSpacing * selectedIndex_;
+    menuSprites_[kCursorIndex]->SetPosition(cursorPos);
+
+
+	// スプライト更新
+    for (auto& sprite : menuSprites_)
+    {
+        sprite->Update();
+	}
+
+
+}
+
+void PauseMenu::Draw()
+{
+    if (!isActive_) return;
+
+    for (auto& sprite : menuSprites_)
+    {
+        sprite->Draw();
+    }
+}
+
+void PauseMenu::Open()
+{
+    isActive_ = true;
+    ignoreEscape_ = true;
+    selectedIndex_ = 0;
+    selectedOption_ = MenuOption::None;
+}
+
+void PauseMenu::Close()
+{
+    isActive_ = false;
+}
+
+
+PauseMenu::MenuOption PauseMenu::GetSelectedOption() const
+{
+    return selectedOption_;
+}
+
+PauseMenu::MenuOption PauseMenu::ConsumeSelectedOption()
+{
+    MenuOption ret = selectedOption_;
+    selectedOption_ = MenuOption::None;
+    return ret;
+}
+
+
+============================================================
+File Path: project/application/scene/PauseMenu.h
+============================================================
+#pragma once
+
+#include <Framework.h>
+
+#include <vector>
+#include <memory>
+
+/// <summary>
+/// ポーズメニュー
+/// </summary>
+class PauseMenu
+{
+public:
+
+	// コンストラクタ・デストラクタ
+	PauseMenu() = default;
+	~PauseMenu() = default;
+
+	// 初期化
+	void Initialize();
+
+	// 更新
+	void Update();
+
+	// 描画
+	void Draw();
+
+	// メニューを開く
+	void Open();
+
+	// メニューを閉じる
+	void Close();
+
+	enum class MenuOption
+	{
+		None,
+		Resume,
+		Restart,
+		ReturnTitle
+	};
+
+	MenuOption GetSelectedOption() const;
+
+	MenuOption ConsumeSelectedOption();
+
+private:
+
+	// メニューがアクティブかどうか
+	bool isActive_ = false;
+	bool ignoreEscape_ = false;
+
+	// メニューオプション
+	uint32_t selectedIndex_ = 0;
+	std::vector<MenuOption> options_;
+
+	// 選択されたメニューオプション
+	MenuOption selectedOption_ = MenuOption::None;
+
+	// スプライト
+	std::vector<std::unique_ptr<Sprite>> menuSprites_;
+	uint32_t spriteNum_ = 5;
+
+	// アニメーション用
+	float animeTimer_ = 0.0f;
+
+	// 各項目の基準位置
+	std::vector<Vector2> basePositions_;
+};
+
+
 
 ============================================================
 File Path: project/application/scene/SceneFactory.cpp
