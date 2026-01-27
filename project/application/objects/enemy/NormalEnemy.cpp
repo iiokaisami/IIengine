@@ -275,32 +275,46 @@ void NormalEnemy::Move()
 
 void NormalEnemy::Attack()
 {
-    // 弾の数と間隔角度
+	// 弾の発射設定
     const int bulletCount = 24;
     const float angleStep = 360.0f / bulletCount;
+    const float bulletCooldown = 0.0f;
 
-    for (int i = 0; i < bulletCount; ++i)
+	// クールタイム管理
+    static float cooldownTimer = 0.0f;
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+    cooldownTimer -= dt;
+
+	// 弾の発射
+    if (cooldownTimer <= 0.0f)
     {
-        // 弾の角度を計算 (ラジアンに変換)
-        float angle = DirectX::XMConvertToRadians(i * angleStep);
-
-        // 弾の方向を計算
-        Vector3 bulletDirection =
+        for (int i = 0; i < bulletCount; ++i)
         {
-            std::cos(angle), // X成分
-            0.0f,            // Y成分
-            std::sin(angle)  // Z成分
-        };
+			// 角度計算
+            float angle = DirectX::XMConvertToRadians(i * angleStep);
 
-        // 弾を生成
-        auto bullet = std::make_unique<EnemyBullet>();
-        bullet->Initialize();
-        bullet->SetPosition({ position_.x,position_.y + 0.5f,position_.z }); // 敵の位置より少し上を初期位置に設定
-        bullet->SetVelocity(bulletDirection * 0.2f);
-        bullet->SyncObjectTransform();
+			// 弾の方向ベクトル計算
+            Vector3 bulletDirection =
+            {
+                std::cos(angle), // X
+                0.0f,            // Y
+                std::sin(angle)  // Z
+            };
 
-        // 弾をリストに追加
-        pBullets_.push_back(std::move(bullet));
+			// 弾の生成と初期化
+            auto bullet = std::make_unique<EnemyBullet>();
+            bullet->Initialize();
+            bullet->SetPosition({ position_.x, position_.y + 0.5f, position_.z });
+            bullet->SetVelocity(bulletDirection * 0.2f);
+            bullet->SyncObjectTransform();
+
+			// 弾をリストに追加
+            pBullets_.push_back(std::move(bullet));
+        }
+
+		// クールタイマーリセット
+        cooldownTimer = bulletCooldown;
     }
 }
     

@@ -340,9 +340,16 @@
     <ClCompile Include="gameEngine\time\TimeManager.cpp">
       <Filter>gameEngine\time</Filter>
     </ClCompile>
-    <ClCompile Include="application\baseObject\StaticObject.cpp" />
-    <ClCompile Include="application\baseObject\Character.cpp" />
-    <ClCompile Include="application\baseObject\BaseBullet.cpp" />
+    <ClCompile Include="application\baseObject\StaticObject.cpp">
+      <Filter>application\baseObject</Filter>
+    </ClCompile>
+    <ClCompile Include="application\baseObject\BaseBullet.cpp">
+      <Filter>application\baseObject</Filter>
+    </ClCompile>
+    <ClCompile Include="application\baseObject\Character.cpp">
+      <Filter>application\baseObject</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\PauseMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -648,10 +655,19 @@
     <ClInclude Include="gameEngine\time\TimeManager.h">
       <Filter>gameEngine\time</Filter>
     </ClInclude>
-    <ClInclude Include="application\baseObject\StaticObject.h" />
-    <ClInclude Include="application\baseObject\Character.h" />
-    <ClInclude Include="application\baseObject\BaseBullet.h" />
-    <ClInclude Include="gameEngine\math\Vector3Hash.h" />
+    <ClInclude Include="gameEngine\math\Vector3Hash.h">
+      <Filter>gameEngine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="application\baseObject\StaticObject.h">
+      <Filter>application\baseObject</Filter>
+    </ClInclude>
+    <ClInclude Include="application\baseObject\Character.h">
+      <Filter>application\baseObject</Filter>
+    </ClInclude>
+    <ClInclude Include="application\baseObject\BaseBullet.h">
+      <Filter>application\baseObject</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\PauseMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

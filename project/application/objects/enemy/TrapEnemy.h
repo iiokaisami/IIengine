@@ -126,6 +126,10 @@ private:
 	// 次の罠がTimeBombかVignetteTrapかのフラグ
 	bool isNextTrapTimeBomb_ = true;
 
+	// トラップ設置のクールタイム管理
+	const float kTrapCooldownTime = 3.0f;
+	float trapCooldownTimer_ = 0.0f;
+
 	// 行動ステート
 	std::unique_ptr<TrapEnemyBehaviorState> pBehaviorState_ = nullptr;
 

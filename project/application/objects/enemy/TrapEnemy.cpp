@@ -70,6 +70,9 @@ void TrapEnemy::Finalize()
 
 void TrapEnemy::Update()
 {
+	// デルタタイム取得
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
     // 基底クラスの共通更新処理を呼び出し
     BaseEnemy::Update();
 
@@ -84,6 +87,20 @@ void TrapEnemy::Update()
 
 	// HPバー更新
 	UpdateHPBar();
+
+	// 罠設置のクールタイム管理
+    if (!isTrapCooldownComplete_)
+    {
+		// タイマーを減少
+        trapCooldownTimer_ -= dt;
+
+        if (trapCooldownTimer_ <= 0.0f)
+        {
+			// クールタイム完了
+            isTrapCooldownComplete_ = true;
+            trapCooldownTimer_ = 0.0f;
+        }
+    }
 
     // プレイヤーとの距離を計算
     float distanceToPlayer = position_.Distance(playerPosition_);

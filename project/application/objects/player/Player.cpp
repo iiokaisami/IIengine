@@ -652,15 +652,15 @@ void Player::AutoMove()
 {
 	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
 
-	static int moveTimer = 0;
+	static float moveTimer = 0.0f;  // moveTimerをfloat型に変更
 	static Vector3 autoDir = { 0.0f, 0.0f, 1.0f }; // 初期は前進
 
 	// フィールド端の範囲
 	const float minX = -15.0f, maxX = 15.0f;
 	const float minZ = -15.0f, maxZ = 15.0f;
 
-	// 一定フレームごとに新しいランダム方向を決める
-	if (moveTimer <= 0)
+	// moveTimerが0以下になったら新しいランダム方向を決める
+	if (moveTimer <= 0.0f)
 	{
 		// -1.0f～1.0fの範囲でランダムなx,zを生成
 		float randX = (float(rand()) / RAND_MAX) * 2.0f - 1.0f;
@@ -668,9 +668,11 @@ void Player::AutoMove()
 		Vector3 dir = { randX, 0.0f, randZ };
 		if (dir.Length() < 0.1f) dir.z = 1.0f; // ゼロベクトル対策
 		autoDir = dir.Normalize();
-		moveTimer = 60 + rand() % 90; // 1～2.5秒ごとに方向転換
+
+		// moveTimerに次の方向転換までの時間（秒）をランダムで設定
+		moveTimer = 1.0f + static_cast<float>(rand() % 150) / 60.0f; // 1秒〜2.5秒
 	}
-	moveTimer--;
+	moveTimer -= dt;  // タイマーを減算（秒単位）
 
 	// 端に近づいたら強制的に内向きにリダイレクト
 	bool redirected = false;
@@ -690,7 +692,7 @@ void Player::AutoMove()
 	if (redirected)
 	{
 		// 端で方向反転したら新たに moveTimerを設定し、即座に再ランダム化しない
-		moveTimer = 60 + rand() % 90;
+		moveTimer = 1.0f + static_cast<float>(rand() % 150) / 60.0f; // 1秒〜2.5秒
 	}
 
 	// 移動速度を計算
@@ -718,10 +720,14 @@ void Player::AutoMove()
 
 void Player::AutoAttack()
 {
+	// デルタタイムを取得
+	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
+
 	// 一定間隔で自動攻撃
-	static int attackCooldown = 0;
-	const int attackInterval = 50; // フレーム数
-	if (attackCooldown <= 0)
+	static float attackCooldown = 0.0f;
+	const float attackInterval = 0.8f;
+
+	if (attackCooldown <= 0.0f)
 	{
 		// プレイヤーの向きに合わせて弾の速度を変更
 		Vector3 bulletVelocity =
@@ -738,10 +744,14 @@ void Player::AutoAttack()
 
 		// 弾を登録する
 		pBullets_.push_back(std::move(newBullet));
+
+		// クールダウンをリセット
 		attackCooldown = attackInterval;
-	} else
+	} 
+	else
 	{
-		attackCooldown--;
+		// クールダウンタイマーを減算
+		attackCooldown -= dt;
 	}
 }
 

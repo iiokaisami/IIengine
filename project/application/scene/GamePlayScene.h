@@ -21,6 +21,8 @@
 #include "cameraController/DeathCameraController.h"
 #include "cameraController/ClearCameraController.h"
 
+#include "PauseMenu.h"
+
 /// <summary>
 ///	ゲームプレイシーン
 /// プレイヤー操作、敵出現、フィールド、ゴール、衝突判定、シーン遷移
@@ -74,6 +76,11 @@ private:
 	std::unique_ptr<IIEngine::BlockRiseTransition> blockTransition_ = nullptr;
 	std::unique_ptr<IIEngine::FadeTransition> fadeTransition_ = nullptr;
 	bool isTransitioning_ = false;
+
+	// ポーズメニュー
+	std::unique_ptr<PauseMenu> pauseMenu_;
+	bool isPaused_ = false;
+	bool inputLock_ = false;
 
 	// 衝突判定
 	ColliderManager* colliderManager_ = nullptr;

@@ -211,6 +211,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\ShakeController.cpp" />
     <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
     <ClCompile Include="application\baseObject\StaticObject.cpp" />
+    <ClCompile Include="application\scene\PauseMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -318,6 +319,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\StartCameraController.h" />
     <ClInclude Include="application\baseObject\StaticObject.h" />
     <ClInclude Include="gameEngine\math\Vector3Hash.h" />
+    <ClInclude Include="application\scene\PauseMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

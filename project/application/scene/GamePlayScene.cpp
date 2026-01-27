@@ -26,6 +26,10 @@ void GamePlayScene::Initialize()
 	camera_->SetPosition(camStart_);
 	camera_->SetRotate(camStartRot_);
 
+	// ポーズメニュー
+	pauseMenu_ = std::make_unique<PauseMenu>();
+	pauseMenu_->Initialize();
+
 	// 衝突判定
 	colliderManager_ = ColliderManager::GetInstance();
 	colliderManager_->Initialize();
@@ -258,6 +262,76 @@ void GamePlayScene::Update()
 		}
 	}
 	
+	// ポーズ入力
+	if (inputLock_)
+	{
+		if (!IIEngine::Input::GetInstance()->PushKey(DIK_SPACE))
+		{
+			inputLock_ = false;
+		}
+		return;
+	}
+
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE))
+	{
+		if (!isPaused_)
+		{
+			isPaused_ = true;
+			pauseMenu_->Open();
+		} 
+		else
+		{
+			isPaused_ = false;
+			pauseMenu_->Close();
+		}
+	}
+	// ポーズ中は更新しない
+	if (isPaused_)
+	{
+		pauseMenu_->Update();
+
+		switch (pauseMenu_->ConsumeSelectedOption())
+		{
+		case PauseMenu::MenuOption::Resume:
+
+			isPaused_ = false;
+			pauseMenu_->Close();
+			inputLock_ = true;
+			return;
+
+		case PauseMenu::MenuOption::Restart:
+
+			// トランジション開始
+			blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();
+			isTransitioning_ = true;
+			blockTransition_->Start([]
+				{
+					// シーン切り替え
+					IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+				});
+			break;
+
+		case PauseMenu::MenuOption::ReturnTitle:
+			
+			// トランジション開始
+			blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();
+			isTransitioning_ = true;
+			blockTransition_->Start([]
+				{
+					// シーン切り替え
+					IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
+				});
+
+			break;
+
+		default:
+			break;
+		}
+
+		return;
+	}
+
+
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
@@ -471,6 +545,12 @@ void GamePlayScene::Draw()
 	pPlayer_->Draw2D();
 
 	pEnemyManager_->Draw2D();
+
+	// ポーズの描画
+	if (isPaused_)
+	{
+		pauseMenu_->Draw();
+	}
 
 	// トランジション描画
 	if (isTransitioning_ && blockTransition_)
