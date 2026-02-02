@@ -8180,7 +8180,6 @@ void Player::Initialize()
 	Character::Initialize("player.obj", "Player", 12.0f);
 
 	position_ = { 0.2f,0.7f,-1.2f };
-	scale_ = { 1.0f,1.5f,1.0f };
 	SyncObjectTransform();
 
 	// ライト設定
@@ -8822,7 +8821,7 @@ void Player::AutoMove()
 {
 	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
 
-	static float moveTimer = 0.0f;  // moveTimerをfloat型に変更
+	static float moveTimer = 0.0f;  // moveTimerを float型に変更
 	static Vector3 autoDir = { 0.0f, 0.0f, 1.0f }; // 初期は前進
 
 	// フィールド端の範囲
