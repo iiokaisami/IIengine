@@ -1637,9 +1637,9 @@ File Path: project/application/baseObject/BaseEnemy.cpp
 
 void BaseEnemy::Initialize(const std::string& _modelFileName, const std::string& _objectName, float _initialHP)
 {
-	// キャラクター基底クラスの初期化を呼び出し
-	Character::Initialize(_modelFileName, _objectName, _initialHP);
-    
+    // キャラクター基底クラスの初期化を呼び出し
+    Character::Initialize(_modelFileName, _objectName, _initialHP);
+
     moveVelocity_ = { 0.1f, 0.0f, 0.1f };
     moveSpeed_ = 0.05f;
 
@@ -1647,11 +1647,11 @@ void BaseEnemy::Initialize(const std::string& _modelFileName, const std::string&
 
 void BaseEnemy::Update()
 {
-    
-	Character::Update();
+
+    Character::Update();
 }
 
-void BaseEnemy::Move() 
+void BaseEnemy::Move()
 {
     // デルタタイム取得
     const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
@@ -1669,12 +1669,31 @@ void BaseEnemy::Move()
 
 Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
 {
-    return Normalize(Slerp(currentVelocity, targetDirection, interpolationRate));
+    if (currentVelocity.Length() < 0.001f)
+    {
+        // 今は止まっている → そのまま目標方向を返す
+        return targetDirection;
+    }
+
+    if (targetDirection.Length() < 0.001f)
+    {
+        // 行き先不明 → 現在速度を維持
+        return Normalize(currentVelocity);
+    }
+
+    Vector3 result = Slerp(currentVelocity, targetDirection, interpolationRate);
+
+    if (result.Length() < 0.001f)
+    {
+        return targetDirection;
+    }
+
+    return Normalize(result);
 }
 
 std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector3& goal, const std::vector<Vector3>& obstacles)
 {
-	// ループ回数制限
+    // ループ回数制限
     int loopCount = 0;
     const int kMaxLoop = 1000;
 
@@ -1686,17 +1705,17 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
         bool operator>(const Node& other) const { return cost > other.cost; }
     };
 
-	// 探索済みノードセットをクリア
+    // 探索済みノードセットをクリア
     closedSet_.clear();
 
-	// スタートとゴールをグリッド座標に変換
+    // スタートとゴールをグリッド座標に変換
     GridPos startGrid = ToGrid(start);
     GridPos goalGrid = ToGrid(goal);
 
-	// オープンセット
+    // オープンセット
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> openSet;
 
-	// コストマップと経路マップ
+    // コストマップと経路マップ
     std::unordered_map<GridPos, float, GridPosHash> gScore;
     std::unordered_map<GridPos, GridPos, GridPosHash> cameFrom;
     std::unordered_set<GridPos, GridPosHash> obstacleGrid;
@@ -1713,11 +1732,11 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
         }
     }
 
-	// スタートノードをオープンセットに追加
+    // スタートノードをオープンセットに追加
     gScore[startGrid] = 0.0f;
     openSet.push({ startGrid, 0.0f });
 
-	// メインループ
+    // メインループ
     while (!openSet.empty())
     {
         if (++loopCount > kMaxLoop)
@@ -1726,62 +1745,54 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
             break;
         }
 
-		// コストの最小ノードを取得
+        // コストの最小ノードを取得
         Node current = openSet.top();
         openSet.pop();
 
-        int dx = abs(current.pos.x - startGrid.x);
-        int dz = abs(current.pos.z - startGrid.z);
-
-        if (dx > 20 || dz > 20)
-        {
-            continue;
-        }
-
-		// 既に探索済みならスキップ
+        // 既に探索済みならスキップ
         if (closedSet_.contains(current.pos))
         {
             continue;
         }
-		// 探索済みノードに追加
+        // 探索済みノードに追加
         closedSet_.insert(current.pos);
 
-		// ゴール判定
+        // ゴール判定
         if (current.pos == goalGrid)
         {
             std::vector<Vector3> path;
             GridPos node = goalGrid;
-			// 経路を逆順にたどる
+            // 経路を逆順にたどる
             while (cameFrom.contains(node))
             {
                 path.push_back(ToWorld(node));
                 node = cameFrom[node];
             }
-			// スタートノードを追加
+            // スタートノードを追加
             std::reverse(path.begin(), path.end());
             return path;
         }
 
-		// 近傍ノードを取得
+        // 近傍ノードを取得
         for (const Vector3& neighborWorld : GetNeighborsWorld(current.pos))
         {
-			// 障害物ノードはスキップ
+            // 障害物ノードはスキップ
             if (std::find(obstacles.begin(), obstacles.end(), neighborWorld) != obstacles.end())
             {
                 continue;
             }
-			// グリッド座標に変換
+            // グリッド座標に変換
             GridPos neighbor = ToGrid(neighborWorld);
 
-			float tentativeGScore = gScore[current.pos] + Heuristic(ToWorld(current.pos), neighborWorld);
+            float tentativeGScore = gScore[current.pos] + Heuristic(ToWorld(current.pos), neighborWorld);
 
-			// 障害物ノードはスキップ
+            // 障害物ノードはスキップ
             if (obstacleGrid.contains(neighbor))
             {
                 continue;
             }
 
-			// より良いコストなら更新
+            // より良いコストなら更新
             if (!gScore.contains(neighbor) or tentativeGScore < gScore[neighbor])
             {
                 gScore[neighbor] = tentativeGScore;
@@ -1800,7 +1811,7 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
 std::vector<Vector3> BaseEnemy::GetNeighbors(const Vector3& node)
 {
     // 近傍のノードを生成(グリッド状を仮定)
-    std::vector<Vector3> neighbors = 
+    std::vector<Vector3> neighbors =
     {
         node + Vector3(1, 0, 0),
         node + Vector3(-1, 0, 0),
@@ -1817,7 +1828,7 @@ float BaseEnemy::Heuristic(const Vector3& a, const Vector3& b)
 
 BaseEnemy::GridPos BaseEnemy::ToGrid(const Vector3& v) const
 {
-    return 
+    return
     {
          static_cast<int>(std::round(v.x / 1.0f)),
          static_cast<int>(std::round(v.z / 1.0f))
@@ -1877,7 +1888,7 @@ public:
 
 	// 更新
 	virtual void Update() override;
-	
+
 	// 移動
 	virtual void Move() override;
 
@@ -1921,20 +1932,20 @@ protected:
 	Vector3 ToWorld(const GridPos& g) const;
 
 	std::vector<Vector3> GetNeighborsWorld(const GridPos& node);
-	
+
 protected:
 
-    // 移動関連
+	// 移動関連
 	Vector3 moveVelocity_ = {};
-    float moveSpeed_ = 0.0f;
+	float moveSpeed_ = 0.0f;
 
-    // プレイヤー関連
+	// プレイヤー関連
 	Vector3 playerPosition_ = {};
 	Vector3 toPlayer_ = {};
 	Vector3 lastPlayerPos_ = {};
 
-    // フレームレート補助
-    static constexpr float kDefaultFrameRate = 60.0f;
+	// フレームレート補助
+	static constexpr float kDefaultFrameRate = 60.0f;
 
 	// 障害物の位置リスト
 	std::vector<Vector3> obstaclePositions_ = {};
@@ -1960,8 +1971,6 @@ protected:
 
 
 };
-
-
 
 ============================================================
 File Path: project/application/baseObject/Character.cpp
@@ -3442,7 +3451,7 @@ void NormalEnemy::Initialize()
     // Initialize を呼び出し共通プロパティを初期化
     BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", 3.0f);
 
-	SyncObjectTransform();
+    SyncObjectTransform();
 
     // ライト設定
     object_->SetLighting(true);
@@ -3467,11 +3476,11 @@ void NormalEnemy::Initialize()
     // 行動ステート
     ChangeBehaviorState(std::make_unique<EnemyBehaviorSpawn>(this));
 
-	// 出現時は無敵状態
+    // 出現時は無敵状態
     isInvincible_ = true;
 
 
-	// パーティクル
+    // パーティクル
     IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
 }
 
@@ -3482,11 +3491,11 @@ void NormalEnemy::Finalize()
         sprite.reset();
     }
 
-	for (auto& bullet : pBullets_)
-	{
-		bullet->SetIsDead(true);
-		bullet->Finalize();
-	}
+    for (auto& bullet : pBullets_)
+    {
+        bullet->SetIsDead(true);
+        bullet->Finalize();
+    }
 
     // 弾の削除
     RemoveDeadBullets<EnemyBullet>(pBullets_);
@@ -3499,8 +3508,8 @@ void NormalEnemy::Update()
     // 基底クラスの共通更新処理を呼び出し
     BaseEnemy::Update();
 
-	// 各行動ステートの更新
-	pBehaviorState_->Update();
+    // 各行動ステートの更新
+    pBehaviorState_->Update();
 
     // モデル変形の更新
     object_->Update();
@@ -3514,13 +3523,12 @@ void NormalEnemy::Update()
     if (distanceToPlayer <= kStopChasingDistance)
     {
         isFarFromPlayer_ = true;
-	}
-    else
-	{
-		isFarFromPlayer_ = false;
-	}
+    } else
+    {
+        isFarFromPlayer_ = false;
+    }
 
-	// 弾の削除
+    // 弾の削除
     RemoveDeadBullets<EnemyBullet>(pBullets_);
 
     // 弾の更新
@@ -3529,7 +3537,7 @@ void NormalEnemy::Update()
         bullet->Update();
     }
 
-	// 暗闇処理(エネミーは動かなくさせる)
+    // 暗闇処理(エネミーは動かなくさせる)
     HitVignetteTrap();
 
 
@@ -3546,24 +3554,24 @@ void NormalEnemy::Update()
 
 void NormalEnemy::Draw()
 {
-	Character::Draw();
+    Character::Draw();
 
-	// 弾描画
-	for (auto& bullet : pBullets_)
-	{
-		bullet->Draw();
-	}
+    // 弾描画
+    for (auto& bullet : pBullets_)
+    {
+        bullet->Draw();
+    }
 }
 
 void NormalEnemy::ImGuiDraw()
 {
 #ifdef USE_IMGUI
 
-	ImGui::Begin("Enemy");
+    ImGui::Begin("Enemy");
 
-	ImGui::SliderFloat3("position", &position_.x, -30.0f, 30.0f);
-	ImGui::SliderFloat3("rotation", &rotation_.x, -3.14f, 3.14f);
-	ImGui::SliderFloat3("scale", &scale_.x, 0.0f, 10.0f);
+    ImGui::SliderFloat3("position", &position_.x, -30.0f, 30.0f);
+    ImGui::SliderFloat3("rotation", &rotation_.x, -3.14f, 3.14f);
+    ImGui::SliderFloat3("scale", &scale_.x, 0.0f, 10.0f);
 
     // オブジェクトのトランスフォーム  
     Vector3 objPos = object_->GetPosition();
@@ -3581,28 +3589,24 @@ void NormalEnemy::ImGuiDraw()
     }
 
     // HP
-	ImGui::SliderFloat("HP", &hp_, 0.0f, maxHP_);
+    ImGui::SliderFloat("HP", &hp_, 0.0f, maxHP_);
 
     // 現在のMoveMode
-	const char* moveModeStr = (moveMode_ == MoveMode::Direct) ? "Direct" : "FollowPath";
-	ImGui::Text("MoveMode: %s", moveModeStr);
+    const char* moveModeStr = (moveMode_ == MoveMode::Direct) ? "Direct" : "FollowPath";
+    ImGui::Text("MoveMode: %s", moveModeStr);
 
     ImGui::End();
 
-	for (auto& bullet : pBullets_)
-	{
-		bullet->ImGuiDraw();
-	}
+    for (auto& bullet : pBullets_)
+    {
+        bullet->ImGuiDraw();
+    }
 
 #endif // USE_IMGUI
 }
 
 void NormalEnemy::Move()
 {
-	// 前フレームの位置
-    Vector3 lastPosition_;
-    int stuckFrame_ = 0;
-
     toPlayer_ = playerPosition_ - position_;
 
     if (isFarFromPlayer_)
@@ -3611,24 +3615,31 @@ void NormalEnemy::Move()
         return;
     }
 
-    Vector3 direction = { 0,0,0 };
-
-    // パスが無い & 障害物があるときだけ計算
-    if (!obstaclePositions_.empty() && path_.empty())
+    if (!obstaclePositions_.empty())
     {
-        path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
-        currentWaypointIndex_ = 0;
-        moveMode_ = path_.empty() ? MoveMode::Direct : MoveMode::FollowPath;
+        if (path_.empty() or pathDirty_)
+        {
+            path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
+            currentWaypointIndex_ = 0;
+            moveMode_ = path_.empty() ? MoveMode::Direct : MoveMode::FollowPath;
+            pathDirty_ = false;
+        }
+    } else
+    {
+        moveMode_ = MoveMode::Direct;
     }
+
+    Vector3 direction = { 0,0,0 };
 
     // パス追従
     if (moveMode_ == MoveMode::FollowPath && currentWaypointIndex_ < path_.size())
     {
         Vector3 target = path_[currentWaypointIndex_];
         Vector3 toTarget = target - position_;
+        Vector3 dir = Normalize(moveVelocity_);
 
         // ウェイポイント到達 
-        if (toTarget.Length() < 1.0f)
+        if (Dot(Normalize(toTarget), dir) < 0.0f or toTarget.Length() < 1.2f)
         {
             currentWaypointIndex_++;
         }
@@ -3656,28 +3667,32 @@ void NormalEnemy::Move()
     // 方向が取れたときだけ更新
     if (direction.Length() > 0.001f)
     {
-        Vector3 currentDir = Normalize(moveVelocity_);
-        float dot = Dot(currentDir, direction);
-
-        // ほぼ同じ方向なら補間しない
-        if (dot > 0.98f)
-        {
-            moveVelocity_ = direction;
-        } 
-        else
-        {
-            moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
-        }
-
-        direction = Normalize(toPlayer_);
         moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
+
+    } else
+    {
+        // 行き先が無いときは少し減速
+        moveVelocity_ *= 0.9f;
     }
+
+    if (stuckFrame_ > 10 && moveMode_ == MoveMode::FollowPath)
+    {
+        Vector3 side = Cross({ 0,1,0 }, moveVelocity_);
+
+        if (side.Length() > 0.0001f)
+        {
+            moveVelocity_ += Normalize(side) * 0.1f;
+        }
+    }
+
+
     moveVelocity_.y = 0.0f;
 
     BaseEnemy::Move();
     SyncObjectTransform();
     IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
 
+    // スタックしていたら更新
     if ((position_ - lastPosition_).Length() < 0.01f)
     {
         stuckFrame_++;
@@ -3688,39 +3703,44 @@ void NormalEnemy::Move()
 
     lastPosition_ = position_;
 
-    if (stuckFrame_ > 30) // 約0.5秒
+    // FollowPath 用の詰まり対処
+    if (stuckFrame_ > 30 && moveMode_ == MoveMode::FollowPath)
     {
-        moveMode_ = MoveMode::Direct;
+        currentWaypointIndex_++;
+        stuckFrame_ = 0;
+    }
+    // Direct 用の詰まり対処
+    if (stuckFrame_ > 30 && moveMode_ == MoveMode::Direct)
+    {
+        pathDirty_ = true;
         path_.clear();
         currentWaypointIndex_ = 0;
         stuckFrame_ = 0;
     }
-
-
 }
 
 void NormalEnemy::Attack()
 {
-	// 弾の発射設定
+    // 弾の発射設定
     const int bulletCount = 24;
     const float angleStep = 360.0f / bulletCount;
     const float bulletCooldown = 0.0f;
 
-	// クールタイム管理
+    // クールタイム管理
     static float cooldownTimer = 0.0f;
     const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
     cooldownTimer -= dt;
 
-	// 弾の発射
+    // 弾の発射
     if (cooldownTimer <= 0.0f)
     {
         for (int i = 0; i < bulletCount; ++i)
         {
-			// 角度計算
+            // 角度計算
             float angle = DirectX::XMConvertToRadians(i * angleStep);
 
-			// 弾の方向ベクトル計算
+            // 弾の方向ベクトル計算
             Vector3 bulletDirection =
             {
                 std::cos(angle), // X
@@ -3728,22 +3748,22 @@ void NormalEnemy::Attack()
                 std::sin(angle)  // Z
             };
 
-			// 弾の生成と初期化
+            // 弾の生成と初期化
             auto bullet = std::make_unique<EnemyBullet>();
             bullet->Initialize();
             bullet->SetPosition({ position_.x, position_.y + 0.5f, position_.z });
             bullet->SetVelocity(bulletDirection * 0.2f);
             bullet->SyncObjectTransform();
 
-			// 弾をリストに追加
+            // 弾をリストに追加
             pBullets_.push_back(std::move(bullet));
         }
 
-		// クールタイマーリセット
+        // クールタイマーリセット
         cooldownTimer = bulletCooldown;
     }
 }
-    
+
 
 void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pState)
 {
@@ -3753,17 +3773,17 @@ void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pStat
 
 void NormalEnemy::OnCollisionTrigger(const Collider* _other)
 {
-	if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
-	{
-		// プレイヤーの弾と衝突した場合
-		if (hp_ > 0)
-		{
+    if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
+    {
+        // プレイヤーの弾と衝突した場合
+        if (hp_ > 0)
+        {
             // HP減少
-			hp_--;
+            hp_--;
 
-			isHit_ = true;
-		}
-	}
+            isHit_ = true;
+        }
+    }
 
     if (!isInvincible_ && _other->GetColliderID() == "ExplosionTimeBomb")
     {
@@ -3790,10 +3810,10 @@ void NormalEnemy::OnCollisionTrigger(const Collider* _other)
 
 void NormalEnemy::OnCollision(const Collider* _other)
 {
-    if (_other->GetColliderID() == "NormalEnemy" or 
+    if (_other->GetColliderID() == "NormalEnemy" or
         _other->GetColliderID() == "TrapEnemy")
     {
-        
+
         // 敵の位置
         Vector3 enemyPosition = _other->GetOwner()->GetPosition();
 
@@ -3803,23 +3823,26 @@ void NormalEnemy::OnCollision(const Collider* _other)
         float distance = 2.5f; // 敵同士の間の距離を調整するための値
 
         // 互いに重ならないように少しずつ位置を調整
-        if ((position_ - enemyPosition).Length() < distance) 
+        if ((position_ - enemyPosition).Length() < distance)
         {
             position_ += direction * 0.1f; // 微調整のための値
         }
     }
 
-    if (_other->GetColliderID() == "Wall" or 
+    if (_other->GetColliderID() == "Wall" or
         _other->GetColliderID() == "Barrie" or
         _other->GetColliderID() == "Player")
     {
         // 相手のAABBを取得
         const AABB* otherAABB = _other->GetAABB();
-        
+
         if (otherAABB)
         {
             // 自分のAABBと位置を渡して補正
             CorrectOverlap(*otherAABB, aabb_, position_);
+
+            pathDirty_ = true;
+
         }
     }
 }
@@ -3836,8 +3859,7 @@ void NormalEnemy::HitVignetteTrap()
         if (vignetteTime_ > 0)
         {
             vignetteTime_--;
-        } 
-        else
+        } else
         {
             // 終了
             isHitVignetteTrap_ = false;
@@ -3847,7 +3869,7 @@ void NormalEnemy::HitVignetteTrap()
 
         }
     }
-    
+
 }
 
 
@@ -3878,13 +3900,13 @@ public:
 
 	// 初期化
 	void Initialize() override;
-	
+
 	// 終了
 	void Finalize() override;
-	
+
 	// 更新
 	void Update() override;
-	
+
 	// 描画
 	void Draw() override;
 
@@ -3945,7 +3967,7 @@ public: // セッター
 	// 被弾フラグをセット
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
 
-	
+
 	// --- ステートでのTransform操作用関数(引数あり) ---
 
 	// オブジェクトの positionをセット
@@ -3955,7 +3977,7 @@ public: // セッター
 	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
-	
+
 private:
 
 	// 追尾停止距離
@@ -3982,6 +4004,10 @@ private:
 	const uint32_t kMaxVignetteTime = 60 * 3;
 	// 暗闇タイマー
 	uint32_t vignetteTime_ = kMaxVignetteTime;
+
+	// 前フレームの位置
+	Vector3 lastPosition_;
+	int stuckFrame_ = 0;
 
 };
 
