@@ -43,7 +43,26 @@ void BaseEnemy::Move()
 
 Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
 {
-    return Normalize(Slerp(currentVelocity, targetDirection, interpolationRate));
+    if (currentVelocity.Length() < 0.001f)
+    {
+        // 今は止まっている → そのまま目標方向を返す
+        return targetDirection;
+    }
+
+    if (targetDirection.Length() < 0.001f)
+    {
+        // 行き先不明 → 現在速度を維持
+        return Normalize(currentVelocity);
+    }
+
+    Vector3 result = Slerp(currentVelocity, targetDirection, interpolationRate);
+
+    if (result.Length() < 0.001f)
+    {
+        return targetDirection;
+    }
+
+    return Normalize(result);
 }
 
 std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector3& goal, const std::vector<Vector3>& obstacles)
@@ -103,14 +122,6 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
 		// コストの最小ノードを取得
         Node current = openSet.top();
         openSet.pop();
-
-        int dx = abs(current.pos.x - startGrid.x);
-        int dz = abs(current.pos.z - startGrid.z);
-
-        if (dx > 20 || dz > 20)
-        {
-            continue;
-        }
 
 		// 既に探索済みならスキップ
         if (closedSet_.contains(current.pos))

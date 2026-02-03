@@ -127,5 +127,9 @@ private:
 	// 暗闇タイマー
 	uint32_t vignetteTime_ = kMaxVignetteTime;
 
+	// 前フレームの位置
+	Vector3 lastPosition_;
+	int stuckFrame_ = 0;
+
 };
 

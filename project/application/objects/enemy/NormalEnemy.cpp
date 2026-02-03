@@ -173,10 +173,6 @@ void NormalEnemy::ImGuiDraw()
 
 void NormalEnemy::Move()
 {
-	// 前フレームの位置
-    Vector3 lastPosition_;
-    int stuckFrame_ = 0;
-
     toPlayer_ = playerPosition_ - position_;
 
     if (isFarFromPlayer_)
@@ -185,24 +181,32 @@ void NormalEnemy::Move()
         return;
     }
 
-    Vector3 direction = { 0,0,0 };
-
-    // パスが無い & 障害物があるときだけ計算
-    if (!obstaclePositions_.empty() && path_.empty())
+    if (!obstaclePositions_.empty())
     {
-        path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
-        currentWaypointIndex_ = 0;
-        moveMode_ = path_.empty() ? MoveMode::Direct : MoveMode::FollowPath;
+        if (path_.empty() or pathDirty_)
+        {
+            path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
+            currentWaypointIndex_ = 0;
+            moveMode_ = path_.empty() ? MoveMode::Direct : MoveMode::FollowPath;
+            pathDirty_ = false;
+        }
+    } 
+    else
+    {
+        moveMode_ = MoveMode::Direct;
     }
+
+    Vector3 direction = { 0,0,0 };
 
     // パス追従
     if (moveMode_ == MoveMode::FollowPath && currentWaypointIndex_ < path_.size())
     {
         Vector3 target = path_[currentWaypointIndex_];
         Vector3 toTarget = target - position_;
+        Vector3 dir = Normalize(moveVelocity_);
 
         // ウェイポイント到達 
-        if (toTarget.Length() < 1.0f)
+        if (Dot(Normalize(toTarget), dir) < 0.0f or toTarget.Length() < 1.2f)
         {
             currentWaypointIndex_++;
         }
@@ -210,7 +214,8 @@ void NormalEnemy::Move()
         if (currentWaypointIndex_ < path_.size())
         {
             direction = Normalize(path_[currentWaypointIndex_] - position_);
-        } else
+        }
+        else
         {
             // パス完走
             path_.clear();
@@ -230,47 +235,58 @@ void NormalEnemy::Move()
     // 方向が取れたときだけ更新
     if (direction.Length() > 0.001f)
     {
-        Vector3 currentDir = Normalize(moveVelocity_);
-        float dot = Dot(currentDir, direction);
-
-        // ほぼ同じ方向なら補間しない
-        if (dot > 0.98f)
-        {
-            moveVelocity_ = direction;
-        } 
-        else
-        {
-            moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
-        }
-
-        direction = Normalize(toPlayer_);
         moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
-    }
-    moveVelocity_.y = 0.0f;
 
+    }
+    else
+    {
+        // 行き先が無いときは少し減速
+        moveVelocity_ *= 0.9f;
+    }
+
+    if (stuckFrame_ > 10 && moveMode_ == MoveMode::FollowPath)
+    {
+        Vector3 side = Cross({ 0,1,0 }, moveVelocity_);
+
+        if (side.Length() > 0.0001f)
+        {
+            moveVelocity_ += Normalize(side) * 0.1f;
+        }
+    }
+
+
+    moveVelocity_.y = 0.0f;
+    
     BaseEnemy::Move();
     SyncObjectTransform();
     IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
 
+    // スタックしていたら更新
     if ((position_ - lastPosition_).Length() < 0.01f)
     {
         stuckFrame_++;
-    } else
+    }
+    else
     {
         stuckFrame_ = 0;
     }
 
     lastPosition_ = position_;
 
-    if (stuckFrame_ > 30) // 約0.5秒
+    // FollowPath 用の詰まり対処
+    if (stuckFrame_ > 30 && moveMode_ == MoveMode::FollowPath)
     {
-        moveMode_ = MoveMode::Direct;
+        currentWaypointIndex_++;
+        stuckFrame_ = 0;
+    }
+    // Direct 用の詰まり対処
+    if (stuckFrame_ > 30 && moveMode_ == MoveMode::Direct)
+    {
+        pathDirty_ = true;
         path_.clear();
         currentWaypointIndex_ = 0;
         stuckFrame_ = 0;
     }
-
-
 }
 
 void NormalEnemy::Attack()
@@ -394,6 +410,9 @@ void NormalEnemy::OnCollision(const Collider* _other)
         {
             // 自分のAABBと位置を渡して補正
             CorrectOverlap(*otherAABB, aabb_, position_);
+           
+            pathDirty_ = true;
+
         }
     }
 }
