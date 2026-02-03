@@ -24,7 +24,7 @@ public:
 
 	// 更新
 	virtual void Update() override;
-	
+
 	// 移動
 	virtual void Move() override;
 
@@ -68,20 +68,20 @@ protected:
 	Vector3 ToWorld(const GridPos& g) const;
 
 	std::vector<Vector3> GetNeighborsWorld(const GridPos& node);
-	
+
 protected:
 
-    // 移動関連
+	// 移動関連
 	Vector3 moveVelocity_ = {};
-    float moveSpeed_ = 0.0f;
+	float moveSpeed_ = 0.0f;
 
-    // プレイヤー関連
+	// プレイヤー関連
 	Vector3 playerPosition_ = {};
 	Vector3 toPlayer_ = {};
 	Vector3 lastPlayerPos_ = {};
 
-    // フレームレート補助
-    static constexpr float kDefaultFrameRate = 60.0f;
+	// フレームレート補助
+	static constexpr float kDefaultFrameRate = 60.0f;
 
 	// 障害物の位置リスト
 	std::vector<Vector3> obstaclePositions_ = {};
@@ -107,4 +107,3 @@ protected:
 
 
 };
-

@@ -22,13 +22,13 @@ public:
 
 	// 初期化
 	void Initialize() override;
-	
+
 	// 終了
 	void Finalize() override;
-	
+
 	// 更新
 	void Update() override;
-	
+
 	// 描画
 	void Draw() override;
 
@@ -89,7 +89,7 @@ public: // セッター
 	// 被弾フラグをセット
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
 
-	
+
 	// --- ステートでのTransform操作用関数(引数あり) ---
 
 	// オブジェクトの positionをセット
@@ -99,7 +99,7 @@ public: // セッター
 	// オブジェクトの scaleをセット
 	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
-	
+
 private:
 
 	// 追尾停止距離
