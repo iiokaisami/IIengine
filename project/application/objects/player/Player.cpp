@@ -4,6 +4,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void Player::Initialize()
 {
 	// 基底初期化

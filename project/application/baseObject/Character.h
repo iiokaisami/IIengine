@@ -105,13 +105,13 @@ protected: // 衝突判定
 	/// 衝突判定時の処理
 	/// </summary>
 	/// <param name="other">衝突相手のコライダー</param>
-	virtual void OnCollisionTrigger(const Collider* _other) { _other; }
+	virtual void OnCollisionTrigger(const IIEngine::Collider* _other) { _other; }
 
 	/// <summary>
     /// 衝突中の処理
     /// </summary>
     /// <param name="_other">衝突相手のコライダー</param>
-	virtual void OnCollision(const Collider* _other) { _other; }
+	virtual void OnCollision(const IIEngine::Collider* _other) { _other; }
 
 	/// <summary>
 	/// 衝突時の押し出し処理
@@ -119,7 +119,7 @@ protected: // 衝突判定
 	/// <param name="otherAABB">相手のAABB</param>
 	/// <param name="selfAABB">自分のAABB</param>
 	/// <param name="position">自分の位置</param>
-	void CorrectOverlap(const AABB& otherAABB, AABB& selfAABB, Vector3& position);
+	void CorrectOverlap(const IIEngine::AABB& otherAABB, IIEngine::AABB& selfAABB, Vector3& position);
 
 	/// <summary>
 	/// AABBの重なり判定
@@ -127,15 +127,15 @@ protected: // 衝突判定
 	/// <param name="a">AABB a</param>
 	/// <param name="b">AABB b</param>
 	/// <returns>重なっているかどうか</returns>
-	bool IsAABBOverlap(const AABB& a, const AABB& b);
+	bool IsAABBOverlap(const IIEngine::AABB& a, const IIEngine::AABB& b);
 
 protected:
 
 	// 衝突判定用
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc colliderDesc_ = {};
+	IIEngine::ColliderManager* colliderManager_ = nullptr;
+	IIEngine::Collider collider_;
+	IIEngine::AABB aabb_;
+	IIEngine::Collider::ColliderDesc colliderDesc_ = {};
 
 	// デフォルトフレームレート
 	static constexpr float kDefaultFrameRate = 60.0f;
@@ -155,7 +155,7 @@ protected:
 	float hpLerpSpeed_ = 10.0f;
 
 	// スプライト
-	std::vector<std::unique_ptr<Sprite>> sprites_;
+	std::vector<std::unique_ptr<IIEngine::Sprite>> sprites_;
 	uint32_t spriteNum_ = 1;
 
 	// HP

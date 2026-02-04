@@ -6,11 +6,14 @@
 #include <Vector3.h>
 
 #include "ICameraController.h"
-
+#include "../../../gameEngine/3d/Camera.h"
 
 /// 前方宣言
-class Camera;
-class CameraManager;
+namespace IIEngine
+{
+	class Camera;
+	class CameraManager;
+}
 
 /// <summary>
 /// シーンカメラ
@@ -64,7 +67,7 @@ public:
 public: // ゲッター
 
 	// カメラ取得
-	std::shared_ptr<Camera> GetCamera() const { return camera_; }
+	std::shared_ptr<IIEngine::Camera> GetCamera() const { return camera_; }
 
 	// 位置取得
 	Vector3 GetPosition() const;
@@ -81,11 +84,11 @@ public: // セッター
 private:
 
 	// カメラ
-	std::shared_ptr<Camera> camera_ = nullptr;
+	std::shared_ptr<IIEngine::Camera> camera_ = nullptr;
 	// カメラコントローラーリスト
 	std::vector<std::unique_ptr<ICameraController>> controllers_;
 	// カメラマネージャー
-	CameraManager& cameraManager_;
+	IIEngine::CameraManager& cameraManager_;
 
 };
 

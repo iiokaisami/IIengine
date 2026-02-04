@@ -1,188 +1,192 @@
 #include "Framework.h"
 
-void Framework::Run()
+namespace IIEngine
 {
-	Initialize();
 
-	while (true)
+	void Framework::Run()
 	{
-		// 終了リクエストが来たら抜ける
-		if (IsEndRequest())
+		Initialize();
+
+		while (true)
 		{
-			break;
+			// 終了リクエストが来たら抜ける
+			if (IsEndRequest())
+			{
+				break;
+			}
+
+			// 時間管理
+			IIEngine::TimeManager::Instance().Tick();
+
+#ifdef USE_IMGUI
+			// ImGui開始
+			imGuiManager->Begin();
+
+#endif // USE_IMGUI
+
+			// 毎フレーム更新
+			Update();
+
+#ifdef USE_IMGUI
+			// ImGui終了
+			imGuiManager->End();
+#endif // USE_IMGUI
+
+			// 描画
+			Draw();
 		}
 
-		// 時間管理
-		IIEngine::TimeManager::Instance().Tick();
+		// ゲームの終了
+		Finalize();
 
-#ifdef USE_IMGUI
-		// ImGui開始
-		imGuiManager->Begin();
-
-#endif // USE_IMGUI
-
-		// 毎フレーム更新
-		Update();
-
-#ifdef USE_IMGUI
-		// ImGui終了
-		imGuiManager->End();
-#endif // USE_IMGUI
-
-		// 描画
-		Draw();
 	}
 
-	// ゲームの終了
-	Finalize();
+	void Framework::Initialize()
+	{
+		// WindowsAPIの初期化
+		winApp = std::make_unique<WinApp>();
+		winApp->Initialize();
 
-}
+		// DirectXの初期化
+		dxCommon = std::make_unique<DirectXCommon>();
+		dxCommon->Initialize(winApp.get());
 
-void Framework::Initialize()
-{
-	// WindowsAPIの初期化
-	winApp = std::make_unique<WinApp>();
-	winApp->Initialize();
+		// SRVマネージャーの初期化
+		srvManager = std::make_unique<SrvManager>();
+		srvManager->Initialize(dxCommon.get());
 
-	// DirectXの初期化
-	dxCommon = std::make_unique<DirectXCommon>();
-	dxCommon->Initialize(winApp.get());
+		modelCommon = std::make_unique<ModelCommon>();
+		modelCommon->Initialize(dxCommon.get());
 
-	// SRVマネージャーの初期化
-	srvManager = std::make_unique<SrvManager>();
-	srvManager->Initialize(dxCommon.get());
+		// キーボード入力
+		input = IIEngine::Input::GetInstance();
+		input->Initialize(winApp.get());
 
-	modelCommon = std::make_unique<ModelCommon>();
-	modelCommon->Initialize(dxCommon.get());
+		// オーディオ
+		audio = Audio::GetInstance();
+		audio->Initialize();
 
-	// キーボード入力
-	input = IIEngine::Input::GetInstance();
-	input->Initialize(winApp.get());
+		// シーンマネージャ
+		sceneManager_ = IIEngine::SceneManager::GetInstance();
 
-	// オーディオ
-	audio = Audio::GetInstance();
-	audio->Initialize();
+		// スプライト共通部分の初期化
+		spriteCommon = SpriteCommon::GetInstance();
+		spriteCommon->Initialize(dxCommon.get());
 
-	// シーンマネージャ
-	sceneManager_ = IIEngine::SceneManager::GetInstance();
+		// テクスチャマネージャー
+		textureManager = TextureManager::GetInstance();
+		textureManager->Initialize(dxCommon.get(), srvManager.get());
 
-	// スプライト共通部分の初期化
-	spriteCommon = SpriteCommon::GetInstance();
-	spriteCommon->Initialize(dxCommon.get());
+		// 3Dオブジェクト
+		object3dCommon = Object3dCommon::GetInstance();
+		object3dCommon->Initialize(dxCommon.get());
 
-	// テクスチャマネージャー
-	textureManager = TextureManager::GetInstance();
-	textureManager->Initialize(dxCommon.get(), srvManager.get());
+		// モデル共通部分の初期化
+		modelManager = ModelManager::GetInstance();
+		modelManager->Initialize(dxCommon.get());
 
-	// 3Dオブジェクト
-	object3dCommon = Object3dCommon::GetInstance();
-	object3dCommon->Initialize(dxCommon.get());
+		// レンダーテクスチャ
+		renderTexture = std::make_unique<RenderTexture>();
+		renderTexture->Initialize(dxCommon.get(), srvManager.get(), WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.1f, 0.25f, 0.5f, 1.0f));
 
-	// モデル共通部分の初期化
-	modelManager = ModelManager::GetInstance();
-	modelManager->Initialize(dxCommon.get());
+		// ポストエフェクト
+		noneEffectPass = std::make_unique<NoneEffectPass>();
+		noneEffectPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/NoneEffect.VS.hlsl", L"resources/shaders/NoneEffect.PS.hlsl");
+		grayscalePass = std::make_unique<GrayscalePass>();
+		grayscalePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Grayscale.VS.hlsl", L"resources/shaders/Grayscale.PS.hlsl");
+		vignettePass = std::make_unique<VignettePass>();
+		vignettePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Vignette.VS.hlsl", L"resources/shaders/Vignette.PS.hlsl");
+		boxFilterPass = std::make_unique<BoxFilterPass>();
+		boxFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/BoxFilter.VS.hlsl", L"resources/shaders/BoxFilter.PS.hlsl");
+		gaussianFilterPass = std::make_unique<GaussianFilterPass>();
+		gaussianFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/GaussianFilter.VS.hlsl", L"resources/shaders/GaussianFilter.PS.hlsl");
 
-	// レンダーテクスチャ
-	renderTexture = std::make_unique<RenderTexture>();
-	renderTexture->Initialize(dxCommon.get(), srvManager.get(), WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.1f, 0.25f, 0.5f, 1.0f));
+		postEffectManager = PostEffectManager::GetInstance();
+		postEffectManager->SetNoneEffect(std::move(noneEffectPass));
+		postEffectManager->AddPass("Grayscale", std::move(grayscalePass));
+		postEffectManager->AddPass("Vignette", std::move(vignettePass));
+		postEffectManager->AddPass("BoxFilter", std::move(boxFilterPass));
+		postEffectManager->AddPass("GaussianFilter", std::move(gaussianFilterPass));
 
-	// ポストエフェクト
-	noneEffectPass = std::make_unique<NoneEffectPass>();
-	noneEffectPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/NoneEffect.VS.hlsl", L"resources/shaders/NoneEffect.PS.hlsl");
-	grayscalePass = std::make_unique<GrayscalePass>();
-	grayscalePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Grayscale.VS.hlsl", L"resources/shaders/Grayscale.PS.hlsl");
-	vignettePass = std::make_unique<VignettePass>();
-	vignettePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Vignette.VS.hlsl", L"resources/shaders/Vignette.PS.hlsl");
-	boxFilterPass = std::make_unique<BoxFilterPass>();
-	boxFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/BoxFilter.VS.hlsl", L"resources/shaders/BoxFilter.PS.hlsl");
-	gaussianFilterPass = std::make_unique<GaussianFilterPass>();
-	gaussianFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/GaussianFilter.VS.hlsl", L"resources/shaders/GaussianFilter.PS.hlsl");
 
-	postEffectManager = PostEffectManager::GetInstance();
-	postEffectManager->SetNoneEffect(std::move(noneEffectPass));
-	postEffectManager->AddPass("Grayscale", std::move(grayscalePass));
-	postEffectManager->AddPass("Vignette", std::move(vignettePass));
-	postEffectManager->AddPass("BoxFilter", std::move(boxFilterPass));
-	postEffectManager->AddPass("GaussianFilter", std::move(gaussianFilterPass));
-	
+		// パーティクル	
+		particleManager = IIEngine::ParticleManager::GetInstance();
+		particleManager->Initialize(dxCommon.get(), srvManager.get(), modelCommon.get());
 
-	// パーティクル	
-	particleManager = IIEngine::ParticleManager::GetInstance();
-	particleManager->Initialize(dxCommon.get(),srvManager.get(),modelCommon.get());
+		inputSrv = renderTexture->GetSRVHandle();
+		inputRes = renderTexture->GetResource();
+		state = renderTexture->GetCurrentState();
 
-	inputSrv = renderTexture->GetSRVHandle();
-	inputRes = renderTexture->GetResource();
-	state = renderTexture->GetCurrentState();
-
-	// Skybox
-	skybox = std::make_unique<IIEngine::Skybox>();
-	skybox->Initialize(dxCommon.get(), srvManager.get());
+		// Skybox
+		skybox = std::make_unique<IIEngine::Skybox>();
+		skybox->Initialize(dxCommon.get(), srvManager.get());
 
 #ifdef USE_IMGUI
 
-	imGuiManager = std::make_unique<ImGuiManager>();
-	imGuiManager->Initialize(winApp.get(), dxCommon.get());
+		imGuiManager = std::make_unique<ImGuiManager>();
+		imGuiManager->Initialize(winApp.get(), dxCommon.get());
 
 #endif // USE_IMGUI
-		
-}
 
-void Framework::Finalize()
-{
-	// WindowsAPIの終了処理
-	winApp->Finalize();
-	// WindowsAPI解放
-	winApp.reset();
-	winApp = nullptr;
+	}
 
-	// DirectX解放
-	dxCommon.reset();
+	void Framework::Finalize()
+	{
+		// WindowsAPIの終了処理
+		winApp->Finalize();
+		// WindowsAPI解放
+		winApp.reset();
+		winApp = nullptr;
 
-	// SRVマネージャー解放
-	srvManager.reset();
+		// DirectX解放
+		dxCommon.reset();
 
-	sceneManager_->Finalize();
-	sceneFactory_.reset();
+		// SRVマネージャー解放
+		srvManager.reset();
 
-	input->Finalize();
+		sceneManager_->Finalize();
+		sceneFactory_.reset();
 
-	audio->Finalize();
+		input->Finalize();
 
-	// スプライト共通部分解放
-	spriteCommon->Finalize();
+		audio->Finalize();
 
-	textureManager->Finalize();
+		// スプライト共通部分解放
+		spriteCommon->Finalize();
 
-	object3dCommon->Finalize();
+		textureManager->Finalize();
 
-	modelManager->Finalize();
+		object3dCommon->Finalize();
 
-	// レンダーテクスチャ解放
-	renderTexture.reset();
-	renderTexture = nullptr;
-	
+		modelManager->Finalize();
+
+		// レンダーテクスチャ解放
+		renderTexture.reset();
+		renderTexture = nullptr;
 
 
-	particleManager->Finalize();
 
-	// skybox解放
-	skybox->Finalize();
+		particleManager->Finalize();
+
+		// skybox解放
+		skybox->Finalize();
 
 #ifdef USE_IMGUI
-	// ImGuiManager解放
-	imGuiManager->Finalize();
-	imGuiManager.reset();
+		// ImGuiManager解放
+		imGuiManager->Finalize();
+		imGuiManager.reset();
 #endif // USE_IMGUI
-}
+	}
 
-void Framework::Update()
-{
-	// シーンマネージャーの更新
-	sceneManager_->Update();
-	
-	// 入力更新
-	input->Update();
+	void Framework::Update()
+	{
+		// シーンマネージャーの更新
+		sceneManager_->Update();
 
-	// パーティクル更新
-	particleManager->Update();
+		// 入力更新
+		input->Update();
+
+		// パーティクル更新
+		particleManager->Update();
+	}
 }

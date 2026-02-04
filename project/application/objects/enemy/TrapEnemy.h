@@ -58,13 +58,13 @@ private: // 衝突判定
 	/// 衝突時の処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollisionTrigger(const Collider* _other)override;
+	void OnCollisionTrigger(const IIEngine::Collider* _other)override;
 
 	/// <summary>
 	/// 衝突中の処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollision(const Collider* _other)override;
+	void OnCollision(const IIEngine::Collider* _other)override;
 
 public: // ゲッター
 

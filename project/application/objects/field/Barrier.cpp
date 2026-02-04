@@ -1,5 +1,7 @@
 #include "Barrier.h"
 
+using namespace IIEngine;
+
 void Barrier::Initialize()
 {
 	// 基底クラス初期化

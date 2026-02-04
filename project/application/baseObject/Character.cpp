@@ -2,6 +2,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void Character::Initialize(const std::string& _modelFileName, const std::string& _objectName, float _initialHP)
 {
     // Object3d の初期化

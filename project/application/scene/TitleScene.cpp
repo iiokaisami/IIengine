@@ -5,6 +5,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void TitleScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
@@ -21,7 +23,7 @@ void TitleScene::Initialize()
 
 	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
+	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 
 
 	// 衝突判定
@@ -112,7 +114,7 @@ void TitleScene::Finalize()
 	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData2_);
 
 	// Object3dCommon に設定したデフォルトカメラを解除
-	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
 
 	// SceneCamera
 	if (camera_) 
@@ -269,7 +271,7 @@ void TitleScene::Update()
 void TitleScene::Draw()
 {
 	// 描画前処理(Object)
-	Object3dCommon::GetInstance()->CommonDrawSetting();
+	IIEngine::Object3dCommon::GetInstance()->CommonDrawSetting();
 
 	// プレイヤー
 	pPlayer_->Draw();

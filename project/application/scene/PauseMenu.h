@@ -57,7 +57,7 @@ private:
 	MenuOption selectedOption_ = MenuOption::None;
 
 	// スプライト
-	std::vector<std::unique_ptr<Sprite>> menuSprites_;
+	std::vector<std::unique_ptr<IIEngine::Sprite>> menuSprites_;
 	uint32_t spriteNum_ = 5;
 
 	// アニメーション用

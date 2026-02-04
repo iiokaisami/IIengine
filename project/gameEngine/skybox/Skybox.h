@@ -7,12 +7,10 @@
 #include <DirectXMath.h>
 #include <MyMath.h>
 
-
-class DirectXCommon;
-class SrvManager;
-
 namespace IIEngine
 {
+    class DirectXCommon;
+    class SrvManager;
 
     struct SkyboxVertex
     {

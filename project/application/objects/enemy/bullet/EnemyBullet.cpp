@@ -1,6 +1,8 @@
 #include "EnemyBullet.h"
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void EnemyBullet::Initialize()
 {
 	// --- 3Dオブジェクト ---

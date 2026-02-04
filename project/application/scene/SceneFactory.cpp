@@ -7,7 +7,7 @@
 #include "../../application/scene/GameOverScene.h"
 #include "../../application/scene/ClearScene.h"
 
-std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& sceneName)
+std::unique_ptr<IIEngine::BaseScene> SceneFactory::CreateScene(const std::string& sceneName)
 {
 	if (sceneName == "TITLE")
 	{

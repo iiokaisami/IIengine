@@ -2,7 +2,7 @@
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, Vector3 targetRot)
+FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, Vector3 targetRot)
 	: camera_(camera),
       targetPos_(targetPos),
 	  targetVelocity_(targetVelocity),
@@ -16,7 +16,7 @@ FollowController::FollowController(std::shared_ptr<Camera> camera, std::function
 void FollowController::Update(float dt)
 {
     // 無効またはカメラがない場合は処理しない
-    if (!active_ || !camera_)
+    if (!active_ or !camera_)
     {
         return;
     }

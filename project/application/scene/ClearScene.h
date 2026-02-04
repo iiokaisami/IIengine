@@ -18,7 +18,7 @@
 /// クリアシーン
 /// クリア表示、エフェクト、BGM再生、シーン遷移
 /// </summary>
-class ClearScene : public BaseScene
+class ClearScene : public IIEngine::BaseScene
 {
 public:
 
@@ -36,13 +36,13 @@ public:
 
 private:
 
-	CameraManager& cameraManager = CameraManager::GetInstance();
+	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 
 	// 2Dスプライト
-	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
+	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 3;
 

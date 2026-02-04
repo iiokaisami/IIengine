@@ -8,6 +8,7 @@
 #include <Vector3.h>
 #include <Framework.h>
 #include <unordered_set>
+#include <string>
 
 /// <summary>
 /// 敵の基底クラス

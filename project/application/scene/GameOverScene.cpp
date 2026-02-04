@@ -4,6 +4,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void GameOverScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
@@ -13,7 +15,7 @@ void GameOverScene::Initialize()
 	camera_->Initialize();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
 	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
+	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
 
@@ -82,7 +84,7 @@ void GameOverScene::Finalize()
 	pEnemyManager_->Finalize();
 
 	// Object3dCommon に設定したデフォルトカメラを解除
-	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
 
 	// SceneCamera
 	if (camera_)
@@ -211,7 +213,7 @@ void GameOverScene::Update()
 void GameOverScene::Draw()
 {
 	// 描画前処理(Object)
-	Object3dCommon::GetInstance()->CommonDrawSetting();
+	IIEngine::Object3dCommon::GetInstance()->CommonDrawSetting();
 
 	pPlayer_->Draw();
 

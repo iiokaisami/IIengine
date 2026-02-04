@@ -45,19 +45,19 @@ private:
 	/// 衝突処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnSetCollisionTrigger(const Collider* _other);
+	void OnSetCollisionTrigger(const IIEngine::Collider* _other);
 	
 	/// <summary>
 	/// 衝突中処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnSetCollision(const Collider* _other);
+	void OnSetCollision(const IIEngine::Collider* _other);
 	
 	/// <summary>
 	/// 衝突時処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnExplosionTrigger(const Collider* _other);
+	void OnExplosionTrigger(const IIEngine::Collider* _other);
 
 
 	// 爆発処理
@@ -106,16 +106,16 @@ private:
 	const float kDefaultFrameRate = 60.0f;
 
 	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
+	IIEngine::ColliderManager* colliderManager_ = nullptr;
 	// 設置判定
-	Collider setCollider_;
-	AABB setAABB_;
-	Collider::ColliderDesc setDesc = {};
+	IIEngine::Collider setCollider_;
+	IIEngine::AABB setAABB_;
+	IIEngine::Collider::ColliderDesc setDesc = {};
 	// 爆発判定
 	std::string explosionObjectName_;
-	Collider explosionCollider_;
-	AABB explosionAABB_;
-	Collider::ColliderDesc explosionDesc = {};
+	IIEngine::Collider explosionCollider_;
+	IIEngine::AABB explosionAABB_;
+	IIEngine::Collider::ColliderDesc explosionDesc = {};
 
 
 	// 爆発フラグ
@@ -134,7 +134,7 @@ private:
 	// 壁との衝突フラグ
 	bool isWallCollision_ = false;
 	// 衝突した壁のAABB
-	AABB collisionWallAABB_;
+	IIEngine::AABB collisionWallAABB_;
 	// 反射のクールタイム
 	uint32_t wallCollisionCooldown_ = 0;
 

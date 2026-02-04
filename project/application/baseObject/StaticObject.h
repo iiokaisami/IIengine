@@ -31,17 +31,17 @@ public:
 protected:
 
     // 衝突処理
-    virtual void OnCollisionTrigger(const Collider* _other) { _other; }
+    virtual void OnCollisionTrigger(const IIEngine::Collider* _other) { _other; }
 
 protected:
 
     
     // 衝突判定管理
-    ColliderManager* colliderManager_ = nullptr; 
+    IIEngine::ColliderManager* colliderManager_ = nullptr;
     // 衝突判定データ
-    Collider collider_;                          
+    IIEngine::Collider collider_;
     // 衝突範囲
-    AABB aabb_;                                   
+    IIEngine::AABB aabb_;
 
 };
 

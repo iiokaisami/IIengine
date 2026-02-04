@@ -7,6 +7,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void Corruptor::Initialize()
 {
 	// Initialize を呼び出し共通プロパティを初期化

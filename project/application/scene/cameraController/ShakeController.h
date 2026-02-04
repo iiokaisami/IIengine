@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "ICameraController.h"
+#include "../../../gameEngine/3d/Camera.h"
 
 // 前方宣言
 class Camera;
@@ -22,7 +23,7 @@ public:
 	/// <param name="consumeHit">ヒットを消費する関数(ヒットがあれば trueを返す)</param>
 	/// <param name="defaultDuration">シェイク継続時間</param>
 	/// <param name="defaultAmp">シェイク振幅</param>
-	ShakeController(std::shared_ptr<Camera> camera, std::function<bool()> consumeHit, float defaultDuration = 0.3f, float defaultAmp = 1.0f);
+	ShakeController(std::shared_ptr<IIEngine::Camera> camera, std::function<bool()> consumeHit, float defaultDuration = 0.3f, float defaultAmp = 1.0f);
 
 	/// <summary>
 	/// 更新
@@ -42,7 +43,7 @@ public: // ゲッター
 private:
 
 	// カメラ
-	std::shared_ptr<Camera> camera_ = nullptr;
+	std::shared_ptr<IIEngine::Camera> camera_ = nullptr;
 	// ヒットを消費する関数
 	std::function<bool()> consumeHit_ = nullptr;
 	// 有効フラグ

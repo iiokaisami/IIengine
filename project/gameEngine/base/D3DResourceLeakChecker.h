@@ -1,17 +1,21 @@
 #pragma once
 
-/// <summary>
-/// Direct3Dリソースリークチェッカー
-/// Direct3Dのリソースが正しく解放されているかをチェックするクラス
-/// </summary>
-class D3DResourceLeakChecker
+namespace IIEngine
 {
-public:
 
 	/// <summary>
-	/// デストラクタ
+	/// Direct3Dリソースリークチェッカー
+	/// Direct3Dのリソースが正しく解放されているかをチェックするクラス
 	/// </summary>
-	~D3DResourceLeakChecker();
+	class D3DResourceLeakChecker
+	{
+	public:
 
-};
+		/// <summary>
+		/// デストラクタ
+		/// </summary>
+		~D3DResourceLeakChecker();
 
+	};
+
+}

@@ -81,7 +81,7 @@ public: // セッター
 protected: // メンバー
 
 	// 描画用の3Dオブジェクト
-	std::unique_ptr<Object3d> object_ = nullptr;
+	std::unique_ptr<IIEngine::Object3d> object_ = nullptr;
 
     std::string objectName_;
     Vector3 scale_;

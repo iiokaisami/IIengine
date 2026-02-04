@@ -6,7 +6,7 @@
 #include <Ease.h>
 #include <MyMath.h>
 
-StartCameraController::StartCameraController(std::shared_ptr<Camera> camera,
+StartCameraController::StartCameraController(std::shared_ptr<IIEngine::Camera> camera,
     const Vector3& cameraStart, const Vector3& cameraControl1, const Vector3& cameraControl2, const Vector3& cameraEnd,
     const Vector3& cameraStartRot, const Vector3& cameraEndRot, float duration)
     : camera_(std::move(camera)),

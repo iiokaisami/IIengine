@@ -47,10 +47,10 @@ protected:
 	static constexpr float kDefaultFrameRate = 60.0f;
 
 	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
+	IIEngine::ColliderManager* colliderManager_ = nullptr;
+	IIEngine::Collider collider_;
+	IIEngine::AABB aabb_;
+	IIEngine::Collider::ColliderDesc desc = {};
 
 	// 移動速度
 	Vector3 velocity_{};

@@ -49,72 +49,76 @@
 
 #endif // USE_IMGUI
 
-/// <summary>
-/// フレームワーク
-/// 基底クラス
-/// </summary>
-class Framework
+namespace IIEngine
 {
-public:
 
-	virtual ~Framework() = default;
+	/// <summary>
+	/// フレームワーク
+	/// 基底クラス
+	/// </summary>
+	class Framework
+	{
+	public:
 
-	void Run();
+		virtual ~Framework() = default;
 
-	// 初期化
-	virtual void Initialize();
-	
-	// 終了
-	virtual void Finalize();
-	
-	// 更新
-	virtual void Update();
-	
-	// 描画	
-	virtual void Draw() = 0;
+		void Run();
 
-	// 終了チェック
-	virtual bool IsEndRequest() const { return winApp->ProcessMessage(); }
+		// 初期化
+		virtual void Initialize();
 
-protected:
+		// 終了
+		virtual void Finalize();
 
-	// ポインタ
-	std::unique_ptr<WinApp> winApp = nullptr;
-	std::unique_ptr<DirectXCommon> dxCommon = nullptr;
-	std::unique_ptr<SrvManager> srvManager = nullptr;
-	std::unique_ptr<ModelCommon> modelCommon = nullptr;
-	IIEngine::Input* input = nullptr;
-	Audio* audio = nullptr;
+		// 更新
+		virtual void Update();
 
-	IIEngine::SceneManager* sceneManager_ = nullptr;
-	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
+		// 描画	
+		virtual void Draw() = 0;
 
-	SpriteCommon* spriteCommon = nullptr;
-	TextureManager* textureManager = nullptr;
-	Object3dCommon* object3dCommon = nullptr;
-	ModelManager* modelManager = nullptr;
+		// 終了チェック
+		virtual bool IsEndRequest() const { return winApp->ProcessMessage(); }
 
-	std::unique_ptr <RenderTexture> renderTexture = nullptr;
+	protected:
 
-	PostEffectManager* postEffectManager = nullptr;
-	std::unique_ptr<NoneEffectPass> noneEffectPass = nullptr;
-	std::unique_ptr<GrayscalePass> grayscalePass = nullptr;
-	std::unique_ptr<VignettePass> vignettePass = nullptr;
-	std::unique_ptr<BoxFilterPass> boxFilterPass = nullptr;
-	std::unique_ptr<GaussianFilterPass> gaussianFilterPass = nullptr;
+		// ポインタ
+		std::unique_ptr<WinApp> winApp = nullptr;
+		std::unique_ptr<DirectXCommon> dxCommon = nullptr;
+		std::unique_ptr<SrvManager> srvManager = nullptr;
+		std::unique_ptr<ModelCommon> modelCommon = nullptr;
+		IIEngine::Input* input = nullptr;
+		Audio* audio = nullptr;
 
-	IIEngine::ParticleManager* particleManager = nullptr;
+		IIEngine::SceneManager* sceneManager_ = nullptr;
+		std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE inputSrv = {};
-	Microsoft::WRL::ComPtr<ID3D12Resource> inputRes;
-	D3D12_RESOURCE_STATES state = {};
+		SpriteCommon* spriteCommon = nullptr;
+		TextureManager* textureManager = nullptr;
+		Object3dCommon* object3dCommon = nullptr;
+		ModelManager* modelManager = nullptr;
 
-	std::unique_ptr<IIEngine::Skybox> skybox = nullptr;
+		std::unique_ptr <RenderTexture> renderTexture = nullptr;
+
+		PostEffectManager* postEffectManager = nullptr;
+		std::unique_ptr<NoneEffectPass> noneEffectPass = nullptr;
+		std::unique_ptr<GrayscalePass> grayscalePass = nullptr;
+		std::unique_ptr<VignettePass> vignettePass = nullptr;
+		std::unique_ptr<BoxFilterPass> boxFilterPass = nullptr;
+		std::unique_ptr<GaussianFilterPass> gaussianFilterPass = nullptr;
+
+		IIEngine::ParticleManager* particleManager = nullptr;
+
+		D3D12_GPU_DESCRIPTOR_HANDLE inputSrv = {};
+		Microsoft::WRL::ComPtr<ID3D12Resource> inputRes;
+		D3D12_RESOURCE_STATES state = {};
+
+		std::unique_ptr<IIEngine::Skybox> skybox = nullptr;
 
 #ifdef USE_IMGUI
 
-	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
+		std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
 
 #endif // USE_IMGUI
-};
+	};
 
+}

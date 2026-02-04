@@ -1,12 +1,13 @@
 #include "SceneCamera.h"
 
 #include <Camera.h>
-#include <CameraManager.h>
+#include "../../../gameEngine/3d/CameraManager.h"
 
+using namespace IIEngine;
 
 SceneCamera::SceneCamera()
-	: camera_(std::make_shared<Camera>()),
-	  cameraManager_(CameraManager::GetInstance())
+	: camera_(std::make_shared<IIEngine::Camera>()),
+	  cameraManager_(IIEngine::CameraManager::GetInstance())
 {}
 
 SceneCamera::~SceneCamera() = default;

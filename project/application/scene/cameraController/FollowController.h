@@ -5,6 +5,7 @@
 
 #include <Vector3.h>
 #include "ICameraController.h"
+#include "../../../gameEngine/3d/Camera.h"
 
 // 前方宣言
 class Camera;
@@ -25,7 +26,7 @@ public:
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
 	/// <param name="rotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
-	FollowController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
+	FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
 
 	/// <summary>
 	/// 更新
@@ -50,7 +51,7 @@ public: // ゲッター
 private:
 
 	// カメラ
-	std::shared_ptr<Camera> camera_ = nullptr;
+	std::shared_ptr<IIEngine::Camera> camera_ = nullptr;
 	// 追尾対象の位置を返す関数
 	std::function<Vector3()> targetPos_ = nullptr;
 	// 追尾対象の速度を返す関数

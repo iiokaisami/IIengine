@@ -115,7 +115,7 @@ namespace IIEngine
 		/// <param name="groupName">パーティクルグループの名前</param>
 		/// <param name="position">発生位置</param>
 		/// <param name="count">発生数</param>
-		void Emit(const std::string groupName, const Vector3& position, uint32_t count);
+		void Emit(const std::string& groupName, const Vector3& position, uint32_t count);
 
 		/// <summary>
 		/// エミッター設定の追加

@@ -2,6 +2,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void ClearScene::Initialize()
 {
 	// 必ず先頭でカメラを全クリア
@@ -11,7 +13,7 @@ void ClearScene::Initialize()
 	camera_->Initialize();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
 	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
+	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
 
@@ -62,7 +64,7 @@ void ClearScene::Finalize()
 	pField_->Finalize();
 
 	// Object3dCommon に設定したデフォルトカメラを解除
-	Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
+	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
 
 	// SceneCamera
 	if (camera_)
@@ -179,7 +181,7 @@ void ClearScene::Update()
 void ClearScene::Draw()
 {
 	// 描画前処理(Object)
-	Object3dCommon::GetInstance()->CommonDrawSetting();
+	IIEngine::Object3dCommon::GetInstance()->CommonDrawSetting();
 
 	// プレイヤー描画
 	pPlayer_->Draw();

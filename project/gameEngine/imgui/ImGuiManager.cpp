@@ -6,91 +6,95 @@
 
 #endif // USE_IMGUI
 
-void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
+namespace IIEngine
 {
 
-	winApp_ = winApp;
-	dxCommon_ = dxCommon;
+	void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
+	{
+
+		winApp_ = winApp;
+		dxCommon_ = dxCommon;
 
 #ifdef USE_IMGUI
-	// ImGuiのコンテキストを生成
-	ImGui::CreateContext();
-	// ImGuiのスタイルを設定
-	ImGui::StyleColorsDark();
+		// ImGuiのコンテキストを生成
+		ImGui::CreateContext();
+		// ImGuiのスタイルを設定
+		ImGui::StyleColorsDark();
 
-	ImGui_ImplWin32_Init(winApp_->GetHwnd());
+		ImGui_ImplWin32_Init(winApp_->GetHwnd());
 
-	// デスクリプタヒープ設定
-	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-	desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	desc.NumDescriptors = 1;
-	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	// デスクリプタヒープ生成
-	HRESULT result = S_FALSE;
-	result = dxCommon_->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap_));
-	assert(SUCCEEDED(result));
+		// デスクリプタヒープ設定
+		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		desc.NumDescriptors = 1;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		// デスクリプタヒープ生成
+		HRESULT result = S_FALSE;
+		result = dxCommon_->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap_));
+		assert(SUCCEEDED(result));
 
-	// DirectX12用初期化
-	ImGui_ImplDX12_Init(
-		dxCommon_->GetDevice().Get(),
-		dxCommon_->GetSwapChainDesc().BufferCount,
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-		srvHeap_.Get(),
-		srvHeap_->GetCPUDescriptorHandleForHeapStart(),
-		srvHeap_->GetGPUDescriptorHandleForHeapStart()
-	);
+		// DirectX12用初期化
+		ImGui_ImplDX12_Init(
+			dxCommon_->GetDevice().Get(),
+			dxCommon_->GetSwapChainDesc().BufferCount,
+			DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+			srvHeap_.Get(),
+			srvHeap_->GetCPUDescriptorHandleForHeapStart(),
+			srvHeap_->GetGPUDescriptorHandleForHeapStart()
+		);
 
 #endif // USE_IMGUI
-}
+	}
 
-void ImGuiManager::Finalize()
-{
+	void ImGuiManager::Finalize()
+	{
 #ifdef USE_IMGUI
 
-	// 後始末
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+		// 後始末
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
 
-	// デスクリプタヒープを解放
-	srvHeap_.Reset();
+		// デスクリプタヒープを解放
+		srvHeap_.Reset();
 
 #endif // USE_IMGUI
-}
+	}
 
-void ImGuiManager::Begin()
-{
+	void ImGuiManager::Begin()
+	{
 #ifdef USE_IMGUI
 
-	// ImGuiフレーム開始
-	ImGui_ImplDX12_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+		// ImGuiフレーム開始
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
 
 #endif // USE_IMGUI
-}
+	}
 
-void ImGuiManager::End()
-{
+	void ImGuiManager::End()
+	{
 #ifdef USE_IMGUI
 
-	// ImGui描画前準備
-	ImGui::Render();
+		// ImGui描画前準備
+		ImGui::Render();
 
 #endif // USE_IMGUI
-}
+	}
 
-void ImGuiManager::Draw()
-{
+	void ImGuiManager::Draw()
+	{
 #ifdef USE_IMGUI
 
-	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList().Get();
+		ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList().Get();
 
-	// デスクリプタヒープの配列を設定
-	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap_.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-	// 描画コマンドを発行
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+		// デスクリプタヒープの配列を設定
+		ID3D12DescriptorHeap* ppHeaps[] = { srvHeap_.Get() };
+		commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+		// 描画コマンドを発行
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 
 #endif // USE_IMGUI
+	}
 }

@@ -6,7 +6,7 @@
 /// シーンファクトリ
 /// シーンの生成を行う
 /// </summary>
-class SceneFactory : public AbstractSceneFactory
+class SceneFactory : public IIEngine::AbstractSceneFactory
 {
 public:
 
@@ -15,5 +15,5 @@ public:
 	/// </summary>
 	/// <param name="sceneName">生成したいシーンの名前</param>
 	/// <returns>生成されたシーンのインスタンス</returns>
-	std::unique_ptr<BaseScene> CreateScene(const std::string& sceneName) override;
+	std::unique_ptr<IIEngine::BaseScene> CreateScene(const std::string& sceneName) override;
 };

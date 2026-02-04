@@ -2,50 +2,54 @@
 
 #include "DirectXCommon.h"
 
-/// <summary>
-/// ImGui管理クラス
-/// <para>ImGuiの初期化、終了、描画を行う</para>
-/// </summary>
-class ImGuiManager
+namespace IIEngine
 {
-public:
 
 	/// <summary>
-	/// 初期化
+	/// ImGui管理クラス
+	/// <para>ImGuiの初期化、終了、描画を行う</para>
 	/// </summary>
-	/// <param name="winApp">WindowsAPI</param>
-	/// <param name="dxCommon">DirectX共通機能管理クラスへのポインタ</param>
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	class ImGuiManager
+	{
+	public:
 
-	/// <summary>
-	/// 終了
-	/// </summary>
-	void Finalize();
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="winApp">WindowsAPI</param>
+		/// <param name="dxCommon">DirectX共通機能管理クラスへのポインタ</param>
+		void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
 
-	/// <summary>
-	/// ImGui受付開始
-	/// </summary>
-	void Begin();
+		/// <summary>
+		/// 終了
+		/// </summary>
+		void Finalize();
 
-	/// <summary>
-	/// ImGui受付終了
-	/// </summary>
-	void End();
+		/// <summary>
+		/// ImGui受付開始
+		/// </summary>
+		void Begin();
 
-	/// <summary>
-	/// 描画
-	/// </summary>
-	void Draw();
+		/// <summary>
+		/// ImGui受付終了
+		/// </summary>
+		void End();
 
-private:
+		/// <summary>
+		/// 描画
+		/// </summary>
+		void Draw();
 
-	// WindowsAPI
-	WinApp* winApp_ = nullptr;
+	private:
 
-	DirectXCommon* dxCommon_ = nullptr;
+		// WindowsAPI
+		WinApp* winApp_ = nullptr;
 
-	// SRV用デスクリプタヒープ
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_ = nullptr;
+		DirectXCommon* dxCommon_ = nullptr;
 
-};
+		// SRV用デスクリプタヒープ
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_ = nullptr;
 
+	};
+
+}

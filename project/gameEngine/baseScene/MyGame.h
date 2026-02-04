@@ -3,43 +3,47 @@
 #include "Framework.h"
 #include "../../../application/scene/SceneFactory.h"
 
-/// <summary>
-/// ゲーム固有のフレームワーク
-/// ゲーム固有の初期化、終了、更新、描画を行う
-/// </summary>
-class MyGame : public Framework
+namespace IIEngine
 {
-public:
 
-	// 初期化
-	void Initialize() override;
+	/// <summary>
+	/// ゲーム固有のフレームワーク
+	/// ゲーム固有の初期化、終了、更新、描画を行う
+	/// </summary>
+	class MyGame : public Framework
+	{
+	public:
 
-	// 終了
-	void Finalize() override;
+		// 初期化
+		void Initialize() override;
 
-	// 更新
-	void Update() override;
+		// 終了
+		void Finalize() override;
 
-	// 描画	
-	void Draw() override;
+		// 更新
+		void Update() override;
 
-	// モデル読み込み
-	void LoadModel();
+		// 描画	
+		void Draw() override;
 
-	// サウンド読み込み
-	void LoadSound();
+		// モデル読み込み
+		void LoadModel();
 
-	// サウンド
-	SoundData soundData_;
-	SoundData soundData2_;
+		// サウンド読み込み
+		void LoadSound();
 
-private:
+		// サウンド
+		SoundData soundData_;
+		SoundData soundData2_;
 
-	bool useExampleGroup_ = true;
+	private:
 
-	// 0 : グレースケール無効, 1: グレースケール有効
-	uint32_t useGrayscale_ = 0;
+		bool useExampleGroup_ = true;
 
-	// Vignetteの強度
-	float vignetteRadius_ = 0.5f;
-};
+		// 0 : グレースケール無効, 1: グレースケール有効
+		uint32_t useGrayscale_ = 0;
+
+		// Vignetteの強度
+		float vignetteRadius_ = 0.5f;
+	};
+}

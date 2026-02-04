@@ -4,7 +4,9 @@
 #include <functional>
 
 #include <Vector3.h>
+
 #include "ICameraController.h"
+#include "../../../gameEngine/3d/Camera.h"
 
 // 前方宣言
 class Camera;
@@ -22,7 +24,7 @@ public:
 	/// <param name="camera">カメラ</param>
 	/// <param name="targetPos">追尾対象の位置を返す関数</param>
 	/// <param name="duration">デスカメラの持続時間</param>
-	DeathCameraController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 2.0f, float endRadius = 12.0f, float endHeight = 12.0f);
+	DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 2.0f, float endRadius = 12.0f, float endHeight = 12.0f);
 
 	// デストラクタ
 	~DeathCameraController() override = default;
@@ -52,7 +54,7 @@ public: // ゲッター
 private:
 
 	// カメラ
-	std::shared_ptr<Camera> camera_;
+	std::shared_ptr<IIEngine::Camera> camera_;
 	// 追尾対象の位置を返す関数
 	std::function<Vector3()> getPlayerPos_;
 

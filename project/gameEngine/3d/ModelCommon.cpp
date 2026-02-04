@@ -1,6 +1,10 @@
 #include "ModelCommon.h"
 
-void ModelCommon::Initialize(DirectXCommon* dxCommon)
+namespace IIEngine
 {
-	dxCommon_ = dxCommon;
+
+	void ModelCommon::Initialize(DirectXCommon* dxCommon)
+	{
+		dxCommon_ = dxCommon;
+	}
 }

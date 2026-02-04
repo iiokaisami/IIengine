@@ -6,30 +6,34 @@
 #include "DirectXCommon.h"
 #include "Logger.h"
 
-/// <summary>
-/// モデル共通
-/// </summary>
-class ModelCommon
+namespace IIEngine
 {
-public:
 
 	/// <summary>
-	/// 初期化
+	/// モデル共通
 	/// </summary>
-	/// <param name="dxCommon"> DirectX共通機能管理クラスへのポインタ</param>
-	void Initialize(DirectXCommon* dxCommon);
+	class ModelCommon
+	{
+	public:
 
-public: // ゲッター
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="dxCommon"> DirectX共通機能管理クラスへのポインタ</param>
+		void Initialize(DirectXCommon* dxCommon);
 
-	/// <summary>
-	/// DirectX共通機能管理クラスの取得
-	/// </summary>
-	DirectXCommon* GetDxCommon() const { return dxCommon_; }
+	public: // ゲッター
 
-private:
+		/// <summary>
+		/// DirectX共通機能管理クラスの取得
+		/// </summary>
+		DirectXCommon* GetDxCommon() const { return dxCommon_; }
 
-	DirectXCommon* dxCommon_;
+	private:
+
+		DirectXCommon* dxCommon_;
 
 
-};
+	};
 
+}

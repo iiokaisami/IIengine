@@ -2,7 +2,7 @@
 
 #include <Camera.h>
 
-ShakeController::ShakeController(std::shared_ptr<Camera> camera, std::function<bool()> consumeHit, float defaultDuration, float defaultAmp)
+ShakeController::ShakeController(std::shared_ptr<IIEngine::Camera> camera, std::function<bool()> consumeHit, float defaultDuration, float defaultAmp)
     : camera_(camera),
       consumeHit_(consumeHit),
       duration_(defaultDuration),
@@ -11,7 +11,7 @@ ShakeController::ShakeController(std::shared_ptr<Camera> camera, std::function<b
 
 void ShakeController::Update(float dt)
 {
-    if (!active_ || !camera_)
+    if (!active_ or !camera_)
     {
         return;
     }

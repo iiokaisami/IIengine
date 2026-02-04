@@ -5,6 +5,7 @@
 
 #include <Vector3.h>
 #include "ICameraController.h"
+#include "../../../gameEngine/3d/Camera.h"
 
 // 前方宣言
 class Camera;
@@ -27,7 +28,7 @@ public:
 	/// <param name="cameraStartRot">カメラ開始回転</param>
 	/// <param name="cameraEndRot">カメラ終了回転</param>
 	/// <param name="duration">持続時間</param>
-    StartCameraController(std::shared_ptr<Camera> camera,const Vector3& cameraStart, const Vector3& cameraControl1, const Vector3& cameraControl2, const Vector3& cameraEnd, const Vector3& cameraStartRot, const Vector3& cameraEndRot, float duration = 1.5f);
+    StartCameraController(std::shared_ptr<IIEngine::Camera> camera,const Vector3& cameraStart, const Vector3& cameraControl1, const Vector3& cameraControl2, const Vector3& cameraEnd, const Vector3& cameraStartRot, const Vector3& cameraEndRot, float duration = 1.5f);
 
 	// デストラクタ
 	~StartCameraController() override = default;
@@ -56,7 +57,7 @@ public: // セッター
 private:
 
 	// カメラ
-	std::shared_ptr<Camera> camera_;
+	std::shared_ptr<IIEngine::Camera> camera_;
 
 	// ベジェ曲線の制御点と位置
 	Vector3 startPos_;

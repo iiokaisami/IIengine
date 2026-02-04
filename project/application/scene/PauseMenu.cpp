@@ -25,7 +25,7 @@ void PauseMenu::Initialize()
         Vector2 pos = { 0.0f, 0.0f };
         basePositions_.push_back(pos);
 
-        auto sprite = std::make_unique<Sprite>();
+        auto sprite = std::make_unique<IIEngine::Sprite>();
         sprite->Initialize(files[i], pos);
         menuSprites_.push_back(std::move(sprite));
     }

@@ -23,7 +23,7 @@
 /// タイトルシーン
 /// タイトルロゴ表示、エフェクト、BGM再生、シーン遷移
 /// </summary>
-class TitleScene : public BaseScene
+class TitleScene : public IIEngine::BaseScene
 {
 public:
 
@@ -42,7 +42,7 @@ public:
 private:
 
 	// カメラ
-	CameraManager& cameraManager = CameraManager::GetInstance();
+	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
@@ -52,12 +52,12 @@ private:
 	bool isTransitioning_ = false;
 
 	// 2Dスプライト
-	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
+	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 2;
 
 	// 衝突判定
-	ColliderManager* colliderManager_ = nullptr;
+	IIEngine::ColliderManager* colliderManager_ = nullptr;
 
 	// プレイヤー
 	std::unique_ptr<Player> pPlayer_ = nullptr;
@@ -73,8 +73,8 @@ private:
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	// サウンド
-	SoundData soundData_;
-	SoundData soundData2_;
+	IIEngine::SoundData soundData_;
+	IIEngine::SoundData soundData2_;
 
 	bool isTerrainDraw = false;
 	bool enableLighting = false;

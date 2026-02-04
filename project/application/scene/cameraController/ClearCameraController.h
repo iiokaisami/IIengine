@@ -4,7 +4,9 @@
 #include <functional>
 
 #include <Vector3.h>
+
 #include "ICameraController.h"
+#include "../../../gameEngine/3d/Camera.h"
 
 // 前方宣言
 class Camera;
@@ -22,7 +24,7 @@ public:
 	/// <param name="camera">カメラ</param>
 	/// <param name="targetPos">追尾対象の位置を返す関数</param>
 	/// <param name="duration">クリアカメラの持続時間</param>
-	ClearCameraController(std::shared_ptr<Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 20.0f, float rotationSpeedMultiplier = 0.12f, float heightRise = 30.0f, float fadeStartThreshold = 0.4f);
+	ClearCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 20.0f, float rotationSpeedMultiplier = 0.12f, float heightRise = 30.0f, float fadeStartThreshold = 0.4f);
 
 	// デストラクタ
 	~ClearCameraController() override = default;
@@ -50,7 +52,7 @@ public: // セッター
     void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
 
 private:
-    std::shared_ptr<Camera> camera_;
+    std::shared_ptr<IIEngine::Camera> camera_;
     std::function<Vector3()> getPlayerPos_;
 
     // 開始時に計算して保持

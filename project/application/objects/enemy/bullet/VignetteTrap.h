@@ -45,13 +45,13 @@ private: // 衝突判定
 	/// 衝突時処理
 	/// </summary>
 	/// <param name="_other>衝突相手のコライダー</param>
-	void OnCollisionTrigger(const Collider* _other);
+	void OnCollisionTrigger(const IIEngine::Collider* _other);
 
 	/// <summary>
 	/// 衝突中処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollision(const Collider* _other);
+	void OnCollision(const IIEngine::Collider* _other);
 
 	// 壁との反発処理
 	void ReflectOnWallCollision();
@@ -94,15 +94,15 @@ private:
 	const float kDefaultFrameRate = 60.0f;
 
 	// 当たり判定関係
-	ColliderManager* colliderManager_ = nullptr;
-	Collider collider_;
-	AABB aabb_;
-	Collider::ColliderDesc desc = {};
+	IIEngine::ColliderManager* colliderManager_ = nullptr;
+	IIEngine::Collider collider_;
+	IIEngine::AABB aabb_;
+	IIEngine::Collider::ColliderDesc desc = {};
 	
 	// 壁との衝突フラグ
 	bool isWallCollision_ = false;
 	// 衝突した壁のAABB
-	AABB collisionWallAABB_;
+	IIEngine::AABB collisionWallAABB_;
 	// 反射のクールタイム
 	uint32_t wallCollisionCooldown_ = 0;
 

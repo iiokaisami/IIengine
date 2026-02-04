@@ -1,6 +1,8 @@
 #include "PlayerBullet.h"
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void PlayerBullet::Initialize()
 {
 	// --- 3Dオブジェクト ---

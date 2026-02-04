@@ -1,5 +1,7 @@
 #include "Goal.h"
 
+using namespace IIEngine;
+
 void Goal::Initialize()
 {
 	// 基底クラス初期化

@@ -19,7 +19,7 @@
 /// ゲームオーバーシーン
 /// ゲームオーバー表示、エフェクト、BGM再生、シーン遷移
 /// </summary>
-class GameOverScene : public BaseScene
+class GameOverScene : public IIEngine::BaseScene
 {
 public:
 
@@ -42,13 +42,13 @@ private:
 
 private:
 
-	CameraManager& cameraManager = CameraManager::GetInstance();
+	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
 
 	// 2Dスプライト
-	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
+	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 3;
 
@@ -60,7 +60,7 @@ private:
 	bool isTransitioning_ = false;
 
 	// 衝突判定
-	ColliderManager* colliderManager_ = nullptr;
+	IIEngine::ColliderManager* colliderManager_ = nullptr;
 
 	// プレイヤー
 	std::unique_ptr<Player> pPlayer_ = nullptr;

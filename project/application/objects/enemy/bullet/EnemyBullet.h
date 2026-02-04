@@ -40,7 +40,7 @@ private: // 衝突判定
 	/// 衝突時処理
 	/// </summary>
 	/// <param name="_other">衝突相手のコライダー</param>
-	void OnCollisionTrigger(const Collider* _other);
+	void OnCollisionTrigger(const IIEngine::Collider* _other);
 
 public: // セッター
 

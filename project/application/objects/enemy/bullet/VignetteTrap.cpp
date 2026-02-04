@@ -4,6 +4,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void VignetteTrap::Initialize()
 {
 	// --- 3Dオブジェクト ---

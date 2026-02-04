@@ -1,5 +1,7 @@
 #include "StaticObject.h"
 
+using namespace IIEngine;
+
 void StaticObject::Initialize(const std::string& _modelFileName, const std::string& _objectName)
 {
     // Object3d の初期化

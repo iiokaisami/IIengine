@@ -27,7 +27,7 @@
 ///	ゲームプレイシーン
 /// プレイヤー操作、敵出現、フィールド、ゴール、衝突判定、シーン遷移
 /// </summary>
-class GamePlayScene : public BaseScene
+class GamePlayScene : public IIEngine::BaseScene
 {
 public:
 
@@ -51,7 +51,7 @@ private:
 private:
 
 	// カメラ
-	CameraManager& cameraManager = CameraManager::GetInstance();
+	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
 	std::shared_ptr<SceneCamera> camera_ = nullptr;
     
     uint32_t activeIndex = 0;
@@ -59,7 +59,7 @@ private:
 	Vector3 cameraPosition_ = { 0.0f,-20.0f,0.0f };
 
 	// 2Dスプライト
-	std::vector<std::unique_ptr<Sprite>>sprites_ = {};
+	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
 	Vector4 color_ = { 0.0f,0.0f,0.0f,1.0f };
 	// 変更後の色(薄めの赤)
 	Vector4 usedColor_ = { 1.0f,0.5f,0.5f,1.0f };
@@ -83,7 +83,7 @@ private:
 	bool inputLock_ = false;
 
 	// 衝突判定
-	ColliderManager* colliderManager_ = nullptr;
+	IIEngine::ColliderManager* colliderManager_ = nullptr;
 
 	// プレイヤー
 	std::unique_ptr<Player> pPlayer_ = nullptr;

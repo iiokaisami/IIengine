@@ -415,7 +415,7 @@ namespace IIEngine
 
     }
 
-    void ParticleManager::Emit(const std::string groupName, const Vector3& position, uint32_t count)
+    void ParticleManager::Emit(const std::string& groupName, const Vector3& position, uint32_t count)
     {
         // グループごとの motionNameを使うEmit
         auto it = particleGroups.find(groupName);

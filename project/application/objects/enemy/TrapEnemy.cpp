@@ -9,6 +9,8 @@
 
 #include "TimeManager.h"
 
+using namespace IIEngine;
+
 void TrapEnemy::Initialize()
 {
     // Initialize を呼び出し共通プロパティを初期化
