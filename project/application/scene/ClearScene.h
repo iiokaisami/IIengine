@@ -8,11 +8,6 @@
 #include <Vector3.h>
 
 #include "../../gameEngine/baseScene/BaseScene.h"
-#include "../../gameEngine/transition/BlockRiseTransition.h"
-#include "../../gameEngine/particle/ParticleEmitter.h"
-#include "../objects/player/Player.h"
-#include "../objects/field/Field.h"
-#include "cameraController/SceneCamera.h"
 
 /// <summary>
 /// クリアシーン
@@ -33,35 +28,5 @@ public:
 
 	// 描画
 	void Draw() override;
-
-private:
-
-	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
-	std::unique_ptr<SceneCamera> camera_ = nullptr;
-	Vector3 cameraPosition_{};
-	Vector3 cameraRotate_{};
-
-	// 2Dスプライト
-	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
-	// 描画するスプライトの数
-	uint32_t spriteNum_ = 3;
-
-	Vector2 rePos_ = { 0,620 };
-	Vector2 toPos_ = { 0,620 };
-
-	// 遷移
-	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
-	bool isTransitioning_ = false;
-
-	// プレイヤー
-	std::unique_ptr<Player> pPlayer_ = nullptr;
-
-	// フィールド
-	std::unique_ptr<Field> pField_ = nullptr;
-
-	// パーティクル位置
-	Vector3 particlePosition_ = { 0.0f,0.0f,-3.5f };
-	Vector3 petalPosition_ = { 0.0f,12.0f,-18.0f };
-
 };
 

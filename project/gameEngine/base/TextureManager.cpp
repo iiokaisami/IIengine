@@ -43,6 +43,8 @@ namespace IIEngine
 		{
 			// DDSファイルの読み込み
 			hr = DirectX::LoadFromDDSFile(filePathW.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
+			assert(SUCCEEDED(hr));
+
 		} else
 		{
 			hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
@@ -57,7 +59,23 @@ namespace IIEngine
 			mipImages = std::move(image);
 		} else
 		{
-			hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+			if (image.GetMetadata().mipLevels > 1)
+			{
+				// すでにミップマップがある場合はそのまま使用
+				mipImages = std::move(image);
+			} else
+			{
+				// ミップマップを生成
+				hr = DirectX::GenerateMipMaps(
+					image.GetImages(),
+					image.GetImageCount(),
+					image.GetMetadata(),
+					DirectX::TEX_FILTER_SRGB,
+					0,
+					mipImages
+				);
+				assert(SUCCEEDED(hr));
+			}
 		}
 
 		const auto& meta = mipImages.GetMetadata();

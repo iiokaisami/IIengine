@@ -202,90 +202,6 @@
     <ClCompile Include="application\scene\TitleScene.cpp">
       <Filter>application\scene</Filter>
     </ClCompile>
-    <ClCompile Include="application\BaseObject\GameObject.cpp">
-      <Filter>application\baseObject</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorAttack.cpp">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorDead.cpp">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorHitReact.cpp">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorMove.cpp">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorSpawn.cpp">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorState.cpp">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorDead.cpp">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorHitReact.cpp">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorMove.cpp">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSetTrap.cpp">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSpawn.cpp">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorState.cpp">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\Bullet\EnemyBullet.cpp">
-      <Filter>application\objects\enemy\bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\Bullet\TimeBomb.cpp">
-      <Filter>application\objects\enemy\bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\Bullet\VignetteTrap.cpp">
-      <Filter>application\objects\enemy\bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\WaveState\EnemyWaveStage1.cpp">
-      <Filter>application\objects\enemy\waveState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\WaveState\EnemyWaveStage2.cpp">
-      <Filter>application\objects\enemy\waveState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\WaveState\EnemyWaveState.cpp">
-      <Filter>application\objects\enemy\waveState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\EnemyManager.cpp">
-      <Filter>application\objects\enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\NormalEnemy.cpp">
-      <Filter>application\objects\enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Enemy\TrapEnemy.cpp">
-      <Filter>application\objects\enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Field\Barrier.cpp">
-      <Filter>application\objects\field</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Field\Field.cpp">
-      <Filter>application\objects\field</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Field\Goal.cpp">
-      <Filter>application\objects\field</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Field\Wall.cpp">
-      <Filter>application\objects\field</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Player\Player.cpp">
-      <Filter>application\objects\player</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Objects\Player\Bullet\PlayerBullet.cpp">
-      <Filter>application\objects\player\bullet</Filter>
-    </ClCompile>
     <ClCompile Include="gameEngine\imgui\ImGuiManager.cpp">
       <Filter>gameEngine\imgui</Filter>
     </ClCompile>
@@ -301,53 +217,11 @@
     <ClCompile Include="gameEngine\transition\TransitionManager.cpp">
       <Filter>gameEngine\transition</Filter>
     </ClCompile>
-    <ClCompile Include="application\objects\enemy\Corruptor.cpp">
-      <Filter>application\objects\enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.cpp">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.cpp">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.cpp">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.cpp">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClCompile>
-    <ClCompile Include="application\baseObject\BaseEnemy.cpp">
-      <Filter>application\objects\enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="application\scene\cameraController\ClearCameraController.cpp">
-      <Filter>application\scene\cameraController</Filter>
-    </ClCompile>
-    <ClCompile Include="application\scene\cameraController\DeathCameraController.cpp">
-      <Filter>application\scene\cameraController</Filter>
-    </ClCompile>
-    <ClCompile Include="application\scene\cameraController\FollowController.cpp">
-      <Filter>application\scene\cameraController</Filter>
-    </ClCompile>
     <ClCompile Include="application\scene\cameraController\SceneCamera.cpp">
-      <Filter>application\scene\cameraController</Filter>
-    </ClCompile>
-    <ClCompile Include="application\scene\cameraController\ShakeController.cpp">
-      <Filter>application\scene\cameraController</Filter>
-    </ClCompile>
-    <ClCompile Include="application\scene\cameraController\StartCameraController.cpp">
       <Filter>application\scene\cameraController</Filter>
     </ClCompile>
     <ClCompile Include="gameEngine\time\TimeManager.cpp">
       <Filter>gameEngine\time</Filter>
-    </ClCompile>
-    <ClCompile Include="application\baseObject\StaticObject.cpp">
-      <Filter>application\baseObject</Filter>
-    </ClCompile>
-    <ClCompile Include="application\baseObject\BaseBullet.cpp">
-      <Filter>application\baseObject</Filter>
-    </ClCompile>
-    <ClCompile Include="application\baseObject\Character.cpp">
-      <Filter>application\baseObject</Filter>
     </ClCompile>
     <ClCompile Include="application\scene\PauseMenu.cpp" />
   </ItemGroup>
@@ -511,90 +385,6 @@
     <ClInclude Include="application\scene\TitleScene.h">
       <Filter>application\scene</Filter>
     </ClInclude>
-    <ClInclude Include="application\BaseObject\GameObject.h">
-      <Filter>application\baseObject</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorAttack.h">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorDead.h">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorHitReact.h">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorMove.h">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorSpawn.h">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\normalEnemyState\EnemyBehaviorState.h">
-      <Filter>application\objects\enemy\behaviorState\normalEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorDead.h">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorHitReact.h">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorMove.h">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSetTrap.h">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorSpawn.h">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\BehaviorState\TrapEnemyState\TrapEnemyBehaviorState.h">
-      <Filter>application\objects\enemy\behaviorState\trapEnemyState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\Bullet\EnemyBullet.h">
-      <Filter>application\objects\enemy\bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\Bullet\TimeBomb.h">
-      <Filter>application\objects\enemy\bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\Bullet\VignetteTrap.h">
-      <Filter>application\objects\enemy\bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\WaveState\EnemyWaveStage1.h">
-      <Filter>application\objects\enemy\waveState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\WaveState\EnemyWaveStage2.h">
-      <Filter>application\objects\enemy\waveState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\WaveState\EnemyWaveState.h">
-      <Filter>application\objects\enemy\waveState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\EnemyManager.h">
-      <Filter>application\objects\enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\NormalEnemy.h">
-      <Filter>application\objects\enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Enemy\TrapEnemy.h">
-      <Filter>application\objects\enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Field\Barrier.h">
-      <Filter>application\objects\field</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Field\Field.h">
-      <Filter>application\objects\field</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Field\Goal.h">
-      <Filter>application\objects\field</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Field\Wall.h">
-      <Filter>application\objects\field</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Player\Player.h">
-      <Filter>application\objects\player</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Objects\Player\Bullet\PlayerBullet.h">
-      <Filter>application\objects\player\bullet</Filter>
-    </ClInclude>
     <ClInclude Include="gameEngine\Collider\Shape.h">
       <Filter>gameEngine\collider</Filter>
     </ClInclude>
@@ -613,43 +403,10 @@
     <ClInclude Include="gameEngine\transition\TransitionManager.h">
       <Filter>gameEngine\transition</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\Corruptor.h">
-      <Filter>application\objects\enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorMove.h">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSelfDestruct.h">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorSpawn.h">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\corruptorState\CorruptorBehaviorState.h">
-      <Filter>application\objects\enemy\behaviorState\corruptorState</Filter>
-    </ClInclude>
-    <ClInclude Include="application\baseObject\BaseEnemy.h">
-      <Filter>application\objects\enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="application\scene\cameraController\ClearCameraController.h">
-      <Filter>application\scene\cameraController</Filter>
-    </ClInclude>
-    <ClInclude Include="application\scene\cameraController\DeathCameraController.h">
-      <Filter>application\scene\cameraController</Filter>
-    </ClInclude>
-    <ClInclude Include="application\scene\cameraController\FollowController.h">
-      <Filter>application\scene\cameraController</Filter>
-    </ClInclude>
     <ClInclude Include="application\scene\cameraController\ICameraController.h">
       <Filter>application\scene\cameraController</Filter>
     </ClInclude>
     <ClInclude Include="application\scene\cameraController\SceneCamera.h">
-      <Filter>application\scene\cameraController</Filter>
-    </ClInclude>
-    <ClInclude Include="application\scene\cameraController\ShakeController.h">
-      <Filter>application\scene\cameraController</Filter>
-    </ClInclude>
-    <ClInclude Include="application\scene\cameraController\StartCameraController.h">
       <Filter>application\scene\cameraController</Filter>
     </ClInclude>
     <ClInclude Include="gameEngine\time\TimeManager.h">
@@ -657,15 +414,6 @@
     </ClInclude>
     <ClInclude Include="gameEngine\math\Vector3Hash.h">
       <Filter>gameEngine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="application\baseObject\StaticObject.h">
-      <Filter>application\baseObject</Filter>
-    </ClInclude>
-    <ClInclude Include="application\baseObject\Character.h">
-      <Filter>application\baseObject</Filter>
-    </ClInclude>
-    <ClInclude Include="application\baseObject\BaseBullet.h">
-      <Filter>application\baseObject</Filter>
     </ClInclude>
     <ClInclude Include="application\scene\PauseMenu.h" />
   </ItemGroup>
