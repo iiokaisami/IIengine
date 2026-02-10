@@ -34,19 +34,10 @@ void TitleScene::Initialize()
 
 		if (i == 0)
 		{
-			
-			sprite->Initialize("monsterBall.dds", { 0,0 }, color_, { 0,0 });
-		}
-		if (i == 1)
-		{
 
 			sprite->Initialize("player.dds", { 0,0 }, color_, { 0,0 });
 		}
-		if (i == 2)
-		{
-
-			sprite->Initialize("sky.dds", { 0,0 }, color_, { 0,0 });
-		}
+		
 
 		sprites_.push_back(std::move(sprite));
 

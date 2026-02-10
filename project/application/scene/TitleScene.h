@@ -41,7 +41,7 @@ private:
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 3;
+	uint32_t spriteNum_ = 1;
 
 	// 透明チェック
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };

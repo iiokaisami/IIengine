@@ -269,22 +269,7 @@ namespace IIEngine
 
 	void MyGame::LoadModel()
 	{
-		ModelManager::GetInstance()->LoadModel("cube.obj");
-		ModelManager::GetInstance()->LoadModel("plane.obj");
-		ModelManager::GetInstance()->LoadModel("sphere.obj");
-		ModelManager::GetInstance()->LoadModel("terrain.obj");
-		ModelManager::GetInstance()->LoadModel("player/player.obj");
-		ModelManager::GetInstance()->LoadModel("player/bullet/playerBullet.obj");
-		ModelManager::GetInstance()->LoadModel("enemy/normal/normalEnemy.obj");
-		ModelManager::GetInstance()->LoadModel("enemy/normal/bullet/enemyBullet.obj");
-		ModelManager::GetInstance()->LoadModel("enemy/trap/trapEnemy.obj");
-		ModelManager::GetInstance()->LoadModel("enemy/trap/timeBomb/bomb.obj");
-		ModelManager::GetInstance()->LoadModel("enemy/trap/vignette/vignette.obj");
-		ModelManager::GetInstance()->LoadModel("wall/wall.obj");
-		ModelManager::GetInstance()->LoadModel("field/field.obj");
-		ModelManager::GetInstance()->LoadModel("goal/goal.obj");
-		ModelManager::GetInstance()->LoadModel("logo/logo.obj");
-		ModelManager::GetInstance()->LoadModel("barrie/barrie.obj");
+		
 
 	}
 
