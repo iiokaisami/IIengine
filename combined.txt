@@ -8436,6 +8436,9 @@ void Player::Move()
 
 		// 回転を更新
 		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
+
+		// パーティクル
+		IIEngine::ParticleEmitter::Emit("walk", position_, 1);
 	}
 
 	// 位置更新
@@ -8443,9 +8446,6 @@ void Player::Move()
 
 	// 移動制限
 	ClampPosition();
-
-	// パーティクル
-	IIEngine::ParticleEmitter::Emit("walk", position_, 1);
 }
 
 void Player::Attack()
@@ -8483,8 +8483,8 @@ void Player::Evade()
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
-	// 回避入力
-	if (!isEvading_ && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
+	// 回避入力（クールタイムが0のときのみ許可）
+	if (!isEvading_ && evadeCoolDownFrame_ == 0 && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
 	{
 		// 移動方向がある場合のみ回避
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
@@ -8500,10 +8500,16 @@ void Player::Evade()
 				evadeDirection_.x /= len;
 				evadeDirection_.z /= len;
 			}
-			// 回避開始時のx軸角度を保存
-			evadeStartRotationX_ = rotation_.x;
+			// 回避開始時のy軸角度を保存
+			evadeStartRotationY_ = rotation_.y;
 			// 目標角度を設定
-			evadeTargetRotationX_ = evadeStartRotationX_ + kEvadeRotateAngle_;
+			float sign = (evadeDirection_.x >= 0.0f) ? 1.0f : -1.0f;
+
+			// 目標Y回転
+			evadeTargetRotationY_ = evadeStartRotationY_ + kEvadeRotateAngle_ * sign;
+
+			// 回避開始時にクールタイムを設定
+			evadeCoolDownFrame_ = kEvadeCoolDown_;
 		}
 	}
 
@@ -8517,7 +8523,7 @@ void Player::Evade()
 
 		// 回避中のx軸回転
 		float t = 1.0f - static_cast<float>(evadeFrame_) / static_cast<float>(kEvadeDuration_);
-		rotation_.x = evadeStartRotationX_ + (evadeTargetRotationX_ - evadeStartRotationX_) * t * dt * kDefaultFrameRate;
+		rotation_.y = evadeStartRotationY_ + (evadeTargetRotationY_ - evadeStartRotationY_) * t * dt * kDefaultFrameRate;
 
 		// フレーム制御を行う
 		if (evadeFrame_ > 0)
@@ -8529,7 +8535,7 @@ void Player::Evade()
 		{
 			isEvading_ = false;
 			// 回避終了時に元の角度に戻す
-			rotation_.x = evadeStartRotationX_;
+			rotation_.y = evadeStartRotationY_;
 		}
 	}
 }
@@ -8858,10 +8864,16 @@ void Player::UpdateControl()
 
 void Player::UpdateStatus()
 {
-	// クールダウン
+	// 攻撃クールダウン
 	if (countCoolDownFrame_ > 0)
 	{
 		countCoolDownFrame_--;
+	}
+
+	// 回避クールダウン
+	if (evadeCoolDownFrame_ > 0)
+	{
+		evadeCoolDownFrame_--;
 	}
 
 }
@@ -9135,6 +9147,8 @@ File Path: project/application/objects/player/Player.h
 
 #include "postEffect/PostEffectManager.h"
 
+
+#include "Quaternion.h"
 #include <Object3d.h>
 #include <Sprite.h>
 #include <Framework.h>
@@ -9326,9 +9340,13 @@ private:
 	const int kEvadeDuration_ = 30; // 回避の持続時間
 	// 回避速度
 	const float kEvadeSpeed_ = 0.2f;
+	// 回避クールタイム	
+	const int kEvadeCoolDown_ = 60;
+	// 回避クールタイムのフレームカウント
+	int evadeCoolDownFrame_ = 0;
 
-	float evadeStartRotationX_ = 0.0f; // 回避開始時のx軸角度
-	float evadeTargetRotationX_ = 0.0f; // 回避中の目標x軸角度
+	float evadeStartRotationY_ = 0.0f; // 回避開始時のY軸角度
+	float evadeTargetRotationY_ = 0.0f; // 回避中の目標Y軸角度
 	const float kEvadeRotateAngle_ = 3.14f * 4.0f; // 1回転(360度) 
 
 
@@ -10237,7 +10255,7 @@ void GamePlayScene::Initialize()
 
 		if (i == 0)
 		{
-			sprite->Initialize("playUI.png", { 0,600 }, color_, { 0,0 });
+			sprite->Initialize("playUI.png", { 0,520 }, color_, { 0,0 });
 		}
 		if (i == 1)
 		{
@@ -24182,6 +24200,8 @@ File Path: project/gameEngine/math/Quaternion.cpp
 ============================================================
 #include "Quaternion.h"
 
+#include <numbers>
+
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs)
 {
 	Quaternion result{};
@@ -24207,7 +24227,7 @@ float Norm(const Quaternion& quaternion)
 	return std::sqrt(quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w);
 }
 
-Quaternion Normalize(const Quaternion& quaternion)
+Quaternion NormalizeQuaternion(const Quaternion& quaternion)
 {
 	float norm = Norm(quaternion);
 	return Quaternion{ quaternion.x / norm, quaternion.y / norm, quaternion.z / norm, quaternion.w / norm };
@@ -24218,6 +24238,43 @@ Quaternion Inverse(const Quaternion& quaternion)
 	float norm = Norm(quaternion);
 	Quaternion conjugate = Conjugate(quaternion);
 	return Quaternion{ conjugate.x / (norm * norm), conjugate.y / (norm * norm), conjugate.z / (norm * norm), conjugate.w / (norm * norm) };
+}
+
+Quaternion MakeAxisAngle(const Vector3& axis, float angle)
+{
+	float half = angle * 0.5f;
+	float s = std::sin(half);
+
+	return NormalizeQuaternion(Quaternion{
+		axis.x * s,
+		axis.y * s,
+		axis.z * s,
+		std::cos(half)
+		});
+}
+
+Vector3 QuaternionToEuler(const Quaternion& q)
+{
+	Vector3 euler{};
+
+	// roll (X軸)
+	float sinr_cosp = 2.0f * (q.w * q.x + q.y * q.z);
+	float cosr_cosp = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+	euler.x = std::atan2(sinr_cosp, cosr_cosp);
+
+	// pitch (Y軸)
+	float sinp = 2.0f * (q.w * q.y - q.z * q.x);
+	if (std::abs(sinp) >= 1)
+		euler.y = std::copysign(std::numbers::pi_v<float> / 2.0f, sinp);
+	else
+		euler.y = std::asin(sinp);
+
+	// yaw (Z軸)
+	float siny_cosp = 2.0f * (q.w * q.z + q.x * q.y);
+	float cosy_cosp = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
+	euler.z = std::atan2(siny_cosp, cosy_cosp);
+
+	return euler;
 }
 
 
@@ -24272,7 +24329,7 @@ float Norm(const Quaternion& quaternion);
 /// </summary>
 /// <param name="quaternion">対象Quaternion</param>
 /// <returns>正規化Quaternion</returns>
-Quaternion Normalize(const Quaternion& quaternion);
+Quaternion NormalizeQuaternion(const Quaternion& quaternion);
 
 /// <summary>
 ///逆Quaternionを返す
@@ -24280,6 +24337,21 @@ Quaternion Normalize(const Quaternion& quaternion);
 /// <param name="quaternion">対象Quaternion</param>
 /// <returns>逆Quaternion</returns>
 Quaternion Inverse(const Quaternion& quaternion);
+
+/// <summary>
+/// 軸と角度からQuaternionを作成して返す
+/// </summary>
+/// <param name="axis">回転軸ベクトル 正規化されていることが前提</param>
+/// <param name="angle">回転角度 ラジアン</param>
+/// <returns>Quaternion</returns>
+Quaternion MakeAxisAngle(const Vector3& axis, float angle);
+
+/// <summary>
+/// Quaternionをオイラー角に変換して返す
+/// </summary>
+/// <param name="q">対象Quaternion</param>
+/// <returns>オイラー角ベクトル (x: roll, y: pitch, z: yaw)</returns>
+Vector3 QuaternionToEuler(const Quaternion& q);
 
 ============================================================
 File Path: project/gameEngine/math/Vector2.cpp
