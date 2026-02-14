@@ -6,6 +6,8 @@
 
 #include "postEffect/PostEffectManager.h"
 
+
+#include "Quaternion.h"
 #include <Object3d.h>
 #include <Sprite.h>
 #include <Framework.h>
@@ -197,9 +199,13 @@ private:
 	const int kEvadeDuration_ = 30; // 回避の持続時間
 	// 回避速度
 	const float kEvadeSpeed_ = 0.2f;
+	// 回避クールタイム	
+	const int kEvadeCoolDown_ = 60;
+	// 回避クールタイムのフレームカウント
+	int evadeCoolDownFrame_ = 0;
 
-	float evadeStartRotationX_ = 0.0f; // 回避開始時のx軸角度
-	float evadeTargetRotationX_ = 0.0f; // 回避中の目標x軸角度
+	float evadeStartRotationY_ = 0.0f; // 回避開始時のY軸角度
+	float evadeTargetRotationY_ = 0.0f; // 回避中の目標Y軸角度
 	const float kEvadeRotateAngle_ = 3.14f * 4.0f; // 1回転(360度) 
 
 

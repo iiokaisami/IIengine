@@ -219,6 +219,9 @@ void Player::Move()
 
 		// 回転を更新
 		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
+
+		// パーティクル
+		IIEngine::ParticleEmitter::Emit("walk", position_, 1);
 	}
 
 	// 位置更新
@@ -226,9 +229,6 @@ void Player::Move()
 
 	// 移動制限
 	ClampPosition();
-
-	// パーティクル
-	IIEngine::ParticleEmitter::Emit("walk", position_, 1);
 }
 
 void Player::Attack()
@@ -266,8 +266,8 @@ void Player::Evade()
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
-	// 回避入力
-	if (!isEvading_ && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
+	// 回避入力（クールタイムが0のときのみ許可）
+	if (!isEvading_ && evadeCoolDownFrame_ == 0 && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
 	{
 		// 移動方向がある場合のみ回避
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
@@ -283,10 +283,16 @@ void Player::Evade()
 				evadeDirection_.x /= len;
 				evadeDirection_.z /= len;
 			}
-			// 回避開始時のx軸角度を保存
-			evadeStartRotationX_ = rotation_.x;
+			// 回避開始時のy軸角度を保存
+			evadeStartRotationY_ = rotation_.y;
 			// 目標角度を設定
-			evadeTargetRotationX_ = evadeStartRotationX_ + kEvadeRotateAngle_;
+			float sign = (evadeDirection_.x >= 0.0f) ? 1.0f : -1.0f;
+
+			// 目標Y回転
+			evadeTargetRotationY_ = evadeStartRotationY_ + kEvadeRotateAngle_ * sign;
+
+			// 回避開始時にクールタイムを設定
+			evadeCoolDownFrame_ = kEvadeCoolDown_;
 		}
 	}
 
@@ -300,7 +306,7 @@ void Player::Evade()
 
 		// 回避中のx軸回転
 		float t = 1.0f - static_cast<float>(evadeFrame_) / static_cast<float>(kEvadeDuration_);
-		rotation_.x = evadeStartRotationX_ + (evadeTargetRotationX_ - evadeStartRotationX_) * t * dt * kDefaultFrameRate;
+		rotation_.y = evadeStartRotationY_ + (evadeTargetRotationY_ - evadeStartRotationY_) * t * dt * kDefaultFrameRate;
 
 		// フレーム制御を行う
 		if (evadeFrame_ > 0)
@@ -312,7 +318,7 @@ void Player::Evade()
 		{
 			isEvading_ = false;
 			// 回避終了時に元の角度に戻す
-			rotation_.x = evadeStartRotationX_;
+			rotation_.y = evadeStartRotationY_;
 		}
 	}
 }
@@ -641,10 +647,16 @@ void Player::UpdateControl()
 
 void Player::UpdateStatus()
 {
-	// クールダウン
+	// 攻撃クールダウン
 	if (countCoolDownFrame_ > 0)
 	{
 		countCoolDownFrame_--;
+	}
+
+	// 回避クールダウン
+	if (evadeCoolDownFrame_ > 0)
+	{
+		evadeCoolDownFrame_--;
 	}
 
 }
