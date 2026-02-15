@@ -4,6 +4,7 @@
 
 EnemyWaveStage2::EnemyWaveStage2(EnemyManager* _pEnemyManager) : EnemyWaveState("Stage1", _pEnemyManager)
 {
+	LoadTextureWave2();
 }
 
 void EnemyWaveStage2::Initialize()
@@ -13,10 +14,16 @@ void EnemyWaveStage2::Initialize()
 	SetLevelData(pEnemyManager_->GetLevelData());
 
 	currentWave_ = 2;
+
+	showWaveStartSprite_ = true;
+	waveStartSpriteTimer_ = kWaveStartSpriteDuration_;
+	spritePos_ = { 1000,0 };
 }
 
 void EnemyWaveStage2::Update()
 {
+	UpdateTexture();
+
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
 
@@ -27,5 +34,16 @@ void EnemyWaveStage2::Update()
 
 		// 今はこのウェーブをクリアしたらゲームクリア
 		pEnemyManager_->SetAllEnemyDefeated(true);
+	}
+}
+
+void EnemyWaveStage2::Draw2D()
+{
+	if (showWaveStartSprite_)
+	{
+		for (auto& sprite : waveStartSprites_)
+		{
+			sprite->Draw();
+		}
 	}
 }

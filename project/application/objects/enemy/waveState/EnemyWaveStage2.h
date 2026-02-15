@@ -21,5 +21,9 @@ public:
 
 	// 更新
 	void Update() override;
+
+	// 2D描画
+	void Draw2D() override;
+
 };
 

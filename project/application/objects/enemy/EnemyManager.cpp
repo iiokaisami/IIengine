@@ -14,6 +14,7 @@ void EnemyManager::Initialize()
 
 	// ウェーブステート
 	ChangeState(std::make_unique<EnemyWaveStage1>(this));
+	pState_->LoadTextureWave1();
 }
 
 void EnemyManager::Finalize()
@@ -180,10 +181,13 @@ void EnemyManager::Draw2D()
 	{
 		enemy->Draw2D();
 	}
-	for(auto& corruptor : pCorruptors_)
+	for (auto& corruptor : pCorruptors_)
 	{
 		corruptor->Draw2D();
 	}
+	
+	pState_->Draw2D();
+	
 }
 
 void EnemyManager::ImGuiDraw()

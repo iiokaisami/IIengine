@@ -8,6 +8,89 @@ EnemyWaveState::~EnemyWaveState()
 {
 }
 
+void EnemyWaveState::LoadTextureWave1()
+{
+    for (uint32_t i = 0; i < spriteIndex_; i++)
+    {
+        auto sprite = std::make_unique<IIEngine::Sprite>();
+
+        if (i == 0)
+        {
+
+            sprite->Initialize("wave.png", spritePos_, {1.0f,1.0f,1.0f,1.0f}, {0,0});
+        }
+        if (i == 1)
+        {
+            sprite->Initialize("1wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+
+        waveStartSprites_.push_back(std::move(sprite));
+    }
+}
+
+void EnemyWaveState::LoadTextureWave2()
+{
+    for (uint32_t i = 0; i < spriteIndex_; i++)
+    {
+        auto sprite = std::make_unique<IIEngine::Sprite>();
+
+        if (i == 0)
+        {
+
+            sprite->Initialize("lastWave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+        if (i == 1)
+        {
+            sprite->Initialize("2wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+
+        waveStartSprites_.push_back(std::move(sprite));
+    }
+}
+
+void EnemyWaveState::UpdateTexture()
+{
+    // タイマーに応じて x を線形補間で -1000 まで移動させる
+    if (showWaveStartSprite_)
+    {
+        // 表示開始時の初期値をキャプチャ
+        if (!waveStartSpriteInit_)
+        {
+            waveStartSpriteInitialX_ = spritePos_.x;
+            waveStartSpriteInitialTimer_ = waveStartSpriteTimer_;
+            waveStartSpriteInit_ = true;
+        }
+
+        // 補間
+        if (waveStartSpriteInitialTimer_ > 0)
+        {
+            float progress = 1.0f - static_cast<float>(waveStartSpriteTimer_) / static_cast<float>(waveStartSpriteInitialTimer_);
+            if (progress < 0.0f) progress = 0.0f;
+            if (progress > 1.0f) progress = 1.0f;
+
+            const float targetX = -1000.0f;
+            spritePos_.x = waveStartSpriteInitialX_ + (targetX - waveStartSpriteInitialX_) * progress;
+        }
+
+        // タイマーが0になったらスプライトを非表示にして初期化フラグをリセット
+        if (waveStartSpriteTimer_ <= 0)
+        {
+            showWaveStartSprite_ = false;
+            waveStartSpriteInit_ = false;
+        }
+
+        // タイマーを減らす
+        waveStartSpriteTimer_--;
+
+        for (auto& sprite : waveStartSprites_)
+        {
+            sprite->SetPosition(spritePos_);
+            sprite->Update();
+        }
+    }
+}
+
+
 void EnemyWaveState::LoadCSV(const std::string& csvPath)
 {
 	// CSVファイルの読み込み

@@ -14,10 +14,13 @@ void EnemyWaveStage1::Initialize()
 	SetLevelData(pEnemyManager_->GetLevelData());
 
 	currentWave_ = 1;
+
+	showWaveStartSprite_ = true;
 }
 
 void EnemyWaveStage1::Update()
 {
+	UpdateTexture();
 
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
@@ -27,5 +30,16 @@ void EnemyWaveStage1::Update()
 	{
 		// ステート遷移
 		pEnemyManager_->ChangeState(std::make_unique<EnemyWaveStage2>(pEnemyManager_));
+	}
+}
+
+void EnemyWaveStage1::Draw2D()
+{
+	if (showWaveStartSprite_)
+	{
+		for (auto& sprite : waveStartSprites_)
+		{
+			sprite->Draw();
+		}
 	}
 }

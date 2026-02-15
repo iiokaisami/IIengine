@@ -4,6 +4,8 @@
 
 #include "../../../../gameEngine/level_editor/LevelDataLoader.h"
 
+#include <Sprite.h>
+
 class EnemyManager;
 
 /// <summary>
@@ -28,6 +30,16 @@ public:
 	
 	// 更新
 	virtual void Update() = 0;
+
+	// テクスチャの読み込み
+	virtual void LoadTextureWave1();
+	virtual void LoadTextureWave2();
+
+	// テクスチャ更新
+	virtual void UpdateTexture();
+
+	// 2D描画
+	virtual void Draw2D() = 0;
 
 public: // セッター
 
@@ -70,7 +82,18 @@ protected:
 	// 現在のウェーブ
 	uint32_t currentWave_ = 1;
 
+	// ウェーブ開始スプライト
+	std::vector<std::unique_ptr<IIEngine::Sprite>> waveStartSprites_ = {};
+	uint32_t spriteIndex_ = 2;
+	Vector2 spritePos_ = { 1000,0 };
+	bool showWaveStartSprite_ = true;
+	uint32_t waveStartSpriteTimer_ = 180;
+	const uint32_t kWaveStartSpriteDuration_ = 120;
 
+	// 表示開始時の初期値保持（タイマーに合わせて線形補間するために使用）
+	float waveStartSpriteInitialX_ = 0.0f;
+	uint32_t waveStartSpriteInitialTimer_ = 0;
+	bool waveStartSpriteInit_ = false;
 
 	// 敵の発生コマンド
 	std::stringstream enemyPopCommands_;
