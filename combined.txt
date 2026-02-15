@@ -2858,6 +2858,7 @@ void EnemyManager::Initialize()
 
 	// ウェーブステート
 	ChangeState(std::make_unique<EnemyWaveStage1>(this));
+	pState_->LoadTextureWave1();
 }
 
 void EnemyManager::Finalize()
@@ -3024,10 +3025,13 @@ void EnemyManager::Draw2D()
 	{
 		enemy->Draw2D();
 	}
-	for(auto& corruptor : pCorruptors_)
+	for (auto& corruptor : pCorruptors_)
 	{
 		corruptor->Draw2D();
 	}
+	
+	pState_->Draw2D();
+	
 }
 
 void EnemyManager::ImGuiDraw()
@@ -7407,10 +7411,13 @@ void EnemyWaveStage1::Initialize()
 	SetLevelData(pEnemyManager_->GetLevelData());
 
 	currentWave_ = 1;
+
+	showWaveStartSprite_ = true;
 }
 
 void EnemyWaveStage1::Update()
 {
+	UpdateTexture();
 
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
@@ -7420,6 +7427,17 @@ void EnemyWaveStage1::Update()
 	{
 		// ステート遷移
 		pEnemyManager_->ChangeState(std::make_unique<EnemyWaveStage2>(pEnemyManager_));
+	}
+}
+
+void EnemyWaveStage1::Draw2D()
+{
+	if (showWaveStartSprite_)
+	{
+		for (auto& sprite : waveStartSprites_)
+		{
+			sprite->Draw();
+		}
 	}
 }
 
@@ -7451,6 +7469,9 @@ public:
 	// 更新
 	void Update() override;
 
+	// 2D描画
+	void Draw2D() override;
+
 };
 
 
@@ -7464,6 +7485,7 @@ File Path: project/application/objects/enemy/waveState/EnemyWaveStage2.cpp
 
 EnemyWaveStage2::EnemyWaveStage2(EnemyManager* _pEnemyManager) : EnemyWaveState("Stage1", _pEnemyManager)
 {
+	LoadTextureWave2();
 }
 
 void EnemyWaveStage2::Initialize()
@@ -7473,10 +7495,16 @@ void EnemyWaveStage2::Initialize()
 	SetLevelData(pEnemyManager_->GetLevelData());
 
 	currentWave_ = 2;
+
+	showWaveStartSprite_ = true;
+	waveStartSpriteTimer_ = kWaveStartSpriteDuration_;
+	spritePos_ = { 1000,0 };
 }
 
 void EnemyWaveStage2::Update()
 {
+	UpdateTexture();
+
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
 
@@ -7487,6 +7515,17 @@ void EnemyWaveStage2::Update()
 
 		// 今はこのウェーブをクリアしたらゲームクリア
 		pEnemyManager_->SetAllEnemyDefeated(true);
+	}
+}
+
+void EnemyWaveStage2::Draw2D()
+{
+	if (showWaveStartSprite_)
+	{
+		for (auto& sprite : waveStartSprites_)
+		{
+			sprite->Draw();
+		}
 	}
 }
 
@@ -7517,6 +7556,10 @@ public:
 
 	// 更新
 	void Update() override;
+
+	// 2D描画
+	void Draw2D() override;
+
 };
 
 
@@ -7533,6 +7576,89 @@ File Path: project/application/objects/enemy/waveState/EnemyWaveState.cpp
 EnemyWaveState::~EnemyWaveState()
 {
 }
+
+void EnemyWaveState::LoadTextureWave1()
+{
+    for (uint32_t i = 0; i < spriteIndex_; i++)
+    {
+        auto sprite = std::make_unique<IIEngine::Sprite>();
+
+        if (i == 0)
+        {
+
+            sprite->Initialize("wave.png", spritePos_, {1.0f,1.0f,1.0f,1.0f}, {0,0});
+        }
+        if (i == 1)
+        {
+            sprite->Initialize("1wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+
+        waveStartSprites_.push_back(std::move(sprite));
+    }
+}
+
+void EnemyWaveState::LoadTextureWave2()
+{
+    for (uint32_t i = 0; i < spriteIndex_; i++)
+    {
+        auto sprite = std::make_unique<IIEngine::Sprite>();
+
+        if (i == 0)
+        {
+
+            sprite->Initialize("lastWave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+        if (i == 1)
+        {
+            sprite->Initialize("2wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+
+        waveStartSprites_.push_back(std::move(sprite));
+    }
+}
+
+void EnemyWaveState::UpdateTexture()
+{
+    // タイマーに応じて x を線形補間で -1000 まで移動させる
+    if (showWaveStartSprite_)
+    {
+        // 表示開始時の初期値をキャプチャ
+        if (!waveStartSpriteInit_)
+        {
+            waveStartSpriteInitialX_ = spritePos_.x;
+            waveStartSpriteInitialTimer_ = waveStartSpriteTimer_;
+            waveStartSpriteInit_ = true;
+        }
+
+        // 補間
+        if (waveStartSpriteInitialTimer_ > 0)
+        {
+            float progress = 1.0f - static_cast<float>(waveStartSpriteTimer_) / static_cast<float>(waveStartSpriteInitialTimer_);
+            if (progress < 0.0f) progress = 0.0f;
+            if (progress > 1.0f) progress = 1.0f;
+
+            const float targetX = -1000.0f;
+            spritePos_.x = waveStartSpriteInitialX_ + (targetX - waveStartSpriteInitialX_) * progress;
+        }
+
+        // タイマーが0になったらスプライトを非表示にして初期化フラグをリセット
+        if (waveStartSpriteTimer_ <= 0)
+        {
+            showWaveStartSprite_ = false;
+            waveStartSpriteInit_ = false;
+        }
+
+        // タイマーを減らす
+        waveStartSpriteTimer_--;
+
+        for (auto& sprite : waveStartSprites_)
+        {
+            sprite->SetPosition(spritePos_);
+            sprite->Update();
+        }
+    }
+}
+
 
 void EnemyWaveState::LoadCSV(const std::string& csvPath)
 {
@@ -7667,6 +7793,8 @@ File Path: project/application/objects/enemy/waveState/EnemyWaveState.h
 
 #include "../../../../gameEngine/level_editor/LevelDataLoader.h"
 
+#include <Sprite.h>
+
 class EnemyManager;
 
 /// <summary>
@@ -7691,6 +7819,16 @@ public:
 	
 	// 更新
 	virtual void Update() = 0;
+
+	// テクスチャの読み込み
+	virtual void LoadTextureWave1();
+	virtual void LoadTextureWave2();
+
+	// テクスチャ更新
+	virtual void UpdateTexture();
+
+	// 2D描画
+	virtual void Draw2D() = 0;
 
 public: // セッター
 
@@ -7733,7 +7871,18 @@ protected:
 	// 現在のウェーブ
 	uint32_t currentWave_ = 1;
 
+	// ウェーブ開始スプライト
+	std::vector<std::unique_ptr<IIEngine::Sprite>> waveStartSprites_ = {};
+	uint32_t spriteIndex_ = 2;
+	Vector2 spritePos_ = { 1000,0 };
+	bool showWaveStartSprite_ = true;
+	uint32_t waveStartSpriteTimer_ = 180;
+	const uint32_t kWaveStartSpriteDuration_ = 120;
 
+	// 表示開始時の初期値保持（タイマーに合わせて線形補間するために使用）
+	float waveStartSpriteInitialX_ = 0.0f;
+	uint32_t waveStartSpriteInitialTimer_ = 0;
+	bool waveStartSpriteInit_ = false;
 
 	// 敵の発生コマンド
 	std::stringstream enemyPopCommands_;
