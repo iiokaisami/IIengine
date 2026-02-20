@@ -92,19 +92,6 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
     // コストマップと経路マップ
     std::unordered_map<GridPos, float, GridPosHash> gScore;
     std::unordered_map<GridPos, GridPos, GridPosHash> cameFrom;
-    std::unordered_set<GridPos, GridPosHash> obstacleGrid;
-
-    for (const auto& o : obstacles)
-    {
-        GridPos g = ToGrid(o);
-        for (int dx = -1; dx <= 1; dx++)
-        {
-            for (int dz = -1; dz <= 1; dz++)
-            {
-                obstacleGrid.insert({ g.x + dx, g.z + dz });
-            }
-        }
-    }
 
     // スタートノードをオープンセットに追加
     gScore[startGrid] = 0.0f;
@@ -144,7 +131,10 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
             }
             // スタートノードを追加
             std::reverse(path.begin(), path.end());
-            return path;
+            
+			// パスをスムージング
+            return SmoothPath(path);
+           
         }
 
         // 近傍ノードを取得
@@ -161,7 +151,7 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
             float tentativeGScore = gScore[current.pos] + Heuristic(ToWorld(current.pos), neighborWorld);
 
             // 障害物ノードはスキップ
-            if (obstacleGrid.contains(neighbor))
+            if (obstacleGrid_.contains(neighbor))
             {
                 continue;
             }
@@ -221,13 +211,117 @@ std::vector<Vector3> BaseEnemy::GetNeighborsWorld(const GridPos& node)
         { node.x + 1, node.z },
         { node.x - 1, node.z },
         { node.x, node.z + 1 },
-        { node.x, node.z - 1 }
+        { node.x, node.z - 1 },
+
+        { node.x + 1, node.z + 1 },
+        { node.x + 1, node.z - 1 },
+        { node.x - 1, node.z + 1 },
+        { node.x - 1, node.z - 1 }
     };
 
     std::vector<Vector3> result;
     for (const auto& n : neighbors)
     {
+        int dx = n.x - node.x;
+        int dz = n.z - node.z;
+
+        // corner cutting防止
+        if (dx != 0 && dz != 0)
+        {
+            // 横か縦のどちらかが壁なら斜め禁止
+            if (obstacleGrid_.contains({ node.x + dx, node.z }) ||
+                obstacleGrid_.contains({ node.x, node.z + dz }))
+            {
+                continue;
+            }
+        }
+
         result.push_back(ToWorld(n));
     }
     return result;
+}
+
+bool BaseEnemy::HasLineOfSight(const GridPos& start, const GridPos& end)
+{
+	// アルゴリズムでスタートからエンドまでのセルを列挙し、障害物がないかチェック
+    int x0 = start.x;
+    int z0 = start.z;
+    int x1 = end.x;
+    int z1 = end.z;
+
+    int dx = abs(x1 - x0);
+    int dz = abs(z1 - z0);
+
+    int sx = (x0 < x1) ? 1 : -1;
+    int sz = (z0 < z1) ? 1 : -1;
+
+    int err = dx - dz;
+
+	// スタートからエンドまでのセルを列挙
+    while (true)
+    {
+        // エンドに到達したら成功
+        if (x0 == x1 && z0 == z1)
+        {
+            return true;
+        }
+
+        // 現在のセルとその周辺に障害物があるかチェック
+        if (obstacleGrid_.contains({ x0, z0 }))
+        {
+            return false;
+        }
+
+        int e2 = 2 * err;
+
+        // 斜め移動のときは両方のセルをチェックする必要があるため、先にエラーを計算してから移動する
+        if (e2 > -dz)
+        {
+            err -= dz;
+            x0 += sx;
+        }
+
+        if (e2 < dx)
+        {
+            err += dx;
+            z0 += sz;
+        }
+    }
+
+    return true;
+}
+
+std::vector<Vector3> BaseEnemy::SmoothPath(const std::vector<Vector3>& path)
+{
+    if (path.size() < 3)
+    {
+        return path; // ウェイポイント数が少ない場合はスムージング不要
+    }
+
+    std::vector<Vector3> smoothedPath;
+    smoothedPath.push_back(path.front()); // スタート地点を追加
+
+    size_t i = 0;
+    while (i < path.size() - 1)
+    {
+        // 現在地から見える最も遠いウェイポイントを探す
+        size_t farthest = i + 1;
+
+        for (size_t j = path.size() - 1; j > i + 1; --j)
+        {
+            GridPos start = ToGrid(path[i]);
+            GridPos end = ToGrid(path[j]);
+
+            if (HasLineOfSight(start, end))
+            {
+                farthest = j;
+                break;
+            }
+        }
+
+        smoothedPath.push_back(path[farthest]);
+        i = farthest;
+    }
+
+    return smoothedPath;
 }

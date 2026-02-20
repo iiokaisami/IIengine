@@ -87,6 +87,9 @@ private: // 内部処理
 	// 移動制限
 	void ClampPosition();
 
+	// 回避スロー
+	void EvadeSlow();
+
 private: // 衝突判定
 
 	/// <summary>
@@ -158,9 +161,9 @@ private:
 	std::vector<std::unique_ptr<PlayerBullet>> pBullets_ = {};
 
 	// 発射クールタイム
-	const int kShootCoolDownFrame_ = 15;
+	static constexpr float kShootCoolDownSec_ = 15.0f / kDefaultFrameRate;
 	// 弾のクールタイム
-	int countCoolDownFrame_ = 0;
+	float shootCooldownSec_ = 0.0f;
 
 	// 移動速度
 	Vector3 moveVelocity_{};
@@ -177,9 +180,9 @@ private:
 	// 暗闇を徐々に戻すフラグ
 	bool isFadingOut_ = false;
 	// 暗闇効果最大時間
-	const uint32_t kMaxVignetteTime = 60 * 3;
+	static constexpr float kMaxVignetteSec_ = (60.0f * 3.0f) / kDefaultFrameRate;
 	// 暗闇タイマー
-	uint32_t vignetteTime_ = kMaxVignetteTime;
+	float vignetteRemainingSec_ = kMaxVignetteSec_;
 	// vignetteの強さ
 	float vignetteStrength_ = 0.0f;
 
@@ -189,20 +192,20 @@ private:
 	// 回避時間
 	uint32_t evadeTime_ = 0;
 	// 回避時間の最大値
-	const uint32_t kEvadeTimeMax_ = 30;
+	static constexpr float kEvadeDurationSec_ = 30.0f / kDefaultFrameRate;
 	// 回避速度
 	Vector3 evadeSpeed_ = { 0.2f,0.0f,0.2f };
 	// 回避方向
 	Vector3 evadeDirection_ = { 0.0f,0.0f,0.0f };
-	// 回避中のフレーム数
-	int32_t evadeFrame_ = 0;
+	// 回避中の残り時間
+	float evadeRemainingSec_ = 0.0f;
 	const int kEvadeDuration_ = 30; // 回避の持続時間
 	// 回避速度
 	const float kEvadeSpeed_ = 0.2f;
 	// 回避クールタイム	
-	const int kEvadeCoolDown_ = 60;
-	// 回避クールタイムのフレームカウント
-	int evadeCoolDownFrame_ = 0;
+	static constexpr float kEvadeCoolDownSec_ = 1.0f;
+	// 回避クールタイムの残り時間
+	float evadeCooldownSec_ = 0.0f;
 
 	float evadeStartRotationY_ = 0.0f; // 回避開始時のY軸角度
 	float evadeTargetRotationY_ = 0.0f; // 回避中の目標Y軸角度
@@ -222,16 +225,24 @@ private:
 	Vector2 limitMax_ = { 40.0f, 30.0f };
 	Vector2 limitMin_ = { -40.0f, -30.0f };
 
+	// スローフラグ
+	bool isSlowMotion_ = false;
+	// Maxスロータイマー
+	const float kSlowDurationSec_ = 2.0f / kDefaultFrameRate;
+	// スロータイマー
+	float slowTimerSec_ = 0.0f;
+
+
 	// デスモーション用構造体
 	struct Motion
 	{
 		bool isActive = false;
 		bool isComplete = false;
-		uint32_t count = 0;           // 現在フレームカウント
-		uint32_t shakeFrames = 40;    // ぷるぷる継続フレーム数（調整可）
+		float timerSec = 0.0f;           
+		float shakeSec = 40.0f;                              // ぷるぷる継続フレーム数
 		// 振動パラメータ
-		float wobbleAmplitude = 0.10f; // 振幅
-		float wobbleFreq = 10.0f;      // 周波数（frameベース）
+		float wobbleAmplitude = 0.10f;                       // 振幅
+		float wobbleFreqHz = 10.0f * kDefaultFrameRate;      // 周波数
 		// 保存しておく基底トランスフォーム
 		Vector3 startPosition = { 0.0f, 0.0f, 0.0f };
 		Vector3 startRotation = { 0.0f, 0.0f, 0.0f };

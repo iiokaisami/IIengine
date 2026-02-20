@@ -539,14 +539,14 @@ void GamePlayScene::Draw()
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();
 
+	pPlayer_->Draw2D();
+
+	pEnemyManager_->Draw2D();
+
 	for (auto& sprite : sprites_)
 	{
 		sprite->Draw();
 	}
-
-	pPlayer_->Draw2D();
-
-	pEnemyManager_->Draw2D();
 
 	// ポーズの描画
 	if (isPaused_)

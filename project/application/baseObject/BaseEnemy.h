@@ -46,6 +46,7 @@ protected:
 	// ヒューリスティック関数
 	float Heuristic(const Vector3& a, const Vector3& b);
 
+	// グリッド座標
 	struct GridPos
 	{
 		int x;
@@ -57,6 +58,7 @@ protected:
 		}
 	};
 
+	// グリッド座標のハッシュ関数
 	struct GridPosHash
 	{
 		size_t operator()(const GridPos& p) const noexcept
@@ -65,10 +67,41 @@ protected:
 		}
 	};
 
+	/// <summary>
+	/// ワールド座標をグリッド座標に変換
+	/// </summary>
+	/// <param name="v">ワールド座標</param>
+	/// <returns>グリッド座標</returns>
 	GridPos ToGrid(const Vector3& v) const;
+
+	/// <summary>
+	/// グリッド座標をワールド座標に変換
+	/// </summary>
+	/// <param name="g">グリッド座標</param>
+	/// <returns>ワールド座標</returns>
 	Vector3 ToWorld(const GridPos& g) const;
 
+	/// <summary>
+	/// グリッド座標の近傍ノードをワールド座標で取得
+	/// </summary>
+	/// <param name="node">グリッド座標のノード</param>
+	/// <returns>近傍ノードのワールド座標リスト</returns>
 	std::vector<Vector3> GetNeighborsWorld(const GridPos& node);
+
+	/// <summary>
+	/// スタートからエンドまでの直線上に障害物がないかどうかを判定
+	/// </summary>
+	/// <param name="start">スタートのグリッド座標</param>
+	/// <param name="end">エンドのグリッド座標</param>
+	/// <returns>障害物がないかどうか</returns>
+	bool HasLineOfSight(const GridPos& start, const GridPos& end);
+
+	/// <summary>
+   /// パスをスムージングして余計なウェイポイントを削減
+   /// </summary>
+   /// <param name="path">元のパス</param>
+   /// <returns>スムージングされたパス</returns>
+	std::vector<Vector3> SmoothPath(const std::vector<Vector3>& path);
 
 protected:
 
@@ -105,6 +138,9 @@ protected:
 		FollowPath // A*のパスを追従中
 	};
 	MoveMode moveMode_ = MoveMode::Direct;
+
+	// ループ回数の上限
+	std::unordered_set<GridPos, GridPosHash> obstacleGrid_;
 
 
 };

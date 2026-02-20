@@ -284,6 +284,7 @@ namespace IIEngine
     {
         // TimeManagerからデルタタイムを取得
         const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+        scaledTimeSec_ += dt;
 
         camera_ = object3dCommon_->GetDefaultCamera();
 
@@ -399,10 +400,10 @@ namespace IIEngine
             dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
             dxCommon_->GetCommandList()->IASetIndexBuffer(&ibv);
 
-            // ---- マテリアルは共通でも良い（必要なら個別対応可能） ----
+            // ---- マテリアルは共通でも良い  ----
             dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
-            // ---- テクスチャとインスタンスSRV（逆にしているかも）----
+            // ---- テクスチャとインスタンスSRV ----
             srvManager_->SetGraphicsRootDescriptorTable(1, ParticleGroup.srvIndex); // StructuredBuffer (instancing)
             srvManager_->SetGraphicsRootDescriptorTable(2, ParticleGroup.materialData.textureIndex); // Texture SRV
 
@@ -424,13 +425,33 @@ namespace IIEngine
             return;
         }
 
-        EmitSetting newSetting;
-        newSetting.groupName = groupName;
-        newSetting.motionName = it->second.motionName;
-        newSetting.emitCount = count;
-        newSetting.emitPosition = position;
-        newSetting.isLooping = false; // 初期状態はループ無し
-        emitSettings_.push_back(newSetting);
+
+        // スロー時だけ間引き
+        const float timeScale = IIEngine::TimeManager::Instance().GetTimeScale();
+        if (timeScale < 1.0f)
+        {
+            float& nextAllowed = nextEmitAllowedByGroupSec_[groupName]; // 無ければ0で初期化
+
+            if (scaledTimeSec_ < nextAllowed)
+            {
+                return;
+            }
+            nextAllowed = scaledTimeSec_ + emitMinIntervalSec_;
+        } 
+        else
+        {
+            // 通常時は間引き無効
+            // 次回スロモ突入時に変な待ちが出ないよう、許可時刻をリセットしておくと安全
+            nextEmitAllowedByGroupSec_[groupName] = 0.0f;
+        }
+
+        //EmitSetting newSetting;
+        //newSetting.groupName = groupName;
+        //newSetting.motionName = it->second.motionName;
+        //newSetting.emitCount = count;
+        //newSetting.emitPosition = position;
+        //newSetting.isLooping = false; // 初期状態はループ無し
+        //emitSettings_.push_back(newSetting);
 
 
         // パーティクル生成
@@ -454,6 +475,7 @@ namespace IIEngine
         native.emitPosition = setting.emitPosition;
         native.emitCount = setting.emitCount;
         native.timer = setting.timer;
+        native.interval = setting.interval;
         native.isLooping = setting.isLooping;
         emitSettings_.push_back(native);
     }

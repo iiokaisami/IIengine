@@ -34,6 +34,7 @@
 #include "postEffect/VignettePass.h"
 #include "postEffect/BoxFilterPass.h"
 #include "postEffect/GaussianFilterPass.h"
+#include "postEffect/RadialBlurPass.h"
 
 #include "../particle/ParticleManager.h"
 
@@ -105,6 +106,7 @@ namespace IIEngine
 		std::unique_ptr<VignettePass> vignettePass = nullptr;
 		std::unique_ptr<BoxFilterPass> boxFilterPass = nullptr;
 		std::unique_ptr<GaussianFilterPass> gaussianFilterPass = nullptr;
+		std::unique_ptr<RadialBlurPass> radialBlurPass = nullptr;
 
 		IIEngine::ParticleManager* particleManager = nullptr;
 

@@ -227,6 +227,42 @@ namespace IIEngine
 			ImGui::Text("Current TimeScale = %.3f", currentScale);
 		}
 
+		// RadialBlurPass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("RadialBlur"))
+		{
+			// エフェクトのオンオフ
+			static bool useRadialBlur = false;
+			if (ImGui::Checkbox("Use RadialBlur", &useRadialBlur))
+			{
+				postEffectManager->SetActiveEffect("RadialBlur", useRadialBlur);
+			}
+
+			// パラメータ
+			static float strength = 0.3f;
+			static int sampleCount = 8;
+			static float center[2] = { 0.5f, 0.5f };
+
+			// 強度のスライダー
+			if (ImGui::SliderFloat("Strength", &strength, 0.0f, 1.5f))
+			{
+				postEffectManager->GetPassAs<RadialBlurPass>("RadialBlur")->SetStrength(strength);
+			}
+
+			// サンプル数のスライダー
+			if (ImGui::SliderInt("Sample Count", &sampleCount, 4, 32))
+			{
+				postEffectManager->GetPassAs<RadialBlurPass>("RadialBlur")->SetSampleCount(sampleCount);
+			}
+
+			// 中心座標のスライダー
+			if (ImGui::SliderFloat2("Center", center, 0.0f, 1.0f))
+			{
+				postEffectManager->GetPassAs<RadialBlurPass>("RadialBlur")->SetCenter({ center[0], center[1] });
+			}
+
+			ImGui::Text("Center = (%.2f, %.2f)", center[0], center[1]);
+		}
+
 
 #endif // USE_IMGUI
 

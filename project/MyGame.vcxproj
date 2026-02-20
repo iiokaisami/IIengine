@@ -212,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\StartCameraController.cpp" />
     <ClCompile Include="application\baseObject\StaticObject.cpp" />
     <ClCompile Include="application\scene\PauseMenu.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\RadialBlurPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -320,6 +321,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\baseObject\StaticObject.h" />
     <ClInclude Include="gameEngine\math\Vector3Hash.h" />
     <ClInclude Include="application\scene\PauseMenu.h" />
+    <ClInclude Include="gameEngine\base\postEffect\RadialBlurPass.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -333,6 +335,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <None Include="resources\shaders\NoneEffect.hlsli" />
     <None Include="resources\shaders\Object3d.hlsli" />
     <None Include="resources\shaders\Particle.hlsli" />
+    <None Include="resources\shaders\RadialBlur.hlsli" />
     <None Include="resources\shaders\Skybox.hlsli" />
     <None Include="resources\shaders\Sprite.hlsli" />
     <None Include="resources\shaders\Vignette.hlsli" />

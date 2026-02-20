@@ -53,6 +53,7 @@ namespace IIEngine
 		Vector3 emitPosition;
 		uint32_t emitCount = 1;
 		float timer = 0.0f;
+		float interval = 1.0f / 60.0f;
 		bool isLooping = false;
 	};
 
@@ -250,6 +251,11 @@ namespace IIEngine
 		std::string direction_ = "UP";
 
 		std::vector<EmitSetting> emitSettings_;
+
+		float scaledTimeSec_ = 0.0f;          // スケール済み経過時間
+		float emitMinIntervalSec_ = 1.0f / 60.0f; // 1フレーム分
+		// グループごとに次のEmitを許可する時刻を管理するマップ
+		std::unordered_map<std::string, float> nextEmitAllowedByGroupSec_;
 
 	};
 

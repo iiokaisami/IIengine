@@ -131,5 +131,9 @@ private:
 	Vector3 lastPosition_;
 	int stuckFrame_ = 0;
 
+	// LOS(視線)判定のフレームカウンター
+	int losTrueFrame_ = 0;
+	int losFalseFrame_ = 0;
+
 };
 

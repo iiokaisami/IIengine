@@ -162,6 +162,12 @@ void NormalEnemy::ImGuiDraw()
     const char* moveModeStr = (moveMode_ == MoveMode::Direct) ? "Direct" : "FollowPath";
     ImGui::Text("MoveMode: %s", moveModeStr);
 
+    ImGui::Text("LOS True Frame: %d", losTrueFrame_);
+    ImGui::Text("LOS False Frame: %d", losFalseFrame_);
+    ImGui::Text("Stuck Frame: %d", stuckFrame_);
+    ImGui::Text("Path Size: %zu", path_.size());
+    ImGui::Text("Current Waypoint: %zu", currentWaypointIndex_);
+
     ImGui::End();
 
     for (auto& bullet : pBullets_)
@@ -182,19 +188,103 @@ void NormalEnemy::Move()
         return;
     }
 
-    if (!obstaclePositions_.empty())
+    obstacleGrid_.clear();
+
+    for (const auto& o : obstaclePositions_)
     {
-        if (path_.empty() or pathDirty_)
+        GridPos g = ToGrid(o);
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dz = -1; dz <= 1; dz++)
+            {
+                obstacleGrid_.insert({ g.x + dx, g.z + dz });
+            }
+        }
+    }
+
+    // LOS判定
+    GridPos enemyGrid = ToGrid(position_);
+    GridPos playerGrid = ToGrid(playerPosition_);
+    bool hasLOS = HasLineOfSight(enemyGrid, playerGrid);
+
+	// LOSのフレームカウンター更新
+    if (hasLOS)
+    {
+        losTrueFrame_++;
+        losFalseFrame_ = 0;
+    } 
+    else
+    {
+        losFalseFrame_++;
+        losTrueFrame_ = 0;
+    }
+  
+
+    if (moveMode_ == MoveMode::FollowPath)
+    {
+        float distToPlayer = toPlayer_.Length();
+
+        if (distToPlayer < 1.5f)
+        {
+            moveMode_ = MoveMode::Direct;
+            path_.clear();
+        }
+
+        // ゴールが一定距離以上ズレたときだけ再計算
+        float goalDist = (path_.empty()) ? 999.0f : (playerPosition_ - path_.back()).Length();
+
+		// パスが汚れているか、ゴールが大きくズレているときは再計算
+        if (pathDirty_ && goalDist > 2.5f)
         {
             path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
             currentWaypointIndex_ = 0;
-            moveMode_ = path_.empty() ? MoveMode::Direct : MoveMode::FollowPath;
             pathDirty_ = false;
         }
-    } else
+
+        // 直進復帰判定
+        if (losTrueFrame_ > 10 && currentWaypointIndex_ > path_.size() * 0.7f)
+        {
+            // 壁が無いなら直進優先
+            moveMode_ = MoveMode::Direct;
+            path_.clear();
+
+            losTrueFrame_ = 0;
+            losFalseFrame_ = 0;
+        }
+    } 
+    else
     {
-        moveMode_ = MoveMode::Direct;
-    }
+        // LOS判定またはスタック判定でパス計算を開始
+        bool shouldCalculatePath = false;
+
+        // LOSが無い
+        if (losFalseFrame_ > 1)
+        {
+            shouldCalculatePath = true;
+        }
+
+        // スタックしている
+        if (stuckFrame_ > 10)
+        {
+            shouldCalculatePath = true;
+        }
+
+		// パス計算を開始する条件を満たしていて、かつ障害物が存在する場合にのみパス計算を行う
+        if (shouldCalculatePath && !obstaclePositions_.empty())
+        {
+            path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
+            currentWaypointIndex_ = 0;
+
+            // パスが見つかった場合のみFollowPathに切り替え
+            if (!path_.empty())
+            {
+                moveMode_ = MoveMode::FollowPath;
+                losTrueFrame_ = 0;
+                losFalseFrame_ = 0;
+                stuckFrame_ = 0;
+            }
+        }
+    } 
 
     Vector3 direction = { 0,0,0 };
 
@@ -203,10 +293,9 @@ void NormalEnemy::Move()
     {
         Vector3 target = path_[currentWaypointIndex_];
         Vector3 toTarget = target - position_;
-        Vector3 dir = Normalize(moveVelocity_);
 
         // ウェイポイント到達 
-        if (Dot(Normalize(toTarget), dir) < 0.0f or toTarget.Length() < 1.2f)
+        if (toTarget.Length() < 1.0f)
         {
             currentWaypointIndex_++;
         }
@@ -214,7 +303,8 @@ void NormalEnemy::Move()
         if (currentWaypointIndex_ < path_.size())
         {
             direction = Normalize(path_[currentWaypointIndex_] - position_);
-        } else
+        }
+        else
         {
             // パス完走
             path_.clear();
@@ -234,7 +324,7 @@ void NormalEnemy::Move()
     // 方向が取れたときだけ更新
     if (direction.Length() > 0.001f)
     {
-        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.15f);
+        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.2f);
 
     } else
     {
@@ -248,7 +338,7 @@ void NormalEnemy::Move()
 
         if (side.Length() > 0.0001f)
         {
-            moveVelocity_ += Normalize(side) * 0.1f;
+            moveVelocity_ += Normalize(side) * 0.05f;
         }
     }
 
@@ -260,7 +350,7 @@ void NormalEnemy::Move()
     IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
 
     // スタックしていたら更新
-    if ((position_ - lastPosition_).Length() < 0.01f)
+    if ((position_ - lastPosition_).Length() < 0.05f)
     {
         stuckFrame_++;
     } else
@@ -271,17 +361,9 @@ void NormalEnemy::Move()
     lastPosition_ = position_;
 
     // FollowPath 用の詰まり対処
-    if (stuckFrame_ > 30 && moveMode_ == MoveMode::FollowPath)
+    if (stuckFrame_ > 20 && moveMode_ == MoveMode::FollowPath)
     {
         currentWaypointIndex_++;
-        stuckFrame_ = 0;
-    }
-    // Direct 用の詰まり対処
-    if (stuckFrame_ > 30 && moveMode_ == MoveMode::Direct)
-    {
-        pathDirty_ = true;
-        path_.clear();
-        currentWaypointIndex_ = 0;
         stuckFrame_ = 0;
     }
 }

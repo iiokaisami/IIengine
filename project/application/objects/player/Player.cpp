@@ -53,13 +53,21 @@ void Player::Initialize()
 	// 移動可能フラグ
 	isCanMove_ = true;
 
+	// 暗闇タイマー
+	vignetteRemainingSec_ = kMaxVignetteSec_;
+
+	// クールダウン
+	shootCooldownSec_ = 0.0f;
+	evadeRemainingSec_ = 0.0f;
+	evadeCooldownSec_ = 0.0f;
+
 	// 死亡モーション初期値
 	deathMotion_.isActive = false;
 	deathMotion_.isComplete = false;
-	deathMotion_.count = 0;
-	deathMotion_.shakeFrames = 40;     // ぷるぷる時間
+	deathMotion_.timerSec = 0.0f;
+	deathMotion_.shakeSec = 40.0f / kDefaultFrameRate;
 	deathMotion_.wobbleAmplitude = 0.10f;
-	deathMotion_.wobbleFreq = 10.0f;
+	deathMotion_.wobbleFreqHz = 10.0f * kDefaultFrameRate;
 	deathMotion_.popScale = 2.0f;
 
 	// フレームレート補正
@@ -127,6 +135,9 @@ void Player::Update()
 
 	// 最も近い敵インジケーター更新
 	UpdateNearEnemyIndicator();
+
+	// スロー
+	EvadeSlow();
 }
 
 void Player::Draw()
@@ -235,7 +246,7 @@ void Player::Attack()
 {
 	if (IIEngine::Input::GetInstance()->PushKey(DIK_SPACE))
 	{
-		if (countCoolDownFrame_ == 0)
+		if (shootCooldownSec_ <= 0.0f)
 		{
 			// プレイヤーの向きに合わせて弾の速度を変更
 			Vector3 bulletVelocity =
@@ -255,8 +266,8 @@ void Player::Attack()
 			// 弾を登録する
 			pBullets_.push_back(std::move(newBullet));
 
-			// フレームベースでクールダウンを設定
-			countCoolDownFrame_ = kShootCoolDownFrame_;
+			// クールタイムをリセット
+			shootCooldownSec_ = kShootCoolDownSec_;
 		}
 	}
 }
@@ -267,13 +278,13 @@ void Player::Evade()
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 回避入力（クールタイムが0のときのみ許可）
-	if (!isEvading_ && evadeCoolDownFrame_ == 0 && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
+	if (!isEvading_ && evadeCooldownSec_ <= 0.0f && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
 	{
 		// 移動方向がある場合のみ回避
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
 		{
 			isEvading_ = true;
-			evadeFrame_ = kEvadeDuration_;
+			evadeRemainingSec_ = kEvadeDurationSec_;
 			// 現在の移動方向を回避方向として保存
 			evadeDirection_ = moveVelocity_;
 			// 正規化
@@ -292,10 +303,10 @@ void Player::Evade()
 			evadeTargetRotationY_ = evadeStartRotationY_ + kEvadeRotateAngle_ * sign;
 
 			// 回避開始時にクールタイムを設定
-			evadeCoolDownFrame_ = kEvadeCoolDown_;
+			evadeCooldownSec_ = kEvadeCoolDownSec_;
 		}
 	}
-
+	// 回避中の処理
 	if (isEvading_)
 	{
 		// 回避移動
@@ -304,20 +315,19 @@ void Player::Evade()
 		// 移動制限
 		ClampPosition();
 
-		// 回避中のx軸回転
-		float t = 1.0f - static_cast<float>(evadeFrame_) / static_cast<float>(kEvadeDuration_);
+		// 回避中の回転
+		float t = 1.0f - (evadeRemainingSec_ / kEvadeDurationSec_);
+		t = std::clamp(t, 0.0f, 1.0f); 
 		rotation_.y = evadeStartRotationY_ + (evadeTargetRotationY_ - evadeStartRotationY_) * t * dt * kDefaultFrameRate;
 
-		// フレーム制御を行う
-		if (evadeFrame_ > 0)
-		{
-			evadeFrame_--;
-		}
+		// 回避時間の減少
+		evadeRemainingSec_ -= dt;
 
-		if (evadeFrame_ <= 0)
+		// 回避終了処理
+		if (evadeRemainingSec_ <= 0.0f)
 		{
 			isEvading_ = false;
-			// 回避終了時に元の角度に戻す
+			evadeRemainingSec_ = 0.0f;
 			rotation_.y = evadeStartRotationY_;
 		}
 	}
@@ -398,29 +408,34 @@ void Player::DeadEffect()
 		return;
 	}
 
-	uint32_t frame = deathMotion_.count;
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// ぷるぷるフェーズ
-	if (frame < deathMotion_.shakeFrames)
+	if (deathMotion_.timerSec < deathMotion_.shakeSec)
 	{
 		// 正規化 t [0,1]
-		float t = static_cast<float>(frame) / static_cast<float>(deathMotion_.shakeFrames);
+		float t = deathMotion_.timerSec / deathMotion_.shakeSec;
 		t = std::clamp(t, 0.0f, 1.0f);
 
-		// 減衰付きサイン振動
-		float angular = static_cast<float>(frame) * deathMotion_.wobbleFreq * (2.0f * 3.14159265f / kDefaultFrameRate);
-		float decay = 1.0f - t; // だんだん振幅を減らす
+		// 減衰
+		float decay = 1.0f - t;
+
+		// 秒ベース角度（Hz）
+		float angular = deathMotion_.timerSec * deathMotion_.wobbleFreqHz * (2.0f * 3.14159265f);
 		float wobble = std::sin(angular) * deathMotion_.wobbleAmplitude * decay;
 
-		// 基準スケールに wobble を加算（均等）
+		// 基準スケールに wobble を加算
 		float baseSx = deathMotion_.startScale.x;
 		float s = baseSx + wobble;
-		if (s < 0.001f) s = 0.001f; // 負スケール防止
+		if (s < 0.001f)
+		{
+			s = 0.001f; // 負スケール防止
+		}
 		scale_.x = s;
 		scale_.y = s;
 		scale_.z = s;
 
-		// ちょっと上下に揺らす（視覚効果）
+		// ちょっと上下に揺らす
 		position_ = deathMotion_.startPosition;
 		position_.y += std::sin(angular) * 0.01f * decay;
 
@@ -434,7 +449,7 @@ void Player::DeadEffect()
 			SyncObjectTransform();
 		}
 
-		deathMotion_.count++;
+		deathMotion_.timerSec += dt;
 		return;
 	}
 
@@ -462,15 +477,14 @@ void Player::StartDeathMotion()
 	{
 		return;
 	}
-
+	// モーション開始
 	deathMotion_.isActive = true;
-	deathMotion_.count = 0;
-	// 保存しておく現在のトランスフォーム
+	deathMotion_.timerSec = 0.0f;
+	// 基準トランスフォームを保存
 	deathMotion_.startPosition = position_;
 	deathMotion_.startRotation = rotation_;
 	deathMotion_.startScale = scale_;
 
-	// 反映
 	if (object_)
 	{
 		SyncObjectTransform();
@@ -647,18 +661,22 @@ void Player::UpdateControl()
 
 void Player::UpdateStatus()
 {
+	// delta
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
 	// 攻撃クールダウン
-	if (countCoolDownFrame_ > 0)
+	if (shootCooldownSec_ > 0.0f)
 	{
-		countCoolDownFrame_--;
+		shootCooldownSec_ -= dt;
+		if (shootCooldownSec_ < 0.0f) shootCooldownSec_ = 0.0f;
 	}
 
 	// 回避クールダウン
-	if (evadeCoolDownFrame_ > 0)
+	if (evadeCooldownSec_ > 0.0f)
 	{
-		evadeCoolDownFrame_--;
+		evadeCooldownSec_ -= dt;
+		if (evadeCooldownSec_ < 0.0f) evadeCooldownSec_ = 0.0f;
 	}
-
 }
 
 void Player::AutoMove()
@@ -774,12 +792,53 @@ void Player::ClampPosition()
 	position_.z = std::clamp(position_.z, limitMin_.y, limitMax_.y);
 }
 
+void Player::EvadeSlow()
+{
+	// 回避中のスローモーション
+	if (isSlowMotion_)
+	{
+		// スローモーション開始
+		IIEngine::TimeManager::Instance().SetTimeScale(0.5f);
+		// を有効化
+		PostEffectManager::GetInstance()->SetActiveEffect("Vignette", isHitVignetteTrap_);
+
+		// スローモーションの時間を減少
+		slowTimerSec_--;
+
+		if(slowTimerSec_ <= 0.0f)
+		{
+			isSlowMotion_ = false;
+			slowTimerSec_ = kSlowDurationSec_;
+
+			// スローモーション終了
+			IIEngine::TimeManager::Instance().SetTimeScale(1.0f);
+		}
+	}
+}
+
 void Player::OnCollisionTrigger(const Collider* _other)
 {
 
-	if (!isEvading_ && (_other->GetColliderID() == "EnemyBullet" or
+	// 回避中のスローモーション発動
+	if (isEvading_)
+	{
+		// 回避中に当たったらスロモにしたいもの
+		const bool isSlowMotionTarget =
+			(_other->GetColliderID() == "VignetteTrap") or
+			(_other->GetColliderID() == "EnemyBullet") or
+			(_other->GetColliderID() == "SetTimeBomb"); 
+		if (isSlowMotionTarget)
+		{
+			isSlowMotion_ = true;
+		}
+
+		// 回避中は通常の被弾処理をさせない
+		return;
+	}
+
+	if (_other->GetColliderID() == "EnemyBullet" or
 		_other->GetColliderID() == "NormalEnemy" or
-		_other->GetColliderID() == "TrapEnemy"))
+		_other->GetColliderID() == "TrapEnemy")
 	{
 		// プレイヤーのHPを減少
 		if (hp_ > 0.3)
@@ -797,8 +856,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 
 	}
 
-	if (!isEvading_ && (_other->GetColliderID() == "ExplosionTimeBomb" or
-		_other->GetColliderID() == "Corruptor"))
+	if (_other->GetColliderID() == "ExplosionTimeBomb" or
+		_other->GetColliderID() == "Corruptor")
 	{
 		if (_other->GetOwner()->IsActive())
 		{
@@ -816,7 +875,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		}
 	}
 
-	if (!isEvading_ && _other->GetColliderID() == "VignetteTrap")
+	if (_other->GetColliderID() == "VignetteTrap")
 	{
 		if (_other->GetOwner()->IsActive())
 		{
@@ -851,12 +910,14 @@ void Player::HitVignetteTrap()
 	// フェードアウト中の処理
 	if (isFadingOut_)
 	{
-		static const float fadeDuration = 30.0f;
+		static const float fadeDurationSec = 30.0f / kDefaultFrameRate;
 		static float fadeTimer = 0.0f;
 
-		fadeTimer++;
-		float t = (fadeTimer / fadeDuration) * dt * kDefaultFrameRate;
+		fadeTimer += dt;
+
+		float t = fadeTimer / fadeDurationSec;
 		t = std::clamp(t, 0.0f, 1.0f);
+
 		vignetteStrength_ = std::lerp(1.8f, 0.0f, t);
 
 		PostEffectManager::GetInstance()->GetPassAs<VignettePass>("Vignette")->SetStrength(vignetteStrength_);
@@ -881,13 +942,21 @@ void Player::HitVignetteTrap()
 	// 通常の効果中
 	if (isHitVignetteTrap_)
 	{
-		if (vignetteTime_ > 150)
+		// フェードインの開始タイミング
+		const float elapsedSec = kMaxVignetteSec_ - vignetteRemainingSec_;
+
+		const float fadeInDurationSec = 30.0f / kDefaultFrameRate;
+
+		if (elapsedSec < fadeInDurationSec)
 		{
 			// フェードイン
-			float t = (1.0f - static_cast<float>(kMaxVignetteTime - vignetteTime_) / 30.0f) * dt * kDefaultFrameRate;
+			float t = elapsedSec / fadeInDurationSec;
 			t = std::clamp(t, 0.0f, 1.0f);
-			vignetteStrength_ = std::lerp(1.8f, 0.0f, t);
-		} else
+
+			// 0→最大へ 
+			vignetteStrength_ = std::lerp(0.0f, 1.8f, t);
+		}
+		else
 		{
 			vignetteStrength_ = 1.8f;
 		}
@@ -905,16 +974,14 @@ void Player::HitVignetteTrap()
 
 
 		// タイマー更新
-		if (vignetteTime_ > 0)
+		vignetteRemainingSec_ -= dt;
+
+		if (vignetteRemainingSec_ <= 0.0f)
 		{
-			vignetteTime_--;
-		} else
-		{
-			// 明るくする準備
 			isHitVignetteTrap_ = false;
 			isFadingOut_ = true;
-			// タイマーをリセット
-			vignetteTime_ = kMaxVignetteTime;
+
+			vignetteRemainingSec_ = kMaxVignetteSec_;
 		}
 	}
 }
