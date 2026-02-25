@@ -797,23 +797,41 @@ void Player::EvadeSlow()
 	// 回避中のスローモーション
 	if (isSlowMotion_)
 	{
-		// スローモーション開始
-		IIEngine::TimeManager::Instance().SetTimeScale(0.5f);
-		// を有効化
-		PostEffectManager::GetInstance()->SetActiveEffect("Vignette", isHitVignetteTrap_);
+		slowTimerSec_ -= TimeManager::Instance().GetUnscaledDeltaTime();
 
-		// スローモーションの時間を減少
-		slowTimerSec_--;
+		if (slowTimerSec_ > kSlowRecoverTime_)
+		{
+			// 固定スロー区間
+			TimeManager::Instance().SetTimeScale(0.1f);
+			radialStrength_ = 0.4f;
+		} 
+		else
+		{
+			// 復帰区間
+			float t = 1.0f - (slowTimerSec_ / kSlowRecoverTime_);
+			t = std::clamp(t, 0.0f, 1.0f);
 
-		if(slowTimerSec_ <= 0.0f)
+			float timeScale = std::lerp(0.1f, 1.0f, t);
+			TimeManager::Instance().SetTimeScale(timeScale);
+
+			radialStrength_ = std::lerp(0.8f, 0.0f, t);
+		}
+
+		// RadialBlurPassを取得
+		auto* radial = PostEffectManager::GetInstance()->GetPassAs<RadialBlurPass>("RadialBlur");
+		radial->SetStrength(radialStrength_);
+
+		if (slowTimerSec_ <= 0.0f)
 		{
 			isSlowMotion_ = false;
-			slowTimerSec_ = kSlowDurationSec_;
+			TimeManager::Instance().SetTimeScale(1.0f);
+			// ブラー解除
+			radial->SetStrength(0.0f);
+			PostEffectManager::GetInstance()->SetActiveEffect("RadialBlur", false);
 
-			// スローモーション終了
-			IIEngine::TimeManager::Instance().SetTimeScale(1.0f);
 		}
 	}
+
 }
 
 void Player::OnCollisionTrigger(const Collider* _other)
@@ -830,6 +848,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		if (isSlowMotionTarget)
 		{
 			isSlowMotion_ = true;
+			slowTimerSec_ = kSlowHoldTime_ + kSlowRecoverTime_;
+			PostEffectManager::GetInstance()->SetActiveEffect("RadialBlur", true);
 		}
 
 		// 回避中は通常の被弾処理をさせない

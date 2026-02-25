@@ -19,6 +19,8 @@ namespace IIEngine
             reinterpret_cast<void**>(&mappedCB_));
         // マップに失敗した場合はエラーを出力
         assert(SUCCEEDED(hr));
+        hr;
+
     }
 
     void RadialBlurPass::Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)

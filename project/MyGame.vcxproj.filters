@@ -349,8 +349,12 @@
     <ClCompile Include="application\baseObject\Character.cpp">
       <Filter>application\baseObject</Filter>
     </ClCompile>
-    <ClCompile Include="application\scene\PauseMenu.cpp" />
-    <ClCompile Include="gameEngine\base\postEffect\RadialBlurPass.cpp" />
+    <ClCompile Include="application\scene\PauseMenu.cpp">
+      <Filter>application\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\RadialBlurPass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -668,8 +672,12 @@
     <ClInclude Include="application\baseObject\BaseBullet.h">
       <Filter>application\baseObject</Filter>
     </ClInclude>
-    <ClInclude Include="application\scene\PauseMenu.h" />
-    <ClInclude Include="gameEngine\base\postEffect\RadialBlurPass.h" />
+    <ClInclude Include="application\scene\PauseMenu.h">
+      <Filter>application\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\RadialBlurPass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -699,7 +707,9 @@
     <None Include="resources\shaders\Sprite.hlsli">
       <Filter>resources\shaders</Filter>
     </None>
-    <None Include="resources\shaders\RadialBlur.hlsli" />
+    <None Include="resources\shaders\RadialBlur.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="application">

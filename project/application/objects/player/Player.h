@@ -228,9 +228,18 @@ private:
 	// スローフラグ
 	bool isSlowMotion_ = false;
 	// Maxスロータイマー
-	const float kSlowDurationSec_ = 2.0f / kDefaultFrameRate;
+	const float kSlowDurationSec_ = 2.45f;
+	// 完全停止時間
+	const float kSlowHoldTime_ = 0.18f;
+	// 復帰時間
+	const float kSlowRecoverTime_ = 0.15f;
 	// スロータイマー
-	float slowTimerSec_ = 0.0f;
+	float slowTimerSec_ = kSlowHoldTime_ + kSlowRecoverTime_;
+	// スローの強さ
+	float slowDuration_ = 0.4f;
+	// ブラーの強さ
+	float radialStrength_ = 0.0f;
+
 
 
 	// デスモーション用構造体
