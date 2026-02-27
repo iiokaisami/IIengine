@@ -217,23 +217,23 @@ namespace IIEngine
 		// コマンドアロケータ
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator_; }
 		// コマンドリスト
-		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
+		ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
 		// DescriptorHeap
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return srvDescriptorHeap_; }
 		// descriptorSizeSRV
-		uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
+		uint32_t GetDescriptorSizeSRV() const { return descriptorSizeSRV_; }
 		// ビューポート
-		D3D12_VIEWPORT GetViewport() { return viewport_; }
+		D3D12_VIEWPORT GetViewport() const { return viewport_; }
 		// シザー矩形
-		D3D12_RECT GetScissorRect() { return scissorRect_; }
+		D3D12_RECT GetScissorRect() const { return scissorRect_; }
 		// バックバッファの数を取得
 		size_t GetBackBufferCount() const { return backBuffers_.size(); }
 		// swapChainDescを取得
-		DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
+		DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() const { return swapChainDesc_; }
 		// DSV用ディスクリプタヒープを取得する関数
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle() { return dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(); }
 		// descriptorSizeDSVを取得
-		size_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
+		size_t GetDescriptorSizeRTV() const { return descriptorSizeRTV_; }
 
 		// Sampler用ディスクリプタヒープを取得する関数
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSamplerHeap() const { return samplerHeap_; }

@@ -98,7 +98,8 @@ namespace IIEngine
 		Object3dCommon* object3dCommon = nullptr;
 		ModelManager* modelManager = nullptr;
 
-		std::unique_ptr <RenderTexture> renderTexture = nullptr;
+		std::unique_ptr<RenderTexture> sceneRT_ = nullptr;
+		std::unique_ptr<RenderTexture> pingpongRT_ = nullptr;
 
 		PostEffectManager* postEffectManager = nullptr;
 		std::unique_ptr<NoneEffectPass> noneEffectPass = nullptr;
@@ -109,10 +110,6 @@ namespace IIEngine
 		std::unique_ptr<RadialBlurPass> radialBlurPass = nullptr;
 
 		IIEngine::ParticleManager* particleManager = nullptr;
-
-		D3D12_GPU_DESCRIPTOR_HANDLE inputSrv = {};
-		Microsoft::WRL::ComPtr<ID3D12Resource> inputRes;
-		D3D12_RESOURCE_STATES state = {};
 
 		std::unique_ptr<IIEngine::Skybox> skybox = nullptr;
 

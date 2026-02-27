@@ -33,7 +33,7 @@ namespace IIEngine
         }
     }
 
-    void PostEffectManager::DrawAll(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
+    void PostEffectManager::DrawAll(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
     {
         bool anyActive = false;
 
@@ -41,13 +41,13 @@ namespace IIEngine
         {
             if (pass->IsActive())
             {
-                pass->Draw(cmdList.Get(), inputSrvHandle, inputResource, currentState);
+                pass->Draw(cmdList, inputSrvHandle, inputResource, currentState);
                 anyActive = true;
             }
         }
 
         if (!anyActive && noneEffect_) {
-            noneEffect_->Draw(cmdList.Get(), inputSrvHandle, inputResource, currentState);
+            noneEffect_->Draw(cmdList, inputSrvHandle, inputResource, currentState);
         }
     }
 
@@ -55,4 +55,20 @@ namespace IIEngine
     {
         noneEffect_ = std::move(pass);
     }
+
+    std::vector<IPostEffectPass*> PostEffectManager::GetActivePasses()
+    {
+        std::vector<IPostEffectPass*> result;
+
+        for (auto& [name, pass] : passes_)
+        {
+            if (pass->IsActive())
+            {
+                result.push_back(pass.get());
+            }
+        }
+
+        return result;
+    }
+
 }

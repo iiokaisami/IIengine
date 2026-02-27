@@ -207,7 +207,7 @@ namespace IIEngine
 
         // サブリソース更新
         UpdateSubresources(
-            dxCommon_->GetCommandList().Get(),
+            dxCommon_->GetCommandList()/*.Get()*/,
             textureResource.Get(),
             textureUploadHeap.Get(),
             0,

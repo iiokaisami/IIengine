@@ -86,8 +86,12 @@ namespace IIEngine
 		modelManager->Initialize(dxCommon.get());
 
 		// レンダーテクスチャ
-		renderTexture = std::make_unique<RenderTexture>();
-		renderTexture->Initialize(dxCommon.get(), srvManager.get(), WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.1f, 0.25f, 0.5f, 1.0f));
+		sceneRT_ = std::make_unique<RenderTexture>();
+		sceneRT_->Initialize(dxCommon.get(), srvManager.get(), WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.1f, 0.25f, 0.5f, 1.0f));
+
+		pingpongRT_ = std::make_unique<RenderTexture>();
+		pingpongRT_->Initialize(dxCommon.get(), srvManager.get(), WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.1f, 0.25f, 0.5f, 1.0f));
+
 
 		// ポストエフェクト
 		noneEffectPass = std::make_unique<NoneEffectPass>();
@@ -115,10 +119,6 @@ namespace IIEngine
 		// パーティクル	
 		particleManager = IIEngine::ParticleManager::GetInstance();
 		particleManager->Initialize(dxCommon.get(), srvManager.get(), modelCommon.get());
-
-		inputSrv = renderTexture->GetSRVHandle();
-		inputRes = renderTexture->GetResource();
-		state = renderTexture->GetCurrentState();
 
 		// Skybox
 		skybox = std::make_unique<IIEngine::Skybox>();
@@ -164,9 +164,8 @@ namespace IIEngine
 		modelManager->Finalize();
 
 		// レンダーテクスチャ解放
-		renderTexture.reset();
-		renderTexture = nullptr;
-
+		sceneRT_.reset();
+		pingpongRT_.reset();
 
 
 		particleManager->Finalize();

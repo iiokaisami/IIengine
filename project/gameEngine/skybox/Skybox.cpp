@@ -62,7 +62,7 @@ namespace IIEngine
 
 	void Skybox::Draw()
 	{
-		ID3D12GraphicsCommandList* cmdList = dxCommon_->GetCommandList().Get();
+		ID3D12GraphicsCommandList* cmdList = dxCommon_->GetCommandList()/*.Get()*/;
 
 		// パイプラインとルートシグネチャ設定
 		cmdList->SetGraphicsRootSignature(rootSignature_.Get());

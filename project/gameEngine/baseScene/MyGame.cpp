@@ -276,7 +276,7 @@ namespace IIEngine
 		//コマンドを積み込んで確定させる
 
 		// ---------- オフスクリーン描画 ----------
-		renderTexture->BeginRender();
+		sceneRT_->BeginRender();
 
 		srvManager->PreDraw();
 
@@ -287,13 +287,34 @@ namespace IIEngine
 
 		particleManager->Draw();
 
-		renderTexture->EndRender();
+		sceneRT_->EndRender();
 
+		
+        // ---------- ピンポン方式ポストエフェクト----------
+		RenderTexture* current = sceneRT_.get();
+		RenderTexture* target = pingpongRT_.get();
+		D3D12_RESOURCE_STATES currentState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+
+		for (auto& pass : postEffectManager->GetActivePasses())
+		{
+			target->BeginRender();
+
+			pass->Draw(dxCommon->GetCommandList(),
+				current->GetSRVHandle(),
+				current->GetResource(),
+				currentState);
+
+			target->EndRender();
+
+			std::swap(current, target);
+		}
 
 		// ---------- SwapChainへの描画 ----------
 		dxCommon->PreDraw();
 
-		postEffectManager->DrawAll(dxCommon->GetCommandList(), renderTexture->GetGPUHandle(), inputRes.Get(), state);
+		postEffectManager->DrawAll(dxCommon->GetCommandList(), sceneRT_->GetGPUHandle(), current->GetResource(), currentState);
+
 
 #ifdef USE_IMGUI
 		// ImGui描画

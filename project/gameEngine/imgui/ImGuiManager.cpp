@@ -87,7 +87,7 @@ namespace IIEngine
 	{
 #ifdef USE_IMGUI
 
-		ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList().Get();
+		ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList()/*.Get()*/;
 
 		// デスクリプタヒープの配列を設定
 		ID3D12DescriptorHeap* ppHeaps[] = { srvHeap_.Get() };

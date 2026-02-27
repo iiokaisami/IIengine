@@ -49,7 +49,7 @@ namespace IIEngine
         /// <param name="inputSrvHandle">入力テクスチャのSRVハンドル</param>
         /// <param name="inputResource">入力リソース</param>
         /// <param name="currentState">入力リソースの現在の状態</param>
-        void DrawAll(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState);
+        void DrawAll(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState);
 
         /// <summary>
         /// Noneエフェクト設定
@@ -57,6 +57,12 @@ namespace IIEngine
         /// </summary>
         /// <param name="pass">ポストエフェクトパスのユニークポインタ</param>
         void SetNoneEffect(std::unique_ptr<IPostEffectPass> pass);
+
+        /// <summary>
+		/// アクティブなパスの取得
+        /// </summary>
+        /// <returns></returns>
+        std::vector<IPostEffectPass*> GetActivePasses();
 
         template<typename T>
         T* GetPassAs(const std::string& name)
