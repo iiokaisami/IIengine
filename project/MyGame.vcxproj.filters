@@ -49,10 +49,18 @@
     <FxCompile Include="resources\shaders\Vignette.PS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\RadialBlur.PS.hlsl" />
-    <FxCompile Include="resources\shaders\RadialBlur.VS.hlsl" />
-    <FxCompile Include="resources\shaders\RGBShift.PS.hlsl" />
-    <FxCompile Include="resources\shaders\RGBShift.VS.hlsl" />
+    <FxCompile Include="resources\shaders\RGBShift.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\RadialBlur.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\RadialBlur.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\RGBShift.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -359,7 +367,9 @@
     <ClCompile Include="gameEngine\base\postEffect\RadialBlurPass.cpp">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClCompile>
-    <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -683,7 +693,9 @@
     <ClInclude Include="gameEngine\base\postEffect\RadialBlurPass.h">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClInclude>
-    <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -716,7 +728,9 @@
     <None Include="resources\shaders\RadialBlur.hlsli">
       <Filter>resources\shaders</Filter>
     </None>
-    <None Include="resources\shaders\RGBShift.hlsli" />
+    <None Include="resources\shaders\RGBShift.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="application">
