@@ -75,6 +75,10 @@ void Player::Initialize()
 	moveSpeed_.z *= kDefaultFrameRate;
 	evadeSpeed_.x *= kDefaultFrameRate;
 	evadeSpeed_.z *= kDefaultFrameRate;
+
+	// RGBShit
+	PostEffectManager::GetInstance()->SetActiveEffect("RGBShift", true);
+
 }
 
 void Player::Finalize()
@@ -138,6 +142,10 @@ void Player::Update()
 
 	// スロー
 	EvadeSlow();
+
+	// RGBシフト
+	DamageRGBShift();
+
 }
 
 void Player::Draw()
@@ -834,6 +842,37 @@ void Player::EvadeSlow()
 
 }
 
+void Player::DamageRGBShift()
+{
+	// delta
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+	
+	// RGBシフトエフェクトの更新
+	if (isRGBShiftActive_)
+	{
+		rgbShiftTimer_ += dt;
+
+		// 一定時間が経過したらエフェクトを無効化
+		if (rgbShiftTimer_ >= rgbShiftDuration_)
+		{
+			isRGBShiftActive_ = false;
+			rgbShiftTimer_ = 0.0f;
+		}
+
+		float t = rgbShiftTimer_;
+		float power = 0.0f;
+
+		// 大きければ強度も大きくなる
+		float amplitude = 0.25f;
+		power = amplitude * abs(sin(t * 40.0f)) * exp(-t * 8.0f);
+
+
+		// Powerをエフェクトに反映
+		PostEffectManager::GetInstance()->GetPassAs<RGBShiftPass>("RGBShift")->SetIntensity(power);
+	}
+
+}
+
 void Player::OnCollisionTrigger(const Collider* _other)
 {
 
@@ -847,8 +886,10 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			(_other->GetColliderID() == "SetTimeBomb"); 
 		if (isSlowMotionTarget)
 		{
+			// スローモーション開始
 			isSlowMotion_ = true;
 			slowTimerSec_ = kSlowHoldTime_ + kSlowRecoverTime_;
+
 			PostEffectManager::GetInstance()->SetActiveEffect("RadialBlur", true);
 		}
 
@@ -866,6 +907,10 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			hp_--;
 
 			isHitMoment_ = true;
+
+			// RGBシフトエフェクトの有効化
+			rgbShiftTimer_ = 0.0f;
+			isRGBShiftActive_ = true;
 
 			IIEngine::ParticleEmitter::Emit("HitReaction", position_, 5);
 		} else
@@ -890,6 +935,10 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			{
 				isDead_ = true;
 			}
+
+			// RGBシフトエフェクトの有効化
+			rgbShiftTimer_ = 0.0f;
+			isRGBShiftActive_ = true;
 
 			isHitMoment_ = true;
 		}

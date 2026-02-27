@@ -106,6 +106,8 @@ namespace IIEngine
 		gaussianFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/GaussianFilter.VS.hlsl", L"resources/shaders/GaussianFilter.PS.hlsl");
 		radialBlurPass = std::make_unique<RadialBlurPass>();
 		radialBlurPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/RadialBlur.VS.hlsl", L"resources/shaders/RadialBlur.PS.hlsl");
+		rgbShiftPass = std::make_unique<RGBShiftPass>();
+		rgbShiftPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/RGBShift.VS.hlsl", L"resources/shaders/RGBShift.PS.hlsl");
 
 		postEffectManager = PostEffectManager::GetInstance();
 		postEffectManager->SetNoneEffect(std::move(noneEffectPass));
@@ -114,6 +116,7 @@ namespace IIEngine
 		postEffectManager->AddPass("BoxFilter", std::move(boxFilterPass));
 		postEffectManager->AddPass("GaussianFilter", std::move(gaussianFilterPass));
 		postEffectManager->AddPass("RadialBlur", std::move(radialBlurPass));
+		postEffectManager->AddPass("RGBShift", std::move(rgbShiftPass));
 
 
 		// パーティクル	

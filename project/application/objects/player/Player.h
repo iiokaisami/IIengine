@@ -90,6 +90,9 @@ private: // 内部処理
 	// 回避スロー
 	void EvadeSlow();
 
+	// ダメージRGBShit
+	void DamageRGBShift();
+
 private: // 衝突判定
 
 	/// <summary>
@@ -240,6 +243,12 @@ private:
 	// ブラーの強さ
 	float radialStrength_ = 0.0f;
 
+	// RGBShiftタイマー
+	float rgbShiftTimer_ = 0.0f;
+	// RGBShift持続時間
+	float rgbShiftDuration_ = 0.35f;
+	// RGBShiftがアクティブかどうか
+	bool  isRGBShiftActive_ = false;
 
 
 	// デスモーション用構造体

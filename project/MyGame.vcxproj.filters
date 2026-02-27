@@ -49,6 +49,10 @@
     <FxCompile Include="resources\shaders\Vignette.PS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resources\shaders\RadialBlur.PS.hlsl" />
+    <FxCompile Include="resources\shaders\RadialBlur.VS.hlsl" />
+    <FxCompile Include="resources\shaders\RGBShift.PS.hlsl" />
+    <FxCompile Include="resources\shaders\RGBShift.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -355,6 +359,7 @@
     <ClCompile Include="gameEngine\base\postEffect\RadialBlurPass.cpp">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -678,6 +683,7 @@
     <ClInclude Include="gameEngine\base\postEffect\RadialBlurPass.h">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -710,6 +716,7 @@
     <None Include="resources\shaders\RadialBlur.hlsli">
       <Filter>resources\shaders</Filter>
     </None>
+    <None Include="resources\shaders\RGBShift.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="application">

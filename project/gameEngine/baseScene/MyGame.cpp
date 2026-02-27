@@ -202,6 +202,40 @@ namespace IIEngine
 			ImGui::Text("Center = (%.2f, %.2f)", center[0], center[1]);
 		}
 
+		// RGBShiftPass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("RGBShift"))
+		{
+			// エフェクトのオンオフ
+			static bool useRGBShift = false;
+			if (ImGui::Checkbox("Use RGBShift", &useRGBShift))
+			{
+				postEffectManager->SetActiveEffect("RGBShift", useRGBShift);
+			}
+
+			// パラメータ
+			static float rgbIntensity = 0.5f; // デフォルトの強さ
+			static float rgbCenter[2] = { 0.5f, 0.5f }; // 画面中心(0..1)
+
+			// 強度スライダー（変化があればパスに反映）
+			if (ImGui::SliderFloat("Shift Intensity", &rgbIntensity, 0.0f, 1.0f))
+			{
+				auto* pass = postEffectManager->GetPassAs<RGBShiftPass>("RGBShift");
+				if (pass) pass->SetIntensity(rgbIntensity);
+			}
+
+			// 中心座標スライダー（変化があればパスに反映）
+			if (ImGui::SliderFloat2("Shift Center", rgbCenter, 0.0f, 1.0f))
+			{
+				auto* pass = postEffectManager->GetPassAs<RGBShiftPass>("RGBShift");
+				if (pass) pass->SetCenter(Vector2{ rgbCenter[0], rgbCenter[1] });
+			}
+
+			// 現在値表示
+			ImGui::Text("Intensity = %.2f", rgbIntensity);
+			ImGui::Text("Center = (%.2f, %.2f)", rgbCenter[0], rgbCenter[1]);
+
+		}
+
 		// TimeManager 用の ImGui 操作パネルを追加
 		if (ImGui::CollapsingHeader("TimeManager"))
 		{
