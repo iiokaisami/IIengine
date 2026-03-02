@@ -167,12 +167,18 @@
     └── └──     ├── BasePostEffectPass.h
     └── └──     ├── BoxFilterPass.cpp
     └── └──     ├── BoxFilterPass.h
+    └── └──     ├── ChromaticPulsePass.cpp
+    └── └──     ├── ChromaticPulsePass.h
     └── └──     ├── GaussianFilterPass.cpp
     └── └──     ├── GaussianFilterPass.h
     └── └──     ├── GrayscalePass.cpp
     └── └──     ├── GrayscalePass.h
     └── └──     ├── IPostEffectPass.cpp
     └── └──     ├── IPostEffectPass.h
+    └── └──     ├── InversionPass.cpp
+    └── └──     ├── InversionPass.h
+    └── └──     ├── NoisePass.cpp
+    └── └──     ├── NoisePass.h
     └── └──     ├── NoneEffectPass.cpp
     └── └──     ├── NoneEffectPass.h
     └── └──     ├── PostEffectManager.cpp
@@ -181,6 +187,8 @@
     └── └──     ├── RGBShiftPass.h
     └── └──     ├── RadialBlurPass.cpp
     └── └──     ├── RadialBlurPass.h
+    └── └──     ├── ScanlinePass.cpp
+    └── └──     ├── ScanlinePass.h
     └── └──     ├── VignettePass.cpp
     └── └──     └── VignettePass.h
     └── ├── baseScene/
@@ -389,6 +397,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\baseObject\BaseEnemy.cpp" />
     <ClCompile Include="application\baseObject\Character.cpp" />
     <ClCompile Include="application\baseObject\BaseBullet.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\FadeTransition.cpp" />
@@ -434,6 +443,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameEngine\utillity\Logger.cpp" />
     <ClCompile Include="application\scene\GamePlayScene.cpp" />
     <ClCompile Include="gameEngine\imgui\ImGuiManager.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="gameEngine\3d\Model.cpp" />
     <ClCompile Include="gameEngine\3d\ModelCommon.cpp" />
@@ -476,6 +486,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\PauseMenu.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\RadialBlurPass.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -495,6 +507,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\baseObject\BaseEnemy.h" />
     <ClInclude Include="application\baseObject\Character.h" />
     <ClInclude Include="application\baseObject\BaseBullet.h" />
+    <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />
     <ClInclude Include="gameEngine\transition\FadeTransition.h" />
@@ -586,6 +599,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\PauseMenu.h" />
     <ClInclude Include="gameEngine\base\postEffect\RadialBlurPass.h" />
     <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\InversionPass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\NoisePass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -594,13 +610,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli" />
+    <None Include="resources\shaders\ChromaticPulse.hlsli" />
     <None Include="resources\shaders\GaussianFilter.hlsli" />
     <None Include="resources\shaders\Grayscale.hlsli" />
+    <None Include="resources\shaders\Inversion.hlsli" />
+    <None Include="resources\shaders\Noise.hlsli" />
     <None Include="resources\shaders\NoneEffect.hlsli" />
     <None Include="resources\shaders\Object3d.hlsli" />
     <None Include="resources\shaders\Particle.hlsli" />
     <None Include="resources\shaders\RadialBlur.hlsli" />
     <None Include="resources\shaders\RGBShift.hlsli" />
+    <None Include="resources\shaders\Scanline.hlsli" />
     <None Include="resources\shaders\Skybox.hlsli" />
     <None Include="resources\shaders\Sprite.hlsli" />
     <None Include="resources\shaders\Vignette.hlsli" />
@@ -613,6 +633,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <FxCompile Include="resources\shaders\BoxFilter.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\ChromaticPulse.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\ChromaticPulse.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resources\shaders\GaussianFilter.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -629,6 +657,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <FxCompile Include="resources\shaders\Grayscale.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Inversion.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Inversion.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Noise.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Noise.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resources\shaders\NoneEffect.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -667,6 +711,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resources\shaders\RGBShift.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Scanline.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Scanline.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -758,6 +810,14 @@ File Path: project/MyGame.vcxproj.filters
     <FxCompile Include="resources\shaders\RGBShift.PS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resources\shaders\ChromaticPulse.PS.hlsl" />
+    <FxCompile Include="resources\shaders\ChromaticPulse.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Inversion.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Inversion.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Noise.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Noise.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Scanline.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Scanline.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -1067,6 +1127,10 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1393,6 +1457,10 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\NoisePass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\InversionPass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -1428,6 +1496,10 @@ File Path: project/MyGame.vcxproj.filters
     <None Include="resources\shaders\RGBShift.hlsli">
       <Filter>resources\shaders</Filter>
     </None>
+    <None Include="resources\shaders\ChromaticPulse.hlsli" />
+    <None Include="resources\shaders\Inversion.hlsli" />
+    <None Include="resources\shaders\Noise.hlsli" />
+    <None Include="resources\shaders\Scanline.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="application">
@@ -8754,10 +8826,14 @@ void Player::Update()
 	// 操作更新
 	UpdateControl();
 
-	// 死亡したらy軸回転を徐々に0にする
+	// 死亡したらy軸回転を徐々に0に&ノイズ解除
 	if (isDead_)
 	{
 		rotation_.y = Lerp(rotation_.y, 0.0f, 0.05f);
+		// ノイズを徐々に0にする
+		finalStrength_ = Lerp(finalStrength_, 0.0f, 0.05f);
+		PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(finalStrength_);
+
 	}
 
 	// 弾の削除
@@ -8788,6 +8864,11 @@ void Player::Update()
 	// RGBシフト
 	DamageRGBShift();
 
+	// 回避コンボ
+	EvadeComboInversion();
+
+	// HP減少ノイズ
+	HPDecreaseNoise();
 }
 
 void Player::Draw()
@@ -8934,6 +9015,7 @@ void Player::Evade()
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
 		{
 			isEvading_ = true;
+
 			evadeRemainingSec_ = kEvadeDurationSec_;
 			// 現在の移動方向を回避方向として保存
 			evadeDirection_ = moveVelocity_;
@@ -8979,6 +9061,10 @@ void Player::Evade()
 			isEvading_ = false;
 			evadeRemainingSec_ = 0.0f;
 			rotation_.y = evadeStartRotationY_;
+			// 回避終了時にコンボ判定をリセットしておく
+			isEvadeComboActive_ = false;
+			hasEvadeSlowHit_ = false;
+			evadeComboWindowSec_ = 0.0f;
 		}
 	}
 }
@@ -9060,6 +9146,7 @@ void Player::DeadEffect()
 
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
+	
 	// ぷるぷるフェーズ
 	if (deathMotion_.timerSec < deathMotion_.shakeSec)
 	{
@@ -9515,6 +9602,64 @@ void Player::DamageRGBShift()
 
 }
 
+void Player::EvadeComboInversion()
+{
+	if (isEvading_)
+	{
+		evadeComboWindowSec_ += IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
+	}
+
+	// Inversion の残り時間更新
+	if (inversionRemainingSec_ > 0.0f)
+	{
+		inversionRemainingSec_ -= TimeManager::Instance().GetUnscaledDeltaTime();
+		if (inversionRemainingSec_ <= 0.0f)
+		{
+			inversionRemainingSec_ = 0.0f;
+			// カウント完了で Inversion を無効化
+			PostEffectManager::GetInstance()->SetActiveEffect("Inversion", false);
+		}
+	}
+
+	// 一度発動したらリセット
+	isEvadeComboActive_ = false;
+}
+
+void Player::HPDecreaseNoise()
+{
+	if (!isAutoControl_ && !isDead_)
+	{
+		float hpRate = hp_ / maxHP_;
+		const float dangerThreshold = 0.3f;
+
+		auto* noise = PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise");
+
+		if (hpRate < dangerThreshold)
+		{
+			float t = 1.0f - (hpRate / dangerThreshold);
+			t = std::clamp(t, 0.0f, 1.0f);
+
+			// 強めイージング
+			float eased = powf(t, 2.5f);
+
+			// 不安定揺らぎ
+			float time = TimeManager::Instance().GetTotalTime();
+			float pulse = sinf(time * 12.0f) * 0.15f;
+
+			// ベース強度アップ
+		    finalStrength_ = eased * 2.5f + pulse;
+			finalStrength_ = std::clamp(finalStrength_, 0.0f, 1.0f);
+
+			PostEffectManager::GetInstance()->SetActiveEffect("Noise", true);
+			noise->SetIntensity(finalStrength_);
+		} 
+		else
+		{
+			PostEffectManager::GetInstance()->SetActiveEffect("Noise", false);
+		}
+	}
+}
+
 void Player::OnCollisionTrigger(const Collider* _other)
 {
 
@@ -9528,6 +9673,24 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			(_other->GetColliderID() == "SetTimeBomb"); 
 		if (isSlowMotionTarget)
 		{
+			if (!hasEvadeSlowHit_)
+			{
+				// 1回目 マークだけ
+				hasEvadeSlowHit_ = true;
+				evadeComboWindowSec_ = 0.0f; // 1回目から計測開始
+			}
+			else
+			{
+				// 2回目 一定時間以上離れていれば「コンボ」として認める
+				if (evadeComboWindowSec_ >= kEvadeComboMinIntervalSec_)
+				{
+					isEvadeComboActive_ = true;
+					inversionRemainingSec_ = inversionDuration_;
+					PostEffectManager::GetInstance()->SetActiveEffect("Inversion", true);
+
+				}
+			}
+
 			// スローモーション開始
 			isSlowMotion_ = true;
 			slowTimerSec_ = kSlowHoldTime_ + kSlowRecoverTime_;
@@ -9795,6 +9958,12 @@ private: // 内部処理
 	// ダメージRGBShit
 	void DamageRGBShift();
 
+	// 回避コンボエフェクト
+	void EvadeComboInversion();
+
+	// HP減少ノイズ
+	void HPDecreaseNoise();
+
 private: // 衝突判定
 
 	/// <summary>
@@ -9916,6 +10085,18 @@ private:
 	float evadeTargetRotationY_ = 0.0f; // 回避中の目標Y軸角度
 	const float kEvadeRotateAngle_ = 3.14f * 4.0f; // 1回転(360度) 
 
+	// 回避コンボ用フラグ
+	bool isEvadeComboActive_ = false;
+	// この回避中に既にスローが発生したか
+	bool hasEvadeSlowHit_ = false;
+	// この回避中の inversion時間
+	float inversionDuration_ = 0.2f;
+	// inversion の残り時間
+	float inversionRemainingSec_ = 0.0f;
+	// 回避中のコンボ用：1回目ヒットからの経過時間
+	float evadeComboWindowSec_ = 0.0f;
+	// 同フレーム/同時ヒットを弾くための最低間隔
+	static constexpr float kEvadeComboMinIntervalSec_ = 0.08f;
 
 	// 環境マップ
 	std::string cubeMapPath_ = "";
@@ -9952,6 +10133,8 @@ private:
 	// RGBShiftがアクティブかどうか
 	bool  isRGBShiftActive_ = false;
 
+	// ノイズの強さ
+	float finalStrength_ = 0.0f;
 
 	// デスモーション用構造体
 	struct Motion
@@ -10998,6 +11181,10 @@ void GamePlayScene::Initialize()
 	isClearMoment_ = false;
 	isClearCamera_ = false;
 	isClearFadeStart_ = false;
+
+
+	// RGBシフトエフェクトの強さを0にしておく
+	PostEffectManager::GetInstance()->GetPassAs<RGBShiftPass>("RGBShift")->SetIntensity(0.0f);
 
 }
 
@@ -18831,25 +19018,38 @@ namespace IIEngine
 		noneEffectPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/NoneEffect.VS.hlsl", L"resources/shaders/NoneEffect.PS.hlsl");
 		grayscalePass = std::make_unique<GrayscalePass>();
 		grayscalePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Grayscale.VS.hlsl", L"resources/shaders/Grayscale.PS.hlsl");
-		vignettePass = std::make_unique<VignettePass>();
-		vignettePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Vignette.VS.hlsl", L"resources/shaders/Vignette.PS.hlsl");
 		boxFilterPass = std::make_unique<BoxFilterPass>();
 		boxFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/BoxFilter.VS.hlsl", L"resources/shaders/BoxFilter.PS.hlsl");
 		gaussianFilterPass = std::make_unique<GaussianFilterPass>();
 		gaussianFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/GaussianFilter.VS.hlsl", L"resources/shaders/GaussianFilter.PS.hlsl");
 		radialBlurPass = std::make_unique<RadialBlurPass>();
 		radialBlurPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/RadialBlur.VS.hlsl", L"resources/shaders/RadialBlur.PS.hlsl");
+		chromaticPulsePass = std::make_unique<ChromaticPulsePass>();
+		chromaticPulsePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/ChromaticPulse.VS.hlsl", L"resources/shaders/ChromaticPulse.PS.hlsl");
+		inversionPass = std::make_unique<InversionPass>();
+		inversionPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Inversion.VS.hlsl", L"resources/shaders/Inversion.PS.hlsl");
 		rgbShiftPass = std::make_unique<RGBShiftPass>();
 		rgbShiftPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/RGBShift.VS.hlsl", L"resources/shaders/RGBShift.PS.hlsl");
-
+		noisePass = std::make_unique<NoisePass>();
+		noisePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Noise.VS.hlsl", L"resources/shaders/Noise.PS.hlsl");
+		scanlinePass = std::make_unique<ScanlinePass>();
+		scanlinePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Scanline.VS.hlsl", L"resources/shaders/Scanline.PS.hlsl");
+		vignettePass = std::make_unique<VignettePass>();
+		vignettePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Vignette.VS.hlsl", L"resources/shaders/Vignette.PS.hlsl");
+		
 		postEffectManager = PostEffectManager::GetInstance();
 		postEffectManager->SetNoneEffect(std::move(noneEffectPass));
 		postEffectManager->AddPass("Grayscale", std::move(grayscalePass));
-		postEffectManager->AddPass("Vignette", std::move(vignettePass));
 		postEffectManager->AddPass("BoxFilter", std::move(boxFilterPass));
 		postEffectManager->AddPass("GaussianFilter", std::move(gaussianFilterPass));
 		postEffectManager->AddPass("RadialBlur", std::move(radialBlurPass));
+		postEffectManager->AddPass("ChromaticPulse", std::move(chromaticPulsePass));
+		postEffectManager->AddPass("Inversion", std::move(inversionPass));
 		postEffectManager->AddPass("RGBShift", std::move(rgbShiftPass));
+		postEffectManager->AddPass("Noise", std::move(noisePass));
+		postEffectManager->AddPass("Scanline", std::move(scanlinePass));
+		postEffectManager->AddPass("Vignette", std::move(vignettePass));
+
 
 
 		// パーティクル	
@@ -18969,7 +19169,11 @@ File Path: project/gameEngine/base/Framework.h
 #include "postEffect/BoxFilterPass.h"
 #include "postEffect/GaussianFilterPass.h"
 #include "postEffect/RadialBlurPass.h"
+#include "postEffect/ChromaticPulsePass.h"
 #include "postEffect/RGBShiftPass.h"
+#include "postEffect/NoisePass.h"
+#include "postEffect/ScanlinePass.h"
+#include "postEffect/InversionPass.h"
 
 #include "../particle/ParticleManager.h"
 
@@ -19044,6 +19248,10 @@ namespace IIEngine
 		std::unique_ptr<GaussianFilterPass> gaussianFilterPass = nullptr;
 		std::unique_ptr<RadialBlurPass> radialBlurPass = nullptr;
 		std::unique_ptr<RGBShiftPass> rgbShiftPass = nullptr;
+		std::unique_ptr<ChromaticPulsePass> chromaticPulsePass = nullptr;
+		std::unique_ptr<NoisePass> noisePass = nullptr;
+		std::unique_ptr<ScanlinePass> scanlinePass = nullptr;
+		std::unique_ptr<InversionPass> inversionPass = nullptr;
 
 		IIEngine::ParticleManager* particleManager = nullptr;
 
@@ -20396,6 +20604,219 @@ namespace IIEngine
 }
 
 ============================================================
+File Path: project/gameEngine/base/postEffect/ChromaticPulsePass.cpp
+============================================================
+#include "ChromaticPulsePass.h"
+
+#include <DirectXCommon.h>
+#include <SrvManager.h>
+#include <TimeManager.h>
+
+namespace IIEngine
+{
+
+    void ChromaticPulsePass::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath)
+    {
+        BasePostEffectPass::Initialize(dxCommon, srvManager, vsPath, psPath);
+
+        cbData_.center = { 0.5f, 0.5f };
+        cbData_.radius = 0.30f;
+        cbData_.width = 0.02f;
+        cbData_.intensity = 1.0f;
+        cbData_.time = 0.0f;
+        cbData_.frequency = 10.0f;
+        cbData_.speed = 1.0f;
+
+        constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));
+        HRESULT hr = constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedCB_));
+        assert(SUCCEEDED(hr) && "Failed to map constant buffer");
+        hr;
+    }
+
+    void ChromaticPulsePass::Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
+    {
+        currentState;
+        inputResource;
+
+        if (!isActive_)
+        {
+            return;
+        }
+
+        // CBV(定数バッファ)のアップロード等
+        UpdateConstantBuffer();
+
+        cmdList->SetPipelineState(pipelineState_.Get());
+        cmdList->SetGraphicsRootSignature(rootSignature_.Get());
+        cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        ID3D12DescriptorHeap* heaps[] = {
+            srvManager_->GetHeap().Get(),
+            dxCommon_->GetSamplerHeap().Get()
+        };
+        cmdList->SetDescriptorHeaps(_countof(heaps), heaps);
+
+        cmdList->SetGraphicsRootDescriptorTable(0, inputSrvHandle);
+        cmdList->SetGraphicsRootDescriptorTable(1, dxCommon_->GetSamplerHandle());
+        cmdList->SetGraphicsRootConstantBufferView(2, constantBuffer_->GetGPUVirtualAddress());
+
+        cmdList->DrawInstanced(3, 1, 0, 0);
+    }
+
+    void ChromaticPulsePass::UpdateConstantBuffer()
+    {
+        const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+
+        if (isPulsing_)
+        {
+            cbData_.time += dt;
+
+            if (cbData_.time >= pulseDuration_)
+            {
+                isPulsing_ = false;
+            }
+        }
+
+        float t = cbData_.time / pulseDuration_;
+        t = std::clamp(t, 0.0f, 1.0f);
+        cbData_.intensity = 1.0f - t;   // 徐々に弱くする
+
+        if (mappedCB_)
+        {
+            *mappedCB_ = cbData_;
+        }
+
+    }
+
+    void ChromaticPulsePass::TriggerPulse()
+    {
+        cbData_.time = 0.0f;
+        isPulsing_ = true;
+    }
+
+}
+
+============================================================
+File Path: project/gameEngine/base/postEffect/ChromaticPulsePass.h
+============================================================
+#pragma once
+
+#include <wrl.h>
+
+#include "BasePostEffectPass.h"
+
+#include <MyMath.h>
+
+namespace IIEngine
+{
+	/// <summary>
+	/// クロマティックパルスエフェクトパス
+	/// </summary>
+	class ChromaticPulsePass : public BasePostEffectPass
+	{
+	public:
+
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="dxCommon">DirectX共通機能管理クラスへのポインタ</param>
+		/// <param name="srvManager">シェーダリソースビュー管理クラスへのポインタ</param>
+		/// <param name="vsPath">頂点シェーダファイルのパス</param>
+		/// <param name="psPath">ピクセルシェーダファイルのパス</param>
+		void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath) override;
+
+		/// <summary>
+		/// 描画
+		/// </summary>
+		/// <param name="cmdList">描画コマンドリスト</param>
+		/// <param name="inputSrvHandle">入力テクスチャのSRVハンドル</param>
+		/// <param name="inputResource">入力リソース</param>
+		/// <param name="currentState">入力リソースの現在の状態</param>
+		void Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState) override;
+
+		/// <summary>
+		/// パス名取得
+		/// </summary>
+		/// <returns>パス名</returns>
+		std::string GetName() const override { return "ChromaticPulse"; }
+
+		/// <summary>
+		/// 定数バッファ更新
+		/// </summary>
+		void UpdateConstantBuffer();
+
+		/// <summary>
+		/// パルスをトリガー
+		/// </summary>
+		void TriggerPulse();
+
+	public: // セッター
+
+		/// <summary>
+		///	中心を設定
+		/// </summary>
+		/// <param name="c">中心</param>
+		void SetCenter(const Vector2& c) { cbData_.center = c; }
+		
+		/// <summary>
+		/// 半径を設定
+		/// </summary>
+		/// <param name="r">半径</param>
+		void SetRadius(float r) { cbData_.radius = r; }
+		
+		/// <summary>
+		/// 幅を設定
+		/// </summary>
+		/// <param name="w">幅</param>
+		void SetWidth(float w) { cbData_.width = w; }
+		
+		/// <summary>
+		/// 強さを設定
+		/// </summary>
+		/// <param name="i">強さ</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
+
+		/// <summary>
+		/// 周波数を設定
+		/// </summary>
+		/// <param name="f">周波数</param>
+		void SetFrequency(float f) { cbData_.frequency = f; }
+		
+		/// <summary>
+		/// 速度を設定
+		/// </summary>
+		/// <param name="s">速度</param>
+		void SetSpeed(float s) { cbData_.speed = s; }
+
+	private:
+
+		struct ChromaticPulseCB
+		{
+			Vector2 center;
+			float radius;
+			float width;
+			float intensity;
+
+			float time;
+			float frequency;
+			float speed;
+		};
+
+
+		ChromaticPulseCB cbData_;
+		ChromaticPulseCB* mappedCB_ = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+
+		float pulseDuration_ = 0.5f;
+		bool  isPulsing_ = false;
+
+	};
+
+}
+
+============================================================
 File Path: project/gameEngine/base/postEffect/GaussianFilterPass.cpp
 ============================================================
 #include "GaussianFilterPass.h"
@@ -20755,6 +21176,280 @@ namespace IIEngine
 }
 
 ============================================================
+File Path: project/gameEngine/base/postEffect/InversionPass.cpp
+============================================================
+#include "InversionPass.h"
+
+#include <DirectXCommon.h>
+#include <SrvManager.h>
+
+namespace IIEngine
+{
+    void InversionPass::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath)
+    {
+        BasePostEffectPass::Initialize(dxCommon, srvManager, vsPath, psPath);
+
+        constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));
+        HRESULT hr = constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedCB_));
+        assert(SUCCEEDED(hr) && "Failed to map constant buffer");
+        hr;
+    }
+
+    void InversionPass::Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
+    {
+        currentState;
+        inputResource;
+
+        if (!isActive_)
+        {
+            return;
+        }
+
+        // CBV(定数バッファ)のアップロード等
+        UpdateConstantBuffer();
+
+        cmdList->SetPipelineState(pipelineState_.Get());
+        cmdList->SetGraphicsRootSignature(rootSignature_.Get());
+        cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        ID3D12DescriptorHeap* heaps[] = {
+            srvManager_->GetHeap().Get(),
+            dxCommon_->GetSamplerHeap().Get()
+        };
+        cmdList->SetDescriptorHeaps(_countof(heaps), heaps);
+
+        cmdList->SetGraphicsRootDescriptorTable(0, inputSrvHandle);
+        cmdList->SetGraphicsRootDescriptorTable(1, dxCommon_->GetSamplerHandle());
+        cmdList->SetGraphicsRootConstantBufferView(2, constantBuffer_->GetGPUVirtualAddress());
+
+        cmdList->DrawInstanced(3, 1, 0, 0);
+    }
+
+    void InversionPass::UpdateConstantBuffer()
+    {
+        if (mappedCB_)
+        {
+            *mappedCB_ = cbData_;
+        }
+    }
+
+}
+
+============================================================
+File Path: project/gameEngine/base/postEffect/InversionPass.h
+============================================================
+#pragma once
+
+#include <wrl.h>
+
+#include "BasePostEffectPass.h"
+
+#include <MyMath.h>
+
+namespace IIEngine
+{
+
+	class InversionPass : public BasePostEffectPass
+	{
+	public:
+
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="dxCommon">DirectX共通機能管理クラスへのポインタ</param>
+		/// <param name="srvManager">シェーダリソースビュー管理クラスへのポインタ</param>
+		/// <param name="vsPath">頂点シェーダファイルのパス</param>
+		/// <param name="psPath">ピクセルシェーダファイルのパス</param>
+		void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath) override;
+
+		/// <summary>
+		/// 描画
+		/// </summary>
+		/// <param name="cmdList">描画コマンドリスト</param>
+		/// <param name="inputSrvHandle">入力テクスチャのSRVハンドル</param>
+		/// <param name="inputResource">入力リソース</param>
+		/// <param name="currentState">入力リソースの現在の状態</param>
+		void Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState) override;
+
+		/// <summary>
+		/// パス名取得
+		/// </summary>
+		/// <returns>パス名</returns>
+		std::string GetName() const override { return "Inversion"; }
+
+		/// <summary>
+		/// 定数バッファ更新
+		/// </summary>
+		void UpdateConstantBuffer();
+
+	public: // セッター
+
+		/// <summary>
+		/// 強さを設定
+		/// </summary>
+		/// <param name="i">強さ</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
+
+	private:
+
+		struct InversionCB
+		{
+			float intensity;
+			Vector3 padding;
+		};
+
+		InversionCB cbData_;
+		InversionCB* mappedCB_ = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+
+	};
+
+}
+
+============================================================
+File Path: project/gameEngine/base/postEffect/NoisePass.cpp
+============================================================
+#include "NoisePass.h"
+
+#include <DirectXCommon.h>
+#include <SrvManager.h>
+#include <TimeManager.h>
+
+namespace IIEngine
+{
+    void NoisePass::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath)
+    {
+        BasePostEffectPass::Initialize(dxCommon, srvManager, vsPath, psPath);
+
+        constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));
+        HRESULT hr = constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedCB_));
+        assert(SUCCEEDED(hr) && "Failed to map constant buffer");
+        hr;
+    }
+
+    void NoisePass::Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
+    {
+        currentState;
+        inputResource;
+
+        if (!isActive_)
+        {
+            return;
+        }
+
+        // CBV(定数バッファ)のアップロード等
+        UpdateConstantBuffer();
+
+        cmdList->SetPipelineState(pipelineState_.Get());
+        cmdList->SetGraphicsRootSignature(rootSignature_.Get());
+        cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        ID3D12DescriptorHeap* heaps[] = {
+            srvManager_->GetHeap().Get(),
+            dxCommon_->GetSamplerHeap().Get()
+        };
+        cmdList->SetDescriptorHeaps(_countof(heaps), heaps);
+
+        cmdList->SetGraphicsRootDescriptorTable(0, inputSrvHandle);
+        cmdList->SetGraphicsRootDescriptorTable(1, dxCommon_->GetSamplerHandle());
+        cmdList->SetGraphicsRootConstantBufferView(2, constantBuffer_->GetGPUVirtualAddress());
+
+        cmdList->DrawInstanced(3, 1, 0, 0);
+    }
+
+    void NoisePass::UpdateConstantBuffer()
+    {
+        const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+        cbData_.time += dt;
+
+        if (mappedCB_)
+        {
+            *mappedCB_ = cbData_;
+        }
+    }
+}
+
+============================================================
+File Path: project/gameEngine/base/postEffect/NoisePass.h
+============================================================
+#pragma once
+
+#include <wrl.h>
+
+#include "BasePostEffectPass.h"
+
+#include <MyMath.h>
+
+namespace IIEngine
+{
+	class NoisePass : public BasePostEffectPass
+	{
+	public:
+
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="dxCommon">DirectX共通機能管理クラスへのポインタ</param>
+		/// <param name="srvManager">シェーダリソースビュー管理クラスへのポインタ</param>
+		/// <param name="vsPath">頂点シェーダファイルのパス</param>
+		/// <param name="psPath">ピクセルシェーダファイルのパス</param>
+		void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath) override;
+
+		/// <summary>
+		/// 描画
+		/// </summary>
+		/// <param name="cmdList">描画コマンドリスト</param>
+		/// <param name="inputSrvHandle">入力テクスチャのSRVハンドル</param>
+		/// <param name="inputResource">入力リソース</param>
+		/// <param name="currentState">入力リソースの現在の状態</param>
+		void Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState) override;
+
+		/// <summary>
+		/// パス名取得
+		/// </summary>
+		/// <returns>パス名</returns>
+		std::string GetName() const override { return "Noise"; }
+
+		/// <summary>
+		/// 定数バッファ更新
+		/// </summary>
+		void UpdateConstantBuffer();
+
+	public: // セッター
+
+		/// <summary>
+		/// ノイズの強さを設定
+		/// </summary>
+		/// <param name="i">強さ</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
+
+		/// <summary>
+		/// 時間を設定
+		/// </summary>
+		/// <param name="t">時間</param>
+		void SetTime(float t) { cbData_.time = t; }
+
+	private:
+
+		struct NoiseCB
+		{
+			float intensity;
+			float time;
+			Vector2 padding;
+		};
+
+		NoiseCB cbData_;
+		NoiseCB* mappedCB_ = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+
+	};
+
+}
+
+============================================================
 File Path: project/gameEngine/base/postEffect/NoneEffectPass.cpp
 ============================================================
 #include "NoneEffectPass.h"
@@ -20926,18 +21621,9 @@ namespace IIEngine
 
     void PostEffectManager::DrawAll(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
     {
-        bool anyActive = false;
-
-        for (auto& [_, pass] : passes_)
+        // ここでは「最終結果を画面に貼るだけ」
+        if (noneEffect_)
         {
-            if (pass->IsActive())
-            {
-                pass->Draw(cmdList, inputSrvHandle, inputResource, currentState);
-                anyActive = true;
-            }
-        }
-
-        if (!anyActive && noneEffect_) {
             noneEffect_->Draw(cmdList, inputSrvHandle, inputResource, currentState);
         }
     }
@@ -21126,7 +21812,9 @@ File Path: project/gameEngine/base/postEffect/RGBShiftPass.h
 
 namespace IIEngine
 {
-
+	/// <summary>
+	/// RGBシフトエフェクトパス
+	/// </summary>
 	class RGBShiftPass : public BasePostEffectPass
 	{
 	public:
@@ -21180,7 +21868,7 @@ namespace IIEngine
 		{
 			Vector2 center;
 			float intensity;
-			float padding;
+			float padding = 0.0f;
 		};
 
 		RGBShiftCB cbData_;
@@ -21354,6 +22042,170 @@ namespace IIEngine
 		RadialBlurCB* mappedCB_ = nullptr;
 
 	};
+}
+
+============================================================
+File Path: project/gameEngine/base/postEffect/ScanlinePass.cpp
+============================================================
+#include "ScanlinePass.h"
+
+#include <DirectXCommon.h>
+#include <SrvManager.h>
+#include <TimeManager.h>
+
+namespace IIEngine
+{
+    void ScanlinePass::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath)
+    {
+        BasePostEffectPass::Initialize(dxCommon, srvManager, vsPath, psPath);
+
+        cbData_.intensity = 1.0f;
+        cbData_.density = 800.0f;
+        cbData_.speed = 3.0f;
+        cbData_.time = 0.0f;
+
+        constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));
+        HRESULT hr = constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedCB_));
+        assert(SUCCEEDED(hr) && "Failed to map constant buffer");
+        hr;
+    }
+
+    void ScanlinePass::Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
+    {
+        currentState;
+        inputResource;
+
+        if (!isActive_)
+        {
+            return;
+        }
+
+        // CBV(定数バッファ)のアップロード等
+        UpdateConstantBuffer();
+
+        cmdList->SetPipelineState(pipelineState_.Get());
+        cmdList->SetGraphicsRootSignature(rootSignature_.Get());
+        cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        ID3D12DescriptorHeap* heaps[] = {
+            srvManager_->GetHeap().Get(),
+            dxCommon_->GetSamplerHeap().Get()
+        };
+        cmdList->SetDescriptorHeaps(_countof(heaps), heaps);
+
+        cmdList->SetGraphicsRootDescriptorTable(0, inputSrvHandle);
+        cmdList->SetGraphicsRootDescriptorTable(1, dxCommon_->GetSamplerHandle());
+        cmdList->SetGraphicsRootConstantBufferView(2, constantBuffer_->GetGPUVirtualAddress());
+
+        cmdList->DrawInstanced(3, 1, 0, 0);
+    }
+
+    void ScanlinePass::UpdateConstantBuffer()
+    {
+        const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+        cbData_.time += dt;
+
+        if (mappedCB_)
+        {
+            *mappedCB_ = cbData_;
+        }
+
+    }
+}
+
+============================================================
+File Path: project/gameEngine/base/postEffect/ScanlinePass.h
+============================================================
+#pragma once
+
+#include <wrl.h>
+
+#include "BasePostEffectPass.h"
+
+#include <MyMath.h>
+
+namespace IIEngine
+{
+	/// <summary>
+	/// スキャンラインエフェクトパス
+	/// </summary>
+	class ScanlinePass : public BasePostEffectPass
+	{
+	public:
+
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="dxCommon">DirectX共通機能管理クラスへのポインタ</param>
+		/// <param name="srvManager">シェーダリソースビュー管理クラスへのポインタ</param>
+		/// <param name="vsPath">頂点シェーダファイルのパス</param>
+		/// <param name="psPath">ピクセルシェーダファイルのパス</param>
+		void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, const std::wstring& vsPath, const std::wstring& psPath) override;
+
+		/// <summary>
+		/// 描画
+		/// </summary>
+		/// <param name="cmdList">描画コマンドリスト</param>
+		/// <param name="inputSrvHandle">入力テクスチャのSRVハンドル</param>
+		/// <param name="inputResource">入力リソース</param>
+		/// <param name="currentState">入力リソースの現在の状態</param>
+		void Draw(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState) override;
+
+		/// <summary>
+		/// パス名取得
+		/// </summary>
+		/// <returns>パス名</returns>
+		std::string GetName() const override { return "Scanline"; }
+
+		/// <summary>
+		/// 定数バッファ更新
+		/// </summary>
+		void UpdateConstantBuffer();
+
+	public: // セッター
+
+		/// <summary>
+		/// 輝度を設定
+		/// </summary>
+		/// <param name="i">輝度</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
+
+		/// <summary>
+		/// 密度を設定
+		/// </summary>
+		/// <param name="d">密度</param>
+		void SetDensity(float d) { cbData_.density = d; }
+
+		/// <summary>
+		/// スキャンラインの速度を設定
+		/// </summary>
+		/// <param name="s">速度</param>
+		void SetSpeed(float s) { cbData_.speed = s; }
+
+		/// <summary>
+		/// 時間を設定
+		/// </summary>
+		/// <param name="t">時間</param>
+		void SetTime(float t) { cbData_.time = t; }
+
+	private:
+
+		struct ScanlineCB
+		{
+			float intensity;
+			float density;
+			float speed;
+			float time;
+		};
+
+		ScanlineCB cbData_;
+		ScanlineCB* mappedCB_ = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+
+	};
+
 }
 
 ============================================================
@@ -21849,13 +22701,98 @@ namespace IIEngine
 
 		}
 
+		// ChromaticPulsePass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("ChromaticPulse"))
+		{
+			static bool useChromaticPulse = false;
+			if (ImGui::Checkbox("Use ChromaticPulse", &useChromaticPulse))
+			{
+				postEffectManager->SetActiveEffect("ChromaticPulse", useChromaticPulse);
+			}
+
+			static float center[2] = { 0.5f, 0.5f };
+			static float radius = 0.30f;
+			static float width = 0.02f;
+
+			if (ImGui::SliderFloat2("Center", center, 0.0f, 1.0f))
+				postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetCenter({ center[0], center[1] });
+
+			if (ImGui::SliderFloat("Radius", &radius, 0.0f, 1.0f))
+				postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetRadius(radius);
+
+			if (ImGui::SliderFloat("Width", &width, 0.001f, 0.2f))
+				postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetWidth(width);
+
+			static float pulseIntensity = 1.0f;
+			ImGui::SliderFloat("Pulse Intensity", &pulseIntensity, 0.0f, 1.0f);
+			postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetIntensity(pulseIntensity);
+		
+			static float frequency = 10.0f;
+			ImGui::SliderFloat("Noise Frequency", &frequency, 0.0f, 10.0f);
+			postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetFrequency(frequency);
+
+			static float speed = 1.0f;
+			ImGui::SliderFloat("Noise Speed", &speed, 0.0f, 10.0f);
+			postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetSpeed(speed);
+		
+		}
+
+		// NoisePass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("Noise"))
+		{
+			static bool useNoise = false;
+			if (ImGui::Checkbox("Use Noise", &useNoise))
+			{
+				postEffectManager->SetActiveEffect("Noise", useNoise);
+			}
+			static float noiseIntensity = 0.5f;
+			ImGui::SliderFloat("Noise Intensity", &noiseIntensity, 0.0f, 1.0f);
+			postEffectManager->GetPassAs<NoisePass>("Noise")->SetIntensity(noiseIntensity);
+
+		}
+
+		// ScanlinePass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("Scanline"))
+		{
+			static bool useScanline = false;
+			if (ImGui::Checkbox("Use Scanline", &useScanline))
+			{
+				postEffectManager->SetActiveEffect("Scanline", useScanline);
+			}
+
+			auto* pass = postEffectManager->GetPassAs<ScanlinePass>("Scanline");
+			if (pass)
+			{
+				static float scanlineIntensity = 0.5f;
+				static float density = 800.0f;
+				static float speed = 3.0f;
+
+				if (ImGui::SliderFloat("Intensity", &scanlineIntensity, 0.0f, 1.0f)) pass->SetIntensity(scanlineIntensity);
+				if (ImGui::SliderFloat("Density", &density, 50.0f, 2000.0f)) pass->SetDensity(density);
+				if (ImGui::SliderFloat("Speed", &speed, 0.0f, 20.0f)) pass->SetSpeed(speed);
+			}
+		}
+		
+		// InversionPass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("Inversion"))
+		{
+			static bool useInversion = false;
+			if (ImGui::Checkbox("Use Inversion", &useInversion))
+			{
+				postEffectManager->SetActiveEffect("Inversion", useInversion);
+			}
+			static float inversionIntensity = 0.5f;
+			ImGui::SliderFloat("Inversion Intensity", &inversionIntensity, 0.0f, 1.0f);
+			postEffectManager->GetPassAs<InversionPass>("Inversion")->SetIntensity(inversionIntensity);
+		}
+
 		// TimeManager 用の ImGui 操作パネルを追加
 		if (ImGui::CollapsingHeader("TimeManager"))
 		{
 			// 現在のタイムスケールを取得
 			float currentScale = IIEngine::TimeManager::Instance().GetTimeScale();
 
-			// スライダーの表示値（ユーザー操作時に優先して反映）
+			// スライダーの表示値
 			static float timeScaleSlider = currentScale;
 			// 外部からタイムスケールが変更された場合、ユーザー操作中でなければ同期する
 			if (!ImGui::IsAnyItemActive() && std::abs(timeScaleSlider - currentScale) > 1e-6f)
@@ -21960,7 +22897,7 @@ namespace IIEngine
 		// ---------- SwapChainへの描画 ----------
 		dxCommon->PreDraw();
 
-		postEffectManager->DrawAll(dxCommon->GetCommandList(), sceneRT_->GetGPUHandle(), current->GetResource(), currentState);
+		postEffectManager->DrawAll(dxCommon->GetCommandList(), current->GetSRVHandle(), current->GetResource(), currentState);
 
 
 #ifdef USE_IMGUI
@@ -29230,6 +30167,9 @@ void TimeManager::Tick()
 	// スケールされたデルタタイム計算
     deltaTime_ = unscaledDt * timeScale_;
 
+	// トータルタイム更新
+    totalTime_ += deltaTime_;
+
 	// タイマー更新
     UpdateTimers(deltaTime_, unscaledDt);
 }
@@ -29462,6 +30402,9 @@ namespace IIEngine {
 		// 固定デルタタイムがスケールの影響を受けるかどうか
 		bool GetFixedUsesScaled() const { return fixedUsesScaled_; }
 
+		// ゲーム開始からの総経過時間(スケールの影響を受ける)
+		float GetTotalTime() const { return totalTime_; }
+
 	private:
 
 		// コンストラクタ(シングルトン)
@@ -29502,6 +30445,9 @@ namespace IIEngine {
 		float fixedDeltaTime_ = 1.0f / 60.0f;
 		// 固定デルタタイムがタイムスケールの影響を受けるかどうか
 		bool fixedUsesScaled_ = true;
+
+		// ゲーム開始からの総経過時間(スケールの影響を受ける)
+		float totalTime_ = 0.0f;
 
 		// 一時停止中かどうか
 		bool paused_ = false;
