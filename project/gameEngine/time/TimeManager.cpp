@@ -125,6 +125,9 @@ void TimeManager::Tick()
 	// スケールされたデルタタイム計算
     deltaTime_ = unscaledDt * timeScale_;
 
+	// トータルタイム更新
+    totalTime_ += deltaTime_;
+
 	// タイマー更新
     UpdateTimers(deltaTime_, unscaledDt);
 }

@@ -26,8 +26,8 @@ PixelShaderOutput main(VertexShaderOutput input)
     float4 color = gTexture.Sample(gSampler, input.texcoord);
 
     float noise = rand(input.texcoord * 500.0f + time * 10.0f);
-    noise = (noise - 0.5f) * 2.0f; // -1～1
-    noise *= intensity * 0.1f;
+    noise = (noise - 0.5f) * 2.0f;
+    noise *= intensity * 0.5f;
 
     color.rgb += noise;
 

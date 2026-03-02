@@ -93,6 +93,12 @@ private: // 内部処理
 	// ダメージRGBShit
 	void DamageRGBShift();
 
+	// 回避コンボエフェクト
+	void EvadeComboInversion();
+
+	// HP減少ノイズ
+	void HPDecreaseNoise();
+
 private: // 衝突判定
 
 	/// <summary>
@@ -214,6 +220,18 @@ private:
 	float evadeTargetRotationY_ = 0.0f; // 回避中の目標Y軸角度
 	const float kEvadeRotateAngle_ = 3.14f * 4.0f; // 1回転(360度) 
 
+	// 回避コンボ用フラグ
+	bool isEvadeComboActive_ = false;
+	// この回避中に既にスローが発生したか
+	bool hasEvadeSlowHit_ = false;
+	// この回避中の inversion時間
+	float inversionDuration_ = 0.2f;
+	// inversion の残り時間
+	float inversionRemainingSec_ = 0.0f;
+	// 回避中のコンボ用：1回目ヒットからの経過時間
+	float evadeComboWindowSec_ = 0.0f;
+	// 同フレーム/同時ヒットを弾くための最低間隔
+	static constexpr float kEvadeComboMinIntervalSec_ = 0.08f;
 
 	// 環境マップ
 	std::string cubeMapPath_ = "";
@@ -250,6 +268,8 @@ private:
 	// RGBShiftがアクティブかどうか
 	bool  isRGBShiftActive_ = false;
 
+	// ノイズの強さ
+	float finalStrength_ = 0.0f;
 
 	// デスモーション用構造体
 	struct Motion

@@ -157,6 +157,9 @@ namespace IIEngine {
 		// 固定デルタタイムがスケールの影響を受けるかどうか
 		bool GetFixedUsesScaled() const { return fixedUsesScaled_; }
 
+		// ゲーム開始からの総経過時間(スケールの影響を受ける)
+		float GetTotalTime() const { return totalTime_; }
+
 	private:
 
 		// コンストラクタ(シングルトン)
@@ -197,6 +200,9 @@ namespace IIEngine {
 		float fixedDeltaTime_ = 1.0f / 60.0f;
 		// 固定デルタタイムがタイムスケールの影響を受けるかどうか
 		bool fixedUsesScaled_ = true;
+
+		// ゲーム開始からの総経過時間(スケールの影響を受ける)
+		float totalTime_ = 0.0f;
 
 		// 一時停止中かどうか
 		bool paused_ = false;

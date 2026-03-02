@@ -213,6 +213,10 @@ void GamePlayScene::Initialize()
 	isClearCamera_ = false;
 	isClearFadeStart_ = false;
 
+
+	// RGBシフトエフェクトの強さを0にしておく
+	PostEffectManager::GetInstance()->GetPassAs<RGBShiftPass>("RGBShift")->SetIntensity(0.0f);
+
 }
 
 void GamePlayScene::Finalize()

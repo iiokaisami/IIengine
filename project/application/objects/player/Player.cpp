@@ -112,10 +112,14 @@ void Player::Update()
 	// 操作更新
 	UpdateControl();
 
-	// 死亡したらy軸回転を徐々に0にする
+	// 死亡したらy軸回転を徐々に0に&ノイズ解除
 	if (isDead_)
 	{
 		rotation_.y = Lerp(rotation_.y, 0.0f, 0.05f);
+		// ノイズを徐々に0にする
+		finalStrength_ = Lerp(finalStrength_, 0.0f, 0.05f);
+		PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(finalStrength_);
+
 	}
 
 	// 弾の削除
@@ -146,6 +150,11 @@ void Player::Update()
 	// RGBシフト
 	DamageRGBShift();
 
+	// 回避コンボ
+	EvadeComboInversion();
+
+	// HP減少ノイズ
+	HPDecreaseNoise();
 }
 
 void Player::Draw()
@@ -292,6 +301,7 @@ void Player::Evade()
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
 		{
 			isEvading_ = true;
+
 			evadeRemainingSec_ = kEvadeDurationSec_;
 			// 現在の移動方向を回避方向として保存
 			evadeDirection_ = moveVelocity_;
@@ -337,6 +347,10 @@ void Player::Evade()
 			isEvading_ = false;
 			evadeRemainingSec_ = 0.0f;
 			rotation_.y = evadeStartRotationY_;
+			// 回避終了時にコンボ判定をリセットしておく
+			isEvadeComboActive_ = false;
+			hasEvadeSlowHit_ = false;
+			evadeComboWindowSec_ = 0.0f;
 		}
 	}
 }
@@ -418,6 +432,7 @@ void Player::DeadEffect()
 
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
+	
 	// ぷるぷるフェーズ
 	if (deathMotion_.timerSec < deathMotion_.shakeSec)
 	{
@@ -873,6 +888,64 @@ void Player::DamageRGBShift()
 
 }
 
+void Player::EvadeComboInversion()
+{
+	if (isEvading_)
+	{
+		evadeComboWindowSec_ += IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
+	}
+
+	// Inversion の残り時間更新
+	if (inversionRemainingSec_ > 0.0f)
+	{
+		inversionRemainingSec_ -= TimeManager::Instance().GetUnscaledDeltaTime();
+		if (inversionRemainingSec_ <= 0.0f)
+		{
+			inversionRemainingSec_ = 0.0f;
+			// カウント完了で Inversion を無効化
+			PostEffectManager::GetInstance()->SetActiveEffect("Inversion", false);
+		}
+	}
+
+	// 一度発動したらリセット
+	isEvadeComboActive_ = false;
+}
+
+void Player::HPDecreaseNoise()
+{
+	if (!isAutoControl_ && !isDead_)
+	{
+		float hpRate = hp_ / maxHP_;
+		const float dangerThreshold = 0.3f;
+
+		auto* noise = PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise");
+
+		if (hpRate < dangerThreshold)
+		{
+			float t = 1.0f - (hpRate / dangerThreshold);
+			t = std::clamp(t, 0.0f, 1.0f);
+
+			// 強めイージング
+			float eased = powf(t, 2.5f);
+
+			// 不安定揺らぎ
+			float time = TimeManager::Instance().GetTotalTime();
+			float pulse = sinf(time * 12.0f) * 0.15f;
+
+			// ベース強度アップ
+		    finalStrength_ = eased * 2.5f + pulse;
+			finalStrength_ = std::clamp(finalStrength_, 0.0f, 1.0f);
+
+			PostEffectManager::GetInstance()->SetActiveEffect("Noise", true);
+			noise->SetIntensity(finalStrength_);
+		} 
+		else
+		{
+			PostEffectManager::GetInstance()->SetActiveEffect("Noise", false);
+		}
+	}
+}
+
 void Player::OnCollisionTrigger(const Collider* _other)
 {
 
@@ -886,6 +959,24 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			(_other->GetColliderID() == "SetTimeBomb"); 
 		if (isSlowMotionTarget)
 		{
+			if (!hasEvadeSlowHit_)
+			{
+				// 1回目 マークだけ
+				hasEvadeSlowHit_ = true;
+				evadeComboWindowSec_ = 0.0f; // 1回目から計測開始
+			}
+			else
+			{
+				// 2回目 一定時間以上離れていれば「コンボ」として認める
+				if (evadeComboWindowSec_ >= kEvadeComboMinIntervalSec_)
+				{
+					isEvadeComboActive_ = true;
+					inversionRemainingSec_ = inversionDuration_;
+					PostEffectManager::GetInstance()->SetActiveEffect("Inversion", true);
+
+				}
+			}
+
 			// スローモーション開始
 			isSlowMotion_ = true;
 			slowTimerSec_ = kSlowHoldTime_ + kSlowRecoverTime_;
