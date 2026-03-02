@@ -35,7 +35,11 @@
 #include "postEffect/BoxFilterPass.h"
 #include "postEffect/GaussianFilterPass.h"
 #include "postEffect/RadialBlurPass.h"
+#include "postEffect/ChromaticPulsePass.h"
 #include "postEffect/RGBShiftPass.h"
+#include "postEffect/NoisePass.h"
+#include "postEffect/ScanlinePass.h"
+#include "postEffect/InversionPass.h"
 
 #include "../particle/ParticleManager.h"
 
@@ -110,6 +114,10 @@ namespace IIEngine
 		std::unique_ptr<GaussianFilterPass> gaussianFilterPass = nullptr;
 		std::unique_ptr<RadialBlurPass> radialBlurPass = nullptr;
 		std::unique_ptr<RGBShiftPass> rgbShiftPass = nullptr;
+		std::unique_ptr<ChromaticPulsePass> chromaticPulsePass = nullptr;
+		std::unique_ptr<NoisePass> noisePass = nullptr;
+		std::unique_ptr<ScanlinePass> scanlinePass = nullptr;
+		std::unique_ptr<InversionPass> inversionPass = nullptr;
 
 		IIEngine::ParticleManager* particleManager = nullptr;
 

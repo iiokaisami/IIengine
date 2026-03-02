@@ -236,13 +236,98 @@ namespace IIEngine
 
 		}
 
+		// ChromaticPulsePass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("ChromaticPulse"))
+		{
+			static bool useChromaticPulse = false;
+			if (ImGui::Checkbox("Use ChromaticPulse", &useChromaticPulse))
+			{
+				postEffectManager->SetActiveEffect("ChromaticPulse", useChromaticPulse);
+			}
+
+			static float center[2] = { 0.5f, 0.5f };
+			static float radius = 0.30f;
+			static float width = 0.02f;
+
+			if (ImGui::SliderFloat2("Center", center, 0.0f, 1.0f))
+				postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetCenter({ center[0], center[1] });
+
+			if (ImGui::SliderFloat("Radius", &radius, 0.0f, 1.0f))
+				postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetRadius(radius);
+
+			if (ImGui::SliderFloat("Width", &width, 0.001f, 0.2f))
+				postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetWidth(width);
+
+			static float pulseIntensity = 1.0f;
+			ImGui::SliderFloat("Pulse Intensity", &pulseIntensity, 0.0f, 1.0f);
+			postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetIntensity(pulseIntensity);
+		
+			static float frequency = 10.0f;
+			ImGui::SliderFloat("Noise Frequency", &frequency, 0.0f, 10.0f);
+			postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetFrequency(frequency);
+
+			static float speed = 1.0f;
+			ImGui::SliderFloat("Noise Speed", &speed, 0.0f, 10.0f);
+			postEffectManager->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetSpeed(speed);
+		
+		}
+
+		// NoisePass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("Noise"))
+		{
+			static bool useNoise = false;
+			if (ImGui::Checkbox("Use Noise", &useNoise))
+			{
+				postEffectManager->SetActiveEffect("Noise", useNoise);
+			}
+			static float noiseIntensity = 0.5f;
+			ImGui::SliderFloat("Noise Intensity", &noiseIntensity, 0.0f, 1.0f);
+			postEffectManager->GetPassAs<NoisePass>("Noise")->SetIntensity(noiseIntensity);
+
+		}
+
+		// ScanlinePass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("Scanline"))
+		{
+			static bool useScanline = false;
+			if (ImGui::Checkbox("Use Scanline", &useScanline))
+			{
+				postEffectManager->SetActiveEffect("Scanline", useScanline);
+			}
+
+			auto* pass = postEffectManager->GetPassAs<ScanlinePass>("Scanline");
+			if (pass)
+			{
+				static float scanlineIntensity = 0.5f;
+				static float density = 800.0f;
+				static float speed = 3.0f;
+
+				if (ImGui::SliderFloat("Intensity", &scanlineIntensity, 0.0f, 1.0f)) pass->SetIntensity(scanlineIntensity);
+				if (ImGui::SliderFloat("Density", &density, 50.0f, 2000.0f)) pass->SetDensity(density);
+				if (ImGui::SliderFloat("Speed", &speed, 0.0f, 20.0f)) pass->SetSpeed(speed);
+			}
+		}
+		
+		// InversionPass 用の ImGui 操作パネルを追加
+		if (ImGui::CollapsingHeader("Inversion"))
+		{
+			static bool useInversion = false;
+			if (ImGui::Checkbox("Use Inversion", &useInversion))
+			{
+				postEffectManager->SetActiveEffect("Inversion", useInversion);
+			}
+			static float inversionIntensity = 0.5f;
+			ImGui::SliderFloat("Inversion Intensity", &inversionIntensity, 0.0f, 1.0f);
+			postEffectManager->GetPassAs<InversionPass>("Inversion")->SetIntensity(inversionIntensity);
+		}
+
 		// TimeManager 用の ImGui 操作パネルを追加
 		if (ImGui::CollapsingHeader("TimeManager"))
 		{
 			// 現在のタイムスケールを取得
 			float currentScale = IIEngine::TimeManager::Instance().GetTimeScale();
 
-			// スライダーの表示値（ユーザー操作時に優先して反映）
+			// スライダーの表示値
 			static float timeScaleSlider = currentScale;
 			// 外部からタイムスケールが変更された場合、ユーザー操作中でなければ同期する
 			if (!ImGui::IsAnyItemActive() && std::abs(timeScaleSlider - currentScale) > 1e-6f)
@@ -347,7 +432,7 @@ namespace IIEngine
 		// ---------- SwapChainへの描画 ----------
 		dxCommon->PreDraw();
 
-		postEffectManager->DrawAll(dxCommon->GetCommandList(), sceneRT_->GetGPUHandle(), current->GetResource(), currentState);
+		postEffectManager->DrawAll(dxCommon->GetCommandList(), current->GetSRVHandle(), current->GetResource(), currentState);
 
 
 #ifdef USE_IMGUI

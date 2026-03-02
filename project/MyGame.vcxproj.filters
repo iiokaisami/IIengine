@@ -61,6 +61,14 @@
     <FxCompile Include="resources\shaders\RGBShift.PS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resources\shaders\ChromaticPulse.PS.hlsl" />
+    <FxCompile Include="resources\shaders\ChromaticPulse.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Inversion.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Inversion.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Noise.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Noise.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Scanline.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Scanline.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -370,6 +378,10 @@
     <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -696,6 +708,10 @@
     <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\NoisePass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\InversionPass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -731,6 +747,10 @@
     <None Include="resources\shaders\RGBShift.hlsli">
       <Filter>resources\shaders</Filter>
     </None>
+    <None Include="resources\shaders\ChromaticPulse.hlsli" />
+    <None Include="resources\shaders\Inversion.hlsli" />
+    <None Include="resources\shaders\Noise.hlsli" />
+    <None Include="resources\shaders\Scanline.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="application">

@@ -35,18 +35,9 @@ namespace IIEngine
 
     void PostEffectManager::DrawAll(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE inputSrvHandle, ID3D12Resource* inputResource, D3D12_RESOURCE_STATES& currentState)
     {
-        bool anyActive = false;
-
-        for (auto& [_, pass] : passes_)
+        // ここでは「最終結果を画面に貼るだけ」
+        if (noneEffect_)
         {
-            if (pass->IsActive())
-            {
-                pass->Draw(cmdList, inputSrvHandle, inputResource, currentState);
-                anyActive = true;
-            }
-        }
-
-        if (!anyActive && noneEffect_) {
             noneEffect_->Draw(cmdList, inputSrvHandle, inputResource, currentState);
         }
     }

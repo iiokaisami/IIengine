@@ -98,25 +98,38 @@ namespace IIEngine
 		noneEffectPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/NoneEffect.VS.hlsl", L"resources/shaders/NoneEffect.PS.hlsl");
 		grayscalePass = std::make_unique<GrayscalePass>();
 		grayscalePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Grayscale.VS.hlsl", L"resources/shaders/Grayscale.PS.hlsl");
-		vignettePass = std::make_unique<VignettePass>();
-		vignettePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Vignette.VS.hlsl", L"resources/shaders/Vignette.PS.hlsl");
 		boxFilterPass = std::make_unique<BoxFilterPass>();
 		boxFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/BoxFilter.VS.hlsl", L"resources/shaders/BoxFilter.PS.hlsl");
 		gaussianFilterPass = std::make_unique<GaussianFilterPass>();
 		gaussianFilterPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/GaussianFilter.VS.hlsl", L"resources/shaders/GaussianFilter.PS.hlsl");
 		radialBlurPass = std::make_unique<RadialBlurPass>();
 		radialBlurPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/RadialBlur.VS.hlsl", L"resources/shaders/RadialBlur.PS.hlsl");
+		chromaticPulsePass = std::make_unique<ChromaticPulsePass>();
+		chromaticPulsePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/ChromaticPulse.VS.hlsl", L"resources/shaders/ChromaticPulse.PS.hlsl");
+		inversionPass = std::make_unique<InversionPass>();
+		inversionPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Inversion.VS.hlsl", L"resources/shaders/Inversion.PS.hlsl");
 		rgbShiftPass = std::make_unique<RGBShiftPass>();
 		rgbShiftPass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/RGBShift.VS.hlsl", L"resources/shaders/RGBShift.PS.hlsl");
-
+		noisePass = std::make_unique<NoisePass>();
+		noisePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Noise.VS.hlsl", L"resources/shaders/Noise.PS.hlsl");
+		scanlinePass = std::make_unique<ScanlinePass>();
+		scanlinePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Scanline.VS.hlsl", L"resources/shaders/Scanline.PS.hlsl");
+		vignettePass = std::make_unique<VignettePass>();
+		vignettePass->Initialize(dxCommon.get(), srvManager.get(), L"resources/shaders/Vignette.VS.hlsl", L"resources/shaders/Vignette.PS.hlsl");
+		
 		postEffectManager = PostEffectManager::GetInstance();
 		postEffectManager->SetNoneEffect(std::move(noneEffectPass));
 		postEffectManager->AddPass("Grayscale", std::move(grayscalePass));
-		postEffectManager->AddPass("Vignette", std::move(vignettePass));
 		postEffectManager->AddPass("BoxFilter", std::move(boxFilterPass));
 		postEffectManager->AddPass("GaussianFilter", std::move(gaussianFilterPass));
 		postEffectManager->AddPass("RadialBlur", std::move(radialBlurPass));
+		postEffectManager->AddPass("ChromaticPulse", std::move(chromaticPulsePass));
+		postEffectManager->AddPass("Inversion", std::move(inversionPass));
 		postEffectManager->AddPass("RGBShift", std::move(rgbShiftPass));
+		postEffectManager->AddPass("Noise", std::move(noisePass));
+		postEffectManager->AddPass("Scanline", std::move(scanlinePass));
+		postEffectManager->AddPass("Vignette", std::move(vignettePass));
+
 
 
 		// パーティクル	

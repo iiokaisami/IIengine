@@ -9,9 +9,9 @@
 namespace IIEngine
 {
 	/// <summary>
-	/// RGBシフトエフェクトパス
+	/// クロマティックパルスエフェクトパス
 	/// </summary>
-	class RGBShiftPass : public BasePostEffectPass
+	class ChromaticPulsePass : public BasePostEffectPass
 	{
 	public:
 
@@ -37,40 +37,78 @@ namespace IIEngine
 		/// パス名取得
 		/// </summary>
 		/// <returns>パス名</returns>
-		std::string GetName() const override { return "RGBShift"; }
+		std::string GetName() const override { return "ChromaticPulse"; }
 
 		/// <summary>
 		/// 定数バッファ更新
 		/// </summary>
 		void UpdateConstantBuffer();
 
+		/// <summary>
+		/// パルスをトリガー
+		/// </summary>
+		void TriggerPulse();
+
 	public: // セッター
 
 		/// <summary>
-		/// シフトの強さを設定
+		///	中心を設定
 		/// </summary>
-		/// <param name="intensity">強さ</param>
-		void SetIntensity(float intensity) { cbData_.intensity = intensity; }
+		/// <param name="c">中心</param>
+		void SetCenter(const Vector2& c) { cbData_.center = c; }
 		
 		/// <summary>
-		/// シフトの中心を設定
+		/// 半径を設定
 		/// </summary>
-		/// <param name="center">中心</param>
-		void SetCenter(const Vector2& center) { cbData_.center = center; }
+		/// <param name="r">半径</param>
+		void SetRadius(float r) { cbData_.radius = r; }
+		
+		/// <summary>
+		/// 幅を設定
+		/// </summary>
+		/// <param name="w">幅</param>
+		void SetWidth(float w) { cbData_.width = w; }
+		
+		/// <summary>
+		/// 強さを設定
+		/// </summary>
+		/// <param name="i">強さ</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
+
+		/// <summary>
+		/// 周波数を設定
+		/// </summary>
+		/// <param name="f">周波数</param>
+		void SetFrequency(float f) { cbData_.frequency = f; }
+		
+		/// <summary>
+		/// 速度を設定
+		/// </summary>
+		/// <param name="s">速度</param>
+		void SetSpeed(float s) { cbData_.speed = s; }
 
 	private:
 
-		struct RGBShiftCB
+		struct ChromaticPulseCB
 		{
 			Vector2 center;
+			float radius;
+			float width;
 			float intensity;
-			float padding = 0.0f;
+
+			float time;
+			float frequency;
+			float speed;
 		};
 
-		RGBShiftCB cbData_;
-		RGBShiftCB* mappedCB_ = nullptr;
+
+		ChromaticPulseCB cbData_;
+		ChromaticPulseCB* mappedCB_ = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+
+		float pulseDuration_ = 0.5f;
+		bool  isPulsing_ = false;
 
 	};
 

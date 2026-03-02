@@ -8,10 +8,8 @@
 
 namespace IIEngine
 {
-	/// <summary>
-	/// RGBシフトエフェクトパス
-	/// </summary>
-	class RGBShiftPass : public BasePostEffectPass
+
+	class InversionPass : public BasePostEffectPass
 	{
 	public:
 
@@ -37,7 +35,7 @@ namespace IIEngine
 		/// パス名取得
 		/// </summary>
 		/// <returns>パス名</returns>
-		std::string GetName() const override { return "RGBShift"; }
+		std::string GetName() const override { return "Inversion"; }
 
 		/// <summary>
 		/// 定数バッファ更新
@@ -47,28 +45,21 @@ namespace IIEngine
 	public: // セッター
 
 		/// <summary>
-		/// シフトの強さを設定
+		/// 強さを設定
 		/// </summary>
-		/// <param name="intensity">強さ</param>
-		void SetIntensity(float intensity) { cbData_.intensity = intensity; }
-		
-		/// <summary>
-		/// シフトの中心を設定
-		/// </summary>
-		/// <param name="center">中心</param>
-		void SetCenter(const Vector2& center) { cbData_.center = center; }
+		/// <param name="i">強さ</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
 
 	private:
 
-		struct RGBShiftCB
+		struct InversionCB
 		{
-			Vector2 center;
 			float intensity;
-			float padding = 0.0f;
+			Vector3 padding;
 		};
 
-		RGBShiftCB cbData_;
-		RGBShiftCB* mappedCB_ = nullptr;
+		InversionCB cbData_;
+		InversionCB* mappedCB_ = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
 

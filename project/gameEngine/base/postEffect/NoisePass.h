@@ -8,10 +8,7 @@
 
 namespace IIEngine
 {
-	/// <summary>
-	/// RGBシフトエフェクトパス
-	/// </summary>
-	class RGBShiftPass : public BasePostEffectPass
+	class NoisePass : public BasePostEffectPass
 	{
 	public:
 
@@ -37,7 +34,7 @@ namespace IIEngine
 		/// パス名取得
 		/// </summary>
 		/// <returns>パス名</returns>
-		std::string GetName() const override { return "RGBShift"; }
+		std::string GetName() const override { return "Noise"; }
 
 		/// <summary>
 		/// 定数バッファ更新
@@ -47,28 +44,28 @@ namespace IIEngine
 	public: // セッター
 
 		/// <summary>
-		/// シフトの強さを設定
+		/// ノイズの強さを設定
 		/// </summary>
-		/// <param name="intensity">強さ</param>
-		void SetIntensity(float intensity) { cbData_.intensity = intensity; }
-		
+		/// <param name="i">強さ</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
+
 		/// <summary>
-		/// シフトの中心を設定
+		/// 時間を設定
 		/// </summary>
-		/// <param name="center">中心</param>
-		void SetCenter(const Vector2& center) { cbData_.center = center; }
+		/// <param name="t">時間</param>
+		void SetTime(float t) { cbData_.time = t; }
 
 	private:
 
-		struct RGBShiftCB
+		struct NoiseCB
 		{
-			Vector2 center;
 			float intensity;
-			float padding = 0.0f;
+			float time;
+			Vector2 padding;
 		};
 
-		RGBShiftCB cbData_;
-		RGBShiftCB* mappedCB_ = nullptr;
+		NoiseCB cbData_;
+		NoiseCB* mappedCB_ = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
 

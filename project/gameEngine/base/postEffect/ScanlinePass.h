@@ -9,9 +9,9 @@
 namespace IIEngine
 {
 	/// <summary>
-	/// RGBシフトエフェクトパス
+	/// スキャンラインエフェクトパス
 	/// </summary>
-	class RGBShiftPass : public BasePostEffectPass
+	class ScanlinePass : public BasePostEffectPass
 	{
 	public:
 
@@ -37,7 +37,7 @@ namespace IIEngine
 		/// パス名取得
 		/// </summary>
 		/// <returns>パス名</returns>
-		std::string GetName() const override { return "RGBShift"; }
+		std::string GetName() const override { return "Scanline"; }
 
 		/// <summary>
 		/// 定数バッファ更新
@@ -47,28 +47,41 @@ namespace IIEngine
 	public: // セッター
 
 		/// <summary>
-		/// シフトの強さを設定
+		/// 輝度を設定
 		/// </summary>
-		/// <param name="intensity">強さ</param>
-		void SetIntensity(float intensity) { cbData_.intensity = intensity; }
-		
+		/// <param name="i">輝度</param>
+		void SetIntensity(float i) { cbData_.intensity = i; }
+
 		/// <summary>
-		/// シフトの中心を設定
+		/// 密度を設定
 		/// </summary>
-		/// <param name="center">中心</param>
-		void SetCenter(const Vector2& center) { cbData_.center = center; }
+		/// <param name="d">密度</param>
+		void SetDensity(float d) { cbData_.density = d; }
+
+		/// <summary>
+		/// スキャンラインの速度を設定
+		/// </summary>
+		/// <param name="s">速度</param>
+		void SetSpeed(float s) { cbData_.speed = s; }
+
+		/// <summary>
+		/// 時間を設定
+		/// </summary>
+		/// <param name="t">時間</param>
+		void SetTime(float t) { cbData_.time = t; }
 
 	private:
 
-		struct RGBShiftCB
+		struct ScanlineCB
 		{
-			Vector2 center;
 			float intensity;
-			float padding = 0.0f;
+			float density;
+			float speed;
+			float time;
 		};
 
-		RGBShiftCB cbData_;
-		RGBShiftCB* mappedCB_ = nullptr;
+		ScanlineCB cbData_;
+		ScanlineCB* mappedCB_ = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
 
