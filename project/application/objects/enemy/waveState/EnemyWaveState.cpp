@@ -1,8 +1,12 @@
 #include "EnemyWaveState.h"
 
 #include "../EnemyManager.h"
+#include <TimeManager.h>
+#include "postEffect/PostEffectManager.h" // 追加: PostEffectManager の正しいインクルード
 
 #include <cassert>
+
+using namespace IIEngine;
 
 EnemyWaveState::~EnemyWaveState()
 {
@@ -86,6 +90,64 @@ void EnemyWaveState::UpdateTexture()
         {
             sprite->SetPosition(spritePos_);
             sprite->Update();
+        }
+    }
+}
+
+void EnemyWaveState::EffectIntro()
+{
+    waveIntroTimer_ = 0.0f;
+    isWaveIntro_ = true;
+    isPulseTriggered_ = false;
+
+    IIEngine::PostEffectManager::GetInstance()->SetActiveEffect("Scanline", true);
+    IIEngine::PostEffectManager::GetInstance()->SetActiveEffect("ChromaticPulse", true);
+
+}
+
+void EnemyWaveState::EffectUpdate()
+{
+    float dt = TimeManager::Instance().GetDeltaTime();
+
+    if (isWaveIntro_)
+    {
+        waveIntroTimer_ += dt;
+
+        float t = waveIntroTimer_ / 3.0f; // 0〜1
+        t = std::clamp(t, 0.0f, 1.0f);
+
+        auto* scanline = PostEffectManager::GetInstance()->GetPassAs<ScanlinePass>("Scanline");
+
+        auto* pulse = PostEffectManager::GetInstance()->GetPassAs<ChromaticPulsePass>("ChromaticPulse");
+
+        // 最初は静か
+        if (t < 0.5f)
+        {
+            scanline->SetIntensity(t * 0.4f);
+        }
+        // 後半で溜め
+        else if (t < 0.75f)
+        {
+            float local = (t - 0.5f) / 0.25f;
+            scanline->SetIntensity(0.4f + local * 0.6f);
+        }
+        // ラスト0.15秒でPulse発動
+        else
+        {
+            if (!isPulseTriggered_)
+            {
+                pulse->TriggerPulse();
+                isPulseTriggered_ = true;
+            }
+        }
+
+        if (waveIntroTimer_ >= 3.0f)
+        {
+            isWaveIntro_ = false;
+            isPulseTriggered_ = false;
+
+            PostEffectManager::GetInstance()->SetActiveEffect("Scanline", false);
+			PostEffectManager::GetInstance()->SetActiveEffect("ChromaticPulse", false);
         }
     }
 }

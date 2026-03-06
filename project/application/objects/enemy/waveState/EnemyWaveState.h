@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "../../../../gameEngine/level_editor/LevelDataLoader.h"
+#include "postEffect/PostEffectManager.h"
 
 #include <Sprite.h>
 
@@ -40,6 +41,12 @@ public:
 
 	// 2D描画
 	virtual void Draw2D() = 0;
+
+	// ウェーブ開始エフェクト
+	void EffectIntro();
+
+	// ウェーブ開始エフェクト更新
+	void EffectUpdate();
 
 public: // セッター
 
@@ -90,10 +97,15 @@ protected:
 	uint32_t waveStartSpriteTimer_ = 180;
 	const uint32_t kWaveStartSpriteDuration_ = 120;
 
-	// 表示開始時の初期値保持（タイマーに合わせて線形補間するために使用）
+	// 表示開始時の初期値保持
 	float waveStartSpriteInitialX_ = 0.0f;
 	uint32_t waveStartSpriteInitialTimer_ = 0;
 	bool waveStartSpriteInit_ = false;
+
+	// ウェーブ開始エフェクト
+	float waveIntroTimer_ = 0.0f;
+	bool isWaveIntro_ = false;
+	bool isPulseTriggered_ = false;
 
 	// 敵の発生コマンド
 	std::stringstream enemyPopCommands_;

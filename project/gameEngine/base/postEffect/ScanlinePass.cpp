@@ -10,9 +10,9 @@ namespace IIEngine
     {
         BasePostEffectPass::Initialize(dxCommon, srvManager, vsPath, psPath);
 
-        cbData_.intensity = 1.0f;
-        cbData_.density = 800.0f;
-        cbData_.speed = 3.0f;
+        cbData_.intensity = 0.5f;
+        cbData_.density = 1200.0f;
+        cbData_.speed = 10.0f;
         cbData_.time = 0.0f;
 
         constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));

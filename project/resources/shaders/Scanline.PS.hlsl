@@ -23,7 +23,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     float scan = sin(input.texcoord.y * density + time * speed);
     scan = scan * 0.5f + 0.5f;
 
-    float stripe = step(0.8f, scan);
+    float stripe = smoothstep(0.7f, 1.0f, scan);
     
     float mask = lerp(1.0f, 0.3f, stripe * intensity);
     color.rgb *= mask;

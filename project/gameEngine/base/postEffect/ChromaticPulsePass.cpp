@@ -13,11 +13,11 @@ namespace IIEngine
 
         cbData_.center = { 0.5f, 0.5f };
         cbData_.radius = 0.30f;
-        cbData_.width = 0.02f;
+        cbData_.width = 0.05f;
         cbData_.intensity = 1.0f;
         cbData_.time = 0.0f;
-        cbData_.frequency = 10.0f;
-        cbData_.speed = 1.0f;
+        cbData_.frequency = 40.0f;
+        cbData_.speed = 8.0f;
 
         constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));
         HRESULT hr = constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedCB_));
@@ -64,6 +64,13 @@ namespace IIEngine
         {
             cbData_.time += dt;
 
+            float t = cbData_.time / pulseDuration_;
+            t = std::clamp(t, 0.0f, 1.0f);
+            cbData_.intensity = (1.0f - t) * 1.5f;
+
+            // 半径を0→1へ拡大
+            cbData_.radius = t;
+
             if (cbData_.time >= pulseDuration_)
             {
                 isPulsing_ = false;
@@ -72,7 +79,7 @@ namespace IIEngine
 
         float t = cbData_.time / pulseDuration_;
         t = std::clamp(t, 0.0f, 1.0f);
-        cbData_.intensity = 1.0f - t;   // 徐々に弱くする
+        cbData_.intensity = (1.0f - t) * 1.5f;
 
         if (mappedCB_)
         {

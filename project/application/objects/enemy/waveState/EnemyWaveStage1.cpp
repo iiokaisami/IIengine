@@ -16,11 +16,19 @@ void EnemyWaveStage1::Initialize()
 	currentWave_ = 1;
 
 	showWaveStartSprite_ = true;
+	
+	// ウェーブ開始エフェクト
+	EffectIntro();
+
 }
 
 void EnemyWaveStage1::Update()
 {
+	// テクスチャ更新
 	UpdateTexture();
+
+	// ウェーブ開始エフェクト更新
+	EffectUpdate();
 
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);

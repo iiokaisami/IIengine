@@ -190,15 +190,24 @@ void GamePlayScene::Initialize()
 			});
 
 		// 演出前に追尾を止めておく
-		if (auto* follow = camera_->FindController<FollowController>()) follow->Stop();
-		// 演出を開始
-		startCtrl->Start();
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
 	}
 
 	// シーン開始時遷移演出
 	blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
-	blockTransition_->Start(nullptr);
+	// トランジション完了時に StartCameraController を開始する
+	blockTransition_->Start([this]()
+		{
+			// トランジション完了後にスタートカメラ演出を開始
+			if (auto* startCtrl = camera_->FindController<StartCameraController>())
+			{
+				startCtrl->Start();
+			}
+		});
 
 	// スタートカメラ演出
 	isStartCamera_ = true;
@@ -264,7 +273,7 @@ void GamePlayScene::Update()
 		if (fadeTransition_->IsFinished())
 		{
 			fadeTransition_.reset();
-			isTransitioning_ = false;
+		    isTransitioning_ = false;
 		}
 	}
 	

@@ -18,11 +18,18 @@ void EnemyWaveStage2::Initialize()
 	showWaveStartSprite_ = true;
 	waveStartSpriteTimer_ = kWaveStartSpriteDuration_;
 	spritePos_ = { 1000,0 };
+
+	// ウェーブ開始エフェクト
+	EffectIntro();
 }
 
 void EnemyWaveStage2::Update()
 {
+	// テクスチャ更新
 	UpdateTexture();
+
+	// ウェーブ開始エフェクト更新
+	EffectUpdate();
 
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);

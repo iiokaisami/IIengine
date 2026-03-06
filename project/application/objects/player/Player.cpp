@@ -860,7 +860,7 @@ void Player::EvadeSlow()
 void Player::DamageRGBShift()
 {
 	// delta
-	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+	const float dt = TimeManager::Instance().GetDeltaTime();
 	
 	// RGBシフトエフェクトの更新
 	if (isRGBShiftActive_)
