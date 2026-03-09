@@ -199,15 +199,7 @@ void GamePlayScene::Initialize()
 	// シーン開始時遷移演出
 	blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
-	// トランジション完了時に StartCameraController を開始する
-	blockTransition_->Start([this]()
-		{
-			// トランジション完了後にスタートカメラ演出を開始
-			if (auto* startCtrl = camera_->FindController<StartCameraController>())
-			{
-				startCtrl->Start();
-			}
-		});
+	blockTransition_->Start(nullptr);
 
 	// スタートカメラ演出
 	isStartCamera_ = true;
@@ -260,6 +252,15 @@ void GamePlayScene::Update()
 		// トランジション終了判定
 		if (blockTransition_->IsFinished())
 		{
+			// 初回開始用フラグが立っていればトランジション完了時にスタートカメラを開始する
+			if (isStartCamera_)
+			{
+				if (auto* startCtrl = camera_->FindController<StartCameraController>())
+				{
+					startCtrl->Start();
+				}
+			}
+
 			blockTransition_.reset();
 			isTransitioning_ = false;
 		}
