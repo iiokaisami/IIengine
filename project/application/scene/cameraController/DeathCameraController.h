@@ -2,6 +2,9 @@
 
 #include <memory>
 #include <functional>
+#include <algorithm>
+#include <cmath>
+#include <corecrt_math_defines.h>
 
 #include <Vector3.h>
 
@@ -77,6 +80,10 @@ private:
 
 	// 演出完了時のコールバック
 	std::function<void()> onFinish_ = nullptr;
+
+	// 1回転 = 2π ラジアン
+	float kTau_ = 2.0f * static_cast<float>(M_PI);;
+
 
 };
 

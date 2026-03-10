@@ -57,6 +57,22 @@ private:
     uint32_t activeIndex = 0;
 	Vector3 cameraRotate_ = { -0.9f,0.0f,0.0f};
 	Vector3 cameraPosition_ = { 0.0f,-20.0f,0.0f };
+	// 追従の速さ
+	float followSpeed_ = 0.8f;
+	// 先行入力の重み
+	float inputLead_ = 0.25f;
+	// カメラのオフセット
+	Vector3 cameraOffset_ = { 1.4f, 0.0f, 0.0f };
+	// 持続時間
+	float duration_ = 0.3f;
+	// 振動の強さ
+	float amplitude_ = 0.5f;
+	// カメラの回転速度
+	float rotationSpeedMultiplier_ = 0.12f;
+	// カメラの最終距離
+	float finalDistance_ = 30.0f;
+	// カメラの最終高さ
+	float finalHeight_ = 0.4f;
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
@@ -66,6 +82,7 @@ private:
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 6;
 
+	Vector2 uiPos_ = { 0,520 };
 	Vector2 spacePos_ = { 0.0f,0.0f };
 	Vector2 wPos_ = { 0.0f,0.0f };
 	Vector2 aPos_ = { 0.0f,0.0f };

@@ -11,7 +11,7 @@ void Player::Initialize()
 	// 基底初期化
 	Character::Initialize("player.obj", "Player", 12.0f);
 
-	position_ = { 0.2f,0.7f,-1.2f };
+	position_ = defaultPosition_;
 	SyncObjectTransform();
 
 	// ライト設定
@@ -243,7 +243,7 @@ void Player::Move()
 		Vector3 currentRotation = rotation_;
 
 		// Y軸の回転のみ、最短経路で補間
-		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, 0.2f);
+		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, turnLerpRate_);
 
 		// 回転を更新
 		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
@@ -758,7 +758,7 @@ void Player::AutoMove()
 		Vector3 normalizedDir = moveVelocity_.Normalize();
 		float targetRotationY = std::atan2(normalizedDir.x, normalizedDir.z);
 		Vector3 currentRotation = rotation_;
-		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, 0.2f);
+		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, turnLerpRate_);
 		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
 	}
 
@@ -779,7 +779,6 @@ void Player::AutoAttack()
 
 	// 一定間隔で自動攻撃
 	static float attackCooldown = 0.0f;
-	const float attackInterval = 0.8f;
 
 	if (attackCooldown <= 0.0f)
 	{
@@ -800,7 +799,7 @@ void Player::AutoAttack()
 		pBullets_.push_back(std::move(newBullet));
 
 		// クールダウンをリセット
-		attackCooldown = attackInterval;
+		attackCooldown = autoAttackIntervalSec_;
 	} 
 	else
 	{
@@ -878,8 +877,8 @@ void Player::DamageRGBShift()
 		float power = 0.0f;
 
 		// 大きければ強度も大きくなる
-		float amplitude = 0.25f;
-		power = amplitude * abs(sin(t * 40.0f)) * exp(-t * 8.0f);
+		float amplitude = rgbShiftAmplitude_;
+		power = amplitude * abs(sin(t * rgbShiftOscillation_)) * exp(-t * rgbShiftDamping_);
 
 
 		// Powerをエフェクトに反映
@@ -916,7 +915,7 @@ void Player::HPDecreaseNoise()
 	if (!isAutoControl_ && !isDead_)
 	{
 		float hpRate = hp_ / maxHP_;
-		const float dangerThreshold = 0.3f;
+		const float dangerThreshold = hpDangerThreshold_;
 
 		auto* noise = PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise");
 
@@ -926,14 +925,14 @@ void Player::HPDecreaseNoise()
 			t = std::clamp(t, 0.0f, 1.0f);
 
 			// 強めイージング
-			float eased = powf(t, 2.5f);
+			float eased = powf(t, hpNoisePow_);
 
 			// 不安定揺らぎ
 			float time = TimeManager::Instance().GetTotalTime();
-			float pulse = sinf(time * 12.0f) * 0.15f;
+			float pulse = sinf(time * hpNoisePulseFreq_) * hpNoisePulseAmp_;
 
 			// ベース強度アップ
-		    finalStrength_ = eased * 2.5f + pulse;
+		    finalStrength_ = eased * hpNoiseBaseGain_ + pulse;
 			finalStrength_ = std::clamp(finalStrength_, 0.0f, 1.0f);
 
 			PostEffectManager::GetInstance()->SetActiveEffect("Noise", true);
@@ -1018,10 +1017,10 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		if (_other->GetOwner()->IsActive())
 		{
 			// プレイヤーのHPを減少
-			if (hp_ > 0.3)
+			if (hp_ > deathHpThreshold_)
 			{
-				hp_ -= 1.5f;
-				IIEngine::ParticleEmitter::Emit("HitReaction", position_, 8);
+				hp_ -= explosionDamage_;
+				IIEngine::ParticleEmitter::Emit("HitReaction", position_, hitParticleCountHeavy_);
 			} else
 			{
 				isDead_ = true;

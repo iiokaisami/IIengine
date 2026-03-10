@@ -13,14 +13,10 @@ void GameOverScene::Initialize()
 
 	camera_ = std::make_unique<SceneCamera>();
 	camera_->Initialize();
-	camera_->SetRotate({ 0.3f,0.0f,0.0f });
-	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
 	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
-
-	cameraPosition_ = { 0.0f,20.0f,-50.0f };
-	cameraRotate_ = { 0.3f,0.0f,0.0f };
+	
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 

@@ -84,9 +84,9 @@ protected: // メンバー
 	std::unique_ptr<IIEngine::Object3d> object_ = nullptr;
 
     std::string objectName_;
-    Vector3 scale_;
-    Vector3 rotation_;
-    Vector3 position_;
+    Vector3 scale_ = { 1.0f, 1.0f, 1.0f };
+	Vector3 rotation_{};
+	Vector3 position_{};
 	// オブジェクトがアクティブかどうか(回避中など判定を付けたくない場合等)
 	bool isActive_ = false;
 	// デスフラグ

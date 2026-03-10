@@ -178,6 +178,9 @@ private:
 	Vector3 moveVelocity_{};
 	Vector3 moveSpeed_ = { 0.1f,0.0f,0.1f };
 
+	// デフォルト位置
+	Vector3 defaultPosition_ = { 0.2f,0.7f,-1.2f };
+
 	// タイトル用オートフラグ(trueだったら自動で動く 入力は受け付けない)
 	bool isAutoControl_ = false;
 
@@ -307,4 +310,58 @@ private:
 
 	ClearMotion clearMotion_;
 	
+	// 回転の線形補間率
+	float turnLerpRate_ = 0.2f;
+
+	// オート攻撃の間隔
+	float autoAttackIntervalSec_ = 0.8f;
+
+	// クリアシーンの軌道パラメータ
+	Vector3 clearOrbitCenter_ = { 0.0f, 0.5f, 0.0f };
+	float clearOrbitRadius_ = 8.0f;
+	float clearOrbitAngularSpeed_ = 1.5f;
+	float clearOrbitInitialAngle_ = 0.2f;
+	bool clearOrbitClockwise_ = false;
+
+	float clearPoyoAmpX_ = 0.2f;
+	float clearPoyoAmpY_ = 0.2f;
+	float clearPoyoAmpZ_ = 0.2f;
+	float clearPoyoFreqXZ_ = 1.2f;
+	float clearPoyoFreqY_ = 1.2f;
+	bool clearMaintainArea_ = false;
+	bool clearMaintainVolume_ = false;
+	Vector3 clearBaseScale_ = { 1.0f, 1.0f, 1.0f };
+	float clearScaleMin_ = 0.05f;
+	float clearScaleMax_ = 5.0f;
+	int clearWalkParticleCount_ = 1;
+
+	// ダメージエフェクトのパラメータ
+	float rgbShiftAmplitude_ = 0.25f;
+	float rgbShiftOscillation_ = 40.0f;
+	float rgbShiftDamping_ = 8.0f;
+
+	float hpDangerThreshold_ = 0.3f;
+	float hpNoisePow_ = 2.5f;
+	float hpNoisePulseFreq_ = 12.0f;
+	float hpNoisePulseAmp_ = 0.15f;
+	float hpNoiseBaseGain_ = 2.5f;
+
+	// 死亡演出のパラメータ
+	float deathHpThreshold_ = 0.3f;
+	int hitParticleCountNormal_ = 5;
+	int hitParticleCountHeavy_ = 8;
+	float explosionDamage_ = 1.5f;
+
+	// オート移動のパラメータ
+	float autoMoveMinX_ = -15.0f, autoMoveMaxX_ = 15.0f;
+	float autoMoveMinZ_ = -15.0f, autoMoveMaxZ_ = 15.0f;
+	float autoMoveDirChangeMinSec_ = 1.0f;
+	float autoMoveDirChangeMaxSec_ = 2.5f;
+	float autoMoveMinDirLen_ = 0.1f;
+
+	// オート攻撃のパラメータ
+	float clearTotalTime_ = 0.0f;
+	float clearCurrentAngle_ = 0.2f;
+	float clearLastYaw_ = 0.0f;
+
 };

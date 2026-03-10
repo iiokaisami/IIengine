@@ -1,11 +1,7 @@
 #include "DeathCameraController.h"
 
-#include <algorithm>
-
 #include <Camera.h>
 #include <Ease.h>
-#include <cmath>
-#include <corecrt_math_defines.h>
 
 DeathCameraController::DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float endRadius, float endHeight)
 	: camera_(std::move(camera)),
@@ -34,10 +30,10 @@ void DeathCameraController::Update(float dt)
     float targetAngle = 0.0f; // 最終的にプレイヤー前方が 0
     float delta = targetAngle - startAngle_;
     // normalize delta to [-pi, pi]
-    while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-    while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
+    while (delta > (float)M_PI) delta -= kTau_;
+    while (delta < (float)-M_PI) delta += kTau_;
 
-    float totalAngularTravel = delta + rotations_ * 2.0f * (float)M_PI;
+    float totalAngularTravel = delta + rotations_ * kTau_;
     float angle = startAngle_ + totalAngularTravel * t_eased;
 
     // 半径・高さを補間

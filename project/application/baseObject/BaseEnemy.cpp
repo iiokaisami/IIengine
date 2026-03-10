@@ -14,8 +14,8 @@ void BaseEnemy::Initialize(const std::string& _modelFileName, const std::string&
     // キャラクター基底クラスの初期化を呼び出し
     Character::Initialize(_modelFileName, _objectName, _initialHP);
 
-    moveVelocity_ = { 0.1f, 0.0f, 0.1f };
-    moveSpeed_ = 0.05f;
+    moveVelocity_ = moveVelocityDefault_;
+    moveSpeed_ = moveSpeedDefault_;
 
 }
 
@@ -33,7 +33,7 @@ void BaseEnemy::Move()
     position_ += moveVelocity_ * moveSpeed_ * dt * kDefaultFrameRate;
 
     // 向きは「現在の速度ベクトル」から決める
-    if (moveVelocity_.Length() > 0.05f)
+    if (moveVelocity_.Length() > moveFacingMinVelocity_)
     {
         float targetYaw = std::atan2(moveVelocity_.x, moveVelocity_.z);
         rotation_.y = LerpAngle(rotation_.y, targetYaw, 0.2f);
@@ -43,13 +43,13 @@ void BaseEnemy::Move()
 
 Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
 {
-    if (currentVelocity.Length() < 0.001f)
+    if (currentVelocity.Length() < directionEpsilon_)
     {
         // 今は止まっている → そのまま目標方向を返す
         return targetDirection;
     }
 
-    if (targetDirection.Length() < 0.001f)
+    if (targetDirection.Length() < directionEpsilon_)
     {
         // 行き先不明 → 現在速度を維持
         return Normalize(currentVelocity);
@@ -57,7 +57,7 @@ Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vec
 
     Vector3 result = Slerp(currentVelocity, targetDirection, interpolationRate);
 
-    if (result.Length() < 0.001f)
+    if (result.Length() < directionEpsilon_)
     {
         return targetDirection;
     }
@@ -69,7 +69,6 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
 {
     // ループ回数制限
     int loopCount = 0;
-    const int kMaxLoop = 1000;
 
     // 優先度付きキュー
     struct Node
@@ -100,7 +99,7 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
     // メインループ
     while (!openSet.empty())
     {
-        if (++loopCount > kMaxLoop)
+        if (++loopCount > maxPathSearchLoop_)
         {
             // 見つからなかった場合は諦める
             break;

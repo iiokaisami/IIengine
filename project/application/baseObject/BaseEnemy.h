@@ -108,6 +108,13 @@ protected:
 	// 移動関連
 	Vector3 moveVelocity_ = {};
 	float moveSpeed_ = 0.0f;
+	// パラメータ
+	float moveFacingMinVelocity_ = 0.05f;
+	float directionEpsilon_ = 0.001f;
+	// デフォルト値
+	Vector3 moveVelocityDefault_ = { 0.1f, 0.0f, 0.1f };
+	float moveSpeedDefault_ = 0.05f;
+
 
 	// プレイヤー関連
 	Vector3 playerPosition_ = {};
@@ -142,5 +149,15 @@ protected:
 	// ループ回数の上限
 	std::unordered_set<GridPos, GridPosHash> obstacleGrid_;
 
+	// 回転補間のレート
+	float yawLerpRate_ = 0.2f; 
+
+	// A*のループ回数上限
+	int maxPathSearchLoop_ = 1000;
+
+	// グリッドのサイズとオフセット
+	float gridCellSize_ = 1.0f;    
+	float gridCellCenterOffset_ = 0.5f;
+	float gridWorldY_ = 0.0f;
 
 };

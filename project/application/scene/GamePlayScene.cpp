@@ -59,7 +59,7 @@ void GamePlayScene::Initialize()
 
 		if (i == 0)
 		{
-			sprite->Initialize("playUI.png", { 0,520 }, color_, { 0,0 });
+			sprite->Initialize("playUI.png", uiPos_ , color_, { 0,0 });
 		}
 		if (i == 1)
 		{
@@ -117,8 +117,9 @@ void GamePlayScene::Initialize()
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
 		[this]() -> Vector3 { return pPlayer_->GetVelocity(); }, // プレイヤー速度を供給
-		0.8f, 0.25f,
-		Vector3{ 1.4f, 0.0f, 0.0f }
+		followSpeed_,// 追従の速さ
+		inputLead_, // 先行入力の重み
+		cameraOffset_
 	));
 
 	// カメラのシェイク
@@ -130,8 +131,8 @@ void GamePlayScene::Initialize()
 			if (hit) pPlayer_->SetHitMoment(false); // consume
 			return hit;
 		},
-		0.3f, // duration
-		0.5f  // amplitude
+		duration_,
+		amplitude_
 	));
 
 	// スタート用コントローラ作成
@@ -151,7 +152,7 @@ void GamePlayScene::Initialize()
 	camera_->AddController<ClearCameraController>(
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
-		clearCameraDuration_, clearCameraRotations_, 0.12f, 30.0f, 0.4f);
+		clearCameraDuration_, clearCameraRotations_, rotationSpeedMultiplier_, finalDistance_, finalHeight_);
 
 	// コールバック設定(FindController を使ってその場で取得)
 	if (auto* death = camera_->FindController<DeathCameraController>())

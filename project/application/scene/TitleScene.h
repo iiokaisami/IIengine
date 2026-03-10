@@ -46,6 +46,10 @@ private:
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
+	// 持続時間
+	float duration_ = 0.3f; 
+	// 振動の強さ
+	float amplitude_ = 0.5f;
 
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
@@ -72,9 +76,6 @@ private:
 	// 透明チェック
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
-	// サウンド
-	IIEngine::SoundData soundData_;
-	IIEngine::SoundData soundData2_;
 
 	bool isTerrainDraw = false;
 	bool enableLighting = false;

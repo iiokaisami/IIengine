@@ -60,4 +60,13 @@ private: // メンバ変数
 	// 寿命
 	static const int32_t kLifeTime = 60 * 5;
 
+	// スケール
+	Vector3 bulletScale_ = { 0.5f, 0.5f, 0.5f };
+	// スピン速度
+	float spinSpeed_ = 1.0f;
+	// スラッシュパーティクルの発生数
+	int slashParticleCount_ = 1;
+	// 寿命時間
+	float lifeTimeSec_ = 5.0f;
+
 };

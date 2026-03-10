@@ -63,12 +63,6 @@ void TitleScene::Initialize()
 
 	}
 
-	// --- サウンド ---
-	soundData_ = Audio::GetInstance()->LoadWav("fanfare.wav");
-	//Audio::GetInstance()->PlayWave(soundData_, false, 0.2f);
-	soundData2_ = Audio::GetInstance()->LoadWav("BGM.wav");
-	//Audio::GetInstance()->PlayWave(soundData2_, true, 0.2f);
-
 
 	// 環境マップ
 	cubeMapPath_ = "resources/images/studio.dds";
@@ -94,8 +88,8 @@ void TitleScene::Initialize()
 			if (hit) pPlayer_->SetHitMoment(false); // consume
 			return hit;
 		},
-		0.3f, // duration
-		0.5f  // amplitude
+		duration_,
+		amplitude_
 	));
 		
 	// シーン開始時にフェードイン
@@ -109,9 +103,6 @@ void TitleScene::Finalize()
 	pPlayer_->Finalize();
 	pEnemyManager_->Finalize();
 	pField_->Finalize();
-
-	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData_);
-	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData2_);
 
 	// Object3dCommon に設定したデフォルトカメラを解除
 	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
@@ -256,15 +247,6 @@ void TitleScene::Update()
 				// フェードアウト後にシーン切り替え
 				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 			});
-	}
-
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_Q))
-	{
-		Audio::GetInstance()->SoundStop(soundData_);
-	}
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_E))
-	{
-		Audio::GetInstance()->SoundStop(soundData2_);
 	}
 }
 

@@ -9,7 +9,7 @@ void PlayerBullet::Initialize()
   	object_ = std::make_unique<Object3d>();
 	object_->Initialize("playerBullet.obj");
 
-	scale_ = { 0.5f,0.5f,0.5f };
+	scale_ = bulletScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -49,7 +49,7 @@ void PlayerBullet::Update()
 
 	SyncObjectTransform();
 
-	rotation_.y += 1.0f * dt * PlayerBullet::kDefaultFrameRate;
+	rotation_.y += spinSpeed_ * dt * PlayerBullet::kDefaultFrameRate;
 	position_ += velocity_ * dt;
 
 	aabb_.min = position_ - object_->GetScale();
@@ -57,7 +57,7 @@ void PlayerBullet::Update()
 	collider_.SetPosition(position_);
 
 	// パーティクル
-	IIEngine::ParticleEmitter::Emit("slash", position_, 1);
+	IIEngine::ParticleEmitter::Emit("slash", position_, slashParticleCount_);
 }
 
 void PlayerBullet::Draw()

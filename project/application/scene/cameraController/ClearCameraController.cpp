@@ -1,9 +1,5 @@
 #include "ClearCameraController.h"
 
-#include <algorithm>
-#include <cmath>
-#include <corecrt_math_defines.h>
-
 #include <Camera.h>
 #include <Ease.h>
 
@@ -63,10 +59,10 @@ void ClearCameraController::Update(float dt)
     float rotationsScaled = rotations_ * rotationSpeedMultiplier_;
     float targetAngle = 0.0f; // プレイヤー正面
     float delta = targetAngle - startAngle_;
-    while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-    while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
+    while (delta > (float)M_PI) delta -= kTau_;
+    while (delta < (float)-M_PI) delta += kTau_;
 
-    float totalAngularTravel = delta + rotationsScaled * 2.0f * (float)M_PI;
+    float totalAngularTravel = delta + rotationsScaled * kTau_;
     float angle = startAngle_ + totalAngularTravel * t_eased;
 
     // 半径は開始時のものを維持（元コード）

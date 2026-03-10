@@ -44,8 +44,8 @@ private:
 
 	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
-	Vector3 cameraPosition_{};
-	Vector3 cameraRotate_{};
+	Vector3 cameraPosition_ = { 0.0f,20.0f,-50.0f };
+	Vector3 cameraRotate_ = { 0.3f,0.0f,0.0f };
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
