@@ -1772,8 +1772,8 @@ void BaseEnemy::Initialize(const std::string& _modelFileName, const std::string&
     // キャラクター基底クラスの初期化を呼び出し
     Character::Initialize(_modelFileName, _objectName, _initialHP);
 
-    moveVelocity_ = { 0.1f, 0.0f, 0.1f };
-    moveSpeed_ = 0.05f;
+    moveVelocity_ = moveVelocityDefault_;
+    moveSpeed_ = moveSpeedDefault_;
 
 }
 
@@ -1791,7 +1791,7 @@ void BaseEnemy::Move()
     position_ += moveVelocity_ * moveSpeed_ * dt * kDefaultFrameRate;
 
     // 向きは「現在の速度ベクトル」から決める
-    if (moveVelocity_.Length() > 0.05f)
+    if (moveVelocity_.Length() > moveFacingMinVelocity_)
     {
         float targetYaw = std::atan2(moveVelocity_.x, moveVelocity_.z);
         rotation_.y = LerpAngle(rotation_.y, targetYaw, 0.2f);
@@ -1801,13 +1801,13 @@ void BaseEnemy::Move()
 
 Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
 {
-    if (currentVelocity.Length() < 0.001f)
+    if (currentVelocity.Length() < directionEpsilon_)
     {
         // 今は止まっている → そのまま目標方向を返す
         return targetDirection;
     }
 
-    if (targetDirection.Length() < 0.001f)
+    if (targetDirection.Length() < directionEpsilon_)
     {
         // 行き先不明 → 現在速度を維持
         return Normalize(currentVelocity);
@@ -1815,7 +1815,7 @@ Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vec
 
     Vector3 result = Slerp(currentVelocity, targetDirection, interpolationRate);
 
-    if (result.Length() < 0.001f)
+    if (result.Length() < directionEpsilon_)
     {
         return targetDirection;
     }
@@ -1827,7 +1827,6 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
 {
     // ループ回数制限
     int loopCount = 0;
-    const int kMaxLoop = 1000;
 
     // 優先度付きキュー
     struct Node
@@ -1858,7 +1857,7 @@ std::vector<Vector3> BaseEnemy::CalculatePath(const Vector3& start, const Vector
     // メインループ
     while (!openSet.empty())
     {
-        if (++loopCount > kMaxLoop)
+        if (++loopCount > maxPathSearchLoop_)
         {
             // 見つからなかった場合は諦める
             break;
@@ -2198,6 +2197,13 @@ protected:
 	// 移動関連
 	Vector3 moveVelocity_ = {};
 	float moveSpeed_ = 0.0f;
+	// パラメータ
+	float moveFacingMinVelocity_ = 0.05f;
+	float directionEpsilon_ = 0.001f;
+	// デフォルト値
+	Vector3 moveVelocityDefault_ = { 0.1f, 0.0f, 0.1f };
+	float moveSpeedDefault_ = 0.05f;
+
 
 	// プレイヤー関連
 	Vector3 playerPosition_ = {};
@@ -2232,6 +2238,16 @@ protected:
 	// ループ回数の上限
 	std::unordered_set<GridPos, GridPosHash> obstacleGrid_;
 
+	// 回転補間のレート
+	float yawLerpRate_ = 0.2f; 
+
+	// A*のループ回数上限
+	int maxPathSearchLoop_ = 1000;
+
+	// グリッドのサイズとオフセット
+	float gridCellSize_ = 1.0f;    
+	float gridCellCenterOffset_ = 0.5f;
+	float gridWorldY_ = 0.0f;
 
 };
 
@@ -2572,9 +2588,7 @@ File Path: project/application/baseObject/GameObject.cpp
 GameObject::GameObject()
 {
     objectName_ = "unnamed-object";
-    scale_ = { 1.0f, 1.0f, 1.0f };
-    rotation_ = { 0.0f, 0.0f, 0.0f };
-    position_ = { 0.0f, 0.0f, 0.0f };
+
 }
 
 void GameObject::SyncObjectTransform()
@@ -2681,9 +2695,9 @@ protected: // メンバー
 	std::unique_ptr<IIEngine::Object3d> object_ = nullptr;
 
     std::string objectName_;
-    Vector3 scale_;
-    Vector3 rotation_;
-    Vector3 position_;
+    Vector3 scale_ = { 1.0f, 1.0f, 1.0f };
+	Vector3 rotation_{};
+	Vector3 position_{};
 	// オブジェクトがアクティブかどうか(回避中など判定を付けたくない場合等)
 	bool isActive_ = false;
 	// デスフラグ
@@ -7761,11 +7775,19 @@ void EnemyWaveStage1::Initialize()
 	currentWave_ = 1;
 
 	showWaveStartSprite_ = true;
+	
+	// ウェーブ開始エフェクト
+	EffectIntro();
+
 }
 
 void EnemyWaveStage1::Update()
 {
+	// テクスチャ更新
 	UpdateTexture();
+
+	// ウェーブ開始エフェクト更新
+	EffectUpdate();
 
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
@@ -7847,11 +7869,18 @@ void EnemyWaveStage2::Initialize()
 	showWaveStartSprite_ = true;
 	waveStartSpriteTimer_ = kWaveStartSpriteDuration_;
 	spritePos_ = { 1000,0 };
+
+	// ウェーブ開始エフェクト
+	EffectIntro();
 }
 
 void EnemyWaveStage2::Update()
 {
+	// テクスチャ更新
 	UpdateTexture();
+
+	// ウェーブ開始エフェクト更新
+	EffectUpdate();
 
 	// 敵の発生コマンドを更新
 	UpdateEnemyPopCommands(pEnemyManager_);
@@ -7918,8 +7947,12 @@ File Path: project/application/objects/enemy/waveState/EnemyWaveState.cpp
 #include "EnemyWaveState.h"
 
 #include "../EnemyManager.h"
+#include <TimeManager.h>
+#include "postEffect/PostEffectManager.h" // 追加: PostEffectManager の正しいインクルード
 
 #include <cassert>
+
+using namespace IIEngine;
 
 EnemyWaveState::~EnemyWaveState()
 {
@@ -8003,6 +8036,64 @@ void EnemyWaveState::UpdateTexture()
         {
             sprite->SetPosition(spritePos_);
             sprite->Update();
+        }
+    }
+}
+
+void EnemyWaveState::EffectIntro()
+{
+    waveIntroTimer_ = 0.0f;
+    isWaveIntro_ = true;
+    isPulseTriggered_ = false;
+
+    IIEngine::PostEffectManager::GetInstance()->SetActiveEffect("Scanline", true);
+    IIEngine::PostEffectManager::GetInstance()->SetActiveEffect("ChromaticPulse", true);
+
+}
+
+void EnemyWaveState::EffectUpdate()
+{
+    float dt = TimeManager::Instance().GetDeltaTime();
+
+    if (isWaveIntro_)
+    {
+        waveIntroTimer_ += dt;
+
+        float t = waveIntroTimer_ / 3.0f; // 0〜1
+        t = std::clamp(t, 0.0f, 1.0f);
+
+        auto* scanline = PostEffectManager::GetInstance()->GetPassAs<ScanlinePass>("Scanline");
+
+        auto* pulse = PostEffectManager::GetInstance()->GetPassAs<ChromaticPulsePass>("ChromaticPulse");
+
+        // 最初は静か
+        if (t < 0.5f)
+        {
+            scanline->SetIntensity(t * 0.4f);
+        }
+        // 後半で溜め
+        else if (t < 0.75f)
+        {
+            float local = (t - 0.5f) / 0.25f;
+            scanline->SetIntensity(0.4f + local * 0.6f);
+        }
+        // ラスト0.15秒でPulse発動
+        else
+        {
+            if (!isPulseTriggered_)
+            {
+                pulse->TriggerPulse();
+                isPulseTriggered_ = true;
+            }
+        }
+
+        if (waveIntroTimer_ >= 3.0f)
+        {
+            isWaveIntro_ = false;
+            isPulseTriggered_ = false;
+
+            PostEffectManager::GetInstance()->SetActiveEffect("Scanline", false);
+			PostEffectManager::GetInstance()->SetActiveEffect("ChromaticPulse", false);
         }
     }
 }
@@ -8140,6 +8231,7 @@ File Path: project/application/objects/enemy/waveState/EnemyWaveState.h
 #include <sstream>
 
 #include "../../../../gameEngine/level_editor/LevelDataLoader.h"
+#include "postEffect/PostEffectManager.h"
 
 #include <Sprite.h>
 
@@ -8177,6 +8269,12 @@ public:
 
 	// 2D描画
 	virtual void Draw2D() = 0;
+
+	// ウェーブ開始エフェクト
+	void EffectIntro();
+
+	// ウェーブ開始エフェクト更新
+	void EffectUpdate();
 
 public: // セッター
 
@@ -8227,10 +8325,15 @@ protected:
 	uint32_t waveStartSpriteTimer_ = 180;
 	const uint32_t kWaveStartSpriteDuration_ = 120;
 
-	// 表示開始時の初期値保持（タイマーに合わせて線形補間するために使用）
+	// 表示開始時の初期値保持
 	float waveStartSpriteInitialX_ = 0.0f;
 	uint32_t waveStartSpriteInitialTimer_ = 0;
 	bool waveStartSpriteInit_ = false;
+
+	// ウェーブ開始エフェクト
+	float waveIntroTimer_ = 0.0f;
+	bool isWaveIntro_ = false;
+	bool isPulseTriggered_ = false;
 
 	// 敵の発生コマンド
 	std::stringstream enemyPopCommands_;
@@ -8725,7 +8828,7 @@ void Player::Initialize()
 	// 基底初期化
 	Character::Initialize("player.obj", "Player", 12.0f);
 
-	position_ = { 0.2f,0.7f,-1.2f };
+	position_ = defaultPosition_;
 	SyncObjectTransform();
 
 	// ライト設定
@@ -8957,7 +9060,7 @@ void Player::Move()
 		Vector3 currentRotation = rotation_;
 
 		// Y軸の回転のみ、最短経路で補間
-		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, 0.2f);
+		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, turnLerpRate_);
 
 		// 回転を更新
 		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
@@ -9472,7 +9575,7 @@ void Player::AutoMove()
 		Vector3 normalizedDir = moveVelocity_.Normalize();
 		float targetRotationY = std::atan2(normalizedDir.x, normalizedDir.z);
 		Vector3 currentRotation = rotation_;
-		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, 0.2f);
+		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, turnLerpRate_);
 		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
 	}
 
@@ -9493,7 +9596,6 @@ void Player::AutoAttack()
 
 	// 一定間隔で自動攻撃
 	static float attackCooldown = 0.0f;
-	const float attackInterval = 0.8f;
 
 	if (attackCooldown <= 0.0f)
 	{
@@ -9514,7 +9616,7 @@ void Player::AutoAttack()
 		pBullets_.push_back(std::move(newBullet));
 
 		// クールダウンをリセット
-		attackCooldown = attackInterval;
+		attackCooldown = autoAttackIntervalSec_;
 	} 
 	else
 	{
@@ -9574,7 +9676,7 @@ void Player::EvadeSlow()
 void Player::DamageRGBShift()
 {
 	// delta
-	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+	const float dt = TimeManager::Instance().GetDeltaTime();
 	
 	// RGBシフトエフェクトの更新
 	if (isRGBShiftActive_)
@@ -9592,8 +9694,8 @@ void Player::DamageRGBShift()
 		float power = 0.0f;
 
 		// 大きければ強度も大きくなる
-		float amplitude = 0.25f;
-		power = amplitude * abs(sin(t * 40.0f)) * exp(-t * 8.0f);
+		float amplitude = rgbShiftAmplitude_;
+		power = amplitude * abs(sin(t * rgbShiftOscillation_)) * exp(-t * rgbShiftDamping_);
 
 
 		// Powerをエフェクトに反映
@@ -9630,7 +9732,7 @@ void Player::HPDecreaseNoise()
 	if (!isAutoControl_ && !isDead_)
 	{
 		float hpRate = hp_ / maxHP_;
-		const float dangerThreshold = 0.3f;
+		const float dangerThreshold = hpDangerThreshold_;
 
 		auto* noise = PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise");
 
@@ -9640,14 +9742,14 @@ void Player::HPDecreaseNoise()
 			t = std::clamp(t, 0.0f, 1.0f);
 
 			// 強めイージング
-			float eased = powf(t, 2.5f);
+			float eased = powf(t, hpNoisePow_);
 
 			// 不安定揺らぎ
 			float time = TimeManager::Instance().GetTotalTime();
-			float pulse = sinf(time * 12.0f) * 0.15f;
+			float pulse = sinf(time * hpNoisePulseFreq_) * hpNoisePulseAmp_;
 
 			// ベース強度アップ
-		    finalStrength_ = eased * 2.5f + pulse;
+		    finalStrength_ = eased * hpNoiseBaseGain_ + pulse;
 			finalStrength_ = std::clamp(finalStrength_, 0.0f, 1.0f);
 
 			PostEffectManager::GetInstance()->SetActiveEffect("Noise", true);
@@ -9732,10 +9834,10 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		if (_other->GetOwner()->IsActive())
 		{
 			// プレイヤーのHPを減少
-			if (hp_ > 0.3)
+			if (hp_ > deathHpThreshold_)
 			{
-				hp_ -= 1.5f;
-				IIEngine::ParticleEmitter::Emit("HitReaction", position_, 8);
+				hp_ -= explosionDamage_;
+				IIEngine::ParticleEmitter::Emit("HitReaction", position_, hitParticleCountHeavy_);
 			} else
 			{
 				isDead_ = true;
@@ -10043,6 +10145,9 @@ private:
 	Vector3 moveVelocity_{};
 	Vector3 moveSpeed_ = { 0.1f,0.0f,0.1f };
 
+	// デフォルト位置
+	Vector3 defaultPosition_ = { 0.2f,0.7f,-1.2f };
+
 	// タイトル用オートフラグ(trueだったら自動で動く 入力は受け付けない)
 	bool isAutoControl_ = false;
 
@@ -10172,6 +10277,60 @@ private:
 
 	ClearMotion clearMotion_;
 	
+	// 回転の線形補間率
+	float turnLerpRate_ = 0.2f;
+
+	// オート攻撃の間隔
+	float autoAttackIntervalSec_ = 0.8f;
+
+	// クリアシーンの軌道パラメータ
+	Vector3 clearOrbitCenter_ = { 0.0f, 0.5f, 0.0f };
+	float clearOrbitRadius_ = 8.0f;
+	float clearOrbitAngularSpeed_ = 1.5f;
+	float clearOrbitInitialAngle_ = 0.2f;
+	bool clearOrbitClockwise_ = false;
+
+	float clearPoyoAmpX_ = 0.2f;
+	float clearPoyoAmpY_ = 0.2f;
+	float clearPoyoAmpZ_ = 0.2f;
+	float clearPoyoFreqXZ_ = 1.2f;
+	float clearPoyoFreqY_ = 1.2f;
+	bool clearMaintainArea_ = false;
+	bool clearMaintainVolume_ = false;
+	Vector3 clearBaseScale_ = { 1.0f, 1.0f, 1.0f };
+	float clearScaleMin_ = 0.05f;
+	float clearScaleMax_ = 5.0f;
+	int clearWalkParticleCount_ = 1;
+
+	// ダメージエフェクトのパラメータ
+	float rgbShiftAmplitude_ = 0.25f;
+	float rgbShiftOscillation_ = 40.0f;
+	float rgbShiftDamping_ = 8.0f;
+
+	float hpDangerThreshold_ = 0.3f;
+	float hpNoisePow_ = 2.5f;
+	float hpNoisePulseFreq_ = 12.0f;
+	float hpNoisePulseAmp_ = 0.15f;
+	float hpNoiseBaseGain_ = 2.5f;
+
+	// 死亡演出のパラメータ
+	float deathHpThreshold_ = 0.3f;
+	int hitParticleCountNormal_ = 5;
+	int hitParticleCountHeavy_ = 8;
+	float explosionDamage_ = 1.5f;
+
+	// オート移動のパラメータ
+	float autoMoveMinX_ = -15.0f, autoMoveMaxX_ = 15.0f;
+	float autoMoveMinZ_ = -15.0f, autoMoveMaxZ_ = 15.0f;
+	float autoMoveDirChangeMinSec_ = 1.0f;
+	float autoMoveDirChangeMaxSec_ = 2.5f;
+	float autoMoveMinDirLen_ = 0.1f;
+
+	// オート攻撃のパラメータ
+	float clearTotalTime_ = 0.0f;
+	float clearCurrentAngle_ = 0.2f;
+	float clearLastYaw_ = 0.0f;
+
 };
 
 ============================================================
@@ -10188,7 +10347,7 @@ void PlayerBullet::Initialize()
   	object_ = std::make_unique<Object3d>();
 	object_->Initialize("playerBullet.obj");
 
-	scale_ = { 0.5f,0.5f,0.5f };
+	scale_ = bulletScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -10228,7 +10387,7 @@ void PlayerBullet::Update()
 
 	SyncObjectTransform();
 
-	rotation_.y += 1.0f * dt * PlayerBullet::kDefaultFrameRate;
+	rotation_.y += spinSpeed_ * dt * PlayerBullet::kDefaultFrameRate;
 	position_ += velocity_ * dt;
 
 	aabb_.min = position_ - object_->GetScale();
@@ -10236,7 +10395,7 @@ void PlayerBullet::Update()
 	collider_.SetPosition(position_);
 
 	// パーティクル
-	IIEngine::ParticleEmitter::Emit("slash", position_, 1);
+	IIEngine::ParticleEmitter::Emit("slash", position_, slashParticleCount_);
 }
 
 void PlayerBullet::Draw()
@@ -10336,6 +10495,15 @@ private: // メンバ変数
 	// 寿命
 	static const int32_t kLifeTime = 60 * 5;
 
+	// スケール
+	Vector3 bulletScale_ = { 0.5f, 0.5f, 0.5f };
+	// スピン速度
+	float spinSpeed_ = 1.0f;
+	// スラッシュパーティクルの発生数
+	int slashParticleCount_ = 1;
+	// 寿命時間
+	float lifeTimeSec_ = 5.0f;
+
 };
 
 ============================================================
@@ -10354,14 +10522,10 @@ void ClearScene::Initialize()
 
 	camera_ = std::make_unique<SceneCamera>();
 	camera_->Initialize();
-	camera_->SetRotate({ 0.3f,0.0f,0.0f });
-	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
 	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
 
-	cameraPosition_ = { 0.0f,12.0f,-33.0f };
-	cameraRotate_ = { 0.3f,0.0f,0.0f };
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
@@ -10592,8 +10756,8 @@ private:
 
 	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
-	Vector3 cameraPosition_{};
-	Vector3 cameraRotate_{};
+	Vector3 cameraPosition_ = { 0.0f,12.0f,-33.0f };
+	Vector3 cameraRotate_ = { 0.3f,0.0f,0.0f };
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
@@ -10639,14 +10803,10 @@ void GameOverScene::Initialize()
 
 	camera_ = std::make_unique<SceneCamera>();
 	camera_->Initialize();
-	camera_->SetRotate({ 0.3f,0.0f,0.0f });
-	camera_->SetPosition({ 0.0f,4.0f,-40.0f });
 	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 	cameraManager.AddCamera(camera_->GetCamera());
 	cameraManager.SetActiveCamera(0);
-
-	cameraPosition_ = { 0.0f,20.0f,-50.0f };
-	cameraRotate_ = { 0.3f,0.0f,0.0f };
+	
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
@@ -10936,8 +11096,8 @@ private:
 
 	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
-	Vector3 cameraPosition_{};
-	Vector3 cameraRotate_{};
+	Vector3 cameraPosition_ = { 0.0f,20.0f,-50.0f };
+	Vector3 cameraRotate_ = { 0.3f,0.0f,0.0f };
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
@@ -11028,7 +11188,7 @@ void GamePlayScene::Initialize()
 
 		if (i == 0)
 		{
-			sprite->Initialize("playUI.png", { 0,520 }, color_, { 0,0 });
+			sprite->Initialize("playUI.png", uiPos_ , color_, { 0,0 });
 		}
 		if (i == 1)
 		{
@@ -11086,8 +11246,9 @@ void GamePlayScene::Initialize()
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
 		[this]() -> Vector3 { return pPlayer_->GetVelocity(); }, // プレイヤー速度を供給
-		0.8f, 0.25f,
-		Vector3{ 1.4f, 0.0f, 0.0f }
+		followSpeed_,// 追従の速さ
+		inputLead_, // 先行入力の重み
+		cameraOffset_
 	));
 
 	// カメラのシェイク
@@ -11099,8 +11260,8 @@ void GamePlayScene::Initialize()
 			if (hit) pPlayer_->SetHitMoment(false); // consume
 			return hit;
 		},
-		0.3f, // duration
-		0.5f  // amplitude
+		duration_,
+		amplitude_
 	));
 
 	// スタート用コントローラ作成
@@ -11120,7 +11281,7 @@ void GamePlayScene::Initialize()
 	camera_->AddController<ClearCameraController>(
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
-		clearCameraDuration_, clearCameraRotations_, 0.12f, 30.0f, 0.4f);
+		clearCameraDuration_, clearCameraRotations_, rotationSpeedMultiplier_, finalDistance_, finalHeight_);
 
 	// コールバック設定(FindController を使ってその場で取得)
 	if (auto* death = camera_->FindController<DeathCameraController>())
@@ -11159,9 +11320,10 @@ void GamePlayScene::Initialize()
 			});
 
 		// 演出前に追尾を止めておく
-		if (auto* follow = camera_->FindController<FollowController>()) follow->Stop();
-		// 演出を開始
-		startCtrl->Start();
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
 	}
 
 	// シーン開始時遷移演出
@@ -11220,6 +11382,15 @@ void GamePlayScene::Update()
 		// トランジション終了判定
 		if (blockTransition_->IsFinished())
 		{
+			// 初回開始用フラグが立っていればトランジション完了時にスタートカメラを開始する
+			if (isStartCamera_)
+			{
+				if (auto* startCtrl = camera_->FindController<StartCameraController>())
+				{
+					startCtrl->Start();
+				}
+			}
+
 			blockTransition_.reset();
 			isTransitioning_ = false;
 		}
@@ -11233,7 +11404,7 @@ void GamePlayScene::Update()
 		if (fadeTransition_->IsFinished())
 		{
 			fadeTransition_.reset();
-			isTransitioning_ = false;
+		    isTransitioning_ = false;
 		}
 	}
 	
@@ -11638,6 +11809,22 @@ private:
     uint32_t activeIndex = 0;
 	Vector3 cameraRotate_ = { -0.9f,0.0f,0.0f};
 	Vector3 cameraPosition_ = { 0.0f,-20.0f,0.0f };
+	// 追従の速さ
+	float followSpeed_ = 0.8f;
+	// 先行入力の重み
+	float inputLead_ = 0.25f;
+	// カメラのオフセット
+	Vector3 cameraOffset_ = { 1.4f, 0.0f, 0.0f };
+	// 持続時間
+	float duration_ = 0.3f;
+	// 振動の強さ
+	float amplitude_ = 0.5f;
+	// カメラの回転速度
+	float rotationSpeedMultiplier_ = 0.12f;
+	// カメラの最終距離
+	float finalDistance_ = 30.0f;
+	// カメラの最終高さ
+	float finalHeight_ = 0.4f;
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
@@ -11647,6 +11834,7 @@ private:
 	// 描画するスプライトの数
 	uint32_t spriteNum_ = 6;
 
+	Vector2 uiPos_ = { 0,520 };
 	Vector2 spacePos_ = { 0.0f,0.0f };
 	Vector2 wPos_ = { 0.0f,0.0f };
 	Vector2 aPos_ = { 0.0f,0.0f };
@@ -12095,12 +12283,6 @@ void TitleScene::Initialize()
 
 	}
 
-	// --- サウンド ---
-	soundData_ = Audio::GetInstance()->LoadWav("fanfare.wav");
-	//Audio::GetInstance()->PlayWave(soundData_, false, 0.2f);
-	soundData2_ = Audio::GetInstance()->LoadWav("BGM.wav");
-	//Audio::GetInstance()->PlayWave(soundData2_, true, 0.2f);
-
 
 	// 環境マップ
 	cubeMapPath_ = "resources/images/studio.dds";
@@ -12126,8 +12308,8 @@ void TitleScene::Initialize()
 			if (hit) pPlayer_->SetHitMoment(false); // consume
 			return hit;
 		},
-		0.3f, // duration
-		0.5f  // amplitude
+		duration_,
+		amplitude_
 	));
 		
 	// シーン開始時にフェードイン
@@ -12141,9 +12323,6 @@ void TitleScene::Finalize()
 	pPlayer_->Finalize();
 	pEnemyManager_->Finalize();
 	pField_->Finalize();
-
-	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData_);
-	Audio::GetInstance()->SoundUnload(Audio::GetInstance()->GetXAudio2(), &soundData2_);
 
 	// Object3dCommon に設定したデフォルトカメラを解除
 	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(nullptr);
@@ -12289,15 +12468,6 @@ void TitleScene::Update()
 				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 			});
 	}
-
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_Q))
-	{
-		Audio::GetInstance()->SoundStop(soundData_);
-	}
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_E))
-	{
-		Audio::GetInstance()->SoundStop(soundData2_);
-	}
 }
 
 void TitleScene::Draw()
@@ -12380,6 +12550,10 @@ private:
 	std::unique_ptr<SceneCamera> camera_ = nullptr;
 	Vector3 cameraPosition_{};
 	Vector3 cameraRotate_{};
+	// 持続時間
+	float duration_ = 0.3f; 
+	// 振動の強さ
+	float amplitude_ = 0.5f;
 
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
@@ -12406,9 +12580,6 @@ private:
 	// 透明チェック
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
-	// サウンド
-	IIEngine::SoundData soundData_;
-	IIEngine::SoundData soundData2_;
 
 	bool isTerrainDraw = false;
 	bool enableLighting = false;
@@ -12453,10 +12624,6 @@ private:
 File Path: project/application/scene/cameraController/ClearCameraController.cpp
 ============================================================
 #include "ClearCameraController.h"
-
-#include <algorithm>
-#include <cmath>
-#include <corecrt_math_defines.h>
 
 #include <Camera.h>
 #include <Ease.h>
@@ -12517,10 +12684,10 @@ void ClearCameraController::Update(float dt)
     float rotationsScaled = rotations_ * rotationSpeedMultiplier_;
     float targetAngle = 0.0f; // プレイヤー正面
     float delta = targetAngle - startAngle_;
-    while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-    while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
+    while (delta > (float)M_PI) delta -= kTau_;
+    while (delta < (float)-M_PI) delta += kTau_;
 
-    float totalAngularTravel = delta + rotationsScaled * 2.0f * (float)M_PI;
+    float totalAngularTravel = delta + rotationsScaled * kTau_;
     float angle = startAngle_ + totalAngularTravel * t_eased;
 
     // 半径は開始時のものを維持（元コード）
@@ -12585,6 +12752,9 @@ File Path: project/application/scene/cameraController/ClearCameraController.h
 
 #include <memory>
 #include <functional>
+#include <algorithm>
+#include <cmath>
+#include <corecrt_math_defines.h>
 
 #include <Vector3.h>
 
@@ -12657,6 +12827,9 @@ private:
     std::function<void()> onFadeStart_ = nullptr;
     std::function<void()> onFinish_ = nullptr;
 
+    // 1回転 = 2π ラジアン
+    float kTau_ = 2.0f * static_cast<float>(M_PI);
+
 };
 
 
@@ -12666,12 +12839,8 @@ File Path: project/application/scene/cameraController/DeathCameraController.cpp
 ============================================================
 #include "DeathCameraController.h"
 
-#include <algorithm>
-
 #include <Camera.h>
 #include <Ease.h>
-#include <cmath>
-#include <corecrt_math_defines.h>
 
 DeathCameraController::DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float endRadius, float endHeight)
 	: camera_(std::move(camera)),
@@ -12700,10 +12869,10 @@ void DeathCameraController::Update(float dt)
     float targetAngle = 0.0f; // 最終的にプレイヤー前方が 0
     float delta = targetAngle - startAngle_;
     // normalize delta to [-pi, pi]
-    while (delta > (float)M_PI) delta -= 2.0f * (float)M_PI;
-    while (delta < (float)-M_PI) delta += 2.0f * (float)M_PI;
+    while (delta > (float)M_PI) delta -= kTau_;
+    while (delta < (float)-M_PI) delta += kTau_;
 
-    float totalAngularTravel = delta + rotations_ * 2.0f * (float)M_PI;
+    float totalAngularTravel = delta + rotations_ * kTau_;
     float angle = startAngle_ + totalAngularTravel * t_eased;
 
     // 半径・高さを補間
@@ -12788,6 +12957,9 @@ File Path: project/application/scene/cameraController/DeathCameraController.h
 
 #include <memory>
 #include <functional>
+#include <algorithm>
+#include <cmath>
+#include <corecrt_math_defines.h>
 
 #include <Vector3.h>
 
@@ -12863,6 +13035,10 @@ private:
 
 	// 演出完了時のコールバック
 	std::function<void()> onFinish_ = nullptr;
+
+	// 1回転 = 2π ラジアン
+	float kTau_ = 2.0f * static_cast<float>(M_PI);;
+
 
 };
 
@@ -20621,11 +20797,11 @@ namespace IIEngine
 
         cbData_.center = { 0.5f, 0.5f };
         cbData_.radius = 0.30f;
-        cbData_.width = 0.02f;
+        cbData_.width = 0.05f;
         cbData_.intensity = 1.0f;
         cbData_.time = 0.0f;
-        cbData_.frequency = 10.0f;
-        cbData_.speed = 1.0f;
+        cbData_.frequency = 40.0f;
+        cbData_.speed = 8.0f;
 
         constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));
         HRESULT hr = constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedCB_));
@@ -20672,6 +20848,13 @@ namespace IIEngine
         {
             cbData_.time += dt;
 
+            float t = cbData_.time / pulseDuration_;
+            t = std::clamp(t, 0.0f, 1.0f);
+            cbData_.intensity = (1.0f - t) * 1.5f;
+
+            // 半径を0→1へ拡大
+            cbData_.radius = t;
+
             if (cbData_.time >= pulseDuration_)
             {
                 isPulsing_ = false;
@@ -20680,7 +20863,7 @@ namespace IIEngine
 
         float t = cbData_.time / pulseDuration_;
         t = std::clamp(t, 0.0f, 1.0f);
-        cbData_.intensity = 1.0f - t;   // 徐々に弱くする
+        cbData_.intensity = (1.0f - t) * 1.5f;
 
         if (mappedCB_)
         {
@@ -22059,9 +22242,9 @@ namespace IIEngine
     {
         BasePostEffectPass::Initialize(dxCommon, srvManager, vsPath, psPath);
 
-        cbData_.intensity = 1.0f;
-        cbData_.density = 800.0f;
-        cbData_.speed = 3.0f;
+        cbData_.intensity = 0.5f;
+        cbData_.density = 1200.0f;
+        cbData_.speed = 10.0f;
         cbData_.time = 0.0f;
 
         constantBuffer_ = dxCommon->CreateUploadBuffer(sizeof(cbData_));
