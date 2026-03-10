@@ -1655,7 +1655,7 @@ void BaseBullet::Draw()
 	}
 }
 
-Vector3 BaseBullet::SetVelocity(const Vector3 _velocity)
+Vector3 BaseBullet::SetVelocity(const Vector3& _velocity)
 {
 	// フレームレート補正
 	velocity_ = _velocity * kDefaultFrameRate;
@@ -1721,7 +1721,7 @@ public:
 	virtual void Draw() override;
 
 	// 速度設定
-	virtual Vector3 SetVelocity(const Vector3 _velocity);
+	virtual Vector3 SetVelocity(const Vector3& _velocity);
 
 protected:
 
@@ -2829,9 +2829,9 @@ using namespace IIEngine;
 void Corruptor::Initialize()
 {
 	// Initialize を呼び出し共通プロパティを初期化
-	BaseEnemy::Initialize("bomb.obj","Corruptor", 1.0f);
+	BaseEnemy::Initialize("bomb.obj","Corruptor", initialHP_);
 
-	scale_ = { 1.0f,1.0f,1.0f };
+	scale_ = initialScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -2843,7 +2843,7 @@ void Corruptor::Initialize()
 	isInvincible_ = true;
 
 	// パーティクル
-	IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
+	IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 }
 
 void Corruptor::Finalize()
@@ -2873,12 +2873,12 @@ void Corruptor::Update()
 	float distanceToPlayer = position_.Distance(playerPosition_);
 
 	// プレイヤーとの距離が一定以上かどうかのフラグ更新
-	isFarFromPlayer_ = (distanceToPlayer < 2.5f);
+	isFarFromPlayer_ = (distanceToPlayer < nearPlayerDistance_);
 
 	if (isExploded_)
 	{
 		// 爆発後に少しだけスケールを大きくする
-		scale_ += Vector3(0.1f, 0.1f, 0.1f) * dt * kDefaultFrameRate;
+		scale_ += Vector3(explodedScaleGrowPerFrame_, explodedScaleGrowPerFrame_, explodedScaleGrowPerFrame_) * dt * kDefaultFrameRate;
 	}
 
 }
@@ -2914,19 +2914,19 @@ void Corruptor::Move()
 	// 基底クラスの補間処理を使用
 	toPlayer_ = playerPosition_ - position_;
 	Vector3 direction = Normalize(toPlayer_);
-	moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
+	moveVelocity_ = InterpolateMovement(moveVelocity_, direction, moveInterpolateRate_);
 
 	// Y軸回転を進行方向に合わせる
 	rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
 	rotation_.x = 0.0f;
 
-	moveVelocity_ /= 7.0f;
+	moveVelocity_ /= moveVelocityDivisor_;
 	moveVelocity_.y = 0.0f;
 	position_ += moveVelocity_ * dt * kDefaultFrameRate;
 
 	SyncObjectTransform();
 
-	IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+	IIEngine::ParticleEmitter::Emit("enemyWalk", position_, moveParticleCount_);
 
 }
 
@@ -2961,10 +2961,9 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 		// 敵同士が重ならないようにする
 		Vector3 direction = position_ - enemyPosition;
 		direction.Normalize();
-		float distance = 2.5f; // 敵同士の間の距離を調整するための値
 
 		// 互いに重ならないように少しずつ位置を調整
-		if ((position_ - enemyPosition).Length() < distance)
+		if ((position_ - enemyPosition).Length() < separationDistance_)
 		{
 			position_ += direction * 0.1f; // 微調整のための値
 		}
@@ -3085,7 +3084,6 @@ public: // セッター
 	void SetIsExploded(bool _isExploded) { isExploded_ = _isExploded; }
 
 	
-
 	// --- ステートでのTransform操作用関数(引数あり) ---
 	// オブジェクトの positionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
@@ -3108,8 +3106,27 @@ private:
 	// プレイヤーとの距離が一定以上かどうかのフラグ
 	bool isFarFromPlayer_ = false;
 
-	// 爆発フラグ(爆発後の判定用にisDead_は取っておきたい)
+	// 爆発フラグ
 	bool isExploded_ = false;
+
+	float initialHP_ = 1.0f;
+	Vector3 initialScale_ = { 1.0f, 1.0f, 1.0f };
+
+	int spawnParticleCount_ = 2;
+
+	// isFarFromPlayer_ 判定に使う閾値
+	float nearPlayerDistance_ = 2.5f;
+	// 爆発後スケール増分
+	float explodedScaleGrowPerFrame_ = 0.1f;      
+
+	// 移動関連
+	float moveInterpolateRate_ = 0.1f;
+	float moveVelocityDivisor_ = 7.0f;
+	int moveParticleCount_ = 1;
+
+	// 障害物回避関連
+	float separationDistance_ = 2.5f;
+	float separationPush_ = 0.1f;
 
 };
 
@@ -3160,7 +3177,7 @@ void EnemyManager::Update()
 	// デルタタイム取得
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	// アップデートするフレーム数計算
-	const int framesThisUpdate = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
+	const int framesThisUpdate = std::max(1, static_cast<int>(dt * updateFrameRateBase_ + 0.5f));
 
 	// ノーマルエネミーの更新
 	for (auto& enemy : pNormalEnemies_)
@@ -3267,7 +3284,7 @@ void EnemyManager::Update()
 		{
 			// ステート遷移
 			isWaveChange_ = true;
-			waveChangeInterval_ = 120;
+			waveChangeInterval_ = waveChangeIntervalResetFrames_;
 		}
 	}
 }
@@ -3329,10 +3346,10 @@ void EnemyManager::ImGuiDraw()
 
 void EnemyManager::TitleEnemyInit()
 {
-	NormalEnemyInit({ 2.0f,0.5f,-5.0f });
-	TrapEnemyInit({ -2.0f,0.5f,2.0f });
-	NormalEnemyInit({ -5.0f,0.5f,-2.0f });
-	TrapEnemyInit({ 5.0f,0.5f,5.0f });
+	NormalEnemyInit(titleEnemySpawnPos_[0]);
+	TrapEnemyInit(titleEnemySpawnPos_[1]);
+	NormalEnemyInit(titleEnemySpawnPos_[2]);
+	TrapEnemyInit(titleEnemySpawnPos_[3]);
 }
 
 void EnemyManager::TitleEnemyUpdate()
@@ -3401,7 +3418,7 @@ void EnemyManager::TitleEnemyUpdate()
 
 void EnemyManager::GameOverEnemyInit()
 {
-	NormalEnemyInit({ -20.0f,0.5f,0.0f });
+	NormalEnemyInit(gameOverEnemySpawnPos_);
 }
 
 void EnemyManager::GameOverEnemyUpdate()
@@ -3713,6 +3730,23 @@ private:
 	// 障害物の位置リスト
 	std::vector<Vector3> obstacles_ = {};
 
+	// フレームレートの基準値
+	float updateFrameRateBase_ = 60.0f;
+
+	// ウェーブ切り替えインターバルの初期値とリセット値
+	int32_t waveChangeIntervalInitFrames_ = 250;
+	int32_t waveChangeIntervalResetFrames_ = 120;
+
+	// タイトルシーン用の敵のスポーン位置
+	Vector3 gameOverEnemySpawnPos_ = { -20.0f, 0.5f, 0.0f };
+	std::vector<Vector3> titleEnemySpawnPos_ =
+	{
+		{ 2.0f, 0.5f, -5.0f },
+		{ -2.0f, 0.5f, 2.0f },
+		{ -5.0f, 0.5f, -2.0f },
+		{ 5.0f, 0.5f, 5.0f },
+	};
+
 };
 
 
@@ -3738,7 +3772,7 @@ using namespace IIEngine;
 void NormalEnemy::Initialize()
 {
     // Initialize を呼び出し共通プロパティを初期化
-    BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", 3.0f);
+    BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", initialHP_);
 
     SyncObjectTransform();
 
@@ -3770,7 +3804,9 @@ void NormalEnemy::Initialize()
 
 
     // パーティクル
-    IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
+    IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
+
+    vignetteTime_ = maxVignetteTimeFrames_;
 }
 
 void NormalEnemy::Finalize()
@@ -3812,7 +3848,8 @@ void NormalEnemy::Update()
     if (distanceToPlayer <= kStopChasingDistance)
     {
         isFarFromPlayer_ = true;
-    } else
+    } 
+    else
     {
         isFarFromPlayer_ = false;
     }
@@ -3833,7 +3870,7 @@ void NormalEnemy::Update()
     if (!isFollowingPath_)
     {
         // プレイヤー位置が一定以上変化したらパスを再計算するフラグを立てる
-        if ((playerPosition_ - lastPlayerPos_).Length() > 1.0f)
+        if ((playerPosition_ - lastPlayerPos_).Length() > playerMoveRePathThreshold_)
         {
             pathDirty_ = true;
             lastPlayerPos_ = playerPosition_;
@@ -3946,7 +3983,7 @@ void NormalEnemy::Move()
     {
         float distToPlayer = toPlayer_.Length();
 
-        if (distToPlayer < 1.5f)
+        if (distToPlayer < followPathToDirectDistance_)
         {
             moveMode_ = MoveMode::Direct;
             path_.clear();
@@ -3956,7 +3993,7 @@ void NormalEnemy::Move()
         float goalDist = (path_.empty()) ? 999.0f : (playerPosition_ - path_.back()).Length();
 
 		// パスが汚れているか、ゴールが大きくズレているときは再計算
-        if (pathDirty_ && goalDist > 2.5f)
+        if (pathDirty_ && goalDist > goalRePathDistance_)
         {
             path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
             currentWaypointIndex_ = 0;
@@ -3964,7 +4001,7 @@ void NormalEnemy::Move()
         }
 
         // 直進復帰判定
-        if (losTrueFrame_ > 10 && currentWaypointIndex_ > path_.size() * 0.7f)
+        if (losTrueFrame_ > losTrueToDirectFrames_ && currentWaypointIndex_ > path_.size() * directReturnPathProgress_)
         {
             // 壁が無いなら直進優先
             moveMode_ = MoveMode::Direct;
@@ -3980,13 +4017,13 @@ void NormalEnemy::Move()
         bool shouldCalculatePath = false;
 
         // LOSが無い
-        if (losFalseFrame_ > 1)
+        if (losFalseFrame_ > losFalseToPathFrames_)
         {
             shouldCalculatePath = true;
         }
 
         // スタックしている
-        if (stuckFrame_ > 10)
+        if (stuckFrame_ > stuckToPathFrames_)
         {
             shouldCalculatePath = true;
         }
@@ -4017,7 +4054,7 @@ void NormalEnemy::Move()
         Vector3 toTarget = target - position_;
 
         // ウェイポイント到達 
-        if (toTarget.Length() < 1.0f)
+        if (toTarget.Length() < waypointArriveDist_)
         {
             currentWaypointIndex_++;
         }
@@ -4035,32 +4072,33 @@ void NormalEnemy::Move()
     }
 
     // 直進 
-    if (moveMode_ == MoveMode::Direct && direction.Length() < 0.001f)
+    if (moveMode_ == MoveMode::Direct && direction.Length() < directionEpsilon_)
     {
-        if (toPlayer_.Length() > 0.001f)
+        if (toPlayer_.Length() > directionEpsilon_)
         {
             direction = Normalize(toPlayer_);
         }
     }
 
     // 方向が取れたときだけ更新
-    if (direction.Length() > 0.001f)
+    if (direction.Length() > directionEpsilon_)
     {
-        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.2f);
+        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, moveInterpolateRate_);
 
-    } else
+    } 
+    else
     {
         // 行き先が無いときは少し減速
-        moveVelocity_ *= 0.9f;
+        moveVelocity_ *= noDirectionDamping_;
     }
 
-    if (stuckFrame_ > 10 && moveMode_ == MoveMode::FollowPath)
+    if (stuckFrame_ > stuckToPathFrames_ && moveMode_ == MoveMode::FollowPath)
     {
         Vector3 side = Cross({ 0,1,0 }, moveVelocity_);
 
-        if (side.Length() > 0.0001f)
+        if (side.Length() > stuckSideEpsilon_)
         {
-            moveVelocity_ += Normalize(side) * 0.05f;
+            moveVelocity_ += Normalize(side) * stuckSidePush_;
         }
     }
 
@@ -4069,13 +4107,14 @@ void NormalEnemy::Move()
 
     BaseEnemy::Move();
     SyncObjectTransform();
-    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, walkParticleCount_);
 
     // スタックしていたら更新
-    if ((position_ - lastPosition_).Length() < 0.05f)
+    if ((position_ - lastPosition_).Length() < stuckDetectMoveEpsilon_)
     {
         stuckFrame_++;
-    } else
+    } 
+    else
     {
         stuckFrame_ = 0;
     }
@@ -4083,7 +4122,7 @@ void NormalEnemy::Move()
     lastPosition_ = position_;
 
     // FollowPath 用の詰まり対処
-    if (stuckFrame_ > 20 && moveMode_ == MoveMode::FollowPath)
+    if (stuckFrame_ > stuckFollowSkipWaypointFrames_ && moveMode_ == MoveMode::FollowPath)
     {
         currentWaypointIndex_++;
         stuckFrame_ = 0;
@@ -4093,9 +4132,9 @@ void NormalEnemy::Move()
 void NormalEnemy::Attack()
 {
     // 弾の発射設定
-    const int bulletCount = 24;
+    const int bulletCount = attackBulletCount_;
     const float angleStep = 360.0f / bulletCount;
-    const float bulletCooldown = 0.0f;
+    const float bulletCooldown = attackCooldownSec_;
 
     // クールタイム管理
     static float cooldownTimer = 0.0f;
@@ -4122,8 +4161,8 @@ void NormalEnemy::Attack()
             // 弾の生成と初期化
             auto bullet = std::make_unique<EnemyBullet>();
             bullet->Initialize();
-            bullet->SetPosition({ position_.x, position_.y + 0.5f, position_.z });
-            bullet->SetVelocity(bulletDirection * 0.2f);
+            bullet->SetPosition({ position_.x, position_.y + bulletSpawnYOffset_, position_.z });
+            bullet->SetVelocity(bulletDirection * bulletSpeed_);
             bullet->SyncObjectTransform();
 
             // 弾をリストに追加
@@ -4163,7 +4202,7 @@ void NormalEnemy::OnCollisionTrigger(const Collider* _other)
             // プレイヤーのHPを減少
             if (hp_ > 0)
             {
-                hp_ -= 1.5f;
+                hp_ -= timeBombExplosionDamage_;
                 isHit_ = true;
             }
         }
@@ -4224,13 +4263,14 @@ void NormalEnemy::HitVignetteTrap()
     if (isHitVignetteTrap_)
     {
         // パーティクルを生成
-        IIEngine::ParticleEmitter::Emit("vignetteGroup", { position_.x, position_.y + 1.0f,position_.z }, 3);
+        IIEngine::ParticleEmitter::Emit("vignetteGroup", { position_.x, position_.y + 1.0f,position_.z }, vignetteParticleCount_);
 
         // タイマー更新
         if (vignetteTime_ > 0)
         {
             vignetteTime_--;
-        } else
+        } 
+        else
         {
             // 終了
             isHitVignetteTrap_ = false;
@@ -4330,7 +4370,7 @@ public: // ゲッター
 public: // セッター
 
 	// プレイヤーの位置をセット
-	void SetPlayerPosition(Vector3 _playerPosition) { playerPosition_ = _playerPosition; }
+	void SetPlayerPosition(Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
 
 	// 無敵フラグをセット
 	void SetIsInvincible(bool _isInvincible) { isInvincible_ = _isInvincible; }
@@ -4384,6 +4424,49 @@ private:
 	int losTrueFrame_ = 0;
 	int losFalseFrame_ = 0;
 
+	float initialHP_ = 3.0f;
+	int spawnParticleCount_ = 2;
+
+	float stopChasingDistance_ = 15.0f;
+
+	// path/LOS tuning
+	float playerMoveRePathThreshold_ = 1.0f;
+	float followPathToDirectDistance_ = 1.5f;
+	float goalRePathDistance_ = 2.5f;
+	int losTrueToDirectFrames_ = 10;
+	float directReturnPathProgress_ = 0.7f;
+	int losFalseToPathFrames_ = 1;
+
+	int stuckToPathFrames_ = 10;
+	int stuckFollowSkipWaypointFrames_ = 20;
+
+	float waypointArriveDist_ = 1.0f;
+
+	float directionEpsilon_ = 0.001f;
+	float moveInterpolateRate_ = 0.2f;
+	float noDirectionDamping_ = 0.9f;
+
+	float stuckSideEpsilon_ = 0.0001f;
+	float stuckSidePush_ = 0.05f;
+
+	float stuckDetectMoveEpsilon_ = 0.05f;
+
+	int walkParticleCount_ = 1;
+
+	// attack tuning
+	int attackBulletCount_ = 24;
+	float bulletSpeed_ = 0.2f;
+	float bulletSpawnYOffset_ = 0.5f;
+	float attackCooldownSec_ = 0.0f;
+
+	// bomb damage
+	float timeBombExplosionDamage_ = 1.5f;
+
+	// vignette effect
+	float vignetteEmitHeight_ = 1.0f;
+	int vignetteParticleCount_ = 3;
+	uint32_t maxVignetteTimeFrames_ = 60 * 3;
+
 };
 
 
@@ -4407,7 +4490,7 @@ using namespace IIEngine;
 void TrapEnemy::Initialize()
 {
     // Initialize を呼び出し共通プロパティを初期化
-    BaseEnemy::Initialize("trapEnemy.obj","TrapEnemy", 3.0f);
+    BaseEnemy::Initialize("trapEnemy.obj","TrapEnemy", initialHP_);
 
 	SyncObjectTransform();
     // ライト設定
@@ -4434,7 +4517,7 @@ void TrapEnemy::Initialize()
     isInvincible_ = true;
     
 	// パーティクル
-    IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
+    IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 }
 
 void TrapEnemy::Finalize()
@@ -4579,18 +4662,18 @@ void TrapEnemy::Move()
 	if (isEscape_)
 	{
 		// 離れる
-		moveVelocity_ = Slerp(moveVelocity_, -direction, 0.1f);
+		moveVelocity_ = Slerp(moveVelocity_, -direction, moveSlerpRate_);
 	}
     else if (isApproach_)
 	{
 		// 近づく
-		moveVelocity_ = Slerp(moveVelocity_, direction, 0.1f);
+		moveVelocity_ = Slerp(moveVelocity_, direction, moveSlerpRate_);
 	}
     // 距離が適切かつ罠のクールタイムが無かったら疑似停止
     else if (isStopAndTrap_ && isTrapCooldownComplete_)
 	{
 		// 罠を設置するため停止
-		moveVelocity_ = { 0.0f, 0.0f, 0.00001f };
+		moveVelocity_ = { 0.0f, 0.0f, stopAndTrapMinZ_ };
 	}
     
 
@@ -4598,13 +4681,13 @@ void TrapEnemy::Move()
     rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
     rotation_.x = 0.0f;
 
-    moveVelocity_ /= 30.0f;
+    moveVelocity_ /= moveVelocityDivisor_;
     moveVelocity_.y = 0.0f;
     position_ += moveVelocity_ * (dt * kDefaultFrameRate);
 
 	SyncObjectTransform();
 
-    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, walkParticleCount_);
 }
 
 
@@ -4644,11 +4727,11 @@ void TrapEnemy::RemoveBullets()
 {
 	// 罠の削除
     pTimeBomb_.erase(
-        std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
+        std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [this](std::unique_ptr<TimeBomb>& trap)
             {
                 if (trap->IsDead())
                 {
-                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), trapRemoveParticleCount_);
                     trap->Finalize();
                     return true;
                 }
@@ -4658,11 +4741,11 @@ void TrapEnemy::RemoveBullets()
     );
 
     pVignetteTrap_.erase(
-        std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
+        std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [this](std::unique_ptr<VignetteTrap>& trap)
             {
                 if (trap->IsDead())
                 {
-                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), trapRemoveParticleCount_);
                     trap->Finalize();
                     return true;
                 }
@@ -4886,12 +4969,28 @@ private:
 	// 罠を設置する
 	bool isStopAndTrap_ = false;
 
-
 	// 無敵フラグ(出現時等攻撃を受けなくさせる)
 	bool isInvincible_ = true;
 
 	// 被弾フラグ
 	bool isHit_ = false;
+
+	// プレイヤーの位置
+	float initialHP_ = 3.0f;
+	int spawnParticleCount_ = 2;
+
+	// 追尾距離
+	float tooCloseDistance_ = 6.0f;
+	float tooFarDistance_ = 20.0f;
+
+	// 物理挙動調整パラメーター
+	float moveSlerpRate_ = 0.1f;
+	float stopAndTrapMinZ_ = 0.00001f;
+	float moveVelocityDivisor_ = 30.0f;
+
+	// パーティクル
+	uint32_t walkParticleCount_ = 1;
+	uint32_t trapRemoveParticleCount_ = 1;
 
 };
 
@@ -4911,7 +5010,7 @@ CorruptorBehaviorMove::CorruptorBehaviorMove(Corruptor* _pCorruptor) : Corruptor
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_; // 移動モーションのカウントを設定
 }
 
 void CorruptorBehaviorMove::Initialize()
@@ -4947,11 +5046,11 @@ void CorruptorBehaviorMove::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 
 	// ポヨポヨ拡大縮小（X・Y両方）
-	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * 0.2f;
-	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * 0.2f;
+	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
+	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
 
 	// スケールを更新（X・Y両方ポヨポヨ）
-	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, 1.0f);
+	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, moveScaleZ_);
 
 	// スケールを適用
 	pCorruptor_->SetObjectScale(motion_.transform.scale);
@@ -4968,7 +5067,7 @@ void CorruptorBehaviorMove::ResetMotion()
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_; // 移動モーションのカウントを設定
 }
 
 
@@ -4998,6 +5097,15 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 移動モーション時間
+	uint32_t moveMotionFrames_ = 30;
+	// ポヨポヨ振幅
+	float moveScaleWaveAmp_ = 0.2f;
+	// Zスケール
+	float moveScaleZ_ = 1.0f;
+
 };
 
 
@@ -5015,7 +5123,7 @@ CorruptorBehaviorSelfDestruct::CorruptorBehaviorSelfDestruct(Corruptor* _pCorrup
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 60; // 自爆モーションのカウントを設定
+	motion_.maxCount = selfDestructMotionFrames_; // 自爆モーションのカウントを設定
 }
 
 void CorruptorBehaviorSelfDestruct::Initialize()
@@ -5031,15 +5139,15 @@ void CorruptorBehaviorSelfDestruct::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 	
 	// はじける演出
-	float scale = Lerp(1.0f, 2.0f, Ease::OutCubic(t));
+	float scale = Lerp(selfDestructScaleFrom_, selfDestructScaleTo_, Ease::OutCubic(t));
 	motion_.transform.scale = Vector3(scale, scale, scale);
 
 	// 揺れ演出
 	Vector3 shakeOffset =
 	{
-	((motion_.count % 2 == 0) ? 1.0f : -1.0f) * 0.1f,
+	((motion_.count % selfDestructShakePeriodX_ == 0) ? 1.0f : -1.0f) * selfDestructShakeAmp_,
 	0.0f, // Y軸は揺らさない
-	((motion_.count % 3 == 0) ? 1.0f : -1.0f) * 0.1f
+	((motion_.count % selfDestructShakePeriodZ_ == 0) ? 1.0f : -1.0f) * selfDestructShakeAmp_
 	};
 
 	Vector3 originPos = pCorruptor_->GetPosition();
@@ -5057,9 +5165,9 @@ void CorruptorBehaviorSelfDestruct::Update()
 		pCorruptor_->SetIsDead(true);
 
 		// パーティクル
-		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 15);
-		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
-		IIEngine::ParticleEmitter::Emit("BltReaction", motion_.transform.position, 1);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, particleExplosionGroupCount_);
+		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, particleRuptureCount_);
+		IIEngine::ParticleEmitter::Emit("BltReaction", motion_.transform.position, particleBulletReactionCount_);
 	}
 
 }
@@ -5095,6 +5203,26 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 自爆モーション時間
+	uint32_t selfDestructMotionFrames_ = 60;
+	
+	// はじけ開始スケール
+	float selfDestructScaleFrom_ = 1.0f;
+	// はじけ最大スケール
+	float selfDestructScaleTo_ = 2.0f;
+
+	// 揺れ
+	float selfDestructShakeAmp_ = 0.1f;
+	int selfDestructShakePeriodX_ = 2;
+	int selfDestructShakePeriodZ_ = 3;
+
+	// 自爆時パーティクル量
+	int particleExplosionGroupCount_ = 15;
+	int particleRuptureCount_ = 20;
+	int particleBulletReactionCount_ = 1;
+
 };
 
 
@@ -5114,7 +5242,7 @@ CorruptorBehaviorSpawn::CorruptorBehaviorSpawn(Corruptor* _pCorruptor) : Corrupt
 	// モーションの初期化
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // スポーンモーションのカウントを設定
+	motion_.maxCount = spawnMotionFrames_; // スポーンモーションのカウントを設定
 }
 
 void CorruptorBehaviorSpawn::Initialize()
@@ -5130,7 +5258,7 @@ void CorruptorBehaviorSpawn::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 
 	// 回転
-	motion_.transform.rotation.y = Lerp(0.0f, std::numbers::pi_v<float> *2.0f, Ease::OutCubic(t));
+	motion_.transform.rotation.y = Lerp(0.0f, std::numbers::pi_v<float> * spawnTurns_, Ease::OutCubic(t));
 
 	// トランスフォームを敵に反映
 	pCorruptor_->SetObjectPosition(motion_.transform.position);
@@ -5181,6 +5309,13 @@ public:
 	
 	// モーションのリセット
 	void ResetMotion() override;
+
+private:
+
+	// スポーンモーションのフレーム数
+	uint32_t spawnMotionFrames_ = 30;
+	// スポーンモーションの持続時間
+	float spawnTurns_ = 2.0f;
 
 };
 
@@ -5315,13 +5450,13 @@ EnemyBehaviorAttack::EnemyBehaviorAttack(NormalEnemy* _pNormalEnemy) : EnemyBeha
 {
 	// モーションの初期化
 	motion_.count = 0;
-	motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+	motion_.maxCount = attackMotionFrames_; // 攻撃モーションのカウントを設定
    
 }
 
 void EnemyBehaviorAttack::Initialize()
 {
-    attackCooldown_ = 10;
+    attackCooldown_ = initialCooldownFrames_;
 }
 
 void EnemyBehaviorAttack::Update()
@@ -5335,18 +5470,18 @@ void EnemyBehaviorAttack::Update()
         // モーションカウントを更新
         MotionCount(motion_);
 
-        if (motion_.count <= 20)
+        if (motion_.count <= chargeFrames_)
         {
-            float t = float(motion_.count) / 20.0f; // 0〜1
+            float t = float(motion_.count) / chargeFrames_; // 0〜1
             float ease = (t <= 0.5f)
                 ? Ease::OutSine(t * 2.0f)               // 0〜0.5  → 縮小
                 : Ease::OutSine((1.0f - t) * 2.0f);     // 0.5〜1  → 元に戻す
 
-            float scaleValue = 1.0f - ease * 0.3f;
+            float scaleValue = 1.0f - ease * chargeScaleShrink_;
             motion_.transform.scale = Vector3(scaleValue, scaleValue, scaleValue);
 			pNormalEnemy_->SetObjectScale(motion_.transform.scale);
 
-            float shake = ((motion_.count % 2 == 0) ? 1 : -1) * 0.05f;
+            float shake = ((motion_.count % chargeShakePeriod_ == 0) ? 1 : -1) * chargeShakeAmp_;
 			pNormalEnemy_->SetObjectPosition(motion_.transform.position + Vector3(shake, 0, shake));
             
         }
@@ -5357,14 +5492,14 @@ void EnemyBehaviorAttack::Update()
             isAttack_ = false;
 
             // 回転しながら弾を飛ばす
-            if (motion_.count == 21)
+            if (motion_.count == attackTriggerFrame_)
             {
                 // 攻撃フラグを立てる
                 isAttack_ = true;
             }
 
             // Y軸回転
-            motion_.transform.rotation.y += 0.3f;
+            motion_.transform.rotation.y += attackYawStep_;
 			pNormalEnemy_->SetRotation(motion_.transform.rotation);
 
         }
@@ -5407,7 +5542,7 @@ void EnemyBehaviorAttack::Update()
     {
         // 攻撃モーションを開始
         motion_.isActive = true;
-        attackCooldown_ = 60 * 3;
+        attackCooldown_ = cooldownFrames_;
     }
 
 	// フラグが立っている場合、攻撃を実行
@@ -5422,7 +5557,7 @@ void EnemyBehaviorAttack::ResetMotion()
 {
     // モーションの初期化
     motion_.count = 0;
-    motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+    motion_.maxCount = attackMotionFrames_; // 攻撃モーションのカウントを設定
 }
 
 
@@ -5463,6 +5598,25 @@ private:
 	// 攻撃クールタイム
 	int attackCooldown_ = 0;
 
+	// 攻撃モーション
+	uint32_t attackMotionFrames_ = 30;
+
+	// 溜めモーション
+	uint32_t chargeFrames_ = 20;
+	float chargeScaleShrink_ = 0.3f;
+
+	// 溜めのときの振動
+	float chargeShakeAmp_ = 0.05f;
+	int chargeShakePeriod_ = 2;
+
+	// 攻撃のときの回転
+	float attackYawStep_ = 0.3f;
+	uint32_t attackTriggerFrame_ = 21;
+
+	// 攻撃後のクールダウン
+	int initialCooldownFrames_ = 10;
+	int cooldownFrames_ = 60 * 3;
+
 };
 
 
@@ -5480,7 +5634,7 @@ EnemyBehaviorDead::EnemyBehaviorDead(NormalEnemy* _pNormalEnemy) : EnemyBehavior
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = deadFrames_; // 移動モーションのカウントを設定
 }
 
 void EnemyBehaviorDead::Initialize()
@@ -5496,17 +5650,17 @@ void EnemyBehaviorDead::Update()
 
 	if (motion_.count == 0)
 	{
-		motion_.transform.scale = Vector3(1.8f, 1.8f, 1.8f); // 初回だけ一気に膨らむ
+		motion_.transform.scale = Vector3(startPopScale_, startPopScale_, startPopScale_); // 初回だけ一気に膨らむ
 	}
 
 	// 徐々に縮む演出(1.8 → 0.0)
-	float scale = Lerp(1.8f, 0.0f, Ease::InCubic(t));
+	float scale = Lerp(startPopScale_, endScale_, Ease::InCubic(t));
 	motion_.transform.scale = (Vector3(scale, scale, scale));
 
-	motion_.transform.position.y += Ease::OutQuad(t) * 0.1f;
+	motion_.transform.position.y += Ease::OutQuad(t) * floatUpAmount_;
 
-	motion_.transform.rotation.y += 0.1f;
-	motion_.transform.rotation.x += 0.1f;
+	motion_.transform.rotation.y += rotSpeedY_;
+	motion_.transform.rotation.x += rotSpeedX_;
 
 	pNormalEnemy_->SetObjectPosition(motion_.transform.position);
 	pNormalEnemy_->SetObjectRotation(motion_.transform.rotation);
@@ -5522,8 +5676,8 @@ void EnemyBehaviorDead::Update()
 		pNormalEnemy_->SetIsDead(true);
 
 		// パーティクル
-		IIEngine::ParticleEmitter::Emit("petalGroup", motion_.transform.position, 6);
-		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
+		IIEngine::ParticleEmitter::Emit("petalGroup", motion_.transform.position, petalParticleCount_);
+		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, ruptureParticleCount_);
 	}
 
 }
@@ -5562,6 +5716,25 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 死亡モーションのフレーム数
+	uint32_t deadFrames_ = 30;
+
+	// 初回膨張
+	float startPopScale_ = 1.8f;     
+	// 最終縮小
+	float endScale_ = 0.0f;          
+	// 上昇量
+	float floatUpAmount_ = 0.1f;
+	// 回転速度
+	float rotSpeedY_ = 0.1f;
+	float rotSpeedX_ = 0.1f;
+
+	// パーティクルの数
+	int petalParticleCount_ = 6;
+	int ruptureParticleCount_ = 20;
+
 };
 
 
@@ -5581,7 +5754,7 @@ EnemyBehaviorHitReact::EnemyBehaviorHitReact(NormalEnemy* _pNormalEnemy) : Enemy
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = hitReactFrames_; // 移動モーションのカウントを設定
 }
 
 void EnemyBehaviorHitReact::Initialize()
@@ -5595,9 +5768,9 @@ void EnemyBehaviorHitReact::Update()
 
 	Vector3 shakeOffset =
 	{
-	((motion_.count % 2 == 0) ? 1.0f : -1.0f) * 0.1f,
+	((motion_.count % shakePeriodX_ == 0) ? 1.0f : -1.0f) * shakeAmp_,
 	0.0f, // Y軸は揺らさない
-	((motion_.count % 3 == 0) ? 1.0f : -1.0f) * 0.1f
+	((motion_.count % shakePeriodZ_ == 0) ? 1.0f : -1.0f) * shakeAmp_
 	};
 
 	Vector3 originPos = pNormalEnemy_->GetPosition();
@@ -5664,6 +5837,18 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 被弾リアクションのフレーム数
+	uint32_t hitReactFrames_ = 30;
+
+	// 振動の強さ
+	float shakeAmp_ = 0.1f;
+	// 振動の周期
+	int shakePeriodX_ = 2;
+	// 振動の周期
+	int shakePeriodZ_ = 3;
+
 };
 
 
@@ -5683,7 +5868,7 @@ EnemyBehaviorMove::EnemyBehaviorMove(NormalEnemy* _pNormalEnemy) : EnemyBehavior
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_;
 }
 
 void EnemyBehaviorMove::Initialize()
@@ -5724,11 +5909,11 @@ void EnemyBehaviorMove::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 
 	// ポヨポヨ拡大縮小（X・Y両方）
-	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * 0.2f;
-	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * 0.2f;
+	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
+	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
 
 	// スケールを更新（X・Y両方ポヨポヨ）
-	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, 1.0f);
+	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, moveScaleZ_);
 
 	// スケールをセット
 	pNormalEnemy_->SetScale(motion_.transform.scale);
@@ -5747,7 +5932,7 @@ void EnemyBehaviorMove::ResetMotion()
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_; // 移動モーションのカウントを設定
 }
 
 
@@ -5780,6 +5965,17 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 移動モーション
+	uint32_t moveMotionFrames_ = 30;
+
+	// 移動モーションの振幅
+	float moveScaleWaveAmp_ = 0.2f;
+	
+	// 移動モーションの振幅の倍率
+	float moveScaleZ_ = 1.0f;
+
 };
 
 
@@ -5799,7 +5995,7 @@ EnemyBehaviorSpawn::EnemyBehaviorSpawn(NormalEnemy* _pNormalEnemy) : EnemyBehavi
 	// モーションの初期化
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // スポーンモーションのカウントを設定
+	motion_.maxCount = spawnMotionFrames_; // スポーンモーションのカウントを設定
 }
 
 void EnemyBehaviorSpawn::Initialize()
@@ -5868,6 +6064,11 @@ public:
 
 	// モーションのリセット
 	void ResetMotion() override;
+
+private:
+
+	// スポーンモーションのフレーム数
+	uint32_t spawnMotionFrames_ = 30;
 
 };
 
@@ -5997,7 +6198,7 @@ TrapEnemyBehaviorDead::TrapEnemyBehaviorDead(TrapEnemy* _pTrapEnemy) : TrapEnemy
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // モーションのカウントを設定
+	motion_.maxCount = deadFrames_; // モーションのカウントを設定
 }
 
 void TrapEnemyBehaviorDead::Initialize()
@@ -6013,17 +6214,17 @@ void TrapEnemyBehaviorDead::Update()
 
 	if (motion_.count == 0)
 	{
-		motion_.transform.scale = Vector3(1.8f, 1.8f, 1.8f); // 初回だけ一気に膨らむ
+		motion_.transform.scale = Vector3(startPopScale_, startPopScale_, startPopScale_); // 初回だけ一気に膨らむ
 	}
 
 	// 徐々に縮む演出
-	float scale = Lerp(1.8f, 0.0f, Ease::InCubic(t));
+	float scale = Lerp(startPopScale_, endScale_, Ease::InCubic(t));
 	motion_.transform.scale = (Vector3(scale, scale, scale));
 
-	motion_.transform.position.y += Ease::OutQuad(t) * 0.1f;
+	motion_.transform.position.y += Ease::OutQuad(t) * floatUpAmount_;
 
-	motion_.transform.rotation.y += 0.1f;
-	motion_.transform.rotation.x += 0.1f;
+	motion_.transform.rotation.y += rotSpeedY_;
+	motion_.transform.rotation.x += rotSpeedX_;
 
 	pTrapEnemy_->SetObjectPosition(motion_.transform.position);
 	pTrapEnemy_->SetObjectRotation(motion_.transform.rotation);
@@ -6039,8 +6240,8 @@ void TrapEnemyBehaviorDead::Update()
 		pTrapEnemy_->SetIsDead(true);
 
 		// パーティクル
-		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 6);
-		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, explosionParticleCount_);
+		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, ruptureParticleCount_);
 	}
 }
 
@@ -6078,6 +6279,24 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 死亡モーションのフレーム数
+	uint32_t deadFrames_ = 30;
+
+	// 最初の膨らみの大きさ
+	float startPopScale_ = 1.8f;
+	// 最終的な縮みの大きさ
+	float endScale_ = 0.0f;
+	// 上昇量
+	float floatUpAmount_ = 0.1f;
+	// 回転速度
+	float rotSpeedY_ = 0.1f;
+	float rotSpeedX_ = 0.1f;
+
+	// パーティクルの数
+	int explosionParticleCount_ = 6;
+	int ruptureParticleCount_ = 20;
 
 };
 
@@ -6098,7 +6317,7 @@ TrapEnemyBehaviorHitReact::TrapEnemyBehaviorHitReact(TrapEnemy* _pTrapEnemy) : T
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = hitReactFrames_; // 移動モーションのカウントを設定
 }
 
 void TrapEnemyBehaviorHitReact::Initialize()
@@ -6112,9 +6331,9 @@ void TrapEnemyBehaviorHitReact::Update()
 
 	Vector3 shakeOffset =
 	{
-	((motion_.count % 2 == 0) ? 1.0f : -1.0f) * 0.1f,
+	((motion_.count % shakePeriodX_ == 0) ? 1.0f : -1.0f) * shakeAmp_,
 	0.0f, // Y軸は揺らさない
-	((motion_.count % 3 == 0) ? 1.0f : -1.0f) * 0.1f
+	((motion_.count % shakePeriodZ_ == 0) ? 1.0f : -1.0f) * shakeAmp_
 	};
 
 	Vector3 originPos = pTrapEnemy_->GetPosition();
@@ -6178,6 +6397,16 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+	
+	// ヒットリアクションの持続フレーム数
+	uint32_t hitReactFrames_ = 30;
+
+	// 震えの大きさ
+	float shakeAmp_ = 0.1f;
+	int shakePeriodX_ = 2;
+	int shakePeriodZ_ = 3;
+
 };
 
 
@@ -6197,7 +6426,7 @@ TrapEnemyBehaviorMove::TrapEnemyBehaviorMove(TrapEnemy* _pTrapEnemy) : TrapEnemy
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_; // 移動モーションのカウントを設定
 }
 
 void TrapEnemyBehaviorMove::Initialize()
@@ -6253,11 +6482,11 @@ void TrapEnemyBehaviorMove::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 
 	// ポヨポヨ拡大縮小（X・Y両方）
-	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * 0.2f;
-	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * 0.2f;
+	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
+	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
 
 	// スケールを更新（X・Y両方ポヨポヨ）
-	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, 1.0f);
+	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, moveScaleZ_);
 
 	// スケールをセット
 	pTrapEnemy_->SetScale(motion_.transform.scale);
@@ -6274,7 +6503,7 @@ void TrapEnemyBehaviorMove::ResetMotion()
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_; // 移動モーションのカウントを設定
 }
 
 
@@ -6315,6 +6544,13 @@ private:
 	// クールタイムの最大値
 	const uint32_t kMaxTrapCooldown = 60 * 3;
 
+	// 移動モーションのフレーム数
+	uint32_t moveMotionFrames_ = 30;
+	// 移動モーションの振幅
+	float moveScaleWaveAmp_ = 0.2f;
+	// 移動モーションの振動数
+	float moveScaleZ_ = 1.0f;
+
 };
 
 
@@ -6335,7 +6571,7 @@ TrapEnemyBehaviorSetTrap::TrapEnemyBehaviorSetTrap(TrapEnemy* _pTrapEnemy) : Tra
 {
 	// モーションの初期化
 	motion_.count = 0;
-	motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+	motion_.maxCount = setTrapMotionFrames_; // 攻撃モーションのカウントを設定
 	motion_.isActive = true;
 }
 
@@ -6348,26 +6584,23 @@ void TrapEnemyBehaviorSetTrap::Update()
     // 敵のトランスフォームを motion_.transformにセット
     TransformUpdate(pTrapEnemy_);
 
-    const int expandTime = 15;
-
     if (motion_.isActive)
     {
-        if (motion_.count < expandTime)
+        if (motion_.count < expandFrames_)
         {
             // ググっと膨らむ
-            float t = float(motion_.count) / expandTime;
-            float scaleValue = 1.0f + Ease::OutBack(t) * 0.5f;
+            float t = float(motion_.count) / expandFrames_;
+            float scaleValue = 1.0f + Ease::OutBack(t) * expandScaleAdd_;
 
             // プルプル震える
-            float shakeMag = 0.05f; // 震えの大きさ
-            float shakeX = std::sin(motion_.count * 0.5f) * shakeMag;
-            float shakeY = std::cos(motion_.count * 0.7f) * shakeMag;
+            float shakeX = std::sin(motion_.count * shakeFreqX_) * shakeMag_;
+            float shakeY = std::cos(motion_.count * shakeFreqY_) * shakeMag_;
 
             motion_.transform.scale = Vector3(scaleValue, scaleValue, scaleValue);
             pTrapEnemy_->SetObjectScale(motion_.transform.scale);
             pTrapEnemy_->SetObjectPosition(motion_.transform.position + Vector3(shakeX, shakeY, 0.0f));
         }
-        else if (motion_.count == expandTime)
+        else if (motion_.count == expandFrames_)
         {
             // フラグを切り替え、シュッと元に戻す
             isSetTrap_ = true;
@@ -6424,7 +6657,7 @@ void TrapEnemyBehaviorSetTrap::ResetMotion()
 {
 	// モーションの初期化
 	motion_.count = 0;
-	motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+	motion_.maxCount = setTrapMotionFrames_; // 攻撃モーションのカウントを設定
 }
 
 
@@ -6460,6 +6693,18 @@ public:
 
 private:
 
+	// 攻撃モーション
+	uint32_t setTrapMotionFrames_ = 30;
+
+	// 膨らむモーション
+	uint32_t expandFrames_ = 15;
+	float expandScaleAdd_ = 0.5f;
+
+	// 震えモーション
+	float shakeMag_ = 0.05f;
+	float shakeFreqX_ = 0.5f;
+	float shakeFreqY_ = 0.7f;
+
 	// 罠設置フラグ
 	bool isSetTrap_ = false;
 
@@ -6482,7 +6727,7 @@ TrapEnemyBehaviorSpawn::TrapEnemyBehaviorSpawn(TrapEnemy* _pTrapEnemy) : TrapEne
 	// モーションの初期化
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // スポーンモーションのカウントを設定
+	motion_.maxCount = spawnMotionFrames_; // スポーンモーションのカウントを設定
 }
 
 void TrapEnemyBehaviorSpawn::Initialize()
@@ -6551,6 +6796,11 @@ public:
 	
 	// モーションのリセット
 	void ResetMotion() override;
+
+private:
+
+	// スポーンモーション
+	uint32_t spawnMotionFrames_ = 30;
 
 };
 
@@ -6684,7 +6934,7 @@ void EnemyBullet::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("enemyBullet.obj");
 
-	scale_ = { 0.7f,0.7f,0.7f };
+	scale_ = { baseScale_,baseScale_,baseScale_ };
 	SyncObjectTransform();
 
 	object_->SetLighting(true);
@@ -6721,7 +6971,7 @@ void EnemyBullet::Update()
 
 	BaseBullet::Update();
 
-	rotation_ += { 0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f };
+	rotation_ += { spinSpeed_* dt * kDefaultFrameRate, spinSpeed_* dt * kDefaultFrameRate, 0.0f };
 	position_ += velocity_ * dt;
 
 	aabb_.min = position_ - object_->GetScale();
@@ -6730,7 +6980,7 @@ void EnemyBullet::Update()
 
 	// 残り寿命に応じてスケールを小さくする
 	float lifeRatio = std::clamp(deathRemainingSeconds_ / (kLifeTime / kDefaultFrameRate), 0.0f, 1.0f);
-	scale_ = { 0.7f * lifeRatio, 0.7f * lifeRatio, 0.7f * lifeRatio };
+	scale_ = { baseScale_ * lifeRatio, baseScale_ * lifeRatio, baseScale_ * lifeRatio };
 
 }
 
@@ -6767,7 +7017,7 @@ void EnemyBullet::OnCollisionTrigger(const Collider* _other)
 		_other->GetColliderID() == "TrapEnemy" or
 		_other->GetColliderID() == "Barrie"))
 	{
-		IIEngine::ParticleEmitter::Emit("BltReaction", position_, 1);
+		IIEngine::ParticleEmitter::Emit("BltReaction", position_, hitParticleCount_);
 		isDead_ = true;
 	} 
 }
@@ -6835,6 +7085,13 @@ public: // セッター
 
 private: // メンバ変数
 	
+	// 弾の基本サイズ
+	float baseScale_ = 0.7f;               
+	// 回転速度
+	float spinSpeed_ = 0.1f;               
+	// 命中時リアクション
+	int hitParticleCount_ = 1;             
+
 	// 寿命
 	static const uint32_t kLifeTime = 60 * 3;
 
@@ -6860,10 +7117,9 @@ void TimeBomb::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("bomb.obj");
 
-	scale_ = { 0.7f, 0.7f, 0.7f };
+	scale_ = { baseScale_, baseScale_, baseScale_ };
 	SyncObjectTransform();
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
 
 	// 当たり判定
@@ -6923,26 +7179,23 @@ void TimeBomb::Update()
 	// 物理挙動（放物線運動）
 	if (isLaunchingTrap_) 
 	{
-		// 重力加速度
-		const float gravity = -9.8f;
-
 		// 速度に重力を加算
-		velocity_.y += gravity * dt;
+		velocity_.y += gravity_ * dt;
 
 		// 位置を速度で更新
 		position_ += velocity_ * dt;
 	}
 
-	if ((position_ - landingPosition_).Length() < 0.1f or position_.y <= 0.5f)
+	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
 	{
 		isLaunchingTrap_ = false;
 	}
 	else
 	{
 		// 地面に埋まらないようにする
-		if (position_.y < 0.5f)
+		if (position_.y < groundY_)
 		{
-			position_.y = 0.5f;
+			position_.y = groundY_;
 			velocity_.y = 0.0f; // Y方向の速度をリセット
 		}
 	}
@@ -6965,7 +7218,7 @@ void TimeBomb::Update()
 	{
 		// 壁に衝突した場合の処理
 		ReflectOnWallCollision();
-		wallCollisionCooldown_ = 1;
+		wallCollisionCooldown_ = wallCollisionCooldownFrames_;
 		isWallCollision_ = false;
 	}
 
@@ -7013,9 +7266,6 @@ void TimeBomb::LaunchTrap()
 {
 	isLaunchingTrap_ = true;
 
-	// 重力加速度
-	const float gravity = -9.8f;
-
 	// XYの差分
 	Vector3 diff = landingPosition_ - position_;
 
@@ -7023,8 +7273,8 @@ void TimeBomb::LaunchTrap()
 	velocity_.x = diff.x / flightTime_;
 	velocity_.z = diff.z / flightTime_;
 
-	// Y方向の初速度（放物線のために加速度を考慮）
-	velocity_.y = (diff.y - 0.5f * gravity * flightTime_ * flightTime_) / flightTime_;
+	// Y方向の初速度
+	velocity_.y = (diff.y - groundY_ * gravity_ * flightTime_ * flightTime_) / flightTime_;
 }
 
 void TimeBomb::DeadMotion()
@@ -7108,7 +7358,7 @@ void TimeBomb::OnExplosionTrigger(const Collider* _other)
 	{
 		isDead_ = true;
 		// パーティクル起動
-		IIEngine::ParticleEmitter::Emit("explosionGroup", position_, 6);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", position_, explosionParticleCount_);
 	}
 }
 
@@ -7157,12 +7407,12 @@ void TimeBomb::ReflectOnWallCollision()
 	{
 		landingPosition_.x = position_.x + (position_.x - landingPosition_.x);
 		// 壁の外側に十分押し出す
-		position_.x += (correctionX + (correctionX > 0 ? 0.5f : -0.5f));
+		position_.x += (correctionX + (correctionX > 0 ? wallPushOut_ : -wallPushOut_));
 	} else
 	{
 		landingPosition_.z = position_.z + (position_.z - landingPosition_.z);
 		// 壁の外側に十分押し出す
-		position_.z += (correctionZ + (correctionZ > 0 ? 0.5f : -0.5f));
+		position_.z += (correctionZ + (correctionZ > 0 ? wallPushOut_ : -wallPushOut_));
 	}
 
 	// ここで新しい放物線運動を再計算
@@ -7171,13 +7421,13 @@ void TimeBomb::ReflectOnWallCollision()
 
 void TimeBomb::SetTrapLandingPosition(const Vector3& _playerPosition)
 {
-	// ランダムな角度（0〜2π）
-	float angle = static_cast<float>(rand()) / RAND_MAX * std::numbers::pi_v<float> *2.0f;
+	// ランダムな角度
+	float angle = static_cast<float>(rand()) / RAND_MAX * twoPi_;
 
-	// ランダムな半径（2.5〜4.0）
-	float radius = 2.5f + static_cast<float>(rand()) / RAND_MAX * 1.5f;
+	// ランダムな半径
+	float radius = minRadius_ + static_cast<float>(rand()) / RAND_MAX * radiusVariance_;
 
-	// オフセットを計算（XZ平面）
+	// オフセットを計算
 	Vector3 offset;
 	offset.x = std::cos(angle) * radius;
 	offset.z = std::sin(angle) * radius;
@@ -7185,7 +7435,7 @@ void TimeBomb::SetTrapLandingPosition(const Vector3& _playerPosition)
 
 	// プレイヤーの位置にオフセットを加え、Y座標を0.5に
 	landingPosition_ = _playerPosition + offset;
-	landingPosition_.y = 0.5f;
+	landingPosition_.y = groundY_;
 }
 
 
@@ -7346,6 +7596,25 @@ private:
 	// デスタイマー
 	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 
+	float baseScale_ = 0.7f;
+
+	// 重力加速度
+	float gravity_ = -9.8f;
+	float landingEpsilon_ = 0.1f;
+	float groundY_ = 0.5f;
+
+	// 壁との反発処理
+	float wallPushOut_ = 0.5f;
+	uint32_t wallCollisionCooldownFrames_ = 1;
+
+	// 爆発のパーティクル関連
+	float twoPi_ = std::numbers::pi_v<float> *2.0f;
+	float minRadius_ = 2.5f;
+	float radiusVariance_ = 1.5f;
+
+	// 爆発のスケールアップ時間
+	int explosionParticleCount_ = 6;
+
 };
 
 
@@ -7354,8 +7623,6 @@ private:
 File Path: project/application/objects/enemy/bullet/VignetteTrap.cpp
 ============================================================
 #include "VignetteTrap.h"
-
-#include <numbers>
 
 #include "TimeManager.h"
 
@@ -7367,7 +7634,7 @@ void VignetteTrap::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("vignette.obj");
 
-	scale_ = { 0.7f,0.7f,0.7f };
+	scale_ = { baseScale_,baseScale_,baseScale_ };
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -7413,25 +7680,22 @@ void VignetteTrap::Update()
 	// 物理挙動（放物線運動）
 	if (isLaunchingTrap_)
 	{
-		// 重力加速度
-		const float gravity = -9.8f;
-
 		// 速度に重力を加算
-		velocity_.y += gravity * dt;
+		velocity_.y += gravity_ * dt;
 		// 位置を速度で更新
 		position_ += velocity_ * dt;
 	}
 	else
 	{
 		// 地面に埋まらないようにする
-		if (position_.y < 0.5f)
+		if (position_.y < groundY_)
 		{
-			position_.y = 0.5f;
+			position_.y = groundY_;
 			velocity_.y = 0.0f; // Y方向の速度をリセット
 		}
 	}
 
-	if ((position_ - landingPosition_).Length() < 0.1f or position_.y <= 0.5f)
+	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
 	{
 		isLaunchingTrap_ = false;
 		velocity_ = { 0.0f, 0.0f, 0.0f }; // 着弾時に速度をリセット
@@ -7456,7 +7720,7 @@ void VignetteTrap::Update()
 	{
 		// 壁に衝突した場合の処理
 		ReflectOnWallCollision();
-		wallCollisionCooldown_ = 1;
+		wallCollisionCooldown_ = wallCollisionCooldownFrames_;
 		isWallCollision_ = false;
 	}
 
@@ -7492,9 +7756,6 @@ void VignetteTrap::LaunchTrap()
 {
 	isLaunchingTrap_ = true;
 
-	// 重力加速度
-	const float gravity = -9.8f;
-
 	// XYの差分
 	Vector3 diff = landingPosition_ - position_;
 
@@ -7503,7 +7764,7 @@ void VignetteTrap::LaunchTrap()
 	velocity_.z = diff.z / flightTime_;
 
 	// Y方向の初速度
-	velocity_.y = (diff.y - 0.5f * gravity * flightTime_ * flightTime_) / flightTime_;
+	velocity_.y = (diff.y - 0.5f * gravity_ * flightTime_ * flightTime_) / flightTime_;
 }
 
 void VignetteTrap::DeadMotion()
@@ -7592,13 +7853,13 @@ void VignetteTrap::ReflectOnWallCollision()
 	{
 		landingPosition_.x = position_.x + (position_.x - landingPosition_.x);
 		// 壁の外側に十分押し出す
-		position_.x += (correctionX + (correctionX > 0 ? 0.5f : -0.5f));
+		position_.x += (correctionX + (correctionX > 0 ? wallPushOut_ : -wallPushOut_));
 	} 
 	else
 	{
 		landingPosition_.z = position_.z + (position_.z - landingPosition_.z);
 		// 壁の外側に十分押し出す
-		position_.z += (correctionZ + (correctionZ > 0 ? 0.5f : -0.5f));
+		position_.z += (correctionZ + (correctionZ > 0 ? wallPushOut_ : -wallPushOut_));
 	}
 
 	// ここで新しい放物線運動を再計算
@@ -7607,13 +7868,13 @@ void VignetteTrap::ReflectOnWallCollision()
 
 void VignetteTrap::SetTrapLandingPosition(const Vector3& _playerPosition)
 {
-	// ランダムな角度（0〜2π）
-	float angle = static_cast<float>(rand()) / RAND_MAX * std::numbers::pi_v<float> *2.0f;
+	// ランダムな角度
+	float angle = static_cast<float>(rand()) / RAND_MAX * TwoPi_;
 
-	// ランダムな半径（2.5〜4.0）
-	float radius = 2.5f + static_cast<float>(rand()) / RAND_MAX * 1.5f;
+	// ランダムな半径
+	float radius = minRadius_ + static_cast<float>(rand()) / RAND_MAX * radiusVariance_;
 
-	// オフセットを計算（XZ平面）
+	// オフセットを計算
 	Vector3 offset;
 	offset.x = std::cos(angle) * radius;
 	offset.z = std::sin(angle) * radius;
@@ -7621,7 +7882,7 @@ void VignetteTrap::SetTrapLandingPosition(const Vector3& _playerPosition)
 
 	// プレイヤーの位置にオフセットを加え、Y座標を0.5に
 	landingPosition_ = _playerPosition + offset;
-	landingPosition_.y = 0.5f;
+	landingPosition_.y = groundY_;
 }
 
 
@@ -7629,6 +7890,8 @@ void VignetteTrap::SetTrapLandingPosition(const Vector3& _playerPosition)
 File Path: project/application/objects/enemy/bullet/VignetteTrap.h
 ============================================================
 #pragma once
+
+#include <numbers>
 
 #include "../../../baseObject/Character.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
@@ -7749,6 +8012,23 @@ private:
 	static const int32_t kLifeTime = 60 * 12;
 	// デスタイマー
 	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
+
+	// 基本スケール
+	float baseScale_ = 0.7f;
+
+	// 物理挙動調整パラメーター
+	float gravity_ = -9.8f;
+	float landingEpsilon_ = 0.1f;
+	float groundY_ = 0.5f;
+
+	// 壁からの押し出し量
+	float wallPushOut_ = 0.5f;
+	uint32_t wallCollisionCooldownFrames_ = 1;
+
+	// 放物線のパラメーター
+	float TwoPi_ = std::numbers::pi_v<float> *2.0f;
+	float minRadius_ = 2.5f;
+	float radiusVariance_ = 1.5f;
 
 };
 
@@ -8390,11 +8670,11 @@ void Barrier::Update()
 		{
 			// 膨張
 			float t = static_cast<float>(explodeCount_) / phaseLength;
-			scale = Lerp(1.0f, 2.5f, t);
+			scale = Lerp(1.0f, explodeScalePeak_, t);
 		} else if (explodeCount_ < phaseLength * 2) {
 			// 消滅
 			float t = static_cast<float>(explodeCount_ - phaseLength) / phaseLength;
-			scale = Lerp(2.5f, 0.0f, t);
+			scale = Lerp(explodeScalePeak_, 0.0f, t);
 		}
 
 		// スケール適用
@@ -8415,22 +8695,22 @@ void Barrier::Update()
 			isBarrierDestroyed_ = false;
 
 			// パーティクル
-			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , 8);
+			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , explodeParticleCount_);
 
 		}
 
 		// 補間後処理
-		if ((scale_ - defaultScale_).Length() < 0.01f)
+		if ((scale_ - defaultScale_).Length() < scaleReturnEpsilon_)
 		{
 			targetScale_ = defaultScale_;
 		}
 
 	}
 
-	if (scale_.x >= 0.1f)
+	if (scale_.x >= sparkMinVisibleScaleX_)
 	{
 		// パーティクル
-		IIEngine::ParticleEmitter::Emit("spark", { position_.x,position_.y + 3.0f,position_.z }, 1);
+		IIEngine::ParticleEmitter::Emit("spark", { position_.x,position_.y + sparkEmitHeight_ ,position_.z }, 1);
 	}
 }
 
@@ -8445,7 +8725,7 @@ void Barrier::OnCollisionTrigger(const Collider* _other)
 		_other->GetColliderID() == "SetTimeBomb")
 	{
 		// 一瞬大きくし、元に戻す
-		targetScale_ = defaultScale_ * 1.5f;
+		targetScale_ = defaultScale_ * hitScaleMultiplier_;
 	}
 	
 }
@@ -8507,13 +8787,25 @@ private:
 	Vector3 defaultScale_ = { 1.5f, 1.5f, 1.5f };
 	// 目標スケール
 	Vector3 targetScale_ = { 1.5f, 1.5f, 1.5f };  
-	float scaleLerpSpeed_ = 0.2f;
 
 	// 爆発演出用カウント
 	uint32_t explodeCount_ = 0;      
 	// 爆発演出の継続フレーム数
 	const uint32_t explodeMaxCount_ = 10; 
 	bool isExploding_ = false;
+
+	uint32_t explodeDurationFrames_ = 10;
+	float hitScaleMultiplier_ = 1.5f;
+	
+	// 破裂パラメーター
+	float explodeScalePeak_ = 2.5f;
+	uint32_t explodeParticleCount_ = 8;
+	
+	// スパークパラメーター
+	float sparkEmitHeight_ = 3.0f;
+	uint32_t sparkParticleCount_ = 1;
+	float sparkMinVisibleScaleX_ = 0.1f;
+	float scaleReturnEpsilon_ = 0.01f;
 
 };
 
@@ -8529,7 +8821,7 @@ void Field::Initialize()
 	StaticObject::Initialize("field.obj", "Field");
 
 	position_ = { 0.0f,0.0f,0.0f };
-	scale_ = { 100.0f,0.1f,100.0f };
+	scale_ = fieldScale_;
 	SyncObjectTransform();
 }
 
@@ -8589,6 +8881,11 @@ private: // 衝突判定
 	/// </summary>
 	void OnCollisionTrigger();
 
+private:
+
+	// デフォルト値
+	Vector3 fieldScale_ = { 100.0f, 0.1f, 100.0f };
+
 };
 
 ============================================================
@@ -8603,8 +8900,8 @@ void Goal::Initialize()
 	// 基底クラス初期化
 	StaticObject::Initialize("goal.obj", "Goal");
 
-	position_ = { 0.0f,0.0f,-3.5f };
-	scale_ = { 1.0f,1.0f,1.0f };
+	position_ = goalInitialPos_;
+	scale_ = goalInitialScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -8639,7 +8936,7 @@ void Goal::Update()
 
 	if (isCleared_)
 	{
-		IIEngine::ParticleEmitter::Emit("goal", position_, 2);
+		IIEngine::ParticleEmitter::Emit("goal", position_, clearedParticleCount_);
 	}
 
 }
@@ -8734,6 +9031,13 @@ private:
 	bool isBarrierDestroyed_ = false;
 	bool wasBarrierDestroyed_ = false;
 
+	// デフォルト値
+	Vector3 goalInitialPos_ = { 0.0f, 0.0f, -3.5f };
+	Vector3 goalInitialScale_ = { 1.0f, 1.0f, 1.0f };
+
+	// パーティクル数
+	int clearedParticleCount_ = 2;
+
 };
 
 ============================================================
@@ -8746,8 +9050,8 @@ void Wall::Initialize()
 	// 基底クラス初期化
 	StaticObject::Initialize("wall.obj", "Wall");
 
-	position_ = { 0.0f,0.0f,-0.5f };
-	scale_ = { 1.5f,3.0f,1.0f };
+	position_ = wallInitialPos_;
+	scale_ = wallInitialScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -8807,6 +9111,12 @@ private: // 衝突判定
 
 	// 衝突時コールバック
 	void OnCollisionTrigger();
+
+private:
+
+	// デフォルト値
+	Vector3 wallInitialPos_ = { 0.0f,0.0f,-0.5f };
+	Vector3 wallInitialScale_ = { 1.5f,3.0f,1.0f };
 
 };
 
