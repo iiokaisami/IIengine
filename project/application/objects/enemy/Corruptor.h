@@ -93,7 +93,6 @@ public: // セッター
 	void SetIsExploded(bool _isExploded) { isExploded_ = _isExploded; }
 
 	
-
 	// --- ステートでのTransform操作用関数(引数あり) ---
 	// オブジェクトの positionをセット
 	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
@@ -116,8 +115,27 @@ private:
 	// プレイヤーとの距離が一定以上かどうかのフラグ
 	bool isFarFromPlayer_ = false;
 
-	// 爆発フラグ(爆発後の判定用にisDead_は取っておきたい)
+	// 爆発フラグ
 	bool isExploded_ = false;
+
+	float initialHP_ = 1.0f;
+	Vector3 initialScale_ = { 1.0f, 1.0f, 1.0f };
+
+	int spawnParticleCount_ = 2;
+
+	// isFarFromPlayer_ 判定に使う閾値
+	float nearPlayerDistance_ = 2.5f;
+	// 爆発後スケール増分
+	float explodedScaleGrowPerFrame_ = 0.1f;      
+
+	// 移動関連
+	float moveInterpolateRate_ = 0.1f;
+	float moveVelocityDivisor_ = 7.0f;
+	int moveParticleCount_ = 1;
+
+	// 障害物回避関連
+	float separationDistance_ = 2.5f;
+	float separationPush_ = 0.1f;
 
 };
 

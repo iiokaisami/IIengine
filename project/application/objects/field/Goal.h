@@ -64,4 +64,11 @@ private:
 	bool isBarrierDestroyed_ = false;
 	bool wasBarrierDestroyed_ = false;
 
+	// デフォルト値
+	Vector3 goalInitialPos_ = { 0.0f, 0.0f, -3.5f };
+	Vector3 goalInitialScale_ = { 1.0f, 1.0f, 1.0f };
+
+	// パーティクル数
+	int clearedParticleCount_ = 2;
+
 };

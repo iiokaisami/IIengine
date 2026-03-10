@@ -24,5 +24,15 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+	
+	// ヒットリアクションの持続フレーム数
+	uint32_t hitReactFrames_ = 30;
+
+	// 震えの大きさ
+	float shakeAmp_ = 0.1f;
+	int shakePeriodX_ = 2;
+	int shakePeriodZ_ = 3;
+
 };
 

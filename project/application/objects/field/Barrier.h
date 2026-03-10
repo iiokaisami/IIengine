@@ -51,12 +51,24 @@ private:
 	Vector3 defaultScale_ = { 1.5f, 1.5f, 1.5f };
 	// 目標スケール
 	Vector3 targetScale_ = { 1.5f, 1.5f, 1.5f };  
-	float scaleLerpSpeed_ = 0.2f;
 
 	// 爆発演出用カウント
 	uint32_t explodeCount_ = 0;      
 	// 爆発演出の継続フレーム数
 	const uint32_t explodeMaxCount_ = 10; 
 	bool isExploding_ = false;
+
+	uint32_t explodeDurationFrames_ = 10;
+	float hitScaleMultiplier_ = 1.5f;
+	
+	// 破裂パラメーター
+	float explodeScalePeak_ = 2.5f;
+	uint32_t explodeParticleCount_ = 8;
+	
+	// スパークパラメーター
+	float sparkEmitHeight_ = 3.0f;
+	uint32_t sparkParticleCount_ = 1;
+	float sparkMinVisibleScaleX_ = 0.1f;
+	float scaleReturnEpsilon_ = 0.01f;
 
 };

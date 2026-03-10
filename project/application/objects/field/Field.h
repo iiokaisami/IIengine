@@ -30,4 +30,9 @@ private: // 衝突判定
 	/// </summary>
 	void OnCollisionTrigger();
 
+private:
+
+	// デフォルト値
+	Vector3 fieldScale_ = { 100.0f, 0.1f, 100.0f };
+
 };

@@ -28,7 +28,7 @@ void BaseBullet::Draw()
 	}
 }
 
-Vector3 BaseBullet::SetVelocity(const Vector3 _velocity)
+Vector3 BaseBullet::SetVelocity(const Vector3& _velocity)
 {
 	// フレームレート補正
 	velocity_ = _velocity * kDefaultFrameRate;

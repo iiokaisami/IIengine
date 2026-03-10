@@ -21,5 +21,14 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 移動モーション時間
+	uint32_t moveMotionFrames_ = 30;
+	// ポヨポヨ振幅
+	float moveScaleWaveAmp_ = 0.2f;
+	// Zスケール
+	float moveScaleZ_ = 1.0f;
+
 };
 

@@ -24,5 +24,10 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// スポーンモーションのフレーム数
+	uint32_t spawnMotionFrames_ = 30;
+
 };
 

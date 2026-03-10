@@ -12,9 +12,9 @@ using namespace IIEngine;
 void Corruptor::Initialize()
 {
 	// Initialize を呼び出し共通プロパティを初期化
-	BaseEnemy::Initialize("bomb.obj","Corruptor", 1.0f);
+	BaseEnemy::Initialize("bomb.obj","Corruptor", initialHP_);
 
-	scale_ = { 1.0f,1.0f,1.0f };
+	scale_ = initialScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -26,7 +26,7 @@ void Corruptor::Initialize()
 	isInvincible_ = true;
 
 	// パーティクル
-	IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
+	IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 }
 
 void Corruptor::Finalize()
@@ -56,12 +56,12 @@ void Corruptor::Update()
 	float distanceToPlayer = position_.Distance(playerPosition_);
 
 	// プレイヤーとの距離が一定以上かどうかのフラグ更新
-	isFarFromPlayer_ = (distanceToPlayer < 2.5f);
+	isFarFromPlayer_ = (distanceToPlayer < nearPlayerDistance_);
 
 	if (isExploded_)
 	{
 		// 爆発後に少しだけスケールを大きくする
-		scale_ += Vector3(0.1f, 0.1f, 0.1f) * dt * kDefaultFrameRate;
+		scale_ += Vector3(explodedScaleGrowPerFrame_, explodedScaleGrowPerFrame_, explodedScaleGrowPerFrame_) * dt * kDefaultFrameRate;
 	}
 
 }
@@ -97,19 +97,19 @@ void Corruptor::Move()
 	// 基底クラスの補間処理を使用
 	toPlayer_ = playerPosition_ - position_;
 	Vector3 direction = Normalize(toPlayer_);
-	moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.1f);
+	moveVelocity_ = InterpolateMovement(moveVelocity_, direction, moveInterpolateRate_);
 
 	// Y軸回転を進行方向に合わせる
 	rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
 	rotation_.x = 0.0f;
 
-	moveVelocity_ /= 7.0f;
+	moveVelocity_ /= moveVelocityDivisor_;
 	moveVelocity_.y = 0.0f;
 	position_ += moveVelocity_ * dt * kDefaultFrameRate;
 
 	SyncObjectTransform();
 
-	IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+	IIEngine::ParticleEmitter::Emit("enemyWalk", position_, moveParticleCount_);
 
 }
 
@@ -144,10 +144,9 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 		// 敵同士が重ならないようにする
 		Vector3 direction = position_ - enemyPosition;
 		direction.Normalize();
-		float distance = 2.5f; // 敵同士の間の距離を調整するための値
 
 		// 互いに重ならないように少しずつ位置を調整
-		if ((position_ - enemyPosition).Length() < distance)
+		if ((position_ - enemyPosition).Length() < separationDistance_)
 		{
 			position_ += direction * 0.1f; // 微調整のための値
 		}

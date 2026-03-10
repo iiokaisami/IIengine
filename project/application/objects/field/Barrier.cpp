@@ -40,11 +40,11 @@ void Barrier::Update()
 		{
 			// 膨張
 			float t = static_cast<float>(explodeCount_) / phaseLength;
-			scale = Lerp(1.0f, 2.5f, t);
+			scale = Lerp(1.0f, explodeScalePeak_, t);
 		} else if (explodeCount_ < phaseLength * 2) {
 			// 消滅
 			float t = static_cast<float>(explodeCount_ - phaseLength) / phaseLength;
-			scale = Lerp(2.5f, 0.0f, t);
+			scale = Lerp(explodeScalePeak_, 0.0f, t);
 		}
 
 		// スケール適用
@@ -65,22 +65,22 @@ void Barrier::Update()
 			isBarrierDestroyed_ = false;
 
 			// パーティクル
-			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , 8);
+			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , explodeParticleCount_);
 
 		}
 
 		// 補間後処理
-		if ((scale_ - defaultScale_).Length() < 0.01f)
+		if ((scale_ - defaultScale_).Length() < scaleReturnEpsilon_)
 		{
 			targetScale_ = defaultScale_;
 		}
 
 	}
 
-	if (scale_.x >= 0.1f)
+	if (scale_.x >= sparkMinVisibleScaleX_)
 	{
 		// パーティクル
-		IIEngine::ParticleEmitter::Emit("spark", { position_.x,position_.y + 3.0f,position_.z }, 1);
+		IIEngine::ParticleEmitter::Emit("spark", { position_.x,position_.y + sparkEmitHeight_ ,position_.z }, 1);
 	}
 }
 
@@ -95,7 +95,7 @@ void Barrier::OnCollisionTrigger(const Collider* _other)
 		_other->GetColliderID() == "SetTimeBomb")
 	{
 		// 一瞬大きくし、元に戻す
-		targetScale_ = defaultScale_ * 1.5f;
+		targetScale_ = defaultScale_ * hitScaleMultiplier_;
 	}
 	
 }

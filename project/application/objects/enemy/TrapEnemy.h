@@ -140,12 +140,28 @@ private:
 	// 罠を設置する
 	bool isStopAndTrap_ = false;
 
-
 	// 無敵フラグ(出現時等攻撃を受けなくさせる)
 	bool isInvincible_ = true;
 
 	// 被弾フラグ
 	bool isHit_ = false;
+
+	// プレイヤーの位置
+	float initialHP_ = 3.0f;
+	int spawnParticleCount_ = 2;
+
+	// 追尾距離
+	float tooCloseDistance_ = 6.0f;
+	float tooFarDistance_ = 20.0f;
+
+	// 物理挙動調整パラメーター
+	float moveSlerpRate_ = 0.1f;
+	float stopAndTrapMinZ_ = 0.00001f;
+	float moveVelocityDivisor_ = 30.0f;
+
+	// パーティクル
+	uint32_t walkParticleCount_ = 1;
+	uint32_t trapRemoveParticleCount_ = 1;
 
 };
 

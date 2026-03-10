@@ -5,8 +5,8 @@ void Wall::Initialize()
 	// 基底クラス初期化
 	StaticObject::Initialize("wall.obj", "Wall");
 
-	position_ = { 0.0f,0.0f,-0.5f };
-	scale_ = { 1.5f,3.0f,1.0f };
+	position_ = wallInitialPos_;
+	scale_ = wallInitialScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);

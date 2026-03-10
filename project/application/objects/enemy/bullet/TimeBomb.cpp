@@ -12,10 +12,9 @@ void TimeBomb::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("bomb.obj");
 
-	scale_ = { 0.7f, 0.7f, 0.7f };
+	scale_ = { baseScale_, baseScale_, baseScale_ };
 	SyncObjectTransform();
 	// ライト設定
-	//object_->SetDirectionalLightEnable(true);
 	object_->SetLighting(true);
 
 	// 当たり判定
@@ -75,26 +74,23 @@ void TimeBomb::Update()
 	// 物理挙動（放物線運動）
 	if (isLaunchingTrap_) 
 	{
-		// 重力加速度
-		const float gravity = -9.8f;
-
 		// 速度に重力を加算
-		velocity_.y += gravity * dt;
+		velocity_.y += gravity_ * dt;
 
 		// 位置を速度で更新
 		position_ += velocity_ * dt;
 	}
 
-	if ((position_ - landingPosition_).Length() < 0.1f or position_.y <= 0.5f)
+	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
 	{
 		isLaunchingTrap_ = false;
 	}
 	else
 	{
 		// 地面に埋まらないようにする
-		if (position_.y < 0.5f)
+		if (position_.y < groundY_)
 		{
-			position_.y = 0.5f;
+			position_.y = groundY_;
 			velocity_.y = 0.0f; // Y方向の速度をリセット
 		}
 	}
@@ -117,7 +113,7 @@ void TimeBomb::Update()
 	{
 		// 壁に衝突した場合の処理
 		ReflectOnWallCollision();
-		wallCollisionCooldown_ = 1;
+		wallCollisionCooldown_ = wallCollisionCooldownFrames_;
 		isWallCollision_ = false;
 	}
 
@@ -165,9 +161,6 @@ void TimeBomb::LaunchTrap()
 {
 	isLaunchingTrap_ = true;
 
-	// 重力加速度
-	const float gravity = -9.8f;
-
 	// XYの差分
 	Vector3 diff = landingPosition_ - position_;
 
@@ -175,8 +168,8 @@ void TimeBomb::LaunchTrap()
 	velocity_.x = diff.x / flightTime_;
 	velocity_.z = diff.z / flightTime_;
 
-	// Y方向の初速度（放物線のために加速度を考慮）
-	velocity_.y = (diff.y - 0.5f * gravity * flightTime_ * flightTime_) / flightTime_;
+	// Y方向の初速度
+	velocity_.y = (diff.y - groundY_ * gravity_ * flightTime_ * flightTime_) / flightTime_;
 }
 
 void TimeBomb::DeadMotion()
@@ -260,7 +253,7 @@ void TimeBomb::OnExplosionTrigger(const Collider* _other)
 	{
 		isDead_ = true;
 		// パーティクル起動
-		IIEngine::ParticleEmitter::Emit("explosionGroup", position_, 6);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", position_, explosionParticleCount_);
 	}
 }
 
@@ -309,12 +302,12 @@ void TimeBomb::ReflectOnWallCollision()
 	{
 		landingPosition_.x = position_.x + (position_.x - landingPosition_.x);
 		// 壁の外側に十分押し出す
-		position_.x += (correctionX + (correctionX > 0 ? 0.5f : -0.5f));
+		position_.x += (correctionX + (correctionX > 0 ? wallPushOut_ : -wallPushOut_));
 	} else
 	{
 		landingPosition_.z = position_.z + (position_.z - landingPosition_.z);
 		// 壁の外側に十分押し出す
-		position_.z += (correctionZ + (correctionZ > 0 ? 0.5f : -0.5f));
+		position_.z += (correctionZ + (correctionZ > 0 ? wallPushOut_ : -wallPushOut_));
 	}
 
 	// ここで新しい放物線運動を再計算
@@ -323,13 +316,13 @@ void TimeBomb::ReflectOnWallCollision()
 
 void TimeBomb::SetTrapLandingPosition(const Vector3& _playerPosition)
 {
-	// ランダムな角度（0〜2π）
-	float angle = static_cast<float>(rand()) / RAND_MAX * std::numbers::pi_v<float> *2.0f;
+	// ランダムな角度
+	float angle = static_cast<float>(rand()) / RAND_MAX * twoPi_;
 
-	// ランダムな半径（2.5〜4.0）
-	float radius = 2.5f + static_cast<float>(rand()) / RAND_MAX * 1.5f;
+	// ランダムな半径
+	float radius = minRadius_ + static_cast<float>(rand()) / RAND_MAX * radiusVariance_;
 
-	// オフセットを計算（XZ平面）
+	// オフセットを計算
 	Vector3 offset;
 	offset.x = std::cos(angle) * radius;
 	offset.z = std::sin(angle) * radius;
@@ -337,5 +330,5 @@ void TimeBomb::SetTrapLandingPosition(const Vector3& _playerPosition)
 
 	// プレイヤーの位置にオフセットを加え、Y座標を0.5に
 	landingPosition_ = _playerPosition + offset;
-	landingPosition_.y = 0.5f;
+	landingPosition_.y = groundY_;
 }

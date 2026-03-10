@@ -10,7 +10,7 @@ TrapEnemyBehaviorHitReact::TrapEnemyBehaviorHitReact(TrapEnemy* _pTrapEnemy) : T
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = hitReactFrames_; // 移動モーションのカウントを設定
 }
 
 void TrapEnemyBehaviorHitReact::Initialize()
@@ -24,9 +24,9 @@ void TrapEnemyBehaviorHitReact::Update()
 
 	Vector3 shakeOffset =
 	{
-	((motion_.count % 2 == 0) ? 1.0f : -1.0f) * 0.1f,
+	((motion_.count % shakePeriodX_ == 0) ? 1.0f : -1.0f) * shakeAmp_,
 	0.0f, // Y軸は揺らさない
-	((motion_.count % 3 == 0) ? 1.0f : -1.0f) * 0.1f
+	((motion_.count % shakePeriodZ_ == 0) ? 1.0f : -1.0f) * shakeAmp_
 	};
 
 	Vector3 originPos = pTrapEnemy_->GetPosition();

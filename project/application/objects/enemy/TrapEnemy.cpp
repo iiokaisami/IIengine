@@ -14,7 +14,7 @@ using namespace IIEngine;
 void TrapEnemy::Initialize()
 {
     // Initialize を呼び出し共通プロパティを初期化
-    BaseEnemy::Initialize("trapEnemy.obj","TrapEnemy", 3.0f);
+    BaseEnemy::Initialize("trapEnemy.obj","TrapEnemy", initialHP_);
 
 	SyncObjectTransform();
     // ライト設定
@@ -41,7 +41,7 @@ void TrapEnemy::Initialize()
     isInvincible_ = true;
     
 	// パーティクル
-    IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
+    IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 }
 
 void TrapEnemy::Finalize()
@@ -186,18 +186,18 @@ void TrapEnemy::Move()
 	if (isEscape_)
 	{
 		// 離れる
-		moveVelocity_ = Slerp(moveVelocity_, -direction, 0.1f);
+		moveVelocity_ = Slerp(moveVelocity_, -direction, moveSlerpRate_);
 	}
     else if (isApproach_)
 	{
 		// 近づく
-		moveVelocity_ = Slerp(moveVelocity_, direction, 0.1f);
+		moveVelocity_ = Slerp(moveVelocity_, direction, moveSlerpRate_);
 	}
     // 距離が適切かつ罠のクールタイムが無かったら疑似停止
     else if (isStopAndTrap_ && isTrapCooldownComplete_)
 	{
 		// 罠を設置するため停止
-		moveVelocity_ = { 0.0f, 0.0f, 0.00001f };
+		moveVelocity_ = { 0.0f, 0.0f, stopAndTrapMinZ_ };
 	}
     
 
@@ -205,13 +205,13 @@ void TrapEnemy::Move()
     rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
     rotation_.x = 0.0f;
 
-    moveVelocity_ /= 30.0f;
+    moveVelocity_ /= moveVelocityDivisor_;
     moveVelocity_.y = 0.0f;
     position_ += moveVelocity_ * (dt * kDefaultFrameRate);
 
 	SyncObjectTransform();
 
-    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, walkParticleCount_);
 }
 
 
@@ -251,11 +251,11 @@ void TrapEnemy::RemoveBullets()
 {
 	// 罠の削除
     pTimeBomb_.erase(
-        std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [](std::unique_ptr<TimeBomb>& trap)
+        std::remove_if(pTimeBomb_.begin(), pTimeBomb_.end(), [this](std::unique_ptr<TimeBomb>& trap)
             {
                 if (trap->IsDead())
                 {
-                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), trapRemoveParticleCount_);
                     trap->Finalize();
                     return true;
                 }
@@ -265,11 +265,11 @@ void TrapEnemy::RemoveBullets()
     );
 
     pVignetteTrap_.erase(
-        std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [](std::unique_ptr<VignetteTrap>& trap)
+        std::remove_if(pVignetteTrap_.begin(), pVignetteTrap_.end(), [this](std::unique_ptr<VignetteTrap>& trap)
             {
                 if (trap->IsDead())
                 {
-                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), 1);
+                    IIEngine::ParticleEmitter::Emit("BltReaction", trap->GetPosition(), trapRemoveParticleCount_);
                     trap->Finalize();
                     return true;
                 }

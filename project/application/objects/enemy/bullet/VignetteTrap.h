@@ -1,5 +1,7 @@
 #pragma once
 
+#include <numbers>
+
 #include "../../../baseObject/Character.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
 
@@ -119,6 +121,23 @@ private:
 	static const int32_t kLifeTime = 60 * 12;
 	// デスタイマー
 	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
+
+	// 基本スケール
+	float baseScale_ = 0.7f;
+
+	// 物理挙動調整パラメーター
+	float gravity_ = -9.8f;
+	float landingEpsilon_ = 0.1f;
+	float groundY_ = 0.5f;
+
+	// 壁からの押し出し量
+	float wallPushOut_ = 0.5f;
+	uint32_t wallCollisionCooldownFrames_ = 1;
+
+	// 放物線のパラメーター
+	float TwoPi_ = std::numbers::pi_v<float> *2.0f;
+	float minRadius_ = 2.5f;
+	float radiusVariance_ = 1.5f;
 
 };
 

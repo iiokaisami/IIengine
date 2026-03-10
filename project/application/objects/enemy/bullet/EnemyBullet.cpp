@@ -9,7 +9,7 @@ void EnemyBullet::Initialize()
 	object_ = std::make_unique<Object3d>();
 	object_->Initialize("enemyBullet.obj");
 
-	scale_ = { 0.7f,0.7f,0.7f };
+	scale_ = { baseScale_,baseScale_,baseScale_ };
 	SyncObjectTransform();
 
 	object_->SetLighting(true);
@@ -46,7 +46,7 @@ void EnemyBullet::Update()
 
 	BaseBullet::Update();
 
-	rotation_ += { 0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f };
+	rotation_ += { spinSpeed_* dt * kDefaultFrameRate, spinSpeed_* dt * kDefaultFrameRate, 0.0f };
 	position_ += velocity_ * dt;
 
 	aabb_.min = position_ - object_->GetScale();
@@ -55,7 +55,7 @@ void EnemyBullet::Update()
 
 	// 残り寿命に応じてスケールを小さくする
 	float lifeRatio = std::clamp(deathRemainingSeconds_ / (kLifeTime / kDefaultFrameRate), 0.0f, 1.0f);
-	scale_ = { 0.7f * lifeRatio, 0.7f * lifeRatio, 0.7f * lifeRatio };
+	scale_ = { baseScale_ * lifeRatio, baseScale_ * lifeRatio, baseScale_ * lifeRatio };
 
 }
 
@@ -92,7 +92,7 @@ void EnemyBullet::OnCollisionTrigger(const Collider* _other)
 		_other->GetColliderID() == "TrapEnemy" or
 		_other->GetColliderID() == "Barrie"))
 	{
-		IIEngine::ParticleEmitter::Emit("BltReaction", position_, 1);
+		IIEngine::ParticleEmitter::Emit("BltReaction", position_, hitParticleCount_);
 		isDead_ = true;
 	} 
 }

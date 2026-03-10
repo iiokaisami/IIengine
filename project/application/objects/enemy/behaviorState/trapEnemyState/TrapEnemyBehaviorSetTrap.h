@@ -27,6 +27,18 @@ public:
 
 private:
 
+	// 攻撃モーション
+	uint32_t setTrapMotionFrames_ = 30;
+
+	// 膨らむモーション
+	uint32_t expandFrames_ = 15;
+	float expandScaleAdd_ = 0.5f;
+
+	// 震えモーション
+	float shakeMag_ = 0.05f;
+	float shakeFreqX_ = 0.5f;
+	float shakeFreqY_ = 0.7f;
+
 	// 罠設置フラグ
 	bool isSetTrap_ = false;
 

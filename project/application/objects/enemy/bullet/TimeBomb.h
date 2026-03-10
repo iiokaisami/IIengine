@@ -152,5 +152,24 @@ private:
 	// デスタイマー
 	float deathRemainingSeconds_ = kLifeTime / kDefaultFrameRate;
 
+	float baseScale_ = 0.7f;
+
+	// 重力加速度
+	float gravity_ = -9.8f;
+	float landingEpsilon_ = 0.1f;
+	float groundY_ = 0.5f;
+
+	// 壁との反発処理
+	float wallPushOut_ = 0.5f;
+	uint32_t wallCollisionCooldownFrames_ = 1;
+
+	// 爆発のパーティクル関連
+	float twoPi_ = std::numbers::pi_v<float> *2.0f;
+	float minRadius_ = 2.5f;
+	float radiusVariance_ = 1.5f;
+
+	// 爆発のスケールアップ時間
+	int explosionParticleCount_ = 6;
+
 };
 

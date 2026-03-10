@@ -7,7 +7,7 @@ void Field::Initialize()
 	StaticObject::Initialize("field.obj", "Field");
 
 	position_ = { 0.0f,0.0f,0.0f };
-	scale_ = { 100.0f,0.1f,100.0f };
+	scale_ = fieldScale_;
 	SyncObjectTransform();
 }
 

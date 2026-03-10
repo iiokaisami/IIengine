@@ -11,7 +11,7 @@ TrapEnemyBehaviorSetTrap::TrapEnemyBehaviorSetTrap(TrapEnemy* _pTrapEnemy) : Tra
 {
 	// モーションの初期化
 	motion_.count = 0;
-	motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+	motion_.maxCount = setTrapMotionFrames_; // 攻撃モーションのカウントを設定
 	motion_.isActive = true;
 }
 
@@ -24,26 +24,23 @@ void TrapEnemyBehaviorSetTrap::Update()
     // 敵のトランスフォームを motion_.transformにセット
     TransformUpdate(pTrapEnemy_);
 
-    const int expandTime = 15;
-
     if (motion_.isActive)
     {
-        if (motion_.count < expandTime)
+        if (motion_.count < expandFrames_)
         {
             // ググっと膨らむ
-            float t = float(motion_.count) / expandTime;
-            float scaleValue = 1.0f + Ease::OutBack(t) * 0.5f;
+            float t = float(motion_.count) / expandFrames_;
+            float scaleValue = 1.0f + Ease::OutBack(t) * expandScaleAdd_;
 
             // プルプル震える
-            float shakeMag = 0.05f; // 震えの大きさ
-            float shakeX = std::sin(motion_.count * 0.5f) * shakeMag;
-            float shakeY = std::cos(motion_.count * 0.7f) * shakeMag;
+            float shakeX = std::sin(motion_.count * shakeFreqX_) * shakeMag_;
+            float shakeY = std::cos(motion_.count * shakeFreqY_) * shakeMag_;
 
             motion_.transform.scale = Vector3(scaleValue, scaleValue, scaleValue);
             pTrapEnemy_->SetObjectScale(motion_.transform.scale);
             pTrapEnemy_->SetObjectPosition(motion_.transform.position + Vector3(shakeX, shakeY, 0.0f));
         }
-        else if (motion_.count == expandTime)
+        else if (motion_.count == expandFrames_)
         {
             // フラグを切り替え、シュッと元に戻す
             isSetTrap_ = true;
@@ -100,5 +97,5 @@ void TrapEnemyBehaviorSetTrap::ResetMotion()
 {
 	// モーションの初期化
 	motion_.count = 0;
-	motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+	motion_.maxCount = setTrapMotionFrames_; // 攻撃モーションのカウントを設定
 }

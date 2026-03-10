@@ -157,5 +157,22 @@ private:
 	// 障害物の位置リスト
 	std::vector<Vector3> obstacles_ = {};
 
+	// フレームレートの基準値
+	float updateFrameRateBase_ = 60.0f;
+
+	// ウェーブ切り替えインターバルの初期値とリセット値
+	int32_t waveChangeIntervalInitFrames_ = 250;
+	int32_t waveChangeIntervalResetFrames_ = 120;
+
+	// タイトルシーン用の敵のスポーン位置
+	Vector3 gameOverEnemySpawnPos_ = { -20.0f, 0.5f, 0.0f };
+	std::vector<Vector3> titleEnemySpawnPos_ =
+	{
+		{ 2.0f, 0.5f, -5.0f },
+		{ -2.0f, 0.5f, 2.0f },
+		{ -5.0f, 0.5f, -2.0f },
+		{ 5.0f, 0.5f, 5.0f },
+	};
+
 };
 

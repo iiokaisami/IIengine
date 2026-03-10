@@ -24,5 +24,16 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 移動モーション
+	uint32_t moveMotionFrames_ = 30;
+
+	// 移動モーションの振幅
+	float moveScaleWaveAmp_ = 0.2f;
+	
+	// 移動モーションの振幅の倍率
+	float moveScaleZ_ = 1.0f;
+
 };
 

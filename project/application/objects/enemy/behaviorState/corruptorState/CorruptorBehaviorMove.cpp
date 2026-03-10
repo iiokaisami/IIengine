@@ -9,7 +9,7 @@ CorruptorBehaviorMove::CorruptorBehaviorMove(Corruptor* _pCorruptor) : Corruptor
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_; // 移動モーションのカウントを設定
 }
 
 void CorruptorBehaviorMove::Initialize()
@@ -45,11 +45,11 @@ void CorruptorBehaviorMove::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 
 	// ポヨポヨ拡大縮小（X・Y両方）
-	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * 0.2f;
-	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * 0.2f;
+	float scaleWaveX = 1.0f + std::sin(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
+	float scaleWaveY = 1.0f + std::cos(t * std::numbers::pi_v<float>) * moveScaleWaveAmp_;
 
 	// スケールを更新（X・Y両方ポヨポヨ）
-	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, 1.0f);
+	motion_.transform.scale = Vector3(scaleWaveX, scaleWaveY, moveScaleZ_);
 
 	// スケールを適用
 	pCorruptor_->SetObjectScale(motion_.transform.scale);
@@ -66,5 +66,5 @@ void CorruptorBehaviorMove::ResetMotion()
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // 移動モーションのカウントを設定
+	motion_.maxCount = moveMotionFrames_; // 移動モーションのカウントを設定
 }

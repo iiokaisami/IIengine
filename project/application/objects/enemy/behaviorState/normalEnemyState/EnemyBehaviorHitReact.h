@@ -24,5 +24,17 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// 被弾リアクションのフレーム数
+	uint32_t hitReactFrames_ = 30;
+
+	// 振動の強さ
+	float shakeAmp_ = 0.1f;
+	// 振動の周期
+	int shakePeriodX_ = 2;
+	// 振動の周期
+	int shakePeriodZ_ = 3;
+
 };
 

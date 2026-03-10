@@ -81,7 +81,7 @@ public: // ゲッター
 public: // セッター
 
 	// プレイヤーの位置をセット
-	void SetPlayerPosition(Vector3 _playerPosition) { playerPosition_ = _playerPosition; }
+	void SetPlayerPosition(Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
 
 	// 無敵フラグをセット
 	void SetIsInvincible(bool _isInvincible) { isInvincible_ = _isInvincible; }
@@ -134,6 +134,49 @@ private:
 	// LOS(視線)判定のフレームカウンター
 	int losTrueFrame_ = 0;
 	int losFalseFrame_ = 0;
+
+	float initialHP_ = 3.0f;
+	int spawnParticleCount_ = 2;
+
+	float stopChasingDistance_ = 15.0f;
+
+	// path/LOS tuning
+	float playerMoveRePathThreshold_ = 1.0f;
+	float followPathToDirectDistance_ = 1.5f;
+	float goalRePathDistance_ = 2.5f;
+	int losTrueToDirectFrames_ = 10;
+	float directReturnPathProgress_ = 0.7f;
+	int losFalseToPathFrames_ = 1;
+
+	int stuckToPathFrames_ = 10;
+	int stuckFollowSkipWaypointFrames_ = 20;
+
+	float waypointArriveDist_ = 1.0f;
+
+	float directionEpsilon_ = 0.001f;
+	float moveInterpolateRate_ = 0.2f;
+	float noDirectionDamping_ = 0.9f;
+
+	float stuckSideEpsilon_ = 0.0001f;
+	float stuckSidePush_ = 0.05f;
+
+	float stuckDetectMoveEpsilon_ = 0.05f;
+
+	int walkParticleCount_ = 1;
+
+	// attack tuning
+	int attackBulletCount_ = 24;
+	float bulletSpeed_ = 0.2f;
+	float bulletSpawnYOffset_ = 0.5f;
+	float attackCooldownSec_ = 0.0f;
+
+	// bomb damage
+	float timeBombExplosionDamage_ = 1.5f;
+
+	// vignette effect
+	float vignetteEmitHeight_ = 1.0f;
+	int vignetteParticleCount_ = 3;
+	uint32_t maxVignetteTimeFrames_ = 60 * 3;
 
 };
 

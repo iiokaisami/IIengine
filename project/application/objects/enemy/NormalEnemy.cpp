@@ -16,7 +16,7 @@ using namespace IIEngine;
 void NormalEnemy::Initialize()
 {
     // Initialize を呼び出し共通プロパティを初期化
-    BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", 3.0f);
+    BaseEnemy::Initialize("normalEnemy.obj", "NormalEnemy", initialHP_);
 
     SyncObjectTransform();
 
@@ -48,7 +48,9 @@ void NormalEnemy::Initialize()
 
 
     // パーティクル
-    IIEngine::ParticleEmitter::Emit("laserGroup", position_, 2);
+    IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
+
+    vignetteTime_ = maxVignetteTimeFrames_;
 }
 
 void NormalEnemy::Finalize()
@@ -90,7 +92,8 @@ void NormalEnemy::Update()
     if (distanceToPlayer <= kStopChasingDistance)
     {
         isFarFromPlayer_ = true;
-    } else
+    } 
+    else
     {
         isFarFromPlayer_ = false;
     }
@@ -111,7 +114,7 @@ void NormalEnemy::Update()
     if (!isFollowingPath_)
     {
         // プレイヤー位置が一定以上変化したらパスを再計算するフラグを立てる
-        if ((playerPosition_ - lastPlayerPos_).Length() > 1.0f)
+        if ((playerPosition_ - lastPlayerPos_).Length() > playerMoveRePathThreshold_)
         {
             pathDirty_ = true;
             lastPlayerPos_ = playerPosition_;
@@ -224,7 +227,7 @@ void NormalEnemy::Move()
     {
         float distToPlayer = toPlayer_.Length();
 
-        if (distToPlayer < 1.5f)
+        if (distToPlayer < followPathToDirectDistance_)
         {
             moveMode_ = MoveMode::Direct;
             path_.clear();
@@ -234,7 +237,7 @@ void NormalEnemy::Move()
         float goalDist = (path_.empty()) ? 999.0f : (playerPosition_ - path_.back()).Length();
 
 		// パスが汚れているか、ゴールが大きくズレているときは再計算
-        if (pathDirty_ && goalDist > 2.5f)
+        if (pathDirty_ && goalDist > goalRePathDistance_)
         {
             path_ = CalculatePath(position_, playerPosition_, obstaclePositions_);
             currentWaypointIndex_ = 0;
@@ -242,7 +245,7 @@ void NormalEnemy::Move()
         }
 
         // 直進復帰判定
-        if (losTrueFrame_ > 10 && currentWaypointIndex_ > path_.size() * 0.7f)
+        if (losTrueFrame_ > losTrueToDirectFrames_ && currentWaypointIndex_ > path_.size() * directReturnPathProgress_)
         {
             // 壁が無いなら直進優先
             moveMode_ = MoveMode::Direct;
@@ -258,13 +261,13 @@ void NormalEnemy::Move()
         bool shouldCalculatePath = false;
 
         // LOSが無い
-        if (losFalseFrame_ > 1)
+        if (losFalseFrame_ > losFalseToPathFrames_)
         {
             shouldCalculatePath = true;
         }
 
         // スタックしている
-        if (stuckFrame_ > 10)
+        if (stuckFrame_ > stuckToPathFrames_)
         {
             shouldCalculatePath = true;
         }
@@ -295,7 +298,7 @@ void NormalEnemy::Move()
         Vector3 toTarget = target - position_;
 
         // ウェイポイント到達 
-        if (toTarget.Length() < 1.0f)
+        if (toTarget.Length() < waypointArriveDist_)
         {
             currentWaypointIndex_++;
         }
@@ -313,32 +316,33 @@ void NormalEnemy::Move()
     }
 
     // 直進 
-    if (moveMode_ == MoveMode::Direct && direction.Length() < 0.001f)
+    if (moveMode_ == MoveMode::Direct && direction.Length() < directionEpsilon_)
     {
-        if (toPlayer_.Length() > 0.001f)
+        if (toPlayer_.Length() > directionEpsilon_)
         {
             direction = Normalize(toPlayer_);
         }
     }
 
     // 方向が取れたときだけ更新
-    if (direction.Length() > 0.001f)
+    if (direction.Length() > directionEpsilon_)
     {
-        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, 0.2f);
+        moveVelocity_ = InterpolateMovement(moveVelocity_, direction, moveInterpolateRate_);
 
-    } else
+    } 
+    else
     {
         // 行き先が無いときは少し減速
-        moveVelocity_ *= 0.9f;
+        moveVelocity_ *= noDirectionDamping_;
     }
 
-    if (stuckFrame_ > 10 && moveMode_ == MoveMode::FollowPath)
+    if (stuckFrame_ > stuckToPathFrames_ && moveMode_ == MoveMode::FollowPath)
     {
         Vector3 side = Cross({ 0,1,0 }, moveVelocity_);
 
-        if (side.Length() > 0.0001f)
+        if (side.Length() > stuckSideEpsilon_)
         {
-            moveVelocity_ += Normalize(side) * 0.05f;
+            moveVelocity_ += Normalize(side) * stuckSidePush_;
         }
     }
 
@@ -347,13 +351,14 @@ void NormalEnemy::Move()
 
     BaseEnemy::Move();
     SyncObjectTransform();
-    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, 1);
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, walkParticleCount_);
 
     // スタックしていたら更新
-    if ((position_ - lastPosition_).Length() < 0.05f)
+    if ((position_ - lastPosition_).Length() < stuckDetectMoveEpsilon_)
     {
         stuckFrame_++;
-    } else
+    } 
+    else
     {
         stuckFrame_ = 0;
     }
@@ -361,7 +366,7 @@ void NormalEnemy::Move()
     lastPosition_ = position_;
 
     // FollowPath 用の詰まり対処
-    if (stuckFrame_ > 20 && moveMode_ == MoveMode::FollowPath)
+    if (stuckFrame_ > stuckFollowSkipWaypointFrames_ && moveMode_ == MoveMode::FollowPath)
     {
         currentWaypointIndex_++;
         stuckFrame_ = 0;
@@ -371,9 +376,9 @@ void NormalEnemy::Move()
 void NormalEnemy::Attack()
 {
     // 弾の発射設定
-    const int bulletCount = 24;
+    const int bulletCount = attackBulletCount_;
     const float angleStep = 360.0f / bulletCount;
-    const float bulletCooldown = 0.0f;
+    const float bulletCooldown = attackCooldownSec_;
 
     // クールタイム管理
     static float cooldownTimer = 0.0f;
@@ -400,8 +405,8 @@ void NormalEnemy::Attack()
             // 弾の生成と初期化
             auto bullet = std::make_unique<EnemyBullet>();
             bullet->Initialize();
-            bullet->SetPosition({ position_.x, position_.y + 0.5f, position_.z });
-            bullet->SetVelocity(bulletDirection * 0.2f);
+            bullet->SetPosition({ position_.x, position_.y + bulletSpawnYOffset_, position_.z });
+            bullet->SetVelocity(bulletDirection * bulletSpeed_);
             bullet->SyncObjectTransform();
 
             // 弾をリストに追加
@@ -441,7 +446,7 @@ void NormalEnemy::OnCollisionTrigger(const Collider* _other)
             // プレイヤーのHPを減少
             if (hp_ > 0)
             {
-                hp_ -= 1.5f;
+                hp_ -= timeBombExplosionDamage_;
                 isHit_ = true;
             }
         }
@@ -502,13 +507,14 @@ void NormalEnemy::HitVignetteTrap()
     if (isHitVignetteTrap_)
     {
         // パーティクルを生成
-        IIEngine::ParticleEmitter::Emit("vignetteGroup", { position_.x, position_.y + 1.0f,position_.z }, 3);
+        IIEngine::ParticleEmitter::Emit("vignetteGroup", { position_.x, position_.y + 1.0f,position_.z }, vignetteParticleCount_);
 
         // タイマー更新
         if (vignetteTime_ > 0)
         {
             vignetteTime_--;
-        } else
+        } 
+        else
         {
             // 終了
             isHitVignetteTrap_ = false;

@@ -40,7 +40,7 @@ void EnemyManager::Update()
 	// デルタタイム取得
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 	// アップデートするフレーム数計算
-	const int framesThisUpdate = std::max(1, static_cast<int>(dt * 60.0f + 0.5f));
+	const int framesThisUpdate = std::max(1, static_cast<int>(dt * updateFrameRateBase_ + 0.5f));
 
 	// ノーマルエネミーの更新
 	for (auto& enemy : pNormalEnemies_)
@@ -147,7 +147,7 @@ void EnemyManager::Update()
 		{
 			// ステート遷移
 			isWaveChange_ = true;
-			waveChangeInterval_ = 120;
+			waveChangeInterval_ = waveChangeIntervalResetFrames_;
 		}
 	}
 }
@@ -209,10 +209,10 @@ void EnemyManager::ImGuiDraw()
 
 void EnemyManager::TitleEnemyInit()
 {
-	NormalEnemyInit({ 2.0f,0.5f,-5.0f });
-	TrapEnemyInit({ -2.0f,0.5f,2.0f });
-	NormalEnemyInit({ -5.0f,0.5f,-2.0f });
-	TrapEnemyInit({ 5.0f,0.5f,5.0f });
+	NormalEnemyInit(titleEnemySpawnPos_[0]);
+	TrapEnemyInit(titleEnemySpawnPos_[1]);
+	NormalEnemyInit(titleEnemySpawnPos_[2]);
+	TrapEnemyInit(titleEnemySpawnPos_[3]);
 }
 
 void EnemyManager::TitleEnemyUpdate()
@@ -281,7 +281,7 @@ void EnemyManager::TitleEnemyUpdate()
 
 void EnemyManager::GameOverEnemyInit()
 {
-	NormalEnemyInit({ -20.0f,0.5f,0.0f });
+	NormalEnemyInit(gameOverEnemySpawnPos_);
 }
 
 void EnemyManager::GameOverEnemyUpdate()

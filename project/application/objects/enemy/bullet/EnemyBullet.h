@@ -57,6 +57,13 @@ public: // セッター
 
 private: // メンバ変数
 	
+	// 弾の基本サイズ
+	float baseScale_ = 0.7f;               
+	// 回転速度
+	float spinSpeed_ = 0.1f;               
+	// 命中時リアクション
+	int hitParticleCount_ = 1;             
+
 	// 寿命
 	static const uint32_t kLifeTime = 60 * 3;
 

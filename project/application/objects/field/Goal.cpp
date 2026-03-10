@@ -7,8 +7,8 @@ void Goal::Initialize()
 	// 基底クラス初期化
 	StaticObject::Initialize("goal.obj", "Goal");
 
-	position_ = { 0.0f,0.0f,-3.5f };
-	scale_ = { 1.0f,1.0f,1.0f };
+	position_ = goalInitialPos_;
+	scale_ = goalInitialScale_;
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
@@ -43,7 +43,7 @@ void Goal::Update()
 
 	if (isCleared_)
 	{
-		IIEngine::ParticleEmitter::Emit("goal", position_, 2);
+		IIEngine::ParticleEmitter::Emit("goal", position_, clearedParticleCount_);
 	}
 
 }

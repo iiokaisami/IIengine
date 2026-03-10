@@ -8,7 +8,7 @@ CorruptorBehaviorSelfDestruct::CorruptorBehaviorSelfDestruct(Corruptor* _pCorrup
 {
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 60; // 自爆モーションのカウントを設定
+	motion_.maxCount = selfDestructMotionFrames_; // 自爆モーションのカウントを設定
 }
 
 void CorruptorBehaviorSelfDestruct::Initialize()
@@ -24,15 +24,15 @@ void CorruptorBehaviorSelfDestruct::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 	
 	// はじける演出
-	float scale = Lerp(1.0f, 2.0f, Ease::OutCubic(t));
+	float scale = Lerp(selfDestructScaleFrom_, selfDestructScaleTo_, Ease::OutCubic(t));
 	motion_.transform.scale = Vector3(scale, scale, scale);
 
 	// 揺れ演出
 	Vector3 shakeOffset =
 	{
-	((motion_.count % 2 == 0) ? 1.0f : -1.0f) * 0.1f,
+	((motion_.count % selfDestructShakePeriodX_ == 0) ? 1.0f : -1.0f) * selfDestructShakeAmp_,
 	0.0f, // Y軸は揺らさない
-	((motion_.count % 3 == 0) ? 1.0f : -1.0f) * 0.1f
+	((motion_.count % selfDestructShakePeriodZ_ == 0) ? 1.0f : -1.0f) * selfDestructShakeAmp_
 	};
 
 	Vector3 originPos = pCorruptor_->GetPosition();
@@ -50,9 +50,9 @@ void CorruptorBehaviorSelfDestruct::Update()
 		pCorruptor_->SetIsDead(true);
 
 		// パーティクル
-		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, 15);
-		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, 20);
-		IIEngine::ParticleEmitter::Emit("BltReaction", motion_.transform.position, 1);
+		IIEngine::ParticleEmitter::Emit("explosionGroup", motion_.transform.position, particleExplosionGroupCount_);
+		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, particleRuptureCount_);
+		IIEngine::ParticleEmitter::Emit("BltReaction", motion_.transform.position, particleBulletReactionCount_);
 	}
 
 }

@@ -11,13 +11,13 @@ EnemyBehaviorAttack::EnemyBehaviorAttack(NormalEnemy* _pNormalEnemy) : EnemyBeha
 {
 	// モーションの初期化
 	motion_.count = 0;
-	motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+	motion_.maxCount = attackMotionFrames_; // 攻撃モーションのカウントを設定
    
 }
 
 void EnemyBehaviorAttack::Initialize()
 {
-    attackCooldown_ = 10;
+    attackCooldown_ = initialCooldownFrames_;
 }
 
 void EnemyBehaviorAttack::Update()
@@ -31,18 +31,18 @@ void EnemyBehaviorAttack::Update()
         // モーションカウントを更新
         MotionCount(motion_);
 
-        if (motion_.count <= 20)
+        if (motion_.count <= chargeFrames_)
         {
-            float t = float(motion_.count) / 20.0f; // 0〜1
+            float t = float(motion_.count) / chargeFrames_; // 0〜1
             float ease = (t <= 0.5f)
                 ? Ease::OutSine(t * 2.0f)               // 0〜0.5  → 縮小
                 : Ease::OutSine((1.0f - t) * 2.0f);     // 0.5〜1  → 元に戻す
 
-            float scaleValue = 1.0f - ease * 0.3f;
+            float scaleValue = 1.0f - ease * chargeScaleShrink_;
             motion_.transform.scale = Vector3(scaleValue, scaleValue, scaleValue);
 			pNormalEnemy_->SetObjectScale(motion_.transform.scale);
 
-            float shake = ((motion_.count % 2 == 0) ? 1 : -1) * 0.05f;
+            float shake = ((motion_.count % chargeShakePeriod_ == 0) ? 1 : -1) * chargeShakeAmp_;
 			pNormalEnemy_->SetObjectPosition(motion_.transform.position + Vector3(shake, 0, shake));
             
         }
@@ -53,14 +53,14 @@ void EnemyBehaviorAttack::Update()
             isAttack_ = false;
 
             // 回転しながら弾を飛ばす
-            if (motion_.count == 21)
+            if (motion_.count == attackTriggerFrame_)
             {
                 // 攻撃フラグを立てる
                 isAttack_ = true;
             }
 
             // Y軸回転
-            motion_.transform.rotation.y += 0.3f;
+            motion_.transform.rotation.y += attackYawStep_;
 			pNormalEnemy_->SetRotation(motion_.transform.rotation);
 
         }
@@ -103,7 +103,7 @@ void EnemyBehaviorAttack::Update()
     {
         // 攻撃モーションを開始
         motion_.isActive = true;
-        attackCooldown_ = 60 * 3;
+        attackCooldown_ = cooldownFrames_;
     }
 
 	// フラグが立っている場合、攻撃を実行
@@ -118,5 +118,5 @@ void EnemyBehaviorAttack::ResetMotion()
 {
     // モーションの初期化
     motion_.count = 0;
-    motion_.maxCount = 30; // 攻撃モーションのカウントを設定
+    motion_.maxCount = attackMotionFrames_; // 攻撃モーションのカウントを設定
 }

@@ -10,7 +10,7 @@ EnemyBehaviorSpawn::EnemyBehaviorSpawn(NormalEnemy* _pNormalEnemy) : EnemyBehavi
 	// モーションの初期化
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // スポーンモーションのカウントを設定
+	motion_.maxCount = spawnMotionFrames_; // スポーンモーションのカウントを設定
 }
 
 void EnemyBehaviorSpawn::Initialize()

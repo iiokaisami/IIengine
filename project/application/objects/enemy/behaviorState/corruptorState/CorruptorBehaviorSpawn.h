@@ -24,5 +24,12 @@ public:
 	// モーションのリセット
 	void ResetMotion() override;
 
+private:
+
+	// スポーンモーションのフレーム数
+	uint32_t spawnMotionFrames_ = 30;
+	// スポーンモーションの持続時間
+	float spawnTurns_ = 2.0f;
+
 };
 

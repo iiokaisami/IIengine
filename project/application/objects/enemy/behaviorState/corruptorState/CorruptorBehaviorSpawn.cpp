@@ -10,7 +10,7 @@ CorruptorBehaviorSpawn::CorruptorBehaviorSpawn(Corruptor* _pCorruptor) : Corrupt
 	// モーションの初期化
 	motion_.isActive = true;
 	motion_.count = 0;
-	motion_.maxCount = 30; // スポーンモーションのカウントを設定
+	motion_.maxCount = spawnMotionFrames_; // スポーンモーションのカウントを設定
 }
 
 void CorruptorBehaviorSpawn::Initialize()
@@ -26,7 +26,7 @@ void CorruptorBehaviorSpawn::Update()
 	float t = float(motion_.count) / motion_.maxCount;
 
 	// 回転
-	motion_.transform.rotation.y = Lerp(0.0f, std::numbers::pi_v<float> *2.0f, Ease::OutCubic(t));
+	motion_.transform.rotation.y = Lerp(0.0f, std::numbers::pi_v<float> * spawnTurns_, Ease::OutCubic(t));
 
 	// トランスフォームを敵に反映
 	pCorruptor_->SetObjectPosition(motion_.transform.position);

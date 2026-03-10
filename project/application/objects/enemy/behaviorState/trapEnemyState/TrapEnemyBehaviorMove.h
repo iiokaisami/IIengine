@@ -32,5 +32,12 @@ private:
 	// クールタイムの最大値
 	const uint32_t kMaxTrapCooldown = 60 * 3;
 
+	// 移動モーションのフレーム数
+	uint32_t moveMotionFrames_ = 30;
+	// 移動モーションの振幅
+	float moveScaleWaveAmp_ = 0.2f;
+	// 移動モーションの振動数
+	float moveScaleZ_ = 1.0f;
+
 };
 
