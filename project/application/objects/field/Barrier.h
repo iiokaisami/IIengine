@@ -34,6 +34,11 @@ public: // セッター
 	/// <param name="_isDestroyed"> 破壊フラグ</param>
 	void SetBarrierDestroyed(bool _isDestroyed) { isBarrierDestroyed_ = _isDestroyed; }
 
+public: // ゲッター
+
+	// バリア破壊完了フラグを取得
+	bool IsBarrierDestroyedComplete() const { return isBarrierDestroyedComplete_; }
+
 private: // 衝突判定
 
 	/// <summary>
@@ -46,6 +51,8 @@ private:
 
 	// バリア破壊フラグ
 	bool isBarrierDestroyed_ = false;
+	// バリア破壊完了フラグ
+	bool isBarrierDestroyedComplete_ = false;
 
 	// 元のスケール
 	Vector3 defaultScale_ = { 1.5f, 1.5f, 1.5f };

@@ -127,6 +127,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\baseObject\BaseEnemy.cpp" />
     <ClCompile Include="application\baseObject\Character.cpp" />
     <ClCompile Include="application\baseObject\BaseBullet.cpp" />
+    <ClCompile Include="application\scene\cameraController\BarrierBreakCameraController.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
@@ -237,6 +238,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\baseObject\BaseEnemy.h" />
     <ClInclude Include="application\baseObject\Character.h" />
     <ClInclude Include="application\baseObject\BaseBullet.h" />
+    <ClInclude Include="application\scene\cameraController\BarrierBreakCameraController.h" />
     <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />

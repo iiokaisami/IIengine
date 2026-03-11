@@ -61,14 +61,30 @@
     <FxCompile Include="resources\shaders\RGBShift.PS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ChromaticPulse.PS.hlsl" />
-    <FxCompile Include="resources\shaders\ChromaticPulse.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Inversion.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Inversion.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Noise.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Noise.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Scanline.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Scanline.VS.hlsl" />
+    <FxCompile Include="resources\shaders\ChromaticPulse.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\ChromaticPulse.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Inversion.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Inversion.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Noise.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Noise.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Scanline.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Scanline.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -378,10 +394,21 @@
     <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClCompile>
-    <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
-    <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp" />
-    <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
-    <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\BarrierBreakCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -708,10 +735,21 @@
     <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClInclude>
-    <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
-    <ClInclude Include="gameEngine\base\postEffect\NoisePass.h" />
-    <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
-    <ClInclude Include="gameEngine\base\postEffect\InversionPass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\InversionPass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\NoisePass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\BarrierBreakCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -747,10 +785,18 @@
     <None Include="resources\shaders\RGBShift.hlsli">
       <Filter>resources\shaders</Filter>
     </None>
-    <None Include="resources\shaders\ChromaticPulse.hlsli" />
-    <None Include="resources\shaders\Inversion.hlsli" />
-    <None Include="resources\shaders\Noise.hlsli" />
-    <None Include="resources\shaders\Scanline.hlsli" />
+    <None Include="resources\shaders\ChromaticPulse.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\Inversion.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\Noise.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\Scanline.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="application">

@@ -64,6 +64,9 @@ void Barrier::Update()
 			// 破壊フラグをリセット
 			isBarrierDestroyed_ = false;
 
+			// 墓移管料フラグをセット
+			isBarrierDestroyedComplete_ = true;
+
 			// パーティクル
 			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , explodeParticleCount_);
 

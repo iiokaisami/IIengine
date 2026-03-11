@@ -154,6 +154,34 @@ void GamePlayScene::Initialize()
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
 		clearCameraDuration_, clearCameraRotations_, rotationSpeedMultiplier_, finalDistance_, finalHeight_);
 
+	// バリア破壊カメラコントローラ作成
+	camera_->AddController<BarrierBreakCameraController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // Player
+		[this]() -> Vector3 { return pGoal_->GetPosition(); },   // Goal
+		[this]() -> bool { return pGoal_->IsBarrierDestroyed(); } // Barrier破壊完了
+	);
+
+	// コールバック設定
+	if (auto* barrierCam = camera_->FindController<BarrierBreakCameraController>())
+	{
+		// Goal到達＝ここでバリア破壊開始
+		barrierCam->SetOnArriveGoal([this]()
+			{
+				if (pGoal_) pGoal_->SetBarrierDestroyed(true);
+			});
+
+		// 演出終了＝Follow復帰
+		barrierCam->SetOnFinish([this]()
+			{
+				if (auto* follow = camera_->FindController<FollowController>())
+				{
+					follow->SnapToTarget();
+					follow->Start();
+				}
+			});
+	}
+
 	// コールバック設定(FindController を使ってその場で取得)
 	if (auto* death = camera_->FindController<DeathCameraController>())
 	{

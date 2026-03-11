@@ -43,6 +43,8 @@ public: // ゲッター
 	// クリアフラグを取得
 	bool IsCleared() const { return isCleared_; }
 
+	// バリア破壊フラグを取得
+	bool IsBarrierDestroyed() const { return pBarrier_->IsBarrierDestroyedComplete(); }
 
 private: // 衝突判定
 

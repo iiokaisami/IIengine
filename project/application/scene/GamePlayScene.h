@@ -20,6 +20,7 @@
 #include "cameraController/StartCameraController.h"
 #include "cameraController/DeathCameraController.h"
 #include "cameraController/ClearCameraController.h"
+#include "cameraController/BarrierBreakCameraController.h"
 
 #include "PauseMenu.h"
 
@@ -121,6 +122,9 @@ private:
 	Vector3 cameraRestCenter_; 
 	// カメラが現在静止モードかどうか
 	bool cameraIsResting_ = true;
+
+	// バリア破壊カメラ演出変数
+	bool isBarrierCameraStarted_ = false;
 
 	// レベルデータローダー
 	std::unique_ptr<IIEngine::LevelData> levelData_ = nullptr;
