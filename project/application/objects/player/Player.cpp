@@ -117,7 +117,7 @@ void Player::Update()
 	{
 		rotation_.y = Lerp(rotation_.y, 0.0f, 0.05f);
 		// ノイズを徐々に0にする
-		finalStrength_ = Lerp(finalStrength_, 0.0f, 0.05f);
+		finalStrength_ = Lerp(finalStrength_, 0.0f, 0.02f);
 		PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(finalStrength_);
 
 	}
@@ -476,7 +476,7 @@ void Player::DeadEffect()
 		return;
 	}
 
-	// 最後は大きさ０にする
+	// 最後は大きさ0にする
 	scale_.x = 0.0f;
 	scale_.y = 0.0f;
 	scale_.z = 0.0f;
@@ -919,7 +919,15 @@ void Player::HPDecreaseNoise()
 
 		auto* noise = PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise");
 
-		if (hpRate < dangerThreshold)
+		// ゴールに触れたらノイズ下げる
+		if (isTouchGoal_)
+		{
+			// 強度を徐々に下げる
+			finalStrength_ = Lerp(finalStrength_, 0.0f, 0.02f);
+			noise->SetIntensity(finalStrength_);
+
+		}
+		else if (hpRate < dangerThreshold)
 		{
 			float t = 1.0f - (hpRate / dangerThreshold);
 			t = std::clamp(t, 0.0f, 1.0f);
@@ -1003,7 +1011,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isRGBShiftActive_ = true;
 
 			IIEngine::ParticleEmitter::Emit("HitReaction", position_, 5);
-		} else
+		}
+		else
 		{
 			isDead_ = true;
 		}
@@ -1042,6 +1051,13 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isHitVignetteTrap_ = true;
 		}
 	}
+
+	if (_other->GetColliderID() == "Goal")
+	{
+		// ゴールに触れたらフラグ trueに
+		isTouchGoal_ = true;
+	}
+
 }
 
 void Player::OnCollision(const Collider* _other)

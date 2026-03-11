@@ -258,6 +258,7 @@ void GamePlayScene::Update()
 			{
 				if (auto* startCtrl = camera_->FindController<StartCameraController>())
 				{
+					pPlayer_->SetTouchGoal(false);
 					startCtrl->Start();
 				}
 			}

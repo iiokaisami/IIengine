@@ -156,6 +156,12 @@ public: // セッター
 	/// <param name="_targetPos">ターゲットエネミーの位置ベクトル</param>
 	void SetTargetEnemyPosition(const Vector3& _targetPos) { targetEnemyPosition_ = _targetPos; hasTarget_ = true; }
 
+	/// <summary>
+	/// ゴールに触れたかのフラグのセッター
+	/// </summary>
+	/// <param name="_isTouchGoal">ゴールに触れたかのフラグ</param>
+	void SetTouchGoal(bool _isTouchGoal) { isTouchGoal_ = _isTouchGoal; }
+
 private:
 
 	// 最も近い敵
@@ -186,6 +192,9 @@ private:
 
 	// ヒットした瞬間のフラグ
 	bool isHitMoment_ = false;
+
+	// ゴールに触れたかのフラグ
+	bool isTouchGoal_ = false;
 
 	// 暗闇トラップに当たったかどうか
 	bool isHitVignetteTrap_ = false;

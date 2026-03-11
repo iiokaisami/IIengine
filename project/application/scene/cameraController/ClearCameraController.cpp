@@ -32,7 +32,7 @@ void ClearCameraController::Start()
     float dx = camPos.x - playerPos.x;
     float dz = camPos.z - playerPos.z;
 
-    // startAngle を atan2(dx, dz) の順で取る（既存コードと整合）
+    // startAngle を atan2(dx, dz)の順で取る
     startAngle_ = std::atan2(dx, dz);
     startRadius_ = std::sqrt(dx * dx + dz * dz);
     startHeight_ = camPos.y - playerPos.y;
@@ -65,13 +65,13 @@ void ClearCameraController::Update(float dt)
     float totalAngularTravel = delta + rotationsScaled * kTau_;
     float angle = startAngle_ + totalAngularTravel * t_eased;
 
-    // 半径は開始時のものを維持（元コード）
+    // 半径は開始時のものを維持
     const float radius = startRadius_;
 
     // 高さは開始高さから徐々に上昇
     float height = startHeight_ + heightRise_ * t_eased;
 
-    // カメラ位置（極座標から）
+    // カメラ位置
     Vector3 playerPos = getPlayerPos_();
     Vector3 camPos;
     camPos.x = playerPos.x + std::sin(angle) * radius;
@@ -106,7 +106,7 @@ void ClearCameraController::Update(float dt)
         finalPos.y = playerPos.y + (startHeight_ + heightRise_);
 
         camera_->SetPosition(finalPos);
-
+		// 最終的にプレイヤーを見る向きもセット
         Vector3 finalDir = (playerPos - finalPos);
         float finalYaw = std::atan2(finalDir.x, finalDir.z);
         float finalH = std::sqrt(finalDir.x * finalDir.x + finalDir.z * finalDir.z);

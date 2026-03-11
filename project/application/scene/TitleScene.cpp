@@ -96,6 +96,9 @@ void TitleScene::Initialize()
 	transition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
 	transition_->Start(nullptr);
+
+	// ノイズを0に
+	PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(0.0f);
 }
 
 void TitleScene::Finalize()
