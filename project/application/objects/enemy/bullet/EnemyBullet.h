@@ -49,7 +49,7 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns>設定後の速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3 _velocity)
+	Vector3 SetVelocity(const Vector3& _velocity)
 	{ 
 		velocity_ = _velocity * kDefaultFrameRate;
 		return velocity_;
