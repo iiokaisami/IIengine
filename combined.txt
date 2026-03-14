@@ -104,6 +104,8 @@
     └──     ├── TitleScene.cpp
     └──     ├── TitleScene.h
     └──     └── cameraController/
+    └──         ├── BarrierBreakCameraController.cpp
+    └──         ├── BarrierBreakCameraController.h
     └──         ├── ClearCameraController.cpp
     └──         ├── ClearCameraController.h
     └──         ├── DeathCameraController.cpp
@@ -397,6 +399,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\baseObject\BaseEnemy.cpp" />
     <ClCompile Include="application\baseObject\Character.cpp" />
     <ClCompile Include="application\baseObject\BaseBullet.cpp" />
+    <ClCompile Include="application\scene\cameraController\BarrierBreakCameraController.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
     <ClCompile Include="gameEngine\transition\BlockRiseTransition.cpp" />
@@ -507,6 +510,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\baseObject\BaseEnemy.h" />
     <ClInclude Include="application\baseObject\Character.h" />
     <ClInclude Include="application\baseObject\BaseBullet.h" />
+    <ClInclude Include="application\scene\cameraController\BarrierBreakCameraController.h" />
     <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
     <ClInclude Include="gameEngine\transition\BaseTransition.h" />
     <ClInclude Include="gameEngine\transition\BlockRiseTransition.h" />
@@ -810,14 +814,30 @@ File Path: project/MyGame.vcxproj.filters
     <FxCompile Include="resources\shaders\RGBShift.PS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ChromaticPulse.PS.hlsl" />
-    <FxCompile Include="resources\shaders\ChromaticPulse.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Inversion.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Inversion.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Noise.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Noise.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Scanline.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Scanline.VS.hlsl" />
+    <FxCompile Include="resources\shaders\ChromaticPulse.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\ChromaticPulse.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Inversion.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Inversion.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Noise.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Noise.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Scanline.PS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Scanline.VS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -1127,10 +1147,21 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClCompile>
-    <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
-    <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp" />
-    <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
-    <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp" />
+    <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\cameraController\BarrierBreakCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1457,10 +1488,21 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="gameEngine\base\postEffect\RGBShiftPass.h">
       <Filter>gameEngine\base\postEffect</Filter>
     </ClInclude>
-    <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
-    <ClInclude Include="gameEngine\base\postEffect\NoisePass.h" />
-    <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
-    <ClInclude Include="gameEngine\base\postEffect\InversionPass.h" />
+    <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\InversionPass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\base\postEffect\NoisePass.h">
+      <Filter>gameEngine\base\postEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\cameraController\BarrierBreakCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -1496,10 +1538,18 @@ File Path: project/MyGame.vcxproj.filters
     <None Include="resources\shaders\RGBShift.hlsli">
       <Filter>resources\shaders</Filter>
     </None>
-    <None Include="resources\shaders\ChromaticPulse.hlsli" />
-    <None Include="resources\shaders\Inversion.hlsli" />
-    <None Include="resources\shaders\Noise.hlsli" />
-    <None Include="resources\shaders\Scanline.hlsli" />
+    <None Include="resources\shaders\ChromaticPulse.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\Inversion.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\Noise.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\Scanline.hlsli">
+      <Filter>resources\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="application">
@@ -7077,7 +7127,7 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns>設定後の速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3 _velocity)
+	Vector3 SetVelocity(const Vector3& _velocity)
 	{ 
 		velocity_ = _velocity * kDefaultFrameRate;
 		return velocity_;
@@ -7519,7 +7569,7 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns>設定した速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3 _velocity) { return velocity_ = _velocity; }
+	Vector3 SetVelocity(const Vector3& _velocity) { return velocity_ = _velocity; }
 
 	/// <summary>
 	/// プレイヤーの周囲の座標を設定
@@ -7959,7 +8009,7 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns></returns>
-	Vector3 SetVelocity(const Vector3 _velocity) { return velocity_ = _velocity; }
+	Vector3 SetVelocity(const Vector3& _velocity) { return velocity_ = _velocity; }
 
 	// プレイヤーの周囲の座標を設定
 	void SetTrapLandingPosition(const Vector3& _playerPosition);
@@ -8694,6 +8744,9 @@ void Barrier::Update()
 			// 破壊フラグをリセット
 			isBarrierDestroyed_ = false;
 
+			// 墓移管料フラグをセット
+			isBarrierDestroyedComplete_ = true;
+
 			// パーティクル
 			IIEngine::ParticleEmitter::Emit("sparkBurst", position_ , explodeParticleCount_);
 
@@ -8770,6 +8823,11 @@ public: // セッター
 	/// <param name="_isDestroyed"> 破壊フラグ</param>
 	void SetBarrierDestroyed(bool _isDestroyed) { isBarrierDestroyed_ = _isDestroyed; }
 
+public: // ゲッター
+
+	// バリア破壊完了フラグを取得
+	bool IsBarrierDestroyedComplete() const { return isBarrierDestroyedComplete_; }
+
 private: // 衝突判定
 
 	/// <summary>
@@ -8782,6 +8840,8 @@ private:
 
 	// バリア破壊フラグ
 	bool isBarrierDestroyed_ = false;
+	// バリア破壊完了フラグ
+	bool isBarrierDestroyedComplete_ = false;
 
 	// 元のスケール
 	Vector3 defaultScale_ = { 1.5f, 1.5f, 1.5f };
@@ -9010,6 +9070,8 @@ public: // ゲッター
 	// クリアフラグを取得
 	bool IsCleared() const { return isCleared_; }
 
+	// バリア破壊フラグを取得
+	bool IsBarrierDestroyed() const { return pBarrier_->IsBarrierDestroyedComplete(); }
 
 private: // 衝突判定
 
@@ -9244,7 +9306,7 @@ void Player::Update()
 	{
 		rotation_.y = Lerp(rotation_.y, 0.0f, 0.05f);
 		// ノイズを徐々に0にする
-		finalStrength_ = Lerp(finalStrength_, 0.0f, 0.05f);
+		finalStrength_ = Lerp(finalStrength_, 0.0f, 0.02f);
 		PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(finalStrength_);
 
 	}
@@ -9603,7 +9665,7 @@ void Player::DeadEffect()
 		return;
 	}
 
-	// 最後は大きさ０にする
+	// 最後は大きさ0にする
 	scale_.x = 0.0f;
 	scale_.y = 0.0f;
 	scale_.z = 0.0f;
@@ -10046,7 +10108,15 @@ void Player::HPDecreaseNoise()
 
 		auto* noise = PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise");
 
-		if (hpRate < dangerThreshold)
+		// ゴールに触れたらノイズ下げる
+		if (isTouchGoal_)
+		{
+			// 強度を徐々に下げる
+			finalStrength_ = Lerp(finalStrength_, 0.0f, 0.02f);
+			noise->SetIntensity(finalStrength_);
+
+		}
+		else if (hpRate < dangerThreshold)
 		{
 			float t = 1.0f - (hpRate / dangerThreshold);
 			t = std::clamp(t, 0.0f, 1.0f);
@@ -10130,7 +10200,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isRGBShiftActive_ = true;
 
 			IIEngine::ParticleEmitter::Emit("HitReaction", position_, 5);
-		} else
+		}
+		else
 		{
 			isDead_ = true;
 		}
@@ -10169,6 +10240,13 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isHitVignetteTrap_ = true;
 		}
 	}
+
+	if (_other->GetColliderID() == "Goal")
+	{
+		// ゴールに触れたらフラグ trueに
+		isTouchGoal_ = true;
+	}
+
 }
 
 void Player::OnCollision(const Collider* _other)
@@ -10433,6 +10511,12 @@ public: // セッター
 	/// <param name="_targetPos">ターゲットエネミーの位置ベクトル</param>
 	void SetTargetEnemyPosition(const Vector3& _targetPos) { targetEnemyPosition_ = _targetPos; hasTarget_ = true; }
 
+	/// <summary>
+	/// ゴールに触れたかのフラグのセッター
+	/// </summary>
+	/// <param name="_isTouchGoal">ゴールに触れたかのフラグ</param>
+	void SetTouchGoal(bool _isTouchGoal) { isTouchGoal_ = _isTouchGoal; }
+
 private:
 
 	// 最も近い敵
@@ -10463,6 +10547,9 @@ private:
 
 	// ヒットした瞬間のフラグ
 	bool isHitMoment_ = false;
+
+	// ゴールに触れたかのフラグ
+	bool isTouchGoal_ = false;
 
 	// 暗闇トラップに当たったかどうか
 	bool isHitVignetteTrap_ = false;
@@ -10794,7 +10881,7 @@ public: // セッター
 	/// 速度取得
 	/// </summary>
 	/// <returns>速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3 _velocity)
+	Vector3 SetVelocity(const Vector3& _velocity)
 	{
 		velocity_ = _velocity * kDefaultFrameRate; 
 		return velocity_; 
@@ -11593,6 +11680,34 @@ void GamePlayScene::Initialize()
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); },
 		clearCameraDuration_, clearCameraRotations_, rotationSpeedMultiplier_, finalDistance_, finalHeight_);
 
+	// バリア破壊カメラコントローラ作成
+	camera_->AddController<BarrierBreakCameraController>(
+		camera_->GetCamera(),
+		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // Player
+		[this]() -> Vector3 { return pGoal_->GetPosition(); },   // Goal
+		[this]() -> bool { return pGoal_->IsBarrierDestroyed(); } // Barrier破壊完了
+	);
+
+	// コールバック設定
+	if (auto* barrierCam = camera_->FindController<BarrierBreakCameraController>())
+	{
+		// Goal到達＝ここでバリア破壊開始
+		barrierCam->SetOnArriveGoal([this]()
+			{
+				if (pGoal_) pGoal_->SetBarrierDestroyed(true);
+			});
+
+		// 演出終了＝Follow復帰
+		barrierCam->SetOnFinish([this]()
+			{
+				if (auto* follow = camera_->FindController<FollowController>())
+				{
+					follow->SnapToTarget();
+					follow->Start();
+				}
+			});
+	}
+
 	// コールバック設定(FindController を使ってその場で取得)
 	if (auto* death = camera_->FindController<DeathCameraController>())
 	{
@@ -11697,6 +11812,7 @@ void GamePlayScene::Update()
 			{
 				if (auto* startCtrl = camera_->FindController<StartCameraController>())
 				{
+					pPlayer_->SetTouchGoal(false);
 					startCtrl->Start();
 				}
 			}
@@ -12082,6 +12198,7 @@ File Path: project/application/scene/GamePlayScene.h
 #include "cameraController/StartCameraController.h"
 #include "cameraController/DeathCameraController.h"
 #include "cameraController/ClearCameraController.h"
+#include "cameraController/BarrierBreakCameraController.h"
 
 #include "PauseMenu.h"
 
@@ -12183,6 +12300,9 @@ private:
 	Vector3 cameraRestCenter_; 
 	// カメラが現在静止モードかどうか
 	bool cameraIsResting_ = true;
+
+	// バリア破壊カメラ演出変数
+	bool isBarrierCameraStarted_ = false;
 
 	// レベルデータローダー
 	std::unique_ptr<IIEngine::LevelData> levelData_ = nullptr;
@@ -12626,6 +12746,9 @@ void TitleScene::Initialize()
 	transition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
 	transition_->Start(nullptr);
+
+	// ノイズを0に
+	PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(0.0f);
 }
 
 void TitleScene::Finalize()
@@ -12931,6 +13054,251 @@ private:
 };
 
 ============================================================
+File Path: project/application/scene/cameraController/BarrierBreakCameraController.cpp
+============================================================
+#include "BarrierBreakCameraController.h"
+
+#include <Ease.h>
+
+BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<bool()> isBarrierBroken)
+	:camera_(std::move(camera)),
+	 getPlayerPos_(std::move(targetPos)),
+	 getGoalPos_(std::move(returnPos)),
+	isBarrierBroken_(std::move(isBarrierBroken))
+{
+}
+
+void BarrierBreakCameraController::Update(float dt)
+{
+    if (!active_ or !camera_ or !getPlayerPos_ or !getGoalPos_)
+    {
+        return;
+    }
+
+    switch (phase_)
+    {
+    case Phase::ToGoal:
+    {
+        timer_ += dt;
+        float t = std::clamp(timer_ / toGoalDuration_, 0.0f, 1.0f);
+        float te = Ease::InOutQuad(t);
+
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
+        camera_->SetPosition(camPos);
+
+        Vector3 goalPos = getGoalPos_();
+        LookAt(camPos, goalPos);
+
+        if (t >= 1.0f)
+        {
+            // Goalに到達した瞬間に一度だけ通知
+            if (!arrivedGoalSignaled_)
+            {
+                arrivedGoalSignaled_ = true;
+                if (onArriveGoal_) onArriveGoal_();
+            }
+
+            phase_ = Phase::WaitBroken;
+            timer_ = 0.0f;
+        }
+        break;
+    }
+
+    case Phase::WaitBroken:
+    {
+        // Goalを注視し続ける
+        Vector3 goalPos = getGoalPos_();
+        Vector3 camPos = goalPos + goalViewOffset_;
+        camera_->SetPosition(camPos);
+        LookAt(camPos, goalPos);
+
+        // バリア破壊完了で戻り開始
+        if (isBarrierBroken_ && isBarrierBroken_())
+        {
+            phase_ = Phase::ReturnToPlayer;
+            timer_ = 0.0f;
+
+            phaseFromPos_ = camera_->GetPosition();
+            Vector3 playerPos = getPlayerPos_();
+            phaseToPos_ = playerPos + playerViewOffset_;
+        }
+        break;
+    }
+
+    case Phase::ReturnToPlayer:
+    {
+        timer_ += dt;
+        float t = std::clamp(timer_ / returnDuration_, 0.0f, 1.0f);
+        float te = Ease::InOutQuad(t);
+
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
+        camera_->SetPosition(camPos);
+
+        Vector3 playerPos = getPlayerPos_();
+        LookAt(camPos, playerPos);
+
+        if (t >= 1.0f)
+        {
+            phase_ = Phase::Finished;
+            active_ = false;
+
+            if (onFinish_) onFinish_();
+        }
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+void BarrierBreakCameraController::Start()
+{
+    if (!camera_ or !getPlayerPos_ or !getGoalPos_)
+    {
+        return;
+    }
+
+    active_ = true;
+    phase_ = Phase::ToGoal;
+    timer_ = 0.0f;
+    arrivedGoalSignaled_ = false;
+
+    // シームレス開始：今のカメラ位置からGoal注視構図へ
+    phaseFromPos_ = camera_->GetPosition();
+
+    Vector3 goalPos = getGoalPos_();
+    phaseToPos_ = goalPos + goalViewOffset_;
+}
+
+void BarrierBreakCameraController::LookAt(const Vector3& eye, const Vector3& target)
+{
+    Vector3 dir = (target - eye);
+
+    float yaw = std::atan2(dir.x, dir.z);
+    float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+    float pitch = std::atan2(-dir.y, horizontalDist);
+
+    camera_->SetRotate({ pitch, yaw, 0.0f });
+}
+
+
+============================================================
+File Path: project/application/scene/cameraController/BarrierBreakCameraController.h
+============================================================
+#pragma once
+
+#include <memory>
+#include <functional>
+#include <algorithm>
+#include <cmath>
+#include <corecrt_math_defines.h>
+
+#include <Vector3.h>
+
+#include "ICameraController.h"
+#include "../../../gameEngine/3d/Camera.h"
+
+// 前方宣言
+class Camera;
+
+/// <summary>
+/// バリア破壊カメラコントローラー
+/// バリアが破壊されたときのカメラ演出を管理
+/// </summary>
+class BarrierBreakCameraController : public ICameraController
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="camera">カメラ</param>
+	///  <param name="playerPos">プレイヤー位置を返す</param>
+    /// <param name="goalPos">ゴール/バリア中心位置を返す</param>
+    /// <param name="isBarrierBroken">バリア破壊完了(戻るタイミング)を返す</param>
+	BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<bool()> isBarrierBroken);
+
+	// デストラクタ
+	~BarrierBreakCameraController() override = default;
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">デルタタイム</param>
+	void Update(float dt) override;
+
+	// 開始
+	void Start() override;
+
+public: // ゲッター
+
+	// コントローラーが有効かどうか
+	bool IsActive() const override { return active_; }
+
+public: // セッター
+
+	// コールバック：ゴール到達と演出完了
+	void SetOnArriveGoal(std::function<void()> cb) { onArriveGoal_ = std::move(cb); }
+	void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
+
+private:
+
+    // LookAtで回転を作る
+    void LookAt(const Vector3& eye, const Vector3& target);
+
+
+private:
+
+    enum class Phase
+    {
+        None,
+        ToGoal,          // player -> goal へ
+        WaitBroken,      // goalを注視して待つ
+        ReturnToPlayer,  // goal -> player へ戻る
+        Finished
+    };
+
+	// カメラ
+    std::shared_ptr<IIEngine::Camera> camera_;
+	// 位置取得用コールバック
+    std::function<Vector3()> getPlayerPos_;
+    std::function<Vector3()> getGoalPos_;
+    std::function<bool()> isBarrierBroken_;
+
+	// コントローラー有効フラグ
+    bool active_ = false;
+
+    // フェーズ管理
+    Phase phase_ = Phase::None;
+
+    // タイマー
+    float timer_ = 0.0f;
+
+    // 演出時間
+    float toGoalDuration_ = 0.6f;      // Player→Goalへ寄る時間
+    float returnDuration_ = 0.6f;      // Goal→Playerへ戻る時間
+
+    // 開始時点のカメラ状態
+    Vector3 startCamPos_{};
+    Vector3 startCamRot_{};
+
+    // 目標構図
+    Vector3 goalViewOffset_ = { 0.0f, 10.0f, -18.0f };
+    Vector3 playerViewOffset_ = { 1.4f, 0.0f, 0.0f }; // Followのoffsetに寄せるなら後で合わせる
+
+    // フェーズ開始時の補間始点・終点
+    Vector3 phaseFromPos_{};
+    Vector3 phaseToPos_{};
+
+    // 到達通知/終了通知
+    bool arrivedGoalSignaled_ = false;
+    std::function<void()> onArriveGoal_ = nullptr;
+    std::function<void()> onFinish_ = nullptr;
+
+};
+
+============================================================
 File Path: project/application/scene/cameraController/ClearCameraController.cpp
 ============================================================
 #include "ClearCameraController.h"
@@ -12967,7 +13335,7 @@ void ClearCameraController::Start()
     float dx = camPos.x - playerPos.x;
     float dz = camPos.z - playerPos.z;
 
-    // startAngle を atan2(dx, dz) の順で取る（既存コードと整合）
+    // startAngle を atan2(dx, dz)の順で取る
     startAngle_ = std::atan2(dx, dz);
     startRadius_ = std::sqrt(dx * dx + dz * dz);
     startHeight_ = camPos.y - playerPos.y;
@@ -13000,13 +13368,13 @@ void ClearCameraController::Update(float dt)
     float totalAngularTravel = delta + rotationsScaled * kTau_;
     float angle = startAngle_ + totalAngularTravel * t_eased;
 
-    // 半径は開始時のものを維持（元コード）
+    // 半径は開始時のものを維持
     const float radius = startRadius_;
 
     // 高さは開始高さから徐々に上昇
     float height = startHeight_ + heightRise_ * t_eased;
 
-    // カメラ位置（極座標から）
+    // カメラ位置
     Vector3 playerPos = getPlayerPos_();
     Vector3 camPos;
     camPos.x = playerPos.x + std::sin(angle) * radius;
@@ -13041,7 +13409,7 @@ void ClearCameraController::Update(float dt)
         finalPos.y = playerPos.y + (startHeight_ + heightRise_);
 
         camera_->SetPosition(finalPos);
-
+		// 最終的にプレイヤーを見る向きもセット
         Vector3 finalDir = (playerPos - finalPos);
         float finalYaw = std::atan2(finalDir.x, finalDir.z);
         float finalH = std::sqrt(finalDir.x * finalDir.x + finalDir.z * finalDir.z);
