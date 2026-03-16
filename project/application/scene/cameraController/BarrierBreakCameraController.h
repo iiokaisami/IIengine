@@ -29,7 +29,7 @@ public:
 	///  <param name="playerPos">プレイヤー位置を返す</param>
     /// <param name="goalPos">ゴール/バリア中心位置を返す</param>
     /// <param name="isBarrierBroken">バリア破壊完了(戻るタイミング)を返す</param>
-	BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<bool()> isBarrierBroken);
+	BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
 
 	// デストラクタ
 	~BarrierBreakCameraController() override = default;
@@ -48,6 +48,9 @@ public: // ゲッター
 	// コントローラーが有効かどうか
 	bool IsActive() const override { return active_; }
 
+	// バリアに到達したかどうか
+	bool IsArrivedGoal() const { return arrivedGoalSignaled_; }
+
 public: // セッター
 
 	// コールバック：ゴール到達と演出完了
@@ -58,6 +61,20 @@ private:
 
     // LookAtで回転を作る
     void LookAt(const Vector3& eye, const Vector3& target);
+
+	// 線形補間
+    static Vector3 LerpVec3(const Vector3& a, const Vector3& b, float t)
+    {
+        return a + (b - a) * t;
+    }
+
+    // x,zだけ補間して yは固定する
+    static Vector3 LerpXZ(const Vector3& from, const Vector3& to, float t, float fixedY)
+    {
+        Vector3 r = LerpVec3(from, to, t);
+        r.y = fixedY;
+        return r;
+    }
 
 
 private:
@@ -74,36 +91,36 @@ private:
 	// カメラ
     std::shared_ptr<IIEngine::Camera> camera_;
 	// 位置取得用コールバック
-    std::function<Vector3()> getPlayerPos_;
-    std::function<Vector3()> getGoalPos_;
+    std::function<Vector3()> getPlayerPos_ = nullptr;
+    std::function<Vector3()> getGoalPos_ = nullptr;
+    std::function<Vector3()> getFollowCamPos_ = nullptr;
     std::function<bool()> isBarrierBroken_;
 
 	// コントローラー有効フラグ
     bool active_ = false;
-
+    
     // フェーズ管理
     Phase phase_ = Phase::None;
 
     // タイマー
     float timer_ = 0.0f;
+    float waitTime_ = 1.5f;
 
     // 演出時間
     float toGoalDuration_ = 0.6f;      // Player→Goalへ寄る時間
     float returnDuration_ = 0.6f;      // Goal→Playerへ戻る時間
 
-    // 開始時点のカメラ状態
-    Vector3 startCamPos_{};
-    Vector3 startCamRot_{};
+    Vector3 cameraOffset_ = { 0.0f, 78.0f, -17.0f };
 
-    // 目標構図
-    Vector3 goalViewOffset_ = { 0.0f, 10.0f, -18.0f };
-    Vector3 playerViewOffset_ = { 1.4f, 0.0f, 0.0f }; // Followのoffsetに寄せるなら後で合わせる
+    // 開始時のYと回転を固定保持
+    float fixedY_ = 0.0f;
+    Vector3 fixedRot_{};
 
-    // フェーズ開始時の補間始点・終点
     Vector3 phaseFromPos_{};
     Vector3 phaseToPos_{};
 
-    // 到達通知/終了通知
+    Vector3 arrivedGoalPos_{};
+
     bool arrivedGoalSignaled_ = false;
     std::function<void()> onArriveGoal_ = nullptr;
     std::function<void()> onFinish_ = nullptr;

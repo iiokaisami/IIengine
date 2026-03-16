@@ -159,6 +159,7 @@ void GamePlayScene::Initialize()
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // Player
 		[this]() -> Vector3 { return pGoal_->GetPosition(); },   // Goal
+		[this]() -> Vector3 { return pPlayer_->GetPosition() + cameraOffset_; }, // 目標位置(Playerの位置にオフセット)
 		[this]() -> bool { return pGoal_->IsBarrierDestroyed(); } // Barrier破壊完了
 	);
 
@@ -496,7 +497,24 @@ void GamePlayScene::Update()
 
 	// ゴールの更新
 	pGoal_->Update();
-	pGoal_->SetBarrierDestroyed(pEnemyManager_->IsAllEnemyDefeated());
+	
+	// 敵全滅した瞬間に一度だけカメラ演出開始
+	if (pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_)
+	{
+		isBarrierCameraStarted_ = true;
+
+		// Follow停止
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
+
+		// Barrier破壊カメラ開始
+		if (auto* barrierCam = camera_->FindController<BarrierBreakCameraController>())
+		{
+			barrierCam->Start();
+		}
+	}
 
 	// スプライトの更新
 	for (auto& sprite : sprites_)

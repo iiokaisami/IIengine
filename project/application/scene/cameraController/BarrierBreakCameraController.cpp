@@ -2,17 +2,18 @@
 
 #include <Ease.h>
 
-BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<bool()> isBarrierBroken)
+BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken)
 	:camera_(std::move(camera)),
 	 getPlayerPos_(std::move(targetPos)),
 	 getGoalPos_(std::move(returnPos)),
-	isBarrierBroken_(std::move(isBarrierBroken))
+     getFollowCamPos_(std::move(getFollowCamPos)),
+	 isBarrierBroken_(std::move(isBarrierBroken))
 {
 }
 
 void BarrierBreakCameraController::Update(float dt)
 {
-    if (!active_ or !camera_ or !getPlayerPos_ or !getGoalPos_)
+    if (!active_ or !camera_ or !getPlayerPos_ or !getGoalPos_ or !getFollowCamPos_)
     {
         return;
     }
@@ -25,14 +26,14 @@ void BarrierBreakCameraController::Update(float dt)
         float t = std::clamp(timer_ / toGoalDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
+        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
         camera_->SetPosition(camPos);
-
-        Vector3 goalPos = getGoalPos_();
-        LookAt(camPos, goalPos);
 
         if (t >= 1.0f)
         {
+            // 到達位置を保持
+            arrivedGoalPos_ = camera_->GetPosition();
+
             // Goalに到達した瞬間に一度だけ通知
             if (!arrivedGoalSignaled_)
             {
@@ -48,21 +49,26 @@ void BarrierBreakCameraController::Update(float dt)
 
     case Phase::WaitBroken:
     {
-        // Goalを注視し続ける
-        Vector3 goalPos = getGoalPos_();
-        Vector3 camPos = goalPos + goalViewOffset_;
-        camera_->SetPosition(camPos);
-        LookAt(camPos, goalPos);
+        // その場で止める
+        camera_->SetPosition(arrivedGoalPos_);
 
-        // バリア破壊完了で戻り開始
+        // バリア破壊完了後だけ timer を進める
         if (isBarrierBroken_ && isBarrierBroken_())
+        {
+            timer_ += dt;
+        }
+
+        if (timer_ >= waitTime_)
         {
             phase_ = Phase::ReturnToPlayer;
             timer_ = 0.0f;
 
             phaseFromPos_ = camera_->GetPosition();
-            Vector3 playerPos = getPlayerPos_();
-            phaseToPos_ = playerPos + playerViewOffset_;
+
+            // 戻り先：Follow位置
+            Vector3 followPos = getFollowCamPos_();
+            followPos.y = fixedY_;
+            phaseToPos_ = followPos + cameraOffset_;
         }
         break;
     }
@@ -73,11 +79,8 @@ void BarrierBreakCameraController::Update(float dt)
         float t = std::clamp(timer_ / returnDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
+        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
         camera_->SetPosition(camPos);
-
-        Vector3 playerPos = getPlayerPos_();
-        LookAt(camPos, playerPos);
 
         if (t >= 1.0f)
         {
@@ -96,7 +99,7 @@ void BarrierBreakCameraController::Update(float dt)
 
 void BarrierBreakCameraController::Start()
 {
-    if (!camera_ or !getPlayerPos_ or !getGoalPos_)
+    if (!camera_ or !getPlayerPos_ or !getGoalPos_ or !getFollowCamPos_)
     {
         return;
     }
@@ -106,11 +109,20 @@ void BarrierBreakCameraController::Start()
     timer_ = 0.0f;
     arrivedGoalSignaled_ = false;
 
-    // シームレス開始：今のカメラ位置からGoal注視構図へ
+    // 角度を固定
+    fixedRot_ = camera_->GetRotate();
+    camera_->SetRotate(fixedRot_);
+
+    // y固定
+    fixedY_ = camera_->GetPosition().y;
+
+    // 開始位置：現在のカメラ位置
     phaseFromPos_ = camera_->GetPosition();
 
-    Vector3 goalPos = getGoalPos_();
-    phaseToPos_ = goalPos + goalViewOffset_;
+    // 目標：ゴール位置 + 固定オフセット
+    Vector3 goalCamPos = getGoalPos_() + cameraOffset_;
+    goalCamPos.y = fixedY_;
+    phaseToPos_ = goalCamPos;
 }
 
 void BarrierBreakCameraController::LookAt(const Vector3& eye, const Vector3& target)
