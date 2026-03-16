@@ -11685,6 +11685,7 @@ void GamePlayScene::Initialize()
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // Player
 		[this]() -> Vector3 { return pGoal_->GetPosition(); },   // Goal
+		[this]() -> Vector3 { return pPlayer_->GetPosition() + cameraOffset_; }, // 目標位置(Playerの位置にオフセット)
 		[this]() -> bool { return pGoal_->IsBarrierDestroyed(); } // Barrier破壊完了
 	);
 
@@ -12022,7 +12023,24 @@ void GamePlayScene::Update()
 
 	// ゴールの更新
 	pGoal_->Update();
-	pGoal_->SetBarrierDestroyed(pEnemyManager_->IsAllEnemyDefeated());
+	
+	// 敵全滅した瞬間に一度だけカメラ演出開始
+	if (pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_)
+	{
+		isBarrierCameraStarted_ = true;
+
+		// Follow停止
+		if (auto* follow = camera_->FindController<FollowController>())
+		{
+			follow->Stop();
+		}
+
+		// Barrier破壊カメラ開始
+		if (auto* barrierCam = camera_->FindController<BarrierBreakCameraController>())
+		{
+			barrierCam->Start();
+		}
+	}
 
 	// スプライトの更新
 	for (auto& sprite : sprites_)
@@ -13060,17 +13078,18 @@ File Path: project/application/scene/cameraController/BarrierBreakCameraControll
 
 #include <Ease.h>
 
-BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<bool()> isBarrierBroken)
+BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken)
 	:camera_(std::move(camera)),
 	 getPlayerPos_(std::move(targetPos)),
 	 getGoalPos_(std::move(returnPos)),
-	isBarrierBroken_(std::move(isBarrierBroken))
+     getFollowCamPos_(std::move(getFollowCamPos)),
+	 isBarrierBroken_(std::move(isBarrierBroken))
 {
 }
 
 void BarrierBreakCameraController::Update(float dt)
 {
-    if (!active_ or !camera_ or !getPlayerPos_ or !getGoalPos_)
+    if (!active_ or !camera_ or !getPlayerPos_ or !getGoalPos_ or !getFollowCamPos_)
     {
         return;
     }
@@ -13083,14 +13102,14 @@ void BarrierBreakCameraController::Update(float dt)
         float t = std::clamp(timer_ / toGoalDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
+        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
         camera_->SetPosition(camPos);
-
-        Vector3 goalPos = getGoalPos_();
-        LookAt(camPos, goalPos);
 
         if (t >= 1.0f)
         {
+            // 到達位置を保持
+            arrivedGoalPos_ = camera_->GetPosition();
+
             // Goalに到達した瞬間に一度だけ通知
             if (!arrivedGoalSignaled_)
             {
@@ -13106,21 +13125,26 @@ void BarrierBreakCameraController::Update(float dt)
 
     case Phase::WaitBroken:
     {
-        // Goalを注視し続ける
-        Vector3 goalPos = getGoalPos_();
-        Vector3 camPos = goalPos + goalViewOffset_;
-        camera_->SetPosition(camPos);
-        LookAt(camPos, goalPos);
+        // その場で止める
+        camera_->SetPosition(arrivedGoalPos_);
 
-        // バリア破壊完了で戻り開始
+        // バリア破壊完了後だけ timer を進める
         if (isBarrierBroken_ && isBarrierBroken_())
+        {
+            timer_ += dt;
+        }
+
+        if (timer_ >= waitTime_)
         {
             phase_ = Phase::ReturnToPlayer;
             timer_ = 0.0f;
 
             phaseFromPos_ = camera_->GetPosition();
-            Vector3 playerPos = getPlayerPos_();
-            phaseToPos_ = playerPos + playerViewOffset_;
+
+            // 戻り先：Follow位置
+            Vector3 followPos = getFollowCamPos_();
+            followPos.y = fixedY_;
+            phaseToPos_ = followPos + cameraOffset_;
         }
         break;
     }
@@ -13131,11 +13155,8 @@ void BarrierBreakCameraController::Update(float dt)
         float t = std::clamp(timer_ / returnDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
+        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
         camera_->SetPosition(camPos);
-
-        Vector3 playerPos = getPlayerPos_();
-        LookAt(camPos, playerPos);
 
         if (t >= 1.0f)
         {
@@ -13154,7 +13175,7 @@ void BarrierBreakCameraController::Update(float dt)
 
 void BarrierBreakCameraController::Start()
 {
-    if (!camera_ or !getPlayerPos_ or !getGoalPos_)
+    if (!camera_ or !getPlayerPos_ or !getGoalPos_ or !getFollowCamPos_)
     {
         return;
     }
@@ -13164,11 +13185,20 @@ void BarrierBreakCameraController::Start()
     timer_ = 0.0f;
     arrivedGoalSignaled_ = false;
 
-    // シームレス開始：今のカメラ位置からGoal注視構図へ
+    // 角度を固定
+    fixedRot_ = camera_->GetRotate();
+    camera_->SetRotate(fixedRot_);
+
+    // y固定
+    fixedY_ = camera_->GetPosition().y;
+
+    // 開始位置：現在のカメラ位置
     phaseFromPos_ = camera_->GetPosition();
 
-    Vector3 goalPos = getGoalPos_();
-    phaseToPos_ = goalPos + goalViewOffset_;
+    // 目標：ゴール位置 + 固定オフセット
+    Vector3 goalCamPos = getGoalPos_() + cameraOffset_;
+    goalCamPos.y = fixedY_;
+    phaseToPos_ = goalCamPos;
 }
 
 void BarrierBreakCameraController::LookAt(const Vector3& eye, const Vector3& target)
@@ -13217,7 +13247,7 @@ public:
 	///  <param name="playerPos">プレイヤー位置を返す</param>
     /// <param name="goalPos">ゴール/バリア中心位置を返す</param>
     /// <param name="isBarrierBroken">バリア破壊完了(戻るタイミング)を返す</param>
-	BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<bool()> isBarrierBroken);
+	BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
 
 	// デストラクタ
 	~BarrierBreakCameraController() override = default;
@@ -13236,6 +13266,9 @@ public: // ゲッター
 	// コントローラーが有効かどうか
 	bool IsActive() const override { return active_; }
 
+	// バリアに到達したかどうか
+	bool IsArrivedGoal() const { return arrivedGoalSignaled_; }
+
 public: // セッター
 
 	// コールバック：ゴール到達と演出完了
@@ -13246,6 +13279,20 @@ private:
 
     // LookAtで回転を作る
     void LookAt(const Vector3& eye, const Vector3& target);
+
+	// 線形補間
+    static Vector3 LerpVec3(const Vector3& a, const Vector3& b, float t)
+    {
+        return a + (b - a) * t;
+    }
+
+    // x,zだけ補間して yは固定する
+    static Vector3 LerpXZ(const Vector3& from, const Vector3& to, float t, float fixedY)
+    {
+        Vector3 r = LerpVec3(from, to, t);
+        r.y = fixedY;
+        return r;
+    }
 
 
 private:
@@ -13262,36 +13309,36 @@ private:
 	// カメラ
     std::shared_ptr<IIEngine::Camera> camera_;
 	// 位置取得用コールバック
-    std::function<Vector3()> getPlayerPos_;
-    std::function<Vector3()> getGoalPos_;
+    std::function<Vector3()> getPlayerPos_ = nullptr;
+    std::function<Vector3()> getGoalPos_ = nullptr;
+    std::function<Vector3()> getFollowCamPos_ = nullptr;
     std::function<bool()> isBarrierBroken_;
 
 	// コントローラー有効フラグ
     bool active_ = false;
-
+    
     // フェーズ管理
     Phase phase_ = Phase::None;
 
     // タイマー
     float timer_ = 0.0f;
+    float waitTime_ = 1.5f;
 
     // 演出時間
     float toGoalDuration_ = 0.6f;      // Player→Goalへ寄る時間
     float returnDuration_ = 0.6f;      // Goal→Playerへ戻る時間
 
-    // 開始時点のカメラ状態
-    Vector3 startCamPos_{};
-    Vector3 startCamRot_{};
+    Vector3 cameraOffset_ = { 0.0f, 78.0f, -17.0f };
 
-    // 目標構図
-    Vector3 goalViewOffset_ = { 0.0f, 10.0f, -18.0f };
-    Vector3 playerViewOffset_ = { 1.4f, 0.0f, 0.0f }; // Followのoffsetに寄せるなら後で合わせる
+    // 開始時のYと回転を固定保持
+    float fixedY_ = 0.0f;
+    Vector3 fixedRot_{};
 
-    // フェーズ開始時の補間始点・終点
     Vector3 phaseFromPos_{};
     Vector3 phaseToPos_{};
 
-    // 到達通知/終了通知
+    Vector3 arrivedGoalPos_{};
+
     bool arrivedGoalSignaled_ = false;
     std::function<void()> onArriveGoal_ = nullptr;
     std::function<void()> onFinish_ = nullptr;
