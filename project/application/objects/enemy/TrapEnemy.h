@@ -76,7 +76,7 @@ public: // ゲッター
 	bool IsStopAndTrap() const { return isStopAndTrap_; }
 
 	// 残っているTimeBombの座標を取得
-	std::vector<Vector3> GetRemainingTimeBombPositions() const;
+	const std::vector<Vector3>& GetRemainingTimeBombPositions() const;
 
 public: // セッター
 
@@ -121,6 +121,9 @@ private:
 	std::vector<std::unique_ptr<TimeBomb>> pTimeBomb_ = {};
 	std::vector<std::unique_ptr<VignetteTrap>> pVignetteTrap_ = {};
 	
+	// 残っているTimeBombの座標
+	mutable std::vector<Vector3> remainingTimeBombPositionsCache_;
+
 	// クールタイム完了フラグ
 	bool isTrapCooldownComplete_ = false;
 	// 次の罠がTimeBombかVignetteTrapかのフラグ

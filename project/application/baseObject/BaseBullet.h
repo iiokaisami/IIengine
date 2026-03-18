@@ -31,7 +31,7 @@ public:
 	virtual void Draw() override;
 
 	// 速度設定
-	virtual Vector3 SetVelocity(const Vector3& _velocity);
+	virtual void SetVelocity(const Vector3& _velocity);
 
 protected:
 

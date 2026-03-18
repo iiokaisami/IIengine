@@ -2,7 +2,7 @@
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, Vector3 targetRot)
+FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, const Vector3& targetRot)
 	: camera_(camera),
       targetPos_(targetPos),
 	  targetVelocity_(targetVelocity),

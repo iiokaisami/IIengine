@@ -110,7 +110,9 @@ private:
     float toGoalDuration_ = 0.6f;      // Player→Goalへ寄る時間
     float returnDuration_ = 0.6f;      // Goal→Playerへ戻る時間
 
+    // カメラのオフセット
     Vector3 cameraOffset_ = { 0.0f, 78.0f, -17.0f };
+    Vector3 goalExtraOffset_ = { 3.0f, 0.0f, -5.0f };
 
     // 開始時のYと回転を固定保持
     float fixedY_ = 0.0f;

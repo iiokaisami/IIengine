@@ -30,7 +30,7 @@ public:
 	virtual void Move() override;
 
 	// 障害物の位置リストをセット
-	void SetObstaclePositions(const std::vector<Vector3>& _obstaclePositions) { obstaclePositions_ = _obstaclePositions; }
+	void SetObstaclePositions(std::vector<Vector3> _obstaclePositions) { obstaclePositions_ = std::move(_obstaclePositions); }
 
 protected:
 

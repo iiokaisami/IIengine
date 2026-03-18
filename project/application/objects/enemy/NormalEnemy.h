@@ -81,7 +81,7 @@ public: // ゲッター
 public: // セッター
 
 	// プレイヤーの位置をセット
-	void SetPlayerPosition(Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
+	void SetPlayerPosition(const Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
 
 	// 無敵フラグをセット
 	void SetIsInvincible(bool _isInvincible) { isInvincible_ = _isInvincible; }

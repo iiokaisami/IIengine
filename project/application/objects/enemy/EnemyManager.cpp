@@ -88,7 +88,7 @@ void EnemyManager::Update()
 				if (enemy->IsDead())
 				{
 					// Finalize 前に残っている罠の位置を取得
-					std::vector<Vector3> remainingTraps = enemy->GetRemainingTimeBombPositions();
+					const auto& remainingTraps = enemy->GetRemainingTimeBombPositions();
 
 					// 出現位置にCorruptorを生成
 					for (const auto& trapPos : remainingTraps)

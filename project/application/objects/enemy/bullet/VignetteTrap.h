@@ -68,7 +68,10 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns></returns>
-	Vector3 SetVelocity(const Vector3& _velocity) { return velocity_ = _velocity; }
+	void SetVelocity(const Vector3& _velocity)
+	{
+		velocity_ = _velocity * kDefaultFrameRate;
+	}
 
 	// プレイヤーの周囲の座標を設定
 	void SetTrapLandingPosition(const Vector3& _playerPosition);

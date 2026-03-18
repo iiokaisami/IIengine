@@ -28,11 +28,10 @@ void BaseBullet::Draw()
 	}
 }
 
-Vector3 BaseBullet::SetVelocity(const Vector3& _velocity)
+void BaseBullet::SetVelocity(const Vector3& _velocity)
 {
-	// フレームレート補正
+	// フレームレート補正（既存方針に合わせる）
 	velocity_ = _velocity * kDefaultFrameRate;
-	return velocity_;
 }
 
 void BaseBullet::UpdateLifetime()

@@ -49,10 +49,9 @@ public: // セッター
 	/// 速度取得
 	/// </summary>
 	/// <returns>速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3& _velocity)
+	void SetVelocity(const Vector3& _velocity)
 	{
 		velocity_ = _velocity * kDefaultFrameRate; 
-		return velocity_; 
 	}
 
 private: // メンバ変数

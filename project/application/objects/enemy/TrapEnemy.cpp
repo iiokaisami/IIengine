@@ -330,19 +330,19 @@ void TrapEnemy::OnCollision(const Collider* _other)
     }
 }
 
-std::vector<Vector3> TrapEnemy::GetRemainingTimeBombPositions() const
+const std::vector<Vector3>& TrapEnemy::GetRemainingTimeBombPositions() const
 {
-    std::vector<Vector3> positions;
+	// キャッシュをクリアして再構築
+    remainingTimeBombPositionsCache_.clear();
+    remainingTimeBombPositionsCache_.reserve(pTimeBomb_.size());
 
-	// 生きているTimeBombの位置を取得
+	// 生きているTimeBombの座標をキャッシュに追加
     for (const auto& trap : pTimeBomb_)
     {
-		// 生きているTimeBombのみ取得
         if (trap && !trap->IsDead())
         {
-            positions.push_back(trap->GetPosition());
+            remainingTimeBombPositionsCache_.push_back(trap->GetPosition());
         }
     }
-
-    return positions;
+    return remainingTimeBombPositionsCache_;
 }
