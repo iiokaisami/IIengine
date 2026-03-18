@@ -1705,11 +1705,10 @@ void BaseBullet::Draw()
 	}
 }
 
-Vector3 BaseBullet::SetVelocity(const Vector3& _velocity)
+void BaseBullet::SetVelocity(const Vector3& _velocity)
 {
-	// フレームレート補正
+	// フレームレート補正（既存方針に合わせる）
 	velocity_ = _velocity * kDefaultFrameRate;
-	return velocity_;
 }
 
 void BaseBullet::UpdateLifetime()
@@ -1771,7 +1770,7 @@ public:
 	virtual void Draw() override;
 
 	// 速度設定
-	virtual Vector3 SetVelocity(const Vector3& _velocity);
+	virtual void SetVelocity(const Vector3& _velocity);
 
 protected:
 
@@ -2169,7 +2168,7 @@ public:
 	virtual void Move() override;
 
 	// 障害物の位置リストをセット
-	void SetObstaclePositions(const std::vector<Vector3>& _obstaclePositions) { obstaclePositions_ = _obstaclePositions; }
+	void SetObstaclePositions(std::vector<Vector3> _obstaclePositions) { obstaclePositions_ = std::move(_obstaclePositions); }
 
 protected:
 
@@ -3275,7 +3274,7 @@ void EnemyManager::Update()
 				if (enemy->IsDead())
 				{
 					// Finalize 前に残っている罠の位置を取得
-					std::vector<Vector3> remainingTraps = enemy->GetRemainingTimeBombPositions();
+					const auto& remainingTraps = enemy->GetRemainingTimeBombPositions();
 
 					// 出現位置にCorruptorを生成
 					for (const auto& trapPos : remainingTraps)
@@ -4420,7 +4419,7 @@ public: // ゲッター
 public: // セッター
 
 	// プレイヤーの位置をセット
-	void SetPlayerPosition(Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
+	void SetPlayerPosition(const Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
 
 	// 無敵フラグをセット
 	void SetIsInvincible(bool _isInvincible) { isInvincible_ = _isInvincible; }
@@ -4856,21 +4855,21 @@ void TrapEnemy::OnCollision(const Collider* _other)
     }
 }
 
-std::vector<Vector3> TrapEnemy::GetRemainingTimeBombPositions() const
+const std::vector<Vector3>& TrapEnemy::GetRemainingTimeBombPositions() const
 {
-    std::vector<Vector3> positions;
+	// キャッシュをクリアして再構築
+    remainingTimeBombPositionsCache_.clear();
+    remainingTimeBombPositionsCache_.reserve(pTimeBomb_.size());
 
-	// 生きているTimeBombの位置を取得
+	// 生きているTimeBombの座標をキャッシュに追加
     for (const auto& trap : pTimeBomb_)
     {
-		// 生きているTimeBombのみ取得
         if (trap && !trap->IsDead())
         {
-            positions.push_back(trap->GetPosition());
+            remainingTimeBombPositionsCache_.push_back(trap->GetPosition());
         }
     }
-
-    return positions;
+    return remainingTimeBombPositionsCache_;
 }
 
 
@@ -4955,7 +4954,7 @@ public: // ゲッター
 	bool IsStopAndTrap() const { return isStopAndTrap_; }
 
 	// 残っているTimeBombの座標を取得
-	std::vector<Vector3> GetRemainingTimeBombPositions() const;
+	const std::vector<Vector3>& GetRemainingTimeBombPositions() const;
 
 public: // セッター
 
@@ -5000,6 +4999,9 @@ private:
 	std::vector<std::unique_ptr<TimeBomb>> pTimeBomb_ = {};
 	std::vector<std::unique_ptr<VignetteTrap>> pVignetteTrap_ = {};
 	
+	// 残っているTimeBombの座標
+	mutable std::vector<Vector3> remainingTimeBombPositionsCache_;
+
 	// クールタイム完了フラグ
 	bool isTrapCooldownComplete_ = false;
 	// 次の罠がTimeBombかVignetteTrapかのフラグ
@@ -7127,10 +7129,9 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns>設定後の速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3& _velocity)
-	{ 
-		velocity_ = _velocity * kDefaultFrameRate;
-		return velocity_;
+	void SetVelocity(const Vector3& _velocity) override
+	{
+		velocity_ = _velocity * kDefaultFrameRate; 
 	}
 
 private: // メンバ変数
@@ -7569,7 +7570,10 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns>設定した速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3& _velocity) { return velocity_ = _velocity; }
+	void SetVelocity(const Vector3& _velocity)
+	{
+		velocity_ = _velocity * kDefaultFrameRate;
+	}
 
 	/// <summary>
 	/// プレイヤーの周囲の座標を設定
@@ -8009,7 +8013,10 @@ public: // セッター
 	/// </summary>
 	/// <param name="_velocity">速度ベクトル</param>
 	/// <returns></returns>
-	Vector3 SetVelocity(const Vector3& _velocity) { return velocity_ = _velocity; }
+	void SetVelocity(const Vector3& _velocity)
+	{
+		velocity_ = _velocity * kDefaultFrameRate;
+	}
 
 	// プレイヤーの周囲の座標を設定
 	void SetTrapLandingPosition(const Vector3& _playerPosition);
@@ -10881,10 +10888,9 @@ public: // セッター
 	/// 速度取得
 	/// </summary>
 	/// <returns>速度ベクトル</returns>
-	Vector3 SetVelocity(const Vector3& _velocity)
+	void SetVelocity(const Vector3& _velocity)
 	{
 		velocity_ = _velocity * kDefaultFrameRate; 
-		return velocity_; 
 	}
 
 private: // メンバ変数
@@ -13328,7 +13334,9 @@ private:
     float toGoalDuration_ = 0.6f;      // Player→Goalへ寄る時間
     float returnDuration_ = 0.6f;      // Goal→Playerへ戻る時間
 
+    // カメラのオフセット
     Vector3 cameraOffset_ = { 0.0f, 78.0f, -17.0f };
+    Vector3 goalExtraOffset_ = { 3.0f, 0.0f, -5.0f };
 
     // 開始時のYと回転を固定保持
     float fixedY_ = 0.0f;
@@ -13776,7 +13784,7 @@ File Path: project/application/scene/cameraController/FollowController.cpp
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, Vector3 targetRot)
+FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, const Vector3& targetRot)
 	: camera_(camera),
       targetPos_(targetPos),
 	  targetVelocity_(targetVelocity),
@@ -13924,7 +13932,7 @@ public:
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
 	/// <param name="rotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
-	FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, Vector3 targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
+	FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, const Vector3& targetRot = Vector3{ 1.2f, 0.0f, 0.0f });
 
 	/// <summary>
 	/// 更新
