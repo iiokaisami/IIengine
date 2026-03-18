@@ -9275,6 +9275,8 @@ void Player::Initialize()
 	// RGBShit
 	PostEffectManager::GetInstance()->SetActiveEffect("RGBShift", true);
 
+	// ノイズ
+	isNoiseActive_ = true;
 }
 
 void Player::Finalize()
@@ -10108,7 +10110,7 @@ void Player::EvadeComboInversion()
 
 void Player::HPDecreaseNoise()
 {
-	if (!isAutoControl_ && !isDead_)
+	if (!isAutoControl_ && !isDead_ && isNoiseActive_)
 	{
 		float hpRate = hp_ / maxHP_;
 		const float dangerThreshold = hpDangerThreshold_;
@@ -10524,6 +10526,12 @@ public: // セッター
 	/// <param name="_isTouchGoal">ゴールに触れたかのフラグ</param>
 	void SetTouchGoal(bool _isTouchGoal) { isTouchGoal_ = _isTouchGoal; }
 
+	/// <summary>
+	/// ノイズをアクティブにするかのセッター
+	/// </summary>
+	/// <param name="_isNoiseActive">ノイズをアクティブにするかのフラグ</param>
+	void SetIsNoiseActive(bool _isNoiseActive) { isNoiseActive_ = _isNoiseActive; }
+
 private:
 
 	// 最も近い敵
@@ -10644,6 +10652,8 @@ private:
 
 	// ノイズの強さ
 	float finalStrength_ = 0.0f;
+	// ノイズの処理を施すかのフラグ
+	bool isNoiseActive_ = false;
 
 	// デスモーション用構造体
 	struct Motion
@@ -11337,6 +11347,7 @@ void GameOverScene::Update()
 	colliderManager_->CheckAllCollision();
 
 	// プレイヤーの更新
+	pPlayer_->SetIsNoiseActive(false); // ゲームオーバーシーンではノイズを常にオフにする
 	pPlayer_->Update();
 	// プレイヤーの位置をエネミーマネージャーにセット
 	pEnemyManager_->SetPlayerPosition(pPlayer_->GetPosition());
@@ -11712,6 +11723,12 @@ void GamePlayScene::Initialize()
 					follow->SnapToTarget();
 					follow->Start();
 				}
+
+				// 演出終了時にプレイヤーの移動を許可する
+				if (pPlayer_)
+				{
+					pPlayer_->SetIsCanMove(true);
+				}
 			});
 	}
 
@@ -12035,10 +12052,11 @@ void GamePlayScene::Update()
 	{
 		isBarrierCameraStarted_ = true;
 
-		// Follow停止
+		// Follow,Player移動停止
 		if (auto* follow = camera_->FindController<FollowController>())
 		{
 			follow->Stop();
+			pPlayer_->SetIsCanMove(false);
 		}
 
 		// Barrier破壊カメラ開始
