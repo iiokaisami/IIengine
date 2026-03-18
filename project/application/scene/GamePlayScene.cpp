@@ -180,6 +180,12 @@ void GamePlayScene::Initialize()
 					follow->SnapToTarget();
 					follow->Start();
 				}
+
+				// 演出終了時にプレイヤーの移動を許可する
+				if (pPlayer_)
+				{
+					pPlayer_->SetIsCanMove(true);
+				}
 			});
 	}
 
@@ -503,10 +509,11 @@ void GamePlayScene::Update()
 	{
 		isBarrierCameraStarted_ = true;
 
-		// Follow停止
+		// Follow,Player移動停止
 		if (auto* follow = camera_->FindController<FollowController>())
 		{
 			follow->Stop();
+			pPlayer_->SetIsCanMove(false);
 		}
 
 		// Barrier破壊カメラ開始

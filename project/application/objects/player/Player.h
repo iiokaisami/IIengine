@@ -162,6 +162,12 @@ public: // セッター
 	/// <param name="_isTouchGoal">ゴールに触れたかのフラグ</param>
 	void SetTouchGoal(bool _isTouchGoal) { isTouchGoal_ = _isTouchGoal; }
 
+	/// <summary>
+	/// ノイズをアクティブにするかのセッター
+	/// </summary>
+	/// <param name="_isNoiseActive">ノイズをアクティブにするかのフラグ</param>
+	void SetIsNoiseActive(bool _isNoiseActive) { isNoiseActive_ = _isNoiseActive; }
+
 private:
 
 	// 最も近い敵
@@ -282,6 +288,8 @@ private:
 
 	// ノイズの強さ
 	float finalStrength_ = 0.0f;
+	// ノイズの処理を施すかのフラグ
+	bool isNoiseActive_ = false;
 
 	// デスモーション用構造体
 	struct Motion

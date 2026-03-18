@@ -144,6 +144,7 @@ void GameOverScene::Update()
 	colliderManager_->CheckAllCollision();
 
 	// プレイヤーの更新
+	pPlayer_->SetIsNoiseActive(false); // ゲームオーバーシーンではノイズを常にオフにする
 	pPlayer_->Update();
 	// プレイヤーの位置をエネミーマネージャーにセット
 	pEnemyManager_->SetPlayerPosition(pPlayer_->GetPosition());

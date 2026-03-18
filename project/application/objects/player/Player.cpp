@@ -79,6 +79,8 @@ void Player::Initialize()
 	// RGBShit
 	PostEffectManager::GetInstance()->SetActiveEffect("RGBShift", true);
 
+	// ノイズ
+	isNoiseActive_ = true;
 }
 
 void Player::Finalize()
@@ -912,7 +914,7 @@ void Player::EvadeComboInversion()
 
 void Player::HPDecreaseNoise()
 {
-	if (!isAutoControl_ && !isDead_)
+	if (!isAutoControl_ && !isDead_ && isNoiseActive_)
 	{
 		float hpRate = hp_ / maxHP_;
 		const float dangerThreshold = hpDangerThreshold_;
