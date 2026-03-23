@@ -30,7 +30,7 @@ void BaseBullet::Draw()
 
 void BaseBullet::SetVelocity(const Vector3& _velocity)
 {
-	// フレームレート補正（既存方針に合わせる）
+	// フレームレート補正
 	velocity_ = _velocity * kDefaultFrameRate;
 }
 

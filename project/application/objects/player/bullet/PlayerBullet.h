@@ -49,7 +49,7 @@ public: // セッター
 	/// 速度取得
 	/// </summary>
 	/// <returns>速度ベクトル</returns>
-	void SetVelocity(const Vector3& _velocity)
+	void SetVelocity(const Vector3& _velocity) override
 	{
 		velocity_ = _velocity * kDefaultFrameRate; 
 	}
