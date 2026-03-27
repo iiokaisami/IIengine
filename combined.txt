@@ -8687,6 +8687,8 @@ File Path: project/application/objects/field/Barrier.cpp
 ============================================================
 #include "Barrier.h"
 
+#include "TimeManager.h"
+
 using namespace IIEngine;
 
 void Barrier::Initialize()
@@ -8701,11 +8703,17 @@ void Barrier::Initialize()
 	// ライト設定
 	object_->SetLighting(true);
 
+	// シェイク
+	shakeMagnitude_ = 0.1f;
+	shakeDuration_ = 1.0f;
+	shakeTimeElapsed_ = 0.0f;
+	randomDistribution_ = std::uniform_real_distribution<float>(-1.0f, 1.0f);
 
 }
 
 void Barrier::Update()
 {
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 基底クラス更新
 	StaticObject::Update();
@@ -8715,22 +8723,29 @@ void Barrier::Update()
 	{
 		isExploding_ = true;
 		explodeCount_ = 0;
+		basePosition_ = GetPosition();
 	}
 
 	// 破裂演出処理
 	if (isExploding_)
 	{
-		uint32_t phaseLength = explodeMaxCount_ / 2;
 		float scale = 1.0f;
 
-		if (explodeCount_ < phaseLength)
+		if (explodeCount_ < shakeMaxCount_)
+		{
+			// シェイク
+			UpdateShake();
+		}
+		else if (explodeCount_ < shakeMaxCount_ + explodeMaxCount_)
 		{
 			// 膨張
-			float t = static_cast<float>(explodeCount_) / phaseLength;
+			float t = static_cast<float>(explodeCount_) / explodeMaxCount_;
 			scale = Lerp(1.0f, explodeScalePeak_, t);
-		} else if (explodeCount_ < phaseLength * 2) {
+		}
+		else
+		{
 			// 消滅
-			float t = static_cast<float>(explodeCount_ - phaseLength) / phaseLength;
+			float t = static_cast<float>(explodeCount_ - explodeMaxCount_) / explodeMaxCount_;
 			scale = Lerp(explodeScalePeak_, 0.0f, t);
 		}
 
@@ -8739,10 +8754,10 @@ void Barrier::Update()
 		SyncObjectTransform();
 
 		// カウンタ更新
-		explodeCount_++;
+		explodeCount_ += dt;
 
 		// 演出終了
-		if (explodeCount_ >= explodeMaxCount_)
+		if (explodeCount_ >= shakeMaxCount_ + (explodeMaxCount_ * 2))
 		{
 			scale_ = { 0.0f, 0.0f, 0.0f };
 			SyncObjectTransform();
@@ -8787,9 +8802,17 @@ void Barrier::OnCollisionTrigger(const Collider* _other)
 		// 一瞬大きくし、元に戻す
 		targetScale_ = defaultScale_ * hitScaleMultiplier_;
 	}
-	
 }
 
+void Barrier ::UpdateShake()
+{
+	float offsetX = randomDistribution_(randomEngine_) * shakeMagnitude_;
+	float offsetZ = randomDistribution_(randomEngine_) * shakeMagnitude_;
+
+	// カメラの位置をシェイク
+	SetPosition(basePosition_ + Vector3(offsetX, 0.0f, offsetZ));
+
+}
 
 ============================================================
 File Path: project/application/objects/field/Barrier.h
@@ -8803,6 +8826,7 @@ File Path: project/application/objects/field/Barrier.h
 #include <Object3d.h>
 #include <memory>
 #include <Framework.h>
+#include <random>
 
 /// <summary>
 /// バリア
@@ -8845,6 +8869,14 @@ private: // 衝突判定
 
 private:
 
+	/// <summary>
+	/// シェイク更新
+	/// </summary>
+	/// <param name="deltaTime">デルタタイム</param>
+	void UpdateShake();
+
+private:
+
 	// バリア破壊フラグ
 	bool isBarrierDestroyed_ = false;
 	// バリア破壊完了フラグ
@@ -8856,16 +8888,24 @@ private:
 	Vector3 targetScale_ = { 1.5f, 1.5f, 1.5f };  
 
 	// 爆発演出用カウント
-	uint32_t explodeCount_ = 0;      
-	// 爆発演出の継続フレーム数
-	const uint32_t explodeMaxCount_ = 10; 
+	float explodeCount_ = 0.0f;      
+	// 爆発演出の継続
+	const float explodeMaxCount_ = 0.1f; 
 	bool isExploding_ = false;
 
-	uint32_t explodeDurationFrames_ = 10;
 	float hitScaleMultiplier_ = 1.5f;
 	
+	// シェイクパラメーター
+	float shakeDuration_ = 0.0f;
+	float shakeMagnitude_ = 0.0f;
+	float shakeTimeElapsed_ = 0.0f;
+	std::default_random_engine randomEngine_;
+	std::uniform_real_distribution<float> randomDistribution_;
+	const float shakeMaxCount_ = 1.5f;
+    Vector3 basePosition_;
+
 	// 破裂パラメーター
-	float explodeScalePeak_ = 2.5f;
+	float explodeScalePeak_ = 2.0f;
 	uint32_t explodeParticleCount_ = 8;
 	
 	// スパークパラメーター
@@ -12048,7 +12088,7 @@ void GamePlayScene::Update()
 	pGoal_->Update();
 	
 	// 敵全滅した瞬間に一度だけカメラ演出開始
-	if (pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_)
+	if ((pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_) or Input::GetInstance()->TriggerKey(DIK_P))
 	{
 		isBarrierCameraStarted_ = true;
 
@@ -13126,13 +13166,20 @@ void BarrierBreakCameraController::Update(float dt)
         float t = std::clamp(timer_ / toGoalDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
         camera_->SetPosition(camPos);
+
+        // 回転
+        Vector3 rot = Lerp(startRot_, goalTargetRot_, te);
+        camera_->SetRotate(rot);
 
         if (t >= 1.0f)
         {
             // 到達位置を保持
             arrivedGoalPos_ = camera_->GetPosition();
+
+            // 最終回転を確定
+            camera_->SetRotate(goalTargetRot_);
 
             // Goalに到達した瞬間に一度だけ通知
             if (!arrivedGoalSignaled_)
@@ -13146,11 +13193,12 @@ void BarrierBreakCameraController::Update(float dt)
         }
         break;
     }
-
     case Phase::WaitBroken:
     {
         // その場で止める
         camera_->SetPosition(arrivedGoalPos_);
+        camera_->SetRotate(goalTargetRot_);
+
 
         // バリア破壊完了後だけ timer を進める
         if (isBarrierBroken_ && isBarrierBroken_())
@@ -13167,31 +13215,37 @@ void BarrierBreakCameraController::Update(float dt)
 
             // 戻り先：Follow位置
             Vector3 followPos = getFollowCamPos_();
-            followPos.y = fixedY_;
-            phaseToPos_ = followPos + cameraOffset_;
+            phaseToPos_ = followPos;
+
+            // 戻り回転補間
+            returnStartRot_ = camera_->GetRotate();
+
         }
+
         break;
     }
-
     case Phase::ReturnToPlayer:
     {
         timer_ += dt;
         float t = std::clamp(timer_ / returnDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
         camera_->SetPosition(camPos);
+
+        Vector3 rot = Lerp(returnStartRot_, returnTargetRot_, te);
+        camera_->SetRotate(rot);
 
         if (t >= 1.0f)
         {
             phase_ = Phase::Finished;
             active_ = false;
+            camera_->SetRotate(returnTargetRot_);
 
             if (onFinish_) onFinish_();
         }
         break;
     }
-
     default:
         break;
     }
@@ -13209,31 +13263,16 @@ void BarrierBreakCameraController::Start()
     timer_ = 0.0f;
     arrivedGoalSignaled_ = false;
 
-    // 角度を固定
-    fixedRot_ = camera_->GetRotate();
-    camera_->SetRotate(fixedRot_);
-
-    // y固定
-    fixedY_ = camera_->GetPosition().y;
-
     // 開始位置：現在のカメラ位置
     phaseFromPos_ = camera_->GetPosition();
 
     // 目標：ゴール位置 + 固定オフセット
-    Vector3 goalCamPos = getGoalPos_() + cameraOffset_;
-    goalCamPos.y = fixedY_;
+    Vector3 goalCamPos = getGoalPos_() + goalExtraOffset_;
     phaseToPos_ = goalCamPos;
-}
 
-void BarrierBreakCameraController::LookAt(const Vector3& eye, const Vector3& target)
-{
-    Vector3 dir = (target - eye);
+    // 回転補間の準備
+    startRot_ = camera_->GetRotate();
 
-    float yaw = std::atan2(dir.x, dir.z);
-    float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
-    float pitch = std::atan2(-dir.y, horizontalDist);
-
-    camera_->SetRotate({ pitch, yaw, 0.0f });
 }
 
 
@@ -13295,29 +13334,11 @@ public: // ゲッター
 
 public: // セッター
 
-	// コールバック：ゴール到達と演出完了
+	// コールバック
+    // ゴール到達
 	void SetOnArriveGoal(std::function<void()> cb) { onArriveGoal_ = std::move(cb); }
-	void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
-
-private:
-
-    // LookAtで回転を作る
-    void LookAt(const Vector3& eye, const Vector3& target);
-
-	// 線形補間
-    static Vector3 LerpVec3(const Vector3& a, const Vector3& b, float t)
-    {
-        return a + (b - a) * t;
-    }
-
-    // x,zだけ補間して yは固定する
-    static Vector3 LerpXZ(const Vector3& from, const Vector3& to, float t, float fixedY)
-    {
-        Vector3 r = LerpVec3(from, to, t);
-        r.y = fixedY;
-        return r;
-    }
-
+    // 演出完了
+    void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
 
 private:
 
@@ -13353,17 +13374,21 @@ private:
     float returnDuration_ = 0.6f;      // Goal→Playerへ戻る時間
 
     // カメラのオフセット
-    Vector3 cameraOffset_ = { 0.0f, 78.0f, -17.0f };
-    Vector3 goalExtraOffset_ = { 3.0f, 0.0f, -5.0f };
+    Vector3 goalExtraOffset_ = { 0.0f, 5.0f, -8.0f };
 
-    // 開始時のYと回転を固定保持
-    float fixedY_ = 0.0f;
-    Vector3 fixedRot_{};
-
+	// 補間開始時の位置
     Vector3 phaseFromPos_{};
     Vector3 phaseToPos_{};
 
+	// 到達位置を保持
     Vector3 arrivedGoalPos_{};
+
+	// 回転の補間用
+    Vector3 startRot_{};
+    Vector3 goalTargetRot_ = { 0.4f,0.0f,0.0f };
+	// 戻るときはさらに上から見下ろす感じにする
+    Vector3 returnStartRot_{};
+    Vector3 returnTargetRot_ = { 2.0f, 0.0f, 0.0f };
 
     bool arrivedGoalSignaled_ = false;
     std::function<void()> onArriveGoal_ = nullptr;
