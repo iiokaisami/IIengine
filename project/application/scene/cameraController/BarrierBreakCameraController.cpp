@@ -79,7 +79,7 @@ void BarrierBreakCameraController::Update(float dt)
 
             // 戻り回転補間
             returnStartRot_ = camera_->GetRotate();
-
+            returnTargetRot_ = initialRot_;
         }
 
         break;
@@ -132,5 +132,6 @@ void BarrierBreakCameraController::Start()
 
     // 回転補間の準備
     startRot_ = camera_->GetRotate();
+    initialRot_ = camera_->GetRotate();
 
 }

@@ -22,14 +22,15 @@ class BarrierBreakCameraController : public ICameraController
 {
 public:
 
-	/// <summary>
+    /// <summary>
 	/// コンストラクタ
-	/// </summary>
+    /// </summary>
 	/// <param name="camera">カメラ</param>
-	///  <param name="playerPos">プレイヤー位置を返す</param>
-    /// <param name="goalPos">ゴール/バリア中心位置を返す</param>
-    /// <param name="isBarrierBroken">バリア破壊完了(戻るタイミング)を返す</param>
-	BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
+	/// <param name="targetPos">プレイヤー位置を返す</param>
+	/// <param name="returnPos">ゴール/バリア中心位置を返す</param>
+	/// <param name="getFollowCamPos">プレイヤーを追従するカメラの位置を返す</param>
+	/// <param name="isBarrierBroken">バリア破壊完了を返す</param>
+    BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
 
 	// デストラクタ
 	~BarrierBreakCameraController() override = default;
@@ -105,6 +106,7 @@ private:
 	// 回転の補間用
     Vector3 startRot_{};
     Vector3 goalTargetRot_ = { 0.4f,0.0f,0.0f };
+    Vector3 initialRot_{};
 	// 戻るときはさらに上から見下ろす感じにする
     Vector3 returnStartRot_{};
     Vector3 returnTargetRot_ = { 2.0f, 0.0f, 0.0f };
