@@ -26,13 +26,20 @@ void BarrierBreakCameraController::Update(float dt)
         float t = std::clamp(timer_ / toGoalDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
         camera_->SetPosition(camPos);
+
+        // 回転
+        Vector3 rot = Lerp(startRot_, goalTargetRot_, te);
+        camera_->SetRotate(rot);
 
         if (t >= 1.0f)
         {
             // 到達位置を保持
             arrivedGoalPos_ = camera_->GetPosition();
+
+            // 最終回転を確定
+            camera_->SetRotate(goalTargetRot_);
 
             // Goalに到達した瞬間に一度だけ通知
             if (!arrivedGoalSignaled_)
@@ -46,11 +53,12 @@ void BarrierBreakCameraController::Update(float dt)
         }
         break;
     }
-
     case Phase::WaitBroken:
     {
         // その場で止める
         camera_->SetPosition(arrivedGoalPos_);
+        camera_->SetRotate(goalTargetRot_);
+
 
         // バリア破壊完了後だけ timer を進める
         if (isBarrierBroken_ && isBarrierBroken_())
@@ -67,31 +75,37 @@ void BarrierBreakCameraController::Update(float dt)
 
             // 戻り先：Follow位置
             Vector3 followPos = getFollowCamPos_();
-            followPos.y = fixedY_;
-            phaseToPos_ = followPos + cameraOffset_;
+            phaseToPos_ = followPos;
+
+            // 戻り回転補間
+            returnStartRot_ = camera_->GetRotate();
+
         }
+
         break;
     }
-
     case Phase::ReturnToPlayer:
     {
         timer_ += dt;
         float t = std::clamp(timer_ / returnDuration_, 0.0f, 1.0f);
         float te = Ease::InOutQuad(t);
 
-        Vector3 camPos = LerpXZ(phaseFromPos_, phaseToPos_, te, fixedY_);
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, te);
         camera_->SetPosition(camPos);
+
+        Vector3 rot = Lerp(returnStartRot_, returnTargetRot_, te);
+        camera_->SetRotate(rot);
 
         if (t >= 1.0f)
         {
             phase_ = Phase::Finished;
             active_ = false;
+            camera_->SetRotate(returnTargetRot_);
 
             if (onFinish_) onFinish_();
         }
         break;
     }
-
     default:
         break;
     }
@@ -109,29 +123,14 @@ void BarrierBreakCameraController::Start()
     timer_ = 0.0f;
     arrivedGoalSignaled_ = false;
 
-    // 角度を固定
-    fixedRot_ = camera_->GetRotate();
-    camera_->SetRotate(fixedRot_);
-
-    // y固定
-    fixedY_ = camera_->GetPosition().y;
-
     // 開始位置：現在のカメラ位置
     phaseFromPos_ = camera_->GetPosition();
 
     // 目標：ゴール位置 + 固定オフセット
-    Vector3 goalCamPos = getGoalPos_() + cameraOffset_;
-    goalCamPos.y = fixedY_;
+    Vector3 goalCamPos = getGoalPos_() + goalExtraOffset_;
     phaseToPos_ = goalCamPos;
-}
 
-void BarrierBreakCameraController::LookAt(const Vector3& eye, const Vector3& target)
-{
-    Vector3 dir = (target - eye);
+    // 回転補間の準備
+    startRot_ = camera_->GetRotate();
 
-    float yaw = std::atan2(dir.x, dir.z);
-    float horizontalDist = std::sqrt(dir.x * dir.x + dir.z * dir.z);
-    float pitch = std::atan2(-dir.y, horizontalDist);
-
-    camera_->SetRotate({ pitch, yaw, 0.0f });
 }

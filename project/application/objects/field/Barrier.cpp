@@ -1,5 +1,7 @@
 #include "Barrier.h"
 
+#include "TimeManager.h"
+
 using namespace IIEngine;
 
 void Barrier::Initialize()
@@ -14,11 +16,17 @@ void Barrier::Initialize()
 	// ライト設定
 	object_->SetLighting(true);
 
+	// シェイク
+	shakeMagnitude_ = 0.1f;
+	shakeDuration_ = 1.0f;
+	shakeTimeElapsed_ = 0.0f;
+	randomDistribution_ = std::uniform_real_distribution<float>(-1.0f, 1.0f);
 
 }
 
 void Barrier::Update()
 {
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	// 基底クラス更新
 	StaticObject::Update();
@@ -28,22 +36,29 @@ void Barrier::Update()
 	{
 		isExploding_ = true;
 		explodeCount_ = 0;
+		basePosition_ = GetPosition();
 	}
 
 	// 破裂演出処理
 	if (isExploding_)
 	{
-		uint32_t phaseLength = explodeMaxCount_ / 2;
 		float scale = 1.0f;
 
-		if (explodeCount_ < phaseLength)
+		if (explodeCount_ < shakeMaxCount_)
+		{
+			// シェイク
+			UpdateShake();
+		}
+		else if (explodeCount_ < shakeMaxCount_ + explodeMaxCount_)
 		{
 			// 膨張
-			float t = static_cast<float>(explodeCount_) / phaseLength;
+			float t = static_cast<float>(explodeCount_) / explodeMaxCount_;
 			scale = Lerp(1.0f, explodeScalePeak_, t);
-		} else if (explodeCount_ < phaseLength * 2) {
+		}
+		else
+		{
 			// 消滅
-			float t = static_cast<float>(explodeCount_ - phaseLength) / phaseLength;
+			float t = static_cast<float>(explodeCount_ - explodeMaxCount_) / explodeMaxCount_;
 			scale = Lerp(explodeScalePeak_, 0.0f, t);
 		}
 
@@ -52,10 +67,10 @@ void Barrier::Update()
 		SyncObjectTransform();
 
 		// カウンタ更新
-		explodeCount_++;
+		explodeCount_ += dt;
 
 		// 演出終了
-		if (explodeCount_ >= explodeMaxCount_)
+		if (explodeCount_ >= shakeMaxCount_ + (explodeMaxCount_ * 2))
 		{
 			scale_ = { 0.0f, 0.0f, 0.0f };
 			SyncObjectTransform();
@@ -100,5 +115,14 @@ void Barrier::OnCollisionTrigger(const Collider* _other)
 		// 一瞬大きくし、元に戻す
 		targetScale_ = defaultScale_ * hitScaleMultiplier_;
 	}
-	
+}
+
+void Barrier ::UpdateShake()
+{
+	float offsetX = randomDistribution_(randomEngine_) * shakeMagnitude_;
+	float offsetZ = randomDistribution_(randomEngine_) * shakeMagnitude_;
+
+	// カメラの位置をシェイク
+	SetPosition(basePosition_ + Vector3(offsetX, 0.0f, offsetZ));
+
 }

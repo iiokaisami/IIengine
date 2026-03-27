@@ -505,7 +505,7 @@ void GamePlayScene::Update()
 	pGoal_->Update();
 	
 	// 敵全滅した瞬間に一度だけカメラ演出開始
-	if (pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_)
+	if ((pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_) or Input::GetInstance()->TriggerKey(DIK_P))
 	{
 		isBarrierCameraStarted_ = true;
 

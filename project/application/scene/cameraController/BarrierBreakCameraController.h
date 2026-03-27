@@ -53,29 +53,11 @@ public: // ゲッター
 
 public: // セッター
 
-	// コールバック：ゴール到達と演出完了
+	// コールバック
+    // ゴール到達
 	void SetOnArriveGoal(std::function<void()> cb) { onArriveGoal_ = std::move(cb); }
-	void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
-
-private:
-
-    // LookAtで回転を作る
-    void LookAt(const Vector3& eye, const Vector3& target);
-
-	// 線形補間
-    static Vector3 LerpVec3(const Vector3& a, const Vector3& b, float t)
-    {
-        return a + (b - a) * t;
-    }
-
-    // x,zだけ補間して yは固定する
-    static Vector3 LerpXZ(const Vector3& from, const Vector3& to, float t, float fixedY)
-    {
-        Vector3 r = LerpVec3(from, to, t);
-        r.y = fixedY;
-        return r;
-    }
-
+    // 演出完了
+    void SetOnFinish(std::function<void()> cb) { onFinish_ = std::move(cb); }
 
 private:
 
@@ -111,17 +93,21 @@ private:
     float returnDuration_ = 0.6f;      // Goal→Playerへ戻る時間
 
     // カメラのオフセット
-    Vector3 cameraOffset_ = { 0.0f, 78.0f, -17.0f };
-    Vector3 goalExtraOffset_ = { 3.0f, 0.0f, -5.0f };
+    Vector3 goalExtraOffset_ = { 0.0f, 5.0f, -8.0f };
 
-    // 開始時のYと回転を固定保持
-    float fixedY_ = 0.0f;
-    Vector3 fixedRot_{};
-
+	// 補間開始時の位置
     Vector3 phaseFromPos_{};
     Vector3 phaseToPos_{};
 
+	// 到達位置を保持
     Vector3 arrivedGoalPos_{};
+
+	// 回転の補間用
+    Vector3 startRot_{};
+    Vector3 goalTargetRot_ = { 0.4f,0.0f,0.0f };
+	// 戻るときはさらに上から見下ろす感じにする
+    Vector3 returnStartRot_{};
+    Vector3 returnTargetRot_ = { 2.0f, 0.0f, 0.0f };
 
     bool arrivedGoalSignaled_ = false;
     std::function<void()> onArriveGoal_ = nullptr;

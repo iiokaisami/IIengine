@@ -7,6 +7,7 @@
 #include <Object3d.h>
 #include <memory>
 #include <Framework.h>
+#include <random>
 
 /// <summary>
 /// バリア
@@ -49,6 +50,14 @@ private: // 衝突判定
 
 private:
 
+	/// <summary>
+	/// シェイク更新
+	/// </summary>
+	/// <param name="deltaTime">デルタタイム</param>
+	void UpdateShake();
+
+private:
+
 	// バリア破壊フラグ
 	bool isBarrierDestroyed_ = false;
 	// バリア破壊完了フラグ
@@ -60,16 +69,24 @@ private:
 	Vector3 targetScale_ = { 1.5f, 1.5f, 1.5f };  
 
 	// 爆発演出用カウント
-	uint32_t explodeCount_ = 0;      
-	// 爆発演出の継続フレーム数
-	const uint32_t explodeMaxCount_ = 10; 
+	float explodeCount_ = 0.0f;      
+	// 爆発演出の継続
+	const float explodeMaxCount_ = 0.1f; 
 	bool isExploding_ = false;
 
-	uint32_t explodeDurationFrames_ = 10;
 	float hitScaleMultiplier_ = 1.5f;
 	
+	// シェイクパラメーター
+	float shakeDuration_ = 0.0f;
+	float shakeMagnitude_ = 0.0f;
+	float shakeTimeElapsed_ = 0.0f;
+	std::default_random_engine randomEngine_;
+	std::uniform_real_distribution<float> randomDistribution_;
+	const float shakeMaxCount_ = 1.5f;
+    Vector3 basePosition_;
+
 	// 破裂パラメーター
-	float explodeScalePeak_ = 2.5f;
+	float explodeScalePeak_ = 2.0f;
 	uint32_t explodeParticleCount_ = 8;
 	
 	// スパークパラメーター
