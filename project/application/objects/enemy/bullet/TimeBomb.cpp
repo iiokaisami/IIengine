@@ -131,7 +131,6 @@ void TimeBomb::Update()
 	SyncObjectTransform();
 	
 	// 回転更新
-	//rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
 	swayTimer_ += dt;
 
 	// 常にY回転

@@ -112,7 +112,6 @@ void VignetteTrap::Update()
 
 	SyncObjectTransform();
 
-	//rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
 	// 回転
 	swayTimer_ += dt;
 
