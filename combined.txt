@@ -7287,8 +7287,16 @@ void TimeBomb::Update()
 	SyncObjectTransform();
 	
 	// 回転更新
-	rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
-	
+	//rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
+	swayTimer_ += dt;
+
+	// 常にY回転
+	rotation_.y += yRotateSpeed_ * dt * kDefaultFrameRate;
+
+	// 左右にゆらゆら
+	rotation_.z = std::sinf(swayTimer_ * (2.0f * std::numbers::pi_v<float>) * swayFrequency_) * swayAmplitude_;
+
+
 	// 設置判定の更新
 	setAABB_.min = position_ - object_->GetScale();
 	setAABB_.max = position_ + object_->GetScale();
@@ -7669,6 +7677,16 @@ private:
 	// 爆発のスケールアップ時間
 	int explosionParticleCount_ = 6;
 
+	// ゆらゆら用(回転)
+	// 揺れの経過時間
+	float swayTimer_ = 0.0f;
+	// Y回転速度
+	float yRotateSpeed_ = 0.10f;
+	// 揺れの最大角度
+	float swayAmplitude_ = 0.5f;
+	// 揺れの速さ
+	float swayFrequency_ = 1.5f;
+
 };
 
 
@@ -7790,7 +7808,15 @@ void VignetteTrap::Update()
 
 	SyncObjectTransform();
 
-	rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
+	//rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
+	// 回転
+	swayTimer_ += dt;
+
+	// 常にY回転
+	rotation_.y += yRotateSpeed_ * dt * kDefaultFrameRate;
+
+	// 左右にゆらゆら
+	rotation_.z = std::sinf(swayTimer_ * (2.0f * std::numbers::pi_v<float>) * swayFrequency_) * swayAmplitude_;
 
 	aabb_.min = position_ - object_->GetScale();
 	aabb_.max = position_ + object_->GetScale();
@@ -8086,6 +8112,16 @@ private:
 	float TwoPi_ = std::numbers::pi_v<float> *2.0f;
 	float minRadius_ = 2.5f;
 	float radiusVariance_ = 1.5f;
+
+	// ゆらゆら用(回転)
+	// 揺れの経過時間
+	float swayTimer_ = 0.0f;                
+	// Y回転速度
+	float yRotateSpeed_ = 0.10f;            
+	// 揺れの最大角度
+	float swayAmplitude_ = 0.5f;            
+	// 揺れの速さ
+	float swayFrequency_ = 1.5f;             
 
 };
 
@@ -13219,7 +13255,7 @@ void BarrierBreakCameraController::Update(float dt)
 
             // 戻り回転補間
             returnStartRot_ = camera_->GetRotate();
-
+            returnTargetRot_ = initialRot_;
         }
 
         break;
@@ -13272,6 +13308,7 @@ void BarrierBreakCameraController::Start()
 
     // 回転補間の準備
     startRot_ = camera_->GetRotate();
+    initialRot_ = camera_->GetRotate();
 
 }
 
@@ -13303,14 +13340,15 @@ class BarrierBreakCameraController : public ICameraController
 {
 public:
 
-	/// <summary>
+    /// <summary>
 	/// コンストラクタ
-	/// </summary>
+    /// </summary>
 	/// <param name="camera">カメラ</param>
-	///  <param name="playerPos">プレイヤー位置を返す</param>
-    /// <param name="goalPos">ゴール/バリア中心位置を返す</param>
-    /// <param name="isBarrierBroken">バリア破壊完了(戻るタイミング)を返す</param>
-	BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
+	/// <param name="targetPos">プレイヤー位置を返す</param>
+	/// <param name="returnPos">ゴール/バリア中心位置を返す</param>
+	/// <param name="getFollowCamPos">プレイヤーを追従するカメラの位置を返す</param>
+	/// <param name="isBarrierBroken">バリア破壊完了を返す</param>
+    BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
 
 	// デストラクタ
 	~BarrierBreakCameraController() override = default;
@@ -13386,6 +13424,7 @@ private:
 	// 回転の補間用
     Vector3 startRot_{};
     Vector3 goalTargetRot_ = { 0.4f,0.0f,0.0f };
+    Vector3 initialRot_{};
 	// 戻るときはさらに上から見下ろす感じにする
     Vector3 returnStartRot_{};
     Vector3 returnTargetRot_ = { 2.0f, 0.0f, 0.0f };
