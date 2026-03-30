@@ -4696,6 +4696,16 @@ void TrapEnemy::ImGuiDraw()
 	ImGui::Text("Is Dead: %s", isDead_ ? "Yes" : "No");
 	ImGui::End();
 
+	// 罠の情報も表示
+    for (auto& trap : pTimeBomb_)
+    {
+        trap->ImGuiDraw();
+    }
+    for (auto& trap : pVignetteTrap_)
+    {
+        trap->ImGuiDraw();
+    }
+
 #endif // USE_IMGUI
 }
 
@@ -7239,7 +7249,14 @@ void TimeBomb::Update()
 
 	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
 	{
+		if (isLaunchingTrap_)
+		{
+			// パーティクル起動
+			IIEngine::ParticleEmitter::Emit("buryTrap", position_, setParticleCount_);
+		}
+
 		isLaunchingTrap_ = false;
+		
 	}
 	else
 	{
@@ -7287,7 +7304,6 @@ void TimeBomb::Update()
 	SyncObjectTransform();
 	
 	// 回転更新
-	//rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
 	swayTimer_ += dt;
 
 	// 常にY回転
@@ -7318,6 +7334,19 @@ void TimeBomb::Draw()
 
 void TimeBomb::ImGuiDraw()
 {
+#ifdef USE_IMGUI
+
+	// デバッグ用のImGui描画
+	ImGui::Begin("TimeBomb Debug");
+	// 位置、回転、スケールのスライダー
+	ImGui::SliderFloat3("Position", &position_.x, -10.0f, 10.0f);
+	ImGui::SliderFloat3("Rotation", &rotation_.x, -180.0f, 180.0f);
+	ImGui::SliderFloat3("Scale", &scale_.x, 0.1f, 5.0f);
+
+	ImGui::Text("Is Exploded: %s", isExploded_ ? "Yes" : "No");
+	ImGui::End();
+
+#endif // USE_IMGUI
 }
 
 
@@ -7674,8 +7703,10 @@ private:
 	float minRadius_ = 2.5f;
 	float radiusVariance_ = 1.5f;
 
-	// 爆発のスケールアップ時間
+	// 爆発パーティクルの数
 	int explosionParticleCount_ = 6;
+	// 設置パーティクルの数
+	int setParticleCount_ = 7;
 
 	// ゆらゆら用(回転)
 	// 揺れの経過時間
@@ -7769,6 +7800,12 @@ void VignetteTrap::Update()
 
 	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
 	{
+		if (isLaunchingTrap_)
+		{
+			// パーティクル起動
+			IIEngine::ParticleEmitter::Emit("buryTrap", position_, setParticleCount_);
+		}
+
 		isLaunchingTrap_ = false;
 		velocity_ = { 0.0f, 0.0f, 0.0f }; // 着弾時に速度をリセット
 	}
@@ -7808,7 +7845,6 @@ void VignetteTrap::Update()
 
 	SyncObjectTransform();
 
-	//rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
 	// 回転
 	swayTimer_ += dt;
 
@@ -7830,6 +7866,9 @@ void VignetteTrap::Draw()
 
 void VignetteTrap::ImGuiDraw()
 {
+#ifdef USE_IMGUI
+
+#endif // USE_IMGUI
 }
 
 void VignetteTrap::LaunchTrap()
@@ -7975,6 +8014,7 @@ File Path: project/application/objects/enemy/bullet/VignetteTrap.h
 
 #include "../../../baseObject/Character.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
+#include "../../../gameEngine/particle/ParticleEmitter.h"
 
 #include <Object3d.h>
 
@@ -8090,6 +8130,9 @@ private:
 	bool isLaunchingTrap_ = false;
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
+
+	// 設置パーティクルの数
+	int setParticleCount_ = 7;
 
 	//寿命
 	static const int32_t kLifeTime = 60 * 12;
@@ -15387,7 +15430,7 @@ namespace IIEngine
 
 	Camera::Camera()
 		: transform_({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} })
-		, fovY_(0.45f)
+		, fovY_(0.4f)
 		, aspectRatio_(float(WinApp::kClientWidth) / float(WinApp::kClientHeight))
 		, nearClip_(0.1f)
 		, farClip_(100.0f)
@@ -23509,6 +23552,7 @@ namespace IIEngine
 		particleManager->CreateParticleGroup("goal", "resources/images/white.png", "plane.obj", "Cube", "Fountain");
 		particleManager->CreateParticleGroup("HitReaction", "resources/images/white.png", "plane.obj", "Cube", "HitReaction");
 		particleManager->CreateParticleGroup("BltReaction", "resources/images/gradationLine.png", "plane.obj", "Ring", "BltReaction");
+		particleManager->CreateParticleGroup("buryTrap", "resources/images/white.png", "plane.obj", "Ring", "HitReaction");
 
 		// Cylinderを出すときに向き指定する
 		IIEngine::ParticleMotion::SetDirection("UP");
