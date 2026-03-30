@@ -131,8 +131,16 @@ void TimeBomb::Update()
 	SyncObjectTransform();
 	
 	// 回転更新
-	rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
-	
+	//rotation_ += {0.1f * (dt * kDefaultFrameRate), 0.1f * (dt * kDefaultFrameRate), 0.0f};
+	swayTimer_ += dt;
+
+	// 常にY回転
+	rotation_.y += yRotateSpeed_ * dt * kDefaultFrameRate;
+
+	// 左右にゆらゆら
+	rotation_.z = std::sinf(swayTimer_ * (2.0f * std::numbers::pi_v<float>) * swayFrequency_) * swayAmplitude_;
+
+
 	// 設置判定の更新
 	setAABB_.min = position_ - object_->GetScale();
 	setAABB_.max = position_ + object_->GetScale();

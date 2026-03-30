@@ -142,5 +142,15 @@ private:
 	float minRadius_ = 2.5f;
 	float radiusVariance_ = 1.5f;
 
+	// ゆらゆら用(回転)
+	// 揺れの経過時間
+	float swayTimer_ = 0.0f;                
+	// Y回転速度
+	float yRotateSpeed_ = 0.10f;            
+	// 揺れの最大角度
+	float swayAmplitude_ = 0.5f;            
+	// 揺れの速さ
+	float swayFrequency_ = 1.5f;             
+
 };
 

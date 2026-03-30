@@ -112,7 +112,15 @@ void VignetteTrap::Update()
 
 	SyncObjectTransform();
 
-	rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
+	//rotation_ += {0.1f * dt * kDefaultFrameRate, 0.1f * dt * kDefaultFrameRate, 0.0f};
+	// 回転
+	swayTimer_ += dt;
+
+	// 常にY回転
+	rotation_.y += yRotateSpeed_ * dt * kDefaultFrameRate;
+
+	// 左右にゆらゆら
+	rotation_.z = std::sinf(swayTimer_ * (2.0f * std::numbers::pi_v<float>) * swayFrequency_) * swayAmplitude_;
 
 	aabb_.min = position_ - object_->GetScale();
 	aabb_.max = position_ + object_->GetScale();
