@@ -83,7 +83,14 @@ void TimeBomb::Update()
 
 	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
 	{
+		if (isLaunchingTrap_)
+		{
+			// パーティクル起動
+			IIEngine::ParticleEmitter::Emit("buryTrap", position_, setParticleCount_);
+		}
+
 		isLaunchingTrap_ = false;
+		
 	}
 	else
 	{
@@ -161,6 +168,19 @@ void TimeBomb::Draw()
 
 void TimeBomb::ImGuiDraw()
 {
+#ifdef USE_IMGUI
+
+	// デバッグ用のImGui描画
+	ImGui::Begin("TimeBomb Debug");
+	// 位置、回転、スケールのスライダー
+	ImGui::SliderFloat3("Position", &position_.x, -10.0f, 10.0f);
+	ImGui::SliderFloat3("Rotation", &rotation_.x, -180.0f, 180.0f);
+	ImGui::SliderFloat3("Scale", &scale_.x, 0.1f, 5.0f);
+
+	ImGui::Text("Is Exploded: %s", isExploded_ ? "Yes" : "No");
+	ImGui::End();
+
+#endif // USE_IMGUI
 }
 
 

@@ -6,7 +6,7 @@ namespace IIEngine
 
 	Camera::Camera()
 		: transform_({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} })
-		, fovY_(0.45f)
+		, fovY_(0.4f)
 		, aspectRatio_(float(WinApp::kClientWidth) / float(WinApp::kClientHeight))
 		, nearClip_(0.1f)
 		, farClip_(100.0f)

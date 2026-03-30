@@ -171,6 +171,16 @@ void TrapEnemy::ImGuiDraw()
 	ImGui::Text("Is Dead: %s", isDead_ ? "Yes" : "No");
 	ImGui::End();
 
+	// 罠の情報も表示
+    for (auto& trap : pTimeBomb_)
+    {
+        trap->ImGuiDraw();
+    }
+    for (auto& trap : pVignetteTrap_)
+    {
+        trap->ImGuiDraw();
+    }
+
 #endif // USE_IMGUI
 }
 

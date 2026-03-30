@@ -4,6 +4,7 @@
 
 #include "../../../baseObject/Character.h"
 #include"../../../../gameEngine/collider/ColliderManager.h"
+#include "../../../gameEngine/particle/ParticleEmitter.h"
 
 #include <Object3d.h>
 
@@ -119,6 +120,9 @@ private:
 	bool isLaunchingTrap_ = false;
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
+
+	// 設置パーティクルの数
+	int setParticleCount_ = 7;
 
 	//寿命
 	static const int32_t kLifeTime = 60 * 12;

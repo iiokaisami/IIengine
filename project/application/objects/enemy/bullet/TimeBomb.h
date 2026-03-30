@@ -171,8 +171,10 @@ private:
 	float minRadius_ = 2.5f;
 	float radiusVariance_ = 1.5f;
 
-	// 爆発のスケールアップ時間
+	// 爆発パーティクルの数
 	int explosionParticleCount_ = 6;
+	// 設置パーティクルの数
+	int setParticleCount_ = 7;
 
 	// ゆらゆら用(回転)
 	// 揺れの経過時間

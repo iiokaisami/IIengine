@@ -73,6 +73,12 @@ void VignetteTrap::Update()
 
 	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
 	{
+		if (isLaunchingTrap_)
+		{
+			// パーティクル起動
+			IIEngine::ParticleEmitter::Emit("buryTrap", position_, setParticleCount_);
+		}
+
 		isLaunchingTrap_ = false;
 		velocity_ = { 0.0f, 0.0f, 0.0f }; // 着弾時に速度をリセット
 	}
@@ -133,6 +139,9 @@ void VignetteTrap::Draw()
 
 void VignetteTrap::ImGuiDraw()
 {
+#ifdef USE_IMGUI
+
+#endif // USE_IMGUI
 }
 
 void VignetteTrap::LaunchTrap()
