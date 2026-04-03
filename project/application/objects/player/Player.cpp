@@ -20,8 +20,8 @@ void Player::Initialize()
 	// ステータス
 	isAutoControl_ = false;
 
-	// 2枚使用
-	spriteNum_ = 2;
+	// 使用枚数
+	spriteNum_ = 3;
 
 	// スプライト
 	for (uint32_t i = 0; i < spriteNum_; ++i)
@@ -33,9 +33,17 @@ void Player::Initialize()
 			sprite->Initialize("hp.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.0f,0.5f });
 			sprite->SetSize(hpBarSize_);
 
-		} else if (i == 1)
+		}
+		else if(i == 1)
 		{
 			sprite->Initialize("nearEnemy.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.5f,1.0f });
+		
+		}
+		else if(i == 2)
+		{
+			sprite->Initialize("uvChecker.png", lockOnIndicatorPos_, lockOnIndicatorColor_, { 1.0f,1.0f });
+			sprite->SetSize(lockOnIndicatorSize_);
+		
 		}
 
 		sprites_.push_back(std::move(sprite));
@@ -190,9 +198,33 @@ void Player::ImGuiDraw()
 	ImGui::Text("HP: %.0f", hp_);
 
 	// ロックオン系
-	ImGui::SliderFloat("chargeRange", &lockOnChargeRange_, 10.0f, 20.0f);
-	ImGui::SliderFloat("chargeMaxTimer", &kLockOnChargeMaxTimeSec_, 0.1f, 5.0f);
-	ImGui::SliderFloat("chargeTimer", &lockOnChargeTimerSec_, 0.0f, 5.0f);
+	if (ImGui::CollapsingHeader("LockOn System"))
+	{
+		ImGui::SliderFloat("chargeRange", &lockOnChargeRange_, 10.0f, 50.0f);
+		ImGui::SliderFloat("chargeMaxTimer", &kLockOnChargeMaxTimeSec_, 0.1f, 5.0f);
+		ImGui::SliderFloat("chargeTimer", &lockOnChargeTimerSec_, 0.0f, 5.0f);
+	}
+
+	if (ImGui::CollapsingHeader("LockOn Indicator (sprites_[2])"))
+	{
+		ImGui::DragFloat2("Pos", &lockOnIndicatorPos_.x, 1.0f);
+		ImGui::DragFloat2("Size base", &lockOnIndicatorSize_.x, 1.0f);
+		ImGui::SliderFloat("Angle", &lockOnIndicatorAngle_, -3.14f * 2.0f, 3.14f * 2.0f);
+		ImGui::SliderFloat("Alpha", &lockOnIndicatorAlpha_, 0.0f, 1.0f);
+		ImGui::ColorEdit4("Color", &lockOnIndicatorColor_.x);
+
+		if (sprites_.size() > 2 && sprites_[2])
+		{
+			Vector2 currentPos = sprites_[2]->GetPosition();
+			Vector2 currentSize = sprites_[2]->GetSize();
+			Vector4 currentColor = sprites_[2]->GetColor();
+
+			ImGui::Text("Actual Sprite Pos:   %.1f, %.1f", currentPos.x, currentPos.y);
+			ImGui::Text("Actual Sprite Size:  %.1f, %.1f", currentSize.x, currentSize.y);
+			ImGui::Text("Actual Sprite Color: %.2f, %.2f, %.2f, %.2f", currentColor.x, currentColor.y, currentColor.z, currentColor.w);
+		
+		}
+	}
 
 	ImGui::End();
 
@@ -956,28 +988,51 @@ void Player::HPDecreaseNoise()
 
 void Player::LockOn()
 {	
-	// ターゲットがいた場合、距離を計算
-	if (hasTarget_)
+	// ターゲットがいなかったらスキップ
+	if (!hasTarget_)
 	{
-		// delta
-		const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+		// ターゲットがいない場合はロックオフ
+		isLockOn_ = false;
+		lockOnChargeTimerSec_ = 0.0f;
 
-		// ターゲットとのベクトルと距離を計算
-		Vector3 toTarget = targetEnemyPosition_ - position_;
-		float distance = toTarget.Length();
+		// ターゲットがいない場合は透明にして更新する
+		//lockOnIndicatorAlpha_ = 0.0f;
+		lockOnIndicatorColor_ = Vector4{ 1.0f, 0.2f, 0.2f, lockOnIndicatorAlpha_ };
+		sprites_[2]->SetColor(lockOnIndicatorColor_);
+		sprites_[2]->Update();
 
-		// ロックオン可能範囲内ならチャージ開始
-		if (distance < lockOnChargeRange_)
+
+		return;
+	}
+
+	// delta
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+	
+	// 初回は比較しない
+	if (preTargetPos_ != Vector3{ 0.0f, 0.0f, 0.0f })
+	{
+		const float kTargetSwitchEpsilon = 1.0f; // 調整用
+		Vector3 diff = targetEnemyPosition_ - preTargetPos_;
+
+		if (diff.Length() > kTargetSwitchEpsilon)
 		{
-			// チャージタイマーを増加
-			lockOnChargeTimerSec_ += dt;
-		}
-		else
-		{
-			// 範囲外に出たらチャージリセット
 			isLockOn_ = false;
 			lockOnChargeTimerSec_ = 0.0f;
 		}
+	}
+
+	// ターゲットの位置を保存
+	preTargetPos_ = targetEnemyPosition_;
+
+	// ターゲットとのベクトルと距離を計算
+	Vector3 toTarget = targetEnemyPosition_ - position_;
+	float distance = toTarget.Length();
+
+	// ロックオン可能範囲内ならチャージ開始
+	if ((distance <= lockOnChargeRange_) && !isLockOn_)
+	{
+		// チャージタイマーを増加
+		lockOnChargeTimerSec_ += dt;
 
 		// チャージが完了したらロックオン状態に
 		if (lockOnChargeTimerSec_ >= kLockOnChargeMaxTimeSec_)
@@ -986,22 +1041,59 @@ void Player::LockOn()
 
 		}
 	}
-	else
+	else if(distance > lockOnChargeRange_)
 	{
-		// ターゲットがいない場合はロックオフ
+		// 範囲外に出たらチャージリセット
 		isLockOn_ = false;
 		lockOnChargeTimerSec_ = 0.0f;
+					
 	}
-
 
 	// ロックオン状態のときの処理
 	if (isLockOn_)
 	{
 		// ターゲットの向きを取得
-		Vector3 toTarget = targetEnemyPosition_ - position_;
+		toTarget = targetEnemyPosition_ - position_;
 		// ターゲットの方向に向ける
 		RotationUpdate(toTarget);
 	}
+
+	// ===== UI更新 =====
+	auto camera = CameraManager::GetInstance().GetActiveCamera();
+
+	float progress = lockOnChargeTimerSec_ / kLockOnChargeMaxTimeSec_;
+	progress = std::clamp(progress, 0.0f, 1.0f);
+
+	// スクリーン位置計算
+	lockOnIndicatorPos_ = camera->WorldToScreen(targetEnemyPosition_);
+	sprites_[2]->SetPosition(lockOnIndicatorPos_);
+
+	// スケール
+	//float scale = 0.6f + progress * 0.6f;
+	//sprites_[2]->SetSize(lockOnIndicatorSize_ * scale);
+	sprites_[2]->SetSize({1280,720});
+
+	// 回転
+	lockOnIndicatorAngle_ += dt * (1.0f + progress * 3.0f);
+	sprites_[2]->SetRotation(lockOnIndicatorAngle_);
+
+	// 透明度
+	lockOnIndicatorAlpha_ = progress;
+
+	// 点滅
+	if (progress > 0.8f)
+	{
+		float blink = sin(IIEngine::TimeManager::Instance().GetTotalTime() * 30.0f) * 0.5f + 0.5f;
+		lockOnIndicatorAlpha_ *= blink;
+	}
+
+	lockOnIndicatorAlpha_ = 1.0f;
+
+	//lockOnIndicatorColor_ = Vector4{ 1.0f, 0.2f, 0.2f, lockOnIndicatorAlpha_ };
+	lockOnIndicatorColor_ = Vector4{ 1.0f, 1.0f, 1.0f, lockOnIndicatorAlpha_ };
+	sprites_[2]->SetColor(lockOnIndicatorColor_);
+
+	sprites_[2]->Update();
 
 }
 
