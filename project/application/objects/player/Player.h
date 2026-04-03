@@ -99,6 +99,15 @@ private: // 内部処理
 	// HP減少ノイズ
 	void HPDecreaseNoise();
 
+	// ロックオン
+	void LockOn();
+
+	/// <summary>
+	/// 回転更新
+	/// </summary>
+	/// <param name="_toAngle">向きたい方向ベクトル</param>
+	void RotationUpdate(const Vector3& _toAngle);
+
 private: // 衝突判定
 
 	/// <summary>
@@ -154,7 +163,7 @@ public: // セッター
 	/// ターゲットエネミーの位置設定
 	/// </summary>
 	/// <param name="_targetPos">ターゲットエネミーの位置ベクトル</param>
-	void SetTargetEnemyPosition(const Vector3& _targetPos) { targetEnemyPosition_ = _targetPos; hasTarget_ = true; }
+	void SetTargetEnemyPosition(const Vector3& _targetPos) { targetEnemyPosition_ = _targetPos; lockOnTargetPosition_ = _targetPos; hasTarget_ = true; }
 
 	/// <summary>
 	/// ゴールに触れたかのフラグのセッター
@@ -290,6 +299,18 @@ private:
 	float finalStrength_ = 0.0f;
 	// ノイズの処理を施すかのフラグ
 	bool isNoiseActive_ = false;
+
+	// ロックオンの有無
+	bool isLockOn_ = false;
+	// ロックオンのターゲット位置
+	Vector3 lockOnTargetPosition_{};
+	// ロックオンのチャージ範囲
+	float lockOnChargeRange_ = 15.0f;
+	// ロックオンのチャージ時間
+	/*const*/ float kLockOnChargeMaxTimeSec_ = 3.0f;
+	// ロックオンのチャージタイマー
+	float lockOnChargeTimerSec_ = 0.0f;
+
 
 	// デスモーション用構造体
 	struct Motion

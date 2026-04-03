@@ -189,6 +189,11 @@ void Player::ImGuiDraw()
 	// HP
 	ImGui::Text("HP: %.0f", hp_);
 
+	// ロックオン系
+	ImGui::SliderFloat("chargeRange", &lockOnChargeRange_, 10.0f, 20.0f);
+	ImGui::SliderFloat("chargeMaxTimer", &kLockOnChargeMaxTimeSec_, 0.1f, 5.0f);
+	ImGui::SliderFloat("chargeTimer", &lockOnChargeTimerSec_, 0.0f, 5.0f);
+
 	ImGui::End();
 
 	for (auto& bullet : pBullets_)
@@ -233,22 +238,16 @@ void Player::Move()
 	// 移動ベクトルがゼロでない場合にプレイヤーの向きを補間で更新
 	if (moveVelocity_.x != 0.0f || moveVelocity_.z != 0.0f)
 	{
-		// 正規化された方向ベクトル
-		Vector3 normalizedDir = moveVelocity_;
+		// ロックオンしているときは向き計算しない
+		if (!isLockOn_)
+		{
+			// 正規化された方向ベクトル
+			Vector3 normalizedDir = moveVelocity_;
+			normalizedDir = normalizedDir.Normalize();
 
-		normalizedDir = normalizedDir.Normalize();
-
-		// Y軸回りの目標回転角度を計算
-		float targetRotationY = std::atan2(normalizedDir.x, normalizedDir.z);
-
-		// 現在の回転を取得
-		Vector3 currentRotation = rotation_;
-
-		// Y軸の回転のみ、最短経路で補間
-		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, turnLerpRate_);
-
-		// 回転を更新
-		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
+			// 回転
+			RotationUpdate(normalizedDir);
+		}
 
 		// パーティクル
 		IIEngine::ParticleEmitter::Emit("walk", position_, 1);
@@ -660,20 +659,23 @@ void Player::UpdateControl()
 			hp_ = 8;
 		}
 
-	} else if (isCanMove_)
+	}
+	else if (isCanMove_)
 	{
 		// 回避処理
 		Evade();
 		// アクティブフラグに回避フラグを入れる
 		isActive_ = isEvading_;
 
-		// 回避中は移動・攻撃を無効化
+		// 回避中はロックオン・移動・攻撃を無効化
 		if (!isEvading_ && !isDead_)
 		{
+			LockOn();
 			Move();
 			Attack();
 		}
-	} else
+	}
+	else
 	{
 		if (isDead_)
 		{
@@ -758,10 +760,7 @@ void Player::AutoMove()
 	if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
 	{
 		Vector3 normalizedDir = moveVelocity_.Normalize();
-		float targetRotationY = std::atan2(normalizedDir.x, normalizedDir.z);
-		Vector3 currentRotation = rotation_;
-		float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, turnLerpRate_);
-		rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
+		RotationUpdate(normalizedDir);
 	}
 
 	// 位置更新
@@ -953,6 +952,70 @@ void Player::HPDecreaseNoise()
 			PostEffectManager::GetInstance()->SetActiveEffect("Noise", false);
 		}
 	}
+}
+
+void Player::LockOn()
+{	
+	// ターゲットがいた場合、距離を計算
+	if (hasTarget_)
+	{
+		// delta
+		const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+		// ターゲットとのベクトルと距離を計算
+		Vector3 toTarget = targetEnemyPosition_ - position_;
+		float distance = toTarget.Length();
+
+		// ロックオン可能範囲内ならチャージ開始
+		if (distance < lockOnChargeRange_)
+		{
+			// チャージタイマーを増加
+			lockOnChargeTimerSec_ += dt;
+		}
+		else
+		{
+			// 範囲外に出たらチャージリセット
+			isLockOn_ = false;
+			lockOnChargeTimerSec_ = 0.0f;
+		}
+
+		// チャージが完了したらロックオン状態に
+		if (lockOnChargeTimerSec_ >= kLockOnChargeMaxTimeSec_)
+		{
+			isLockOn_ = true;
+
+		}
+	}
+	else
+	{
+		// ターゲットがいない場合はロックオフ
+		isLockOn_ = false;
+		lockOnChargeTimerSec_ = 0.0f;
+	}
+
+
+	// ロックオン状態のときの処理
+	if (isLockOn_)
+	{
+		// ターゲットの向きを取得
+		Vector3 toTarget = targetEnemyPosition_ - position_;
+		// ターゲットの方向に向ける
+		RotationUpdate(toTarget);
+	}
+
+}
+
+void Player::RotationUpdate(const Vector3& _toAngle)
+{
+	// ターゲットの方向に向ける
+	float targetRotationY = std::atan2(_toAngle.x, _toAngle.z);
+	Vector3 currentRotation = rotation_;
+
+	// Y軸の回転のみ、最短経路で補間
+	float easedRotationY = LerpAngle(currentRotation.y, targetRotationY, turnLerpRate_);
+
+	// 回転を更新
+	rotation_ = { currentRotation.x, easedRotationY, currentRotation.z };
 }
 
 void Player::OnCollisionTrigger(const Collider* _other)
