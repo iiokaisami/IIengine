@@ -124,7 +124,7 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 	if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
 	{
 		// プレイヤーの弾と衝突した場合
-		if (hp_ > 1)
+		if (hp_ > 0.0f)
 		{
 			// HP減少
 			hp_--;

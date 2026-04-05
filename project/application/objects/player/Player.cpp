@@ -90,6 +90,9 @@ void Player::Initialize()
 
 	// ノイズ
 	isNoiseActive_ = true;
+
+	// バリア破壊フラグ
+	isBarrierBroken_ = false;
 }
 
 void Player::Finalize()
@@ -396,7 +399,7 @@ void Player::UpdateNearEnemyIndicator()
 		return;
 	}
 
-	// ターゲットがセットされていない場合は非表示
+	// ターゲットがセットされていない場合は画面外
 	if (!hasTarget_)
 	{
 		sprites_[1]->SetPosition({ -10000.0f, -10000.0f });
@@ -1000,7 +1003,7 @@ void Player::LockOn()
 		// ターゲットがいない場合は透明にして更新する
 		lockOnIndicatorAlpha_ = 0.0f;
 		lockOnIndicatorColor_ = Vector4{ 1.0f, 0.2f, 0.2f, lockOnIndicatorAlpha_ };
-		sprites_[2]->SetColor(lockOnIndicatorColor_);
+		sprites_[2]->SetColorChange(lockOnIndicatorColor_);
 		sprites_[2]->Update();
 
 		return;
@@ -1216,9 +1219,10 @@ void Player::OnCollisionTrigger(const Collider* _other)
 
 void Player::OnCollision(const Collider* _other)
 {
-	if (_other->GetColliderID() == "Wall" or
+	if ((_other->GetColliderID() == "Wall" or
 		_other->GetColliderID() == "Barrie" or
 		_other->GetColliderID() == "NormalEnemy")
+		&& !isBarrierBroken_)
 	{
 		// 相手のAABBを取得
 		const AABB* otherAABB = _other->GetAABB();

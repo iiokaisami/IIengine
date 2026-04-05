@@ -118,7 +118,7 @@ private:
 	// 爆発フラグ
 	bool isExploded_ = false;
 
-	float initialHP_ = 1.0f;
+	float initialHP_ = 3.5f;
 	Vector3 initialScale_ = { 1.0f, 1.0f, 1.0f };
 
 	int spawnParticleCount_ = 2;

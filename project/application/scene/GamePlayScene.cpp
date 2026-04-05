@@ -169,7 +169,12 @@ void GamePlayScene::Initialize()
 		// Goal到達＝ここでバリア破壊開始
 		barrierCam->SetOnArriveGoal([this]()
 			{
-				if (pGoal_) pGoal_->SetBarrierDestroyed(true);
+				if (pGoal_)
+				{
+					pGoal_->SetBarrierDestroyed(true);
+					pPlayer_->SetIsBarrierBroken(true);
+				}
+
 			});
 
 		// 演出終了＝Follow復帰

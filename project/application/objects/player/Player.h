@@ -177,6 +177,12 @@ public: // セッター
 	/// <param name="_isNoiseActive">ノイズをアクティブにするかのフラグ</param>
 	void SetIsNoiseActive(bool _isNoiseActive) { isNoiseActive_ = _isNoiseActive; }
 
+	/// <summary>
+	/// バリアが破壊されているかのフラグのセッター
+	/// </summary>
+	/// <param name="_isBarrierBroken">バリアが破壊されているかのフラグ</param>
+	void SetIsBarrierBroken(bool _isBarrierBroken) { isBarrierBroken_ = _isBarrierBroken; }
+
 private:
 
 	// 最も近い敵
@@ -305,7 +311,7 @@ private:
 	// ロックオンのターゲット位置
 	Vector3 lockOnTargetPosition_{};
 	// ロックオンのチャージ範囲
-	float lockOnChargeRange_ = 20.0f;
+	float lockOnChargeRange_ = 12.0f;
 	// ロックオンのチャージ時間
 	const float kLockOnChargeMaxTimeSec_ = 2.0f;
 	// ロックオンのチャージタイマー
@@ -323,7 +329,8 @@ private:
 	// ロックオンスプライトの色
 	Vector4 lockOnIndicatorColor_ = { 1.0f, 0.1f, 0.1f,lockOnIndicatorAlpha_ };
 
-
+	// バリア破壊フラグ
+	bool isBarrierBroken_ = false;
 
 	// デスモーション用構造体
 	struct Motion
