@@ -2990,7 +2990,7 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 	if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
 	{
 		// プレイヤーの弾と衝突した場合
-		if (hp_ > 1)
+		if (hp_ > 0.0f)
 		{
 			// HP減少
 			hp_--;
@@ -3158,7 +3158,7 @@ private:
 	// 爆発フラグ
 	bool isExploded_ = false;
 
-	float initialHP_ = 1.0f;
+	float initialHP_ = 3.5f;
 	Vector3 initialScale_ = { 1.0f, 1.0f, 1.0f };
 
 	int spawnParticleCount_ = 2;
@@ -9405,6 +9405,9 @@ void Player::Initialize()
 
 	// ノイズ
 	isNoiseActive_ = true;
+
+	// バリア破壊フラグ
+	isBarrierBroken_ = false;
 }
 
 void Player::Finalize()
@@ -9711,7 +9714,7 @@ void Player::UpdateNearEnemyIndicator()
 		return;
 	}
 
-	// ターゲットがセットされていない場合は非表示
+	// ターゲットがセットされていない場合は画面外
 	if (!hasTarget_)
 	{
 		sprites_[1]->SetPosition({ -10000.0f, -10000.0f });
@@ -10315,7 +10318,7 @@ void Player::LockOn()
 		// ターゲットがいない場合は透明にして更新する
 		lockOnIndicatorAlpha_ = 0.0f;
 		lockOnIndicatorColor_ = Vector4{ 1.0f, 0.2f, 0.2f, lockOnIndicatorAlpha_ };
-		sprites_[2]->SetColor(lockOnIndicatorColor_);
+		sprites_[2]->SetColorChange(lockOnIndicatorColor_);
 		sprites_[2]->Update();
 
 		return;
@@ -10531,9 +10534,10 @@ void Player::OnCollisionTrigger(const Collider* _other)
 
 void Player::OnCollision(const Collider* _other)
 {
-	if (_other->GetColliderID() == "Wall" or
+	if ((_other->GetColliderID() == "Wall" or
 		_other->GetColliderID() == "Barrie" or
 		_other->GetColliderID() == "NormalEnemy")
+		&& !isBarrierBroken_)
 	{
 		// 相手のAABBを取得
 		const AABB* otherAABB = _other->GetAABB();
@@ -10812,6 +10816,12 @@ public: // セッター
 	/// <param name="_isNoiseActive">ノイズをアクティブにするかのフラグ</param>
 	void SetIsNoiseActive(bool _isNoiseActive) { isNoiseActive_ = _isNoiseActive; }
 
+	/// <summary>
+	/// バリアが破壊されているかのフラグのセッター
+	/// </summary>
+	/// <param name="_isBarrierBroken">バリアが破壊されているかのフラグ</param>
+	void SetIsBarrierBroken(bool _isBarrierBroken) { isBarrierBroken_ = _isBarrierBroken; }
+
 private:
 
 	// 最も近い敵
@@ -10940,7 +10950,7 @@ private:
 	// ロックオンのターゲット位置
 	Vector3 lockOnTargetPosition_{};
 	// ロックオンのチャージ範囲
-	float lockOnChargeRange_ = 20.0f;
+	float lockOnChargeRange_ = 12.0f;
 	// ロックオンのチャージ時間
 	const float kLockOnChargeMaxTimeSec_ = 2.0f;
 	// ロックオンのチャージタイマー
@@ -10958,7 +10968,8 @@ private:
 	// ロックオンスプライトの色
 	Vector4 lockOnIndicatorColor_ = { 1.0f, 0.1f, 0.1f,lockOnIndicatorAlpha_ };
 
-
+	// バリア破壊フラグ
+	bool isBarrierBroken_ = false;
 
 	// デスモーション用構造体
 	struct Motion
@@ -12017,7 +12028,12 @@ void GamePlayScene::Initialize()
 		// Goal到達＝ここでバリア破壊開始
 		barrierCam->SetOnArriveGoal([this]()
 			{
-				if (pGoal_) pGoal_->SetBarrierDestroyed(true);
+				if (pGoal_)
+				{
+					pGoal_->SetBarrierDestroyed(true);
+					pPlayer_->SetIsBarrierBroken(true);
+				}
+
 			});
 
 		// 演出終了＝Follow復帰
