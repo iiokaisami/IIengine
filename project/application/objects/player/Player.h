@@ -307,13 +307,13 @@ private:
 	// ロックオンのチャージ範囲
 	float lockOnChargeRange_ = 20.0f;
 	// ロックオンのチャージ時間
-	/*const*/ float kLockOnChargeMaxTimeSec_ = 2.0f;
+	const float kLockOnChargeMaxTimeSec_ = 2.0f;
 	// ロックオンのチャージタイマー
 	float lockOnChargeTimerSec_ = 0.0f;
 	// 前フレームのターゲットの位置
 	Vector3 preTargetPos_{};
 	// ロックオンスプライトのサイズ
-	Vector2 lockOnIndicatorSize_ = { 400.0f, 400.0f };
+	Vector2 lockOnIndicatorSize_ = { 100.0f, 100.0f };
 	// ロックオンスプライトの回転角度
 	float lockOnIndicatorAngle_ = 0.0f;
 	// ロックオンスプライトの座標
@@ -321,7 +321,7 @@ private:
 	// ロックオンスプライトの透明度
 	float lockOnIndicatorAlpha_ = 0.0f;
 	// ロックオンスプライトの色
-	Vector4 lockOnIndicatorColor_ = { 1.0f, 0.2f, 0.2f,lockOnIndicatorAlpha_ };
+	Vector4 lockOnIndicatorColor_ = { 1.0f, 0.1f, 0.1f,lockOnIndicatorAlpha_ };
 
 
 

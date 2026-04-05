@@ -240,7 +240,7 @@ void TitleScene::Update()
 
 	
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_)
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();

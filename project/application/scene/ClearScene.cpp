@@ -149,7 +149,7 @@ void ClearScene::Update()
 #endif // USE_IMGUI
 
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_)
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
@@ -161,7 +161,7 @@ void ClearScene::Update()
 			});
 	}
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_R))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_R) && !isTransitioning_)
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();

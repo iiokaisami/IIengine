@@ -36,14 +36,15 @@ void Player::Initialize()
 		}
 		else if(i == 1)
 		{
+			
 			sprite->Initialize("nearEnemy.png", { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f }, { 0.5f,1.0f });
-		
+
 		}
 		else if(i == 2)
 		{
-			sprite->Initialize("uvChecker.png", lockOnIndicatorPos_, lockOnIndicatorColor_, { 1.0f,1.0f });
+			sprite->Initialize("lockON.png", lockOnIndicatorPos_, lockOnIndicatorColor_, { 0.5f,0.5f });
 			sprite->SetSize(lockOnIndicatorSize_);
-		
+	
 		}
 
 		sprites_.push_back(std::move(sprite));
@@ -201,7 +202,6 @@ void Player::ImGuiDraw()
 	if (ImGui::CollapsingHeader("LockOn System"))
 	{
 		ImGui::SliderFloat("chargeRange", &lockOnChargeRange_, 10.0f, 50.0f);
-		ImGui::SliderFloat("chargeMaxTimer", &kLockOnChargeMaxTimeSec_, 0.1f, 5.0f);
 		ImGui::SliderFloat("chargeTimer", &lockOnChargeTimerSec_, 0.0f, 5.0f);
 	}
 
@@ -699,10 +699,12 @@ void Player::UpdateControl()
 		// アクティブフラグに回避フラグを入れる
 		isActive_ = isEvading_;
 
-		// 回避中はロックオン・移動・攻撃を無効化
+		// ロックオン処理
+		LockOn();
+
+		// 回避中は移動・攻撃を無効化
 		if (!isEvading_ && !isDead_)
 		{
-			LockOn();
 			Move();
 			Attack();
 		}
@@ -996,11 +998,10 @@ void Player::LockOn()
 		lockOnChargeTimerSec_ = 0.0f;
 
 		// ターゲットがいない場合は透明にして更新する
-		//lockOnIndicatorAlpha_ = 0.0f;
+		lockOnIndicatorAlpha_ = 0.0f;
 		lockOnIndicatorColor_ = Vector4{ 1.0f, 0.2f, 0.2f, lockOnIndicatorAlpha_ };
 		sprites_[2]->SetColor(lockOnIndicatorColor_);
 		sprites_[2]->Update();
-
 
 		return;
 	}
@@ -1069,9 +1070,8 @@ void Player::LockOn()
 	sprites_[2]->SetPosition(lockOnIndicatorPos_);
 
 	// スケール
-	//float scale = 0.6f + progress * 0.6f;
-	//sprites_[2]->SetSize(lockOnIndicatorSize_ * scale);
-	sprites_[2]->SetSize({1280,720});
+	float scale = 0.6f + progress * 0.6f;
+	sprites_[2]->SetSize(lockOnIndicatorSize_ * scale);
 
 	// 回転
 	lockOnIndicatorAngle_ += dt * (1.0f + progress * 3.0f);
@@ -1081,17 +1081,14 @@ void Player::LockOn()
 	lockOnIndicatorAlpha_ = progress;
 
 	// 点滅
-	if (progress > 0.8f)
+	if (progress < 0.8f)
 	{
 		float blink = sin(IIEngine::TimeManager::Instance().GetTotalTime() * 30.0f) * 0.5f + 0.5f;
 		lockOnIndicatorAlpha_ *= blink;
 	}
 
-	lockOnIndicatorAlpha_ = 1.0f;
-
-	//lockOnIndicatorColor_ = Vector4{ 1.0f, 0.2f, 0.2f, lockOnIndicatorAlpha_ };
-	lockOnIndicatorColor_ = Vector4{ 1.0f, 1.0f, 1.0f, lockOnIndicatorAlpha_ };
-	sprites_[2]->SetColor(lockOnIndicatorColor_);
+	lockOnIndicatorColor_ = Vector4{ 1.0f, 0.0f, 0.0f, lockOnIndicatorAlpha_ };
+	sprites_[2]->SetColorChange(lockOnIndicatorColor_);
 
 	sprites_[2]->Update();
 
