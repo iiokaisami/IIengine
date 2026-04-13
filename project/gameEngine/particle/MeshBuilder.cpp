@@ -511,4 +511,36 @@ namespace IIEngine
         model->UpdateVertexBuffer();
         model->UpdateIndexBuffer();
     }
+
+    void MeshBuilder::BuildQuad(Model* model)
+    {
+        model->ClearVertexData();
+
+        // 大きさ
+        const float kHalfW = 20.0f;
+        const float kHalfH = 20.0f; 
+
+        // XZ平面の板
+        const Vector3 normal = { 0, 1, 0 };
+
+        uint32_t base = model->GetVertexCount();
+
+        // 頂点
+        model->AddVertex({ -kHalfW, 0.0f, -kHalfH, 1.0f }, { 0.0f, 1.0f }, normal); // 左下(手前)
+        model->AddVertex({ kHalfW, 0.0f, -kHalfH, 1.0f }, { 1.0f, 1.0f }, normal); // 右下(手前)
+        model->AddVertex({ kHalfW, 0.0f,  kHalfH, 1.0f }, { 1.0f, 0.0f }, normal); // 右上(奥)
+        model->AddVertex({ -kHalfW, 0.0f,  kHalfH, 1.0f }, { 0.0f, 0.0f }, normal); // 左上(奥)
+
+        // 2三角形
+        model->AddIndex(base + 0);
+        model->AddIndex(base + 1);
+        model->AddIndex(base + 2);
+
+        model->AddIndex(base + 2);
+        model->AddIndex(base + 3);
+        model->AddIndex(base + 0);
+
+        model->UpdateVertexBuffer();
+        model->UpdateIndexBuffer();
+    }
 }

@@ -270,6 +270,7 @@ namespace IIEngine
             { "Petal",    MeshBuilder::BuildPetal},
             { "Cube",     MeshBuilder::BuildCube },
             { "Line",     MeshBuilder::BuildLine },
+			{ "Quad",     MeshBuilder::BuildQuad },
         };
 
         // モデル構築後に呼ぶ

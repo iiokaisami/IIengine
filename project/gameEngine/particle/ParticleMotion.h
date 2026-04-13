@@ -217,6 +217,14 @@ namespace IIEngine
 		/// <returns>生成したパーティクル</returns>
 		static Particle MakeBulletHitReaction(std::mt19937& rand, const Vector3& translate);
 
+		/// <summary>
+		/// 四角上昇
+		/// </summary>
+		/// <param name="rand">ランダム生成器</param>
+		/// <param name="translate">発現位置</param>
+		/// <returns>生成したパーティクル</returns>
+		static Particle MakeQuadRise(std::mt19937& rand, const Vector3& translate);
+
 	public: // セッター
 
 		/// <summary>

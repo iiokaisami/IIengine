@@ -57,6 +57,7 @@ namespace IIEngine
         Register("SparkBurst", MakeSparkBurst);
         Register("HitReaction", MakeHitReaction);
         Register("BltReaction", MakeBulletHitReaction);
+        Register("QuadRise", MakeQuadRise);
     }
 
     const std::unordered_map<std::string, ParticleMotion::MotionFunc>& ParticleMotion::GetAll()
@@ -603,6 +604,35 @@ namespace IIEngine
         p.lifeTime = 0.5f;
         p.currentTime = 0.0f;
 
+        return p;
+    }
+
+    Particle ParticleMotion::MakeQuadRise(std::mt19937& rand, const Vector3& translate)
+    {
+        std::uniform_real_distribution<float> distXZ(-0.2f, 0.2f);
+        std::uniform_real_distribution<float> distScale(0.2f, 0.5f);
+        std::uniform_real_distribution<float> distLife(0.8f, 1.5f);
+        std::uniform_real_distribution<float> distUp(0.6f, 1.2f);
+
+        Particle p;
+        p.transform.translate = translate + Vector3(distXZ(rand), 0.0f, distXZ(rand));
+        float s = distScale(rand);
+        p.transform.scale = { s, s, s };
+
+        // 板ポリを正面向きにしたいなら rotate を固定
+        p.transform.rotate = { 0.0f, 0.0f, 0.0f };
+
+        // 上昇
+        p.velocity = { 0.0f, distUp(rand), 0.0f };
+
+        // 少し縮ませたい場合
+        //p.scaleVelocity = { -0.05f, -0.05f, -0.05f };
+
+        // 色
+        p.color = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+        p.lifeTime = distLife(rand);
+        p.currentTime = 0.0f;
         return p;
     }
 

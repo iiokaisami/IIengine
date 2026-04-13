@@ -79,6 +79,12 @@ namespace IIEngine
 		/// <param name="model">モデルポインタ</param>
 		static void BuildLine(Model* model);
 
+		/// <summary>
+        /// Quad作成(板ポリ四角形)
+        /// </summary>
+        /// <param name="model">モデルポインタ</param>
+		static void BuildQuad(Model* model);
+
 	};
 
 }

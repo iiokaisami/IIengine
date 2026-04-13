@@ -47,6 +47,7 @@ namespace IIEngine
 		particleManager->CreateParticleGroup("HitReaction", "resources/images/white.png", "plane.obj", "Cube", "HitReaction");
 		particleManager->CreateParticleGroup("BltReaction", "resources/images/gradationLine.png", "plane.obj", "Ring", "BltReaction");
 		particleManager->CreateParticleGroup("buryTrap", "resources/images/white.png", "plane.obj", "Ring", "HitReaction");
+		particleManager->CreateParticleGroup("quadRise", "resources/images/gradationLine.png", "plane.obj", "Quad", "QuadRise");
 
 		// Cylinderを出すときに向き指定する
 		IIEngine::ParticleMotion::SetDirection("UP");
