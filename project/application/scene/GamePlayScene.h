@@ -59,11 +59,14 @@ private:
 	Vector3 cameraRotate_ = { -0.9f,0.0f,0.0f};
 	Vector3 cameraPosition_ = { 0.0f,-20.0f,0.0f };
 	// 追従の速さ
-	float followSpeed_ = 0.8f;
-	// 先行入力の重み
-	float inputLead_ = 0.25f;
+	float cameraPositionLerp_ = 0.8f;
+	// 回転の速さ
+	float cameraRotationLerp_ = 0.25f;
 	// カメラのオフセット
 	Vector3 cameraOffset_ = { 1.4f, 0.0f, 0.0f };
+	Vector3 cameraTargetOffset_ = { 0.0f, 45.0f, -20.0f };
+	// カメラの回転の目標値
+	Vector3 cameraTargetRot_ = { 1.2f,0.0f,0.0f };
 	// 持続時間
 	float duration_ = 0.3f;
 	// 振動の強さ

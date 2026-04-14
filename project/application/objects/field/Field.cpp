@@ -11,12 +11,6 @@ void Field::Initialize()
 	SyncObjectTransform();
 }
 
-void Field::Update()
-{
-	// パーティクル
-	IIEngine::ParticleEmitter::Emit("quadRise", position_, particleCount_);
-}
-
 void Field::ImGuiDraw()
 {
 #ifdef USE_IMGUI

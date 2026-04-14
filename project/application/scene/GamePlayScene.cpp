@@ -23,6 +23,8 @@ void GamePlayScene::Initialize()
 	cameraPosition_.z = -15.0f;
 	cameraRotate_.x = 1.2f;
 
+	cameraManager.AddCamera(camera_->GetCamera());
+	cameraManager.SetActiveCamera(0);
 	IIEngine::Object3dCommon::GetInstance()->SetDefaultCamera(camera_->GetCamera());
 
 	camera_->SetPosition(camStart_);
@@ -117,9 +119,10 @@ void GamePlayScene::Initialize()
 		camera_->GetCamera(),
 		[this]() -> Vector3 { return pPlayer_->GetPosition(); }, // プレイヤー位置を供給
 		[this]() -> Vector3 { return pPlayer_->GetVelocity(); }, // プレイヤー速度を供給
-		followSpeed_,// 追従の速さ
-		inputLead_, // 先行入力の重み
-		cameraOffset_
+		cameraPositionLerp_,
+		cameraRotationLerp_,
+		cameraTargetRot_ ,
+		cameraTargetOffset_
 	));
 
 	// カメラのシェイク
@@ -223,6 +226,7 @@ void GamePlayScene::Initialize()
 				// スタート演出終わったらフォロー再開
 				if (auto* follow = camera_->FindController<FollowController>())
 				{
+					follow->ResetStateToTarget();
 					follow->SnapToTarget();
 					follow->Start();
 				}
@@ -541,7 +545,7 @@ void GamePlayScene::Update()
 
 	AllImGui();
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_UP))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_O))
 	{
 		// トランジション開始
 		fadeTransition_ = std::make_unique<IIEngine::FadeTransition>();
@@ -552,7 +556,7 @@ void GamePlayScene::Update()
 				IIEngine::SceneManager::GetInstance()->ChangeScene("CLEAR");
 			});
 	}
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_DOWN))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_K))
 	{
 		// トランジション開始
 		blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();

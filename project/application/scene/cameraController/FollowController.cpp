@@ -2,13 +2,14 @@
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, const Vector3& targetRot)
+FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, const Vector3& targetRot, const Vector3& offset)
 	: camera_(camera),
       targetPos_(targetPos),
 	  targetVelocity_(targetVelocity),
       positionLerp_(positionLerp),
 	  rotationLerp_(rotationLerp),
 	  targetRot_(targetRot),
+	  offset_(offset),
       smoothedVelocity_({ 0.0f, 0.0f, 0.0f }),
       blendingProgress_(0.0f)
 {}
@@ -116,4 +117,15 @@ void FollowController::SnapToTarget()
 	// 直接スナップ
 	camera_->SetPosition(targetPos);
 	camera_->SetRotate(targetRot_);
+}
+
+void FollowController::ResetStateToTarget()
+{
+    if (!camera_ || !targetPos_) return;
+
+    lastStopPosition_ = targetPos_();   
+    followTimer_ = 0.0f;
+    stopTimer_ = 0.0f;
+    isFollowing_ = true;               
+    blendingProgress_ = 1.0f;
 }

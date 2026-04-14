@@ -253,19 +253,23 @@ void Player::Move()
 	moveVelocity_ = {};
 
 	// 画面上の見た目通りに移動（カメラ回転なし）
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_W))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_W) or
+		IIEngine::Input::GetInstance()->PushKey(DIK_UP))
 	{
 		moveVelocity_.z += moveSpeed_.z;
 	}
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_S))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_S) or
+		IIEngine::Input::GetInstance()->PushKey(DIK_DOWN))
 	{
 		moveVelocity_.z -= moveSpeed_.z;
 	}
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_A))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_A) or
+		IIEngine::Input::GetInstance()->PushKey(DIK_LEFT))
 	{
 		moveVelocity_.x -= moveSpeed_.x;
 	}
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_D))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_D) or
+		IIEngine::Input::GetInstance()->PushKey(DIK_RIGHT))
 	{
 		moveVelocity_.x += moveSpeed_.x;
 	}

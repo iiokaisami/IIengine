@@ -72,6 +72,12 @@ void GameOverScene::Initialize()
 	transition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
 	transition_->Start(nullptr);
+
+	//// スキャンラインを0に
+	//PostEffectManager::GetInstance()->GetPassAs<ScanlinePass>("ScanLine")->SetIntensity(0.0f);
+	//// ChromaticPulseを0に
+	//PostEffectManager::GetInstance()->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetIntensity(0.0f);
+
 }
 
 void GameOverScene::Finalize()
