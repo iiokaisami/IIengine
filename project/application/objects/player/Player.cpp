@@ -249,29 +249,44 @@ void Player::Move()
 {
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+	// 入力時の省略
+	auto* input = IIEngine::Input::GetInstance();
 
 	moveVelocity_ = {};
 
-	// 画面上の見た目通りに移動（カメラ回転なし）
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_W) or
-		IIEngine::Input::GetInstance()->PushKey(DIK_UP))
+	// コントローラー接続されているときはスティック入力、そうでないときはキーボード入力
+	if (input->IsPadConnected())
 	{
-		moveVelocity_.z += moveSpeed_.z;
+		StickState ls = input->GetLeftStick();
+
+		// デッドゾーンはController側にもあるが、歩き出しの安定のためにここでも軽く
+		const float th = 0.15f;
+		if (std::abs(ls.x) < th) ls.x = 0.0f;
+		if (std::abs(ls.y) < th) ls.y = 0.0f;
+
+		// 画面上の見た目通りに移動
+		moveVelocity_.x = ls.x * moveSpeed_.x;
+		moveVelocity_.z = ls.y * moveSpeed_.z;
 	}
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_S) or
-		IIEngine::Input::GetInstance()->PushKey(DIK_DOWN))
+	else
 	{
-		moveVelocity_.z -= moveSpeed_.z;
-	}
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_A) or
-		IIEngine::Input::GetInstance()->PushKey(DIK_LEFT))
-	{
-		moveVelocity_.x -= moveSpeed_.x;
-	}
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_D) or
-		IIEngine::Input::GetInstance()->PushKey(DIK_RIGHT))
-	{
-		moveVelocity_.x += moveSpeed_.x;
+		// 画面上の見た目通りに移動
+		if (input->PushKey(DIK_W) or input->PushKey(DIK_UP))
+		{
+			moveVelocity_.z += moveSpeed_.z;
+		}
+		if (input->PushKey(DIK_S) or input->PushKey(DIK_DOWN))
+		{
+			moveVelocity_.z -= moveSpeed_.z;
+		}
+		if (input->PushKey(DIK_A) or input->PushKey(DIK_LEFT))
+		{
+			moveVelocity_.x -= moveSpeed_.x;
+		}
+		if (input->PushKey(DIK_D) or input->PushKey(DIK_RIGHT))
+		{
+			moveVelocity_.x += moveSpeed_.x;
+		}
 	}
 
 	// 移動ベクトルがゼロでない場合にプレイヤーの向きを補間で更新
@@ -301,7 +316,9 @@ void Player::Move()
 
 void Player::Attack()
 {
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_SPACE))
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_SPACE) or 
+		(IIEngine::Input::GetInstance()->IsPadConnected() && 
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::RT)))
 	{
 		if (shootCooldownSec_ <= 0.0f)
 		{
@@ -334,8 +351,11 @@ void Player::Evade()
 	// delta
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
-	// 回避入力（クールタイムが0のときのみ許可）
-	if (!isEvading_ && evadeCooldownSec_ <= 0.0f && IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT))
+	// 回避入力(クールタイムが0のときのみ許可)
+	if (!isEvading_ && evadeCooldownSec_ <= 0.0f &&
+		(IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT) or
+		(IIEngine::Input::GetInstance()->IsPadConnected() &&
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A))))
 	{
 		// 移動方向がある場合のみ回避
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
@@ -674,6 +694,12 @@ bool Player::UpdateDeathMotion()
 	if (deathMotion_.isActive)
 	{
 		DeadEffect();
+
+	    // スキャンラインをoffに
+        PostEffectManager::GetInstance()->GetPassAs<ScanlinePass>("Scanline")->SetActive(false);
+	    // ChromaticPulseをoffに
+		PostEffectManager::GetInstance()->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetActive(false);
+
 		return true;
 	}
 

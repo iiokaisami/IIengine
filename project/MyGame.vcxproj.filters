@@ -409,6 +409,9 @@
     <ClCompile Include="application\scene\cameraController\BarrierBreakCameraController.cpp">
       <Filter>application\scene\cameraController</Filter>
     </ClCompile>
+    <ClCompile Include="gameEngine\io\Controller.cpp">
+      <Filter>gameEngine\io</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -749,6 +752,15 @@
     </ClInclude>
     <ClInclude Include="application\scene\cameraController\BarrierBreakCameraController.h">
       <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\io\InputData.h">
+      <Filter>gameEngine\io</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\io\Controller.h">
+      <Filter>gameEngine\io</Filter>
+    </ClInclude>
+    <ClInclude Include="gameEngine\io\ComPtr.h">
+      <Filter>gameEngine\io</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

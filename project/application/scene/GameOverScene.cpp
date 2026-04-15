@@ -73,11 +73,6 @@ void GameOverScene::Initialize()
 	isTransitioning_ = true;
 	transition_->Start(nullptr);
 
-	//// スキャンラインを0に
-	//PostEffectManager::GetInstance()->GetPassAs<ScanlinePass>("ScanLine")->SetIntensity(0.0f);
-	//// ChromaticPulseを0に
-	//PostEffectManager::GetInstance()->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetIntensity(0.0f);
-
 }
 
 void GameOverScene::Finalize()
@@ -187,7 +182,9 @@ void GameOverScene::Update()
 #endif // USE_IMGUI
 
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_)
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_ or
+	(IIEngine::Input::GetInstance()->IsPadConnected() &&
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A)))
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
@@ -199,7 +196,9 @@ void GameOverScene::Update()
 			});
 	}
 
-	if(IIEngine::Input::GetInstance()->TriggerKey(DIK_R) && !isTransitioning_)
+	if(IIEngine::Input::GetInstance()->TriggerKey(DIK_R) && !isTransitioning_ or
+		(IIEngine::Input::GetInstance()->IsPadConnected() &&
+			IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::B)))
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();

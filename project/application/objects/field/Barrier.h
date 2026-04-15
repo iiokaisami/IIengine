@@ -90,7 +90,7 @@ private:
 	uint32_t explodeParticleCount_ = 8;
 	
 	// スパークパラメーター
-	float sparkEmitHeight_ = 3.0f;
+	float sparkEmitHeight_ = 2.0f;
 	uint32_t sparkParticleCount_ = 1;
 	float sparkMinVisibleScaleX_ = 0.1f;
 	float scaleReturnEpsilon_ = 0.01f;

@@ -39,6 +39,9 @@ namespace IIEngine
 		// 排他的制御レベルのセット
 		result = keyboard->SetCooperativeLevel(winApp_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 		assert(SUCCEEDED(result));
+
+		// コントローラーの初期化
+		controller_.Initialize();
 	}
 
 	void Input::Update()
@@ -51,6 +54,10 @@ namespace IIEngine
 		keyboard->Acquire();
 		// 全キーの入力状態を取得する
 		keyboard->GetDeviceState(sizeof(key), key);
+
+		// コントローラーの更新
+		controller_.Update();
+
 	}
 
 	bool Input::PushKey(BYTE keyNumber)const
@@ -73,5 +80,42 @@ namespace IIEngine
 		}
 
 		return false;
+	}
+
+	bool Input::IsPadConnected() const
+	{
+		XINPUT_STATE st{};
+		DWORD r = XInputGetState(0, &st);
+		return (r == ERROR_SUCCESS);
+	}
+	
+	bool Input::PushPadButton(ControllerButtonType button) const
+	{
+		return controller_.PushButton(0, button);
+	}
+	
+	bool Input::TriggerPadButton(ControllerButtonType button) const
+	{
+		return controller_.TriggerButton(0, button);
+	}
+	
+	bool Input::ReleasePadButton(ControllerButtonType button) const
+	{
+		return controller_.ReleaseButton(0, button);
+	}
+	
+	StickState Input::GetLeftStick() const
+	{
+		return controller_.GetLeftStickState(0);
+	}
+	
+	StickState Input::GetRightStick() const
+	{
+		return controller_.GetRightStickState(0);
+	}
+	
+	float Input::GetTriggerValue(ControllerButtonType button) const
+	{
+		return controller_.GetTriggerValue(0, button);
 	}
 }

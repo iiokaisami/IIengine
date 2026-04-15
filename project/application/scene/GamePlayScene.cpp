@@ -327,14 +327,19 @@ void GamePlayScene::Update()
 	// ポーズ入力
 	if (inputLock_)
 	{
-		if (!IIEngine::Input::GetInstance()->PushKey(DIK_SPACE))
+		if (!IIEngine::Input::GetInstance()->PushKey(DIK_SPACE) or
+			(IIEngine::Input::GetInstance()->IsPadConnected() &&
+			IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::A)))
 		{
 			inputLock_ = false;
 		}
 		return;
 	}
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE) or
+	   (IIEngine::Input::GetInstance()->IsPadConnected() &&
+		(IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::Select) or
+		IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::Start))))
 	{
 		if (!isPaused_)
 		{
@@ -514,7 +519,7 @@ void GamePlayScene::Update()
 	pGoal_->Update();
 	
 	// 敵全滅した瞬間に一度だけカメラ演出開始
-	if ((pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_) or Input::GetInstance()->TriggerKey(DIK_P))
+	if (pEnemyManager_->IsAllEnemyDefeated() && !isBarrierCameraStarted_)
 	{
 		isBarrierCameraStarted_ = true;
 
@@ -545,7 +550,7 @@ void GamePlayScene::Update()
 
 	AllImGui();
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_O))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_P))
 	{
 		// トランジション開始
 		fadeTransition_ = std::make_unique<IIEngine::FadeTransition>();
@@ -556,7 +561,7 @@ void GamePlayScene::Update()
 				IIEngine::SceneManager::GetInstance()->ChangeScene("CLEAR");
 			});
 	}
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_K))
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_L))
 	{
 		// トランジション開始
 		blockTransition_ = std::make_unique<IIEngine::BlockRiseTransition>();

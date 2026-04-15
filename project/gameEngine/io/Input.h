@@ -8,6 +8,8 @@ using namespace Microsoft::WRL;
 #include <dinput.h>
 
 #include "WinApp.h"
+#include "Controller.h"
+#include "InputData.h"
 
 namespace IIEngine
 {
@@ -51,6 +53,8 @@ namespace IIEngine
 		/// </summary>
 		void Update();
 
+		// --- キーボード ---
+
 		/// <summary>
 		/// キーの押下をチェック
 		/// </summary>
@@ -64,6 +68,54 @@ namespace IIEngine
 		/// <param name="KeyNumber">キー番号( DIK_0 等 )</param>
 		/// <returns>トリガーか</returns>
 		bool TriggerKey(BYTE keyNumber)const;
+
+		// --- コントローラー ---
+
+		/// <summary>
+		/// コントローラーが接続されているか
+		/// </summary>+
+		/// <returns>接続されているか</returns>
+		bool IsPadConnected() const;
+		
+		/// <summary>
+		/// コントローラーのボタンが押されているか
+		/// </summary>
+		/// <param name="button">ボタンの種類</param>
+		/// <returns>押されているか</returns>
+		bool PushPadButton(ControllerButtonType button) const;
+
+		/// <summary>
+		/// コントローラーのボタンがトリガーされているか
+		/// </summary>
+		/// <param name="button">ボタンの種類</param>
+		/// <returns>トリガーされているか</returns>
+		bool TriggerPadButton(ControllerButtonType button) const;
+		
+		/// <summary>
+		/// コントローラーのボタンがリリースされているか
+		/// </summary>
+		/// <param name="button">ボタンの種類</param>
+		/// <returns>リリースされているか</returns>
+		bool ReleasePadButton(ControllerButtonType button) const;
+
+		/// <summary>
+		/// コントローラーのトリガーの値を取得
+		/// </summary>
+		/// <returns>トリガーの値</returns>
+		StickState GetLeftStick() const;
+
+		/// <summary>
+		/// コントローラーのスティックの値を取得
+		/// </summary>
+		/// <returns>スティックの値</returns>
+		StickState GetRightStick() const;
+
+		/// <summary>
+		/// コントローラーのスティックの値を取得
+		/// </summary>
+		/// <param name="button">ボタンの種類</param>
+		/// <returns>トリガーの値</returns>
+		float GetTriggerValue(ControllerButtonType button) const;
 
 	private:
 
@@ -80,6 +132,10 @@ namespace IIEngine
 		BYTE key[256] = {};
 		// 前回の全キーの状態
 		BYTE keyPre[256] = {};
+
+		// コントローラー
+		Controller controller_;
+
 	};
 
 }

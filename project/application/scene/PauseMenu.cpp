@@ -42,7 +42,10 @@ void PauseMenu::Update()
 
     if (ignoreEscape_)
     {
-        if (!input->PushKey(DIK_ESCAPE)) // 離されたら解除
+        if (!input->PushKey(DIK_ESCAPE) or
+           (IIEngine::Input::GetInstance()->IsPadConnected() &&
+           (IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::Select) or
+            IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::Start))))
         {
             ignoreEscape_ = false;
         }
@@ -63,7 +66,10 @@ void PauseMenu::Update()
     constexpr int kCursorIndex = 4; // pauseUI.png
 
     // ESCでメニュー閉じる
-    if (input->TriggerKey(DIK_ESCAPE))
+    if (input->TriggerKey(DIK_ESCAPE) or
+       (IIEngine::Input::GetInstance()->IsPadConnected() &&
+       (IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::Select) or
+       IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::Start))))
     {
         Close();
 		return;
@@ -71,20 +77,46 @@ void PauseMenu::Update()
 
     const int menuCount = static_cast<int>(options_.size());
 
+    if (IIEngine::Input::GetInstance()->IsPadConnected())
+    {
+        const float threshold = 0.6f;          // メニュー用
+        float y = input->GetLeftStick().y;     // -1..1 想定
+
+        // 前フレーム threshold 未満 -> 今回 threshold 超え で上移動
+        upPadStick = (prevStickY_ <= threshold && y > threshold);
+
+        // 前フレーム -threshold より上 -> 今回 -threshold 未満 で下移動
+        downPadStick = (prevStickY_ >= -threshold && y < -threshold);
+
+        prevStickY_ = y;
+    } 
+    else
+    {
+        prevStickY_ = 0.0f;
+    }
+
     // 上移動
-    if (input->TriggerKey(DIK_W) or input->TriggerKey(DIK_UP))
+    if (input->TriggerKey(DIK_W) or input->TriggerKey(DIK_UP) or
+       (IIEngine::Input::GetInstance()->IsPadConnected() &&
+        (IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::DPadUP) or 
+         upPadStick)))
     {
         selectedIndex_ = (selectedIndex_ - 1 + menuCount) % menuCount;
     }
 
     // 下移動
-    if (input->TriggerKey(DIK_S) or input->TriggerKey(DIK_DOWN))
+    if (input->TriggerKey(DIK_S) or input->TriggerKey(DIK_DOWN) or
+       (IIEngine::Input::GetInstance()->IsPadConnected() &&
+       (IIEngine::Input::GetInstance()->TriggerPadButton(ControllerButtonType::DPadDOWN) or
+        downPadStick)))
     {
         selectedIndex_ = (selectedIndex_ + 1) % menuCount;
     }
 
     // 決定
-    if (input->TriggerKey(DIK_RETURN) or input->TriggerKey(DIK_SPACE))
+    if (input->TriggerKey(DIK_RETURN) or input->TriggerKey(DIK_SPACE) or
+       (IIEngine::Input::GetInstance()->IsPadConnected() &&
+        IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A)))
     {
         selectedOption_ = options_[selectedIndex_];
     }

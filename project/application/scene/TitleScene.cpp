@@ -99,6 +99,10 @@ void TitleScene::Initialize()
 
 	// ノイズを0に
 	PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(0.0f);
+	// ChromaticPulseをoffに
+	PostEffectManager::GetInstance()->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetActive(false);
+	// スキャンラインをoffに
+	PostEffectManager::GetInstance()->GetPassAs<ScanlinePass>("Scanline")->SetActive(false);
 	
 }
 
@@ -241,7 +245,9 @@ void TitleScene::Update()
 
 	
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_)
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_ or
+		(IIEngine::Input::GetInstance()->IsPadConnected() &&
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A)))
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();

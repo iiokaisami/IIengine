@@ -65,5 +65,11 @@ private:
 
 	// 各項目の基準位置
 	std::vector<Vector2> basePositions_;
+
+	// コントローラーのスティック
+	float prevStickY_ = 0.0f;
+	bool upPadStick = false;
+	bool downPadStick = false;
+
 };
 
