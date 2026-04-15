@@ -355,7 +355,8 @@ void Player::Evade()
 	if (!isEvading_ && evadeCooldownSec_ <= 0.0f &&
 		(IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT) or
 		(IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A))))
+		(IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::LB) or
+		 IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::LT)))))
 	{
 		// 移動方向がある場合のみ回避
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
