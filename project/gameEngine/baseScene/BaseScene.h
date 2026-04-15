@@ -34,6 +34,11 @@ namespace IIEngine
         /// </summary>
         virtual void Draw();
 
+		/// <summary>
+		/// ポストエフェクトがかかりパーティクルが描画された後に描きたいもの(UIなど)
+		/// </summary>
+		virtual void Draw2DPostFX() {}
+
         /// <summary>
         /// ポストエフェクト後に描くUIなど
         /// </summary>

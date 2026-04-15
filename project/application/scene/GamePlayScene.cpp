@@ -622,8 +622,6 @@ void GamePlayScene::Draw()
 	// 描画前処理(Sprite)
 	SpriteCommon::GetInstance()->CommonDrawSetting();
 
-	pPlayer_->Draw2D();
-
 	pEnemyManager_->Draw2D();
 
 	for (auto& sprite : sprites_)
@@ -631,6 +629,13 @@ void GamePlayScene::Draw()
 		sprite->Draw();
 	}
 
+}
+
+void GamePlayScene::Draw2DPostFX()
+{
+	SpriteCommon::GetInstance()->CommonDrawSetting();
+
+	pPlayer_->Draw2D();
 }
 
 void GamePlayScene::DrawOverlay()

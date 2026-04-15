@@ -36,6 +36,9 @@ namespace IIEngine {
 		// 描画
 		void Draw();
 
+		// ポストエフェクトがかかりパーティクルが描画された後に描きたいもの(UIなど)
+		void Draw2DPostFX();
+
 		// ポストFX後のOverlay描画
 		void DrawOverlay();
 

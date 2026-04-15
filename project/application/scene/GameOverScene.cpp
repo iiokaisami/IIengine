@@ -182,9 +182,10 @@ void GameOverScene::Update()
 #endif // USE_IMGUI
 
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_ or
-	(IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A)))
+	if (!isTransitioning_ && 
+	   (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) or
+	   (IIEngine::Input::GetInstance()->IsPadConnected() &&
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A))))
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
@@ -196,9 +197,10 @@ void GameOverScene::Update()
 			});
 	}
 
-	if(IIEngine::Input::GetInstance()->TriggerKey(DIK_R) && !isTransitioning_ or
-		(IIEngine::Input::GetInstance()->IsPadConnected() &&
-			IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::B)))
+	if(!isTransitioning_ && 
+	   (IIEngine::Input::GetInstance()->TriggerKey(DIK_R) or
+	   (IIEngine::Input::GetInstance()->IsPadConnected() &&
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::B))))
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();

@@ -44,6 +44,9 @@ public:
 	// 描画
 	void Draw() override;
 
+	// ポストエフェクトがかかりパーティクルが描画された後に描きたいもの(UIなど)
+	void Draw2DPostFX() override;
+
 	// ポストエフェクト後に描くUIなど
 	void DrawOverlay() override;
 

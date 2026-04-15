@@ -408,6 +408,8 @@ namespace IIEngine
 
 		particleManager->Draw();
 
+		sceneManager_->Draw2DPostFX();// パーティクルの後に描きたいもの(UIなど)があればここで描画
+
 		sceneRT_->EndRender();
 
 		
@@ -436,8 +438,9 @@ namespace IIEngine
 
 		postEffectManager->DrawAll(dxCommon->GetCommandList(), current->GetSRVHandle(), current->GetResource(), currentState);
 
-		sceneManager_->DrawOverlay();    
-		sceneManager_->DrawOverlayTop();
+		sceneManager_->DrawOverlay();  // ポストエフェクト後のOverlay描画(メニュー画面など)
+
+		sceneManager_->DrawOverlayTop(); // 最前面Overlay描画(トランジションなど)
 
 #ifdef USE_IMGUI
 		// ImGui描画

@@ -56,6 +56,14 @@ namespace IIEngine {
         }
     }
 
+    void SceneManager::Draw2DPostFX()
+    {
+        if (scene_)
+        {
+            scene_->Draw2DPostFX(); 
+        }
+	}
+
     void SceneManager::DrawOverlay()
     {
         if (scene_)

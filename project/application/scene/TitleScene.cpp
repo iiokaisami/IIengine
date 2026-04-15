@@ -245,9 +245,10 @@ void TitleScene::Update()
 
 	
 
-	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) && !isTransitioning_ or
+	if (!isTransitioning_ &&
+		(IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) or
 		(IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A)))
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A))))
 	{
 		// トランジション開始
 		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
