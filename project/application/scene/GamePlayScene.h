@@ -64,9 +64,9 @@ private:
 	float cameraRotationLerp_ = 0.25f;
 	// カメラのオフセット
 	Vector3 cameraOffset_ = { 1.4f, 0.0f, 0.0f };
-	Vector3 cameraTargetOffset_ = { 0.0f, 45.0f, -20.0f };
+	Vector3 cameraTargetOffset_ = { 0.0f, 48.0f, -35.0f };
 	// カメラの回転の目標値
-	Vector3 cameraTargetRot_ = { 1.2f,0.0f,0.0f };
+	Vector3 cameraTargetRot_ = { 0.95f,0.0f,0.0f };
 	// 持続時間
 	float duration_ = 0.3f;
 	// 振動の強さ
