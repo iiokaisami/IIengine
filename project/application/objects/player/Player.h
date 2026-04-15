@@ -328,6 +328,8 @@ private:
 	float lockOnIndicatorAlpha_ = 0.0f;
 	// ロックオンスプライトの色
 	Vector4 lockOnIndicatorColor_ = { 1.0f, 0.1f, 0.1f,lockOnIndicatorAlpha_ };
+	// ロックオンインジケーターのYオフセット
+	float lockOnIndicatorOffsetY_ = -20.0f;
 
 	// バリア破壊フラグ
 	bool isBarrierBroken_ = false;

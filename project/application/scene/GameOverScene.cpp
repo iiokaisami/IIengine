@@ -229,6 +229,12 @@ void GameOverScene::Draw()
 		sprite->Draw();
 	}
 
+}
+
+void GameOverScene::DrawOverlayTop()
+{
+	// 描画前処理(Sprite)
+	SpriteCommon::GetInstance()->CommonDrawSetting();
 
 	// トランジション描画
 	if (isTransitioning_ && transition_)

@@ -56,6 +56,22 @@ namespace IIEngine {
         }
     }
 
+    void SceneManager::DrawOverlay()
+    {
+        if (scene_)
+        {
+            scene_->DrawOverlay(); 
+        }
+    }
+
+    void SceneManager::DrawOverlayTop()
+    {
+        if (scene_)
+        {
+            scene_->DrawOverlayTop(); 
+        }
+    }
+
     void SceneManager::ChangeScene(const std::string& sceneName)
     {
         assert(sceneFactory_);

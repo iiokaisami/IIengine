@@ -36,6 +36,12 @@ namespace IIEngine {
 		// 描画
 		void Draw();
 
+		// ポストFX後のOverlay描画
+		void DrawOverlay();
+
+		// 最前面Overlay描画
+		void DrawOverlayTop();
+
 		/// <summary>
 		/// シーン変更
 		/// </summary>

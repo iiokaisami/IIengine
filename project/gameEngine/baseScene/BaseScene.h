@@ -34,6 +34,16 @@ namespace IIEngine
         /// </summary>
         virtual void Draw();
 
+        /// <summary>
+        /// ポストエフェクト後に描くUIなど
+        /// </summary>
+        virtual void DrawOverlay() {}
+
+        /// <summary>
+        /// 常に最前面に描きたいもの(トランジションなど)
+        /// </summary>
+        virtual void DrawOverlayTop() {}
+
     public:
 
         /// <summary>

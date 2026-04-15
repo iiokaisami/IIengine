@@ -1101,7 +1101,7 @@ void Player::LockOn()
 
 	// スクリーン位置計算
 	lockOnIndicatorPos_ = camera->WorldToScreen(targetEnemyPosition_);
-	sprites_[2]->SetPosition(lockOnIndicatorPos_);
+	sprites_[2]->SetPosition({lockOnIndicatorPos_.x, lockOnIndicatorPos_.y + lockOnIndicatorOffsetY_});
 
 	// スケール
 	float scale = 0.6f + progress * 0.6f;

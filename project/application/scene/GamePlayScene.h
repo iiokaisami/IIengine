@@ -44,6 +44,12 @@ public:
 	// 描画
 	void Draw() override;
 
+	// ポストエフェクト後に描くUIなど
+	void DrawOverlay() override;
+
+	// 常に最前面に描きたいもの(トランジションなど)
+	void DrawOverlayTop() override;
+
 private:
 
 	// このシーンで出す全てのImGui

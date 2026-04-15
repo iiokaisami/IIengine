@@ -34,6 +34,9 @@ public:
 	// 描画
 	void Draw() override;
 
+	// 常に最前面に描きたいもの(トランジションなど)
+	void DrawOverlayTop() override;
+
 private:
 
 	IIEngine::CameraManager& cameraManager = IIEngine::CameraManager::GetInstance();

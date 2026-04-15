@@ -279,11 +279,18 @@ void TitleScene::Draw()
 	{
 		sprite->Draw();
 	}
+	
+}
+
+void TitleScene::DrawOverlayTop()
+{
+	// 描画前処理(Sprite)
+	SpriteCommon::GetInstance()->CommonDrawSetting();
 
 	// トランジション描画
-	if (isTransitioning_ && transition_) 
+	if (isTransitioning_ && transition_)
 	{
 		transition_->Draw();
 	}
-	
+
 }

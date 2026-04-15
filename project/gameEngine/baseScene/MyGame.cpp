@@ -436,6 +436,8 @@ namespace IIEngine
 
 		postEffectManager->DrawAll(dxCommon->GetCommandList(), current->GetSRVHandle(), current->GetResource(), currentState);
 
+		sceneManager_->DrawOverlay();    
+		sceneManager_->DrawOverlayTop();
 
 #ifdef USE_IMGUI
 		// ImGui描画

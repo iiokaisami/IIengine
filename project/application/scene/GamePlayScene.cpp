@@ -631,11 +631,23 @@ void GamePlayScene::Draw()
 		sprite->Draw();
 	}
 
+}
+
+void GamePlayScene::DrawOverlay()
+{
+	SpriteCommon::GetInstance()->CommonDrawSetting();
+
 	// ポーズの描画
 	if (isPaused_)
 	{
 		pauseMenu_->Draw();
 	}
+
+}
+
+void GamePlayScene::DrawOverlayTop()
+{
+	SpriteCommon::GetInstance()->CommonDrawSetting();
 
 	// トランジション描画
 	if (isTransitioning_ && blockTransition_)
@@ -646,6 +658,7 @@ void GamePlayScene::Draw()
 	{
 		fadeTransition_->Draw();
 	}
+
 }
 
 void GamePlayScene::AllImGui()

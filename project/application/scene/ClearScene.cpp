@@ -197,10 +197,16 @@ void ClearScene::Draw()
 		sprite->Draw();
 	}
 
+}
+
+void ClearScene::DrawOverlayTop()
+{
+	// 描画前処理(Sprite)
+	SpriteCommon::GetInstance()->CommonDrawSetting();
+
 	// トランジション描画
 	if (isTransitioning_ && transition_)
 	{
 		transition_->Draw();
 	}
-
 }
