@@ -73,4 +73,11 @@ private:
 	// パーティクル数
 	int clearedParticleCount_ = 2;
 
+	// 演出パラメータ
+	float tiltAngleRad_ = 0.35f;            // 斜め
+	float rotateSpeedRadPerSec_ = 1.5f;     // y回転速度
+	float bobAmplitude_ = 0.3f;            // 上下の振れ幅
+	float bobFreqRadPerSec_ = 2.0f;         // 上下の角周波数
+	float bobTimeSec_ = 0.0f;               // 経過時間
+
 };

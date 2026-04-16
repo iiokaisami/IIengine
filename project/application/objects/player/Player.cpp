@@ -311,7 +311,7 @@ void Player::Move()
 	position_ += moveVelocity_ * dt;
 
 	// 移動制限
-	ClampPosition();
+	//ClampPosition();
 }
 
 void Player::Attack()
@@ -391,7 +391,7 @@ void Player::Evade()
 		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } *dt;
 
 		// 移動制限
-		ClampPosition();
+		//ClampPosition();
 
 		// 回避中の回転
 		float t = 1.0f - (evadeRemainingSec_ / kEvadeDurationSec_);
@@ -1150,7 +1150,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		const bool isSlowMotionTarget =
 			(_other->GetColliderID() == "VignetteTrap") or
 			(_other->GetColliderID() == "EnemyBullet") or
-			(_other->GetColliderID() == "SetTimeBomb"); 
+			(_other->GetColliderID() == "SetTimeBomb") or
+			(_other->GetColliderID() == "Corruptor");
 		if (isSlowMotionTarget)
 		{
 			if (!hasEvadeSlowHit_)
@@ -1184,7 +1185,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 
 	if (_other->GetColliderID() == "EnemyBullet" or
 		_other->GetColliderID() == "NormalEnemy" or
-		_other->GetColliderID() == "TrapEnemy")
+		_other->GetColliderID() == "TrapEnemy" or
+		_other->GetColliderID() == "Corruptor")
 	{
 		// プレイヤーのHPを減少
 		if (hp_ > 0.3)

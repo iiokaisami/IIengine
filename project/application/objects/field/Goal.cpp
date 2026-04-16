@@ -9,9 +9,12 @@ void Goal::Initialize()
 
 	position_ = goalInitialPos_;
 	scale_ = goalInitialScale_;
+	rotation_ = { tiltAngleRad_, 0.0f, 0.0f };
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
+
+	bobTimeSec_ = 0.0f;
 
 	// バリア
 	pBarrier_ = std::make_unique<Barrier>();
@@ -40,6 +43,21 @@ void Goal::Update()
 	
 	// 状態を保存
 	wasBarrierDestroyed_ = isBarrierDestroyed_;
+
+	// 見た目の演出 回転 + 上下
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// y軸回転
+	rotation_.y += rotateSpeedRadPerSec_ * dt;
+
+	// 上下
+	bobTimeSec_ += dt;
+	position_.y = goalInitialPos_.y + std::sinf(bobTimeSec_ * bobFreqRadPerSec_) * bobAmplitude_;
+
+	// 斜め固定
+	rotation_.x = tiltAngleRad_;
+
+	SyncObjectTransform();
 
 	if (isCleared_)
 	{
