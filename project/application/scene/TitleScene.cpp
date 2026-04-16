@@ -56,7 +56,7 @@ void TitleScene::Initialize()
 		}
 		if(i == 1)
 		{
-			sprite->Initialize("titleUI.png", { 0,0 }, color_, { 0,0 });
+			sprite->Initialize("titleControllerUI.png", { 0,0 }, color_, { 0,0 });
 		}
 
 		sprites_.push_back(std::move(sprite));

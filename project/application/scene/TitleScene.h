@@ -114,7 +114,7 @@ private:
 	float environmentStrength_ = 1.0f;
 
 
-	// パーティクル用変数
+	// スプライト用変数
 	float time_ = 0.0f;
 
 };
