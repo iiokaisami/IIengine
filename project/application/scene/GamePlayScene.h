@@ -89,11 +89,11 @@ private:
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
-	Vector4 color_ = { 0.0f,0.0f,0.0f,1.0f };
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	// 変更後の色(薄めの赤)
 	Vector4 usedColor_ = { 1.0f,0.5f,0.5f,1.0f };
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 6;
+	uint32_t spriteNum_ = 4;
 
 	Vector2 uiPos_ = { 0,520 };
 	Vector2 spacePos_ = { 0.0f,0.0f };

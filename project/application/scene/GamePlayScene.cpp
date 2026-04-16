@@ -65,24 +65,18 @@ void GamePlayScene::Initialize()
 		}
 		if (i == 1)
 		{
-			sprite->Initialize("playSPACE.png", spacePos_, color_, { 0,0 });
+			sprite->Initialize("playEvading.png", spacePos_, color_, { 0,0 });
 		}
 		if (i == 2)
 		{
-			sprite->Initialize("playW.png", wPos_, color_, { 0,0 });
+			sprite->Initialize("playContorollerMove.png", wPos_, color_, { 0,0 });
 		}
 		if (i == 3)
 		{
-			sprite->Initialize("playA.png", aPos_, color_, { 0,0 });
+			sprite->Initialize("playContorollerAttack.png", aPos_, color_, { 0,0 });
 		}
-		if (i == 4)
-		{
-			sprite->Initialize("playS.png", sPos_, color_, { 0,0 });
-		}
-		if (i == 5)
-		{
-			sprite->Initialize("playD.png", dPos_, color_, { 0,0 });
-		}
+
+		
 
 		sprites_.push_back(std::move(sprite));
 	}
@@ -403,9 +397,9 @@ void GamePlayScene::Update()
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	{
-		// sprite の順序: space, W, A, S, D の 5 つを順番に動かす
+		// sprite の順序: 攻撃, 移動, 回避 の 3 つを順番に動かす
 		static float seqTimer = 0.0f;
-		constexpr int kCount = 5;
+		constexpr int kCount = 3;
 		const float slotDuration = 0.2f; // 各スロットの所要時間
 		const float totalDuration = slotDuration * kCount;
 
@@ -425,17 +419,13 @@ void GamePlayScene::Update()
 
 		spacePos_.y = calcY(0);
 		wPos_.y = calcY(1);
-		aPos_.y = calcY(2);
-		sPos_.y = calcY(3);
-		dPos_.y = calcY(4);
 
-		if (sprites_.size() >= 6)
+		if (sprites_.size() >= 4)
 		{
 			sprites_[1]->SetPosition({ spacePos_.x, spacePos_.y });
 			sprites_[2]->SetPosition({ wPos_.x, wPos_.y });
 			sprites_[3]->SetPosition({ aPos_.x, aPos_.y });
-			sprites_[4]->SetPosition({ sPos_.x, sPos_.y });
-			sprites_[5]->SetPosition({ dPos_.x, dPos_.y });
+
 		}
 	}
 
