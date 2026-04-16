@@ -3215,7 +3215,7 @@ void EnemyManager::Initialize()
 {
 	// エディタ読み込み
 	auto levelData = std::make_shared<IIEngine::LevelData>();
-	levelData = IIEngine::LevelDataLoader::LoadLevelData("enemySpawn");
+	levelData = IIEngine::LevelDataLoader::LoadLevelData("easyEnemySpawn");
 	SetLevelData(levelData);
 
 	// ウェーブステート
@@ -9112,9 +9112,12 @@ void Goal::Initialize()
 
 	position_ = goalInitialPos_;
 	scale_ = goalInitialScale_;
+	rotation_ = { tiltAngleRad_, 0.0f, 0.0f };
 	SyncObjectTransform();
 	// ライト設定
 	object_->SetLighting(true);
+
+	bobTimeSec_ = 0.0f;
 
 	// バリア
 	pBarrier_ = std::make_unique<Barrier>();
@@ -9143,6 +9146,21 @@ void Goal::Update()
 	
 	// 状態を保存
 	wasBarrierDestroyed_ = isBarrierDestroyed_;
+
+	// 見た目の演出 回転 + 上下
+	const float dt = TimeManager::Instance().GetDeltaTime();
+
+	// y軸回転
+	rotation_.y += rotateSpeedRadPerSec_ * dt;
+
+	// 上下
+	bobTimeSec_ += dt;
+	position_.y = goalInitialPos_.y + std::sinf(bobTimeSec_ * bobFreqRadPerSec_) * bobAmplitude_;
+
+	// 斜め固定
+	rotation_.x = tiltAngleRad_;
+
+	SyncObjectTransform();
 
 	if (isCleared_)
 	{
@@ -9249,6 +9267,13 @@ private:
 
 	// パーティクル数
 	int clearedParticleCount_ = 2;
+
+	// 演出パラメータ
+	float tiltAngleRad_ = 0.35f;            // 斜め
+	float rotateSpeedRadPerSec_ = 1.5f;     // y回転速度
+	float bobAmplitude_ = 0.3f;            // 上下の振れ幅
+	float bobFreqRadPerSec_ = 2.0f;         // 上下の角周波数
+	float bobTimeSec_ = 0.0f;               // 経過時間
 
 };
 
@@ -9650,13 +9675,13 @@ void Player::Move()
 	position_ += moveVelocity_ * dt;
 
 	// 移動制限
-	ClampPosition();
+	//ClampPosition();
 }
 
 void Player::Attack()
 {
-	if (IIEngine::Input::GetInstance()->PushKey(DIK_SPACE) or 
-		(IIEngine::Input::GetInstance()->IsPadConnected() && 
+	if (IIEngine::Input::GetInstance()->PushKey(DIK_SPACE) or
+		(IIEngine::Input::GetInstance()->IsPadConnected() &&
 		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::RT)))
 	{
 		if (shootCooldownSec_ <= 0.0f)
@@ -9694,8 +9719,7 @@ void Player::Evade()
 	if (!isEvading_ && evadeCooldownSec_ <= 0.0f &&
 		(IIEngine::Input::GetInstance()->PushKey(DIK_LSHIFT) or
 		(IIEngine::Input::GetInstance()->IsPadConnected() &&
-		(IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::LB) or
-		 IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::LT)))))
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A))))
 	{
 		// 移動方向がある場合のみ回避
 		if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
@@ -9731,7 +9755,7 @@ void Player::Evade()
 		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } *dt;
 
 		// 移動制限
-		ClampPosition();
+		//ClampPosition();
 
 		// 回避中の回転
 		float t = 1.0f - (evadeRemainingSec_ / kEvadeDurationSec_);
@@ -10490,7 +10514,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		const bool isSlowMotionTarget =
 			(_other->GetColliderID() == "VignetteTrap") or
 			(_other->GetColliderID() == "EnemyBullet") or
-			(_other->GetColliderID() == "SetTimeBomb"); 
+			(_other->GetColliderID() == "SetTimeBomb") or
+			(_other->GetColliderID() == "Corruptor");
 		if (isSlowMotionTarget)
 		{
 			if (!hasEvadeSlowHit_)
@@ -10524,7 +10549,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 
 	if (_other->GetColliderID() == "EnemyBullet" or
 		_other->GetColliderID() == "NormalEnemy" or
-		_other->GetColliderID() == "TrapEnemy")
+		_other->GetColliderID() == "TrapEnemy" or
+		_other->GetColliderID() == "Corruptor")
 	{
 		// プレイヤーのHPを減少
 		if (hp_ > 0.3)
@@ -11334,11 +11360,19 @@ void ClearScene::Initialize()
 		} 
 		else if (i == 1)
 		{
-			sprite->Initialize("reTry.png", rePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("reTry.png", rePos_, reColor_, { 0,0 });
 		} 
 		else if (i == 2)
 		{
-			sprite->Initialize("toTitle.png", toPos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+			sprite->Initialize("toTitle.png", toPos_, toColor_, { 0,0 });
+		}
+		else if(i == 3)
+		{
+			sprite->Initialize("endUI.png", rePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+		}
+		else if(i == 4)
+		{
+			sprite->Initialize("titleControllerUI.png", {0.0f,20.0f}, uiColor_, { 0,0 });
 		}
 		
 		sprites_.push_back(std::move(sprite));
@@ -11348,6 +11382,14 @@ void ClearScene::Initialize()
 	transition_ = std::make_unique<IIEngine::BlockRiseTransition>(IIEngine::BlockRiseTransition::Mode::DropOnly);
 	isTransitioning_ = true;
 	transition_->Start(nullptr);
+
+	// 選択肢の位置を初期化
+	reBasePos_ = rePos_;
+	toBasePos_ = toPos_;
+	// 初期は Retry を選択
+	selectedIndex_ = 0;                 
+	selectedOption_ = MenuOption::None;
+	prevStickX_ = 0.0f;
 
 }
 
@@ -11391,27 +11433,6 @@ void ClearScene::Update()
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
-
-	// rePos_とtoPos_を範囲で往復させる
-	{
-		static float timer = 0.0f;
-		const float speed = 2.0f; // 速さ
-		const float minX = 0.0f;
-		const float maxX = 30.0f;
-		const float mid = (minX + maxX) * 0.5f;
-		const float amp = (maxX - minX) * 0.5f;
-
-		timer += dt;
-		const float x1 = mid + amp * std::sinf(timer * speed);
-		const float x2 = mid + amp * std::sinf(timer * speed + 3.14159265358979f); // 逆位相
-
-		rePos_.x = x1;
-		toPos_.x = x2;
-	}
-	sprites_[1]->SetPosition(rePos_);
-	sprites_[2]->SetPosition(toPos_);
-
-
 	// スプライト更新
 	for (auto& sprite : sprites_)
 	{
@@ -11445,35 +11466,126 @@ void ClearScene::Update()
 
 #endif // USE_IMGUI
 
-
-	if (!isTransitioning_ && 
-		(IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) or
-		(IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A))))
+	// 選択中のスプライトだけ左右往復させる
 	{
-		// トランジション開始
-		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
-		isTransitioning_ = true;
-		transition_->Start([]
-			{
-				// シーン切り替え
-				IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
-			});
+		const float speed = 2.0f;
+		const float minX = 0.0f;
+		const float maxX = 30.0f;
+		const float mid = (minX + maxX) * 0.5f;
+		const float amp = (maxX - minX) * 0.5f;
+
+		// まず基準位置へ
+		rePos_ = reBasePos_;
+		toPos_ = toBasePos_;
+
+		// 選択中の方だけ timer を進め、offset を更新する
+		if (selectedIndex_ == 0) // Retry 選択中
+		{
+			retrySwayTimer_ += dt;
+			retrySwayOffsetX_ = mid + amp * std::sinf(retrySwayTimer_ * speed);
+
+		} else if (selectedIndex_ == 1) // Title 選択中
+		{
+			titleSwayTimer_ += dt;
+			titleSwayOffsetX_ = mid + amp * std::sinf(titleSwayTimer_ * speed);
+
+		}
+
+		// 位置へ反映t
+		rePos_.x += retrySwayOffsetX_;
+		toPos_.x += titleSwayOffsetX_;
+
+		sprites_[1]->SetPosition(rePos_);
+		sprites_[2]->SetPosition(toPos_);
+
+		Vector2 cursorPos = (selectedIndex_ == 0) ? rePos_ : toPos_;
+		if (selectedIndex_ == 1)
+		{
+			cursorPos.x += uiOffset_;
+		}
+		sprites_[3]->SetPosition(cursorPos);
+
+		// 透明度の上下
+		const float alphaSpeed = 4.0f;
+		time_ += dt;
+		uiColor_.w = 0.5f * (1.0f + std::sinf(time_ * alphaSpeed));
+
+		sprites_[4]->SetColor(uiColor_);
 	}
 
-	if (!isTransitioning_ && 
-		(IIEngine::Input::GetInstance()->TriggerKey(DIK_R) or
-		(IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::B))))
+	// !isTransitioning_ のときだけ受付
+	if (!isTransitioning_)
 	{
-		// トランジション開始
-		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
-		isTransitioning_ = true;
-		transition_->Start([]
-			{
-				// シーン切り替え
-				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
-			});
+		auto* input = IIEngine::Input::GetInstance();
+
+		const int menuCount = 2; // Retry, Title
+
+		// パッドの左スティック左右
+		leftPadStick_ = false;
+		rightPadStick_ = false;
+
+		if (input->IsPadConnected())
+		{
+			const float threshold = 0.6f;
+			float x = input->GetLeftStick().x; // -1..1 想定
+
+			// 左
+			leftPadStick_ = (prevStickX_ >= -threshold && x < -threshold);
+			// 右
+			rightPadStick_ = (prevStickX_ <= threshold && x > threshold);
+
+			prevStickX_ = x;
+		} 
+		else
+		{
+			prevStickX_ = 0.0f;
+		}
+
+		// 左へ移動
+		if (input->TriggerKey(DIK_A) or input->TriggerKey(DIK_LEFT) or
+			(input->IsPadConnected() &&
+			(input->TriggerPadButton(ControllerButtonType::DPadLEFT) or leftPadStick_)))
+		{
+			selectedIndex_ = (selectedIndex_ - 1 + menuCount) % menuCount;
+		}
+
+		// 右へ移動
+		if (input->TriggerKey(DIK_D) or input->TriggerKey(DIK_RIGHT) or
+			(input->IsPadConnected() &&
+			(input->TriggerPadButton(ControllerButtonType::DPadRIGHT) or rightPadStick_)))
+		{
+			selectedIndex_ = (selectedIndex_ + 1) % menuCount;
+		}
+
+		// 決定
+		if (input->TriggerKey(DIK_RETURN) or input->TriggerKey(DIK_SPACE) or
+			(input->IsPadConnected() &&
+			input->PushPadButton(ControllerButtonType::A)))
+		{
+			selectedOption_ = (selectedIndex_ == 0) ? MenuOption::Retry : MenuOption::Title;
+		}
+
+		// 選択確定したらトランジション開始
+		if (selectedOption_ != MenuOption::None)
+		{
+			transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
+			isTransitioning_ = true;
+
+			const MenuOption decided = selectedOption_;
+			selectedOption_ = MenuOption::None;
+
+			transition_->Start([decided]
+				{
+					if (decided == MenuOption::Title)
+					{
+						IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
+					}
+					else // Retry
+					{
+						IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+					}
+				});
+		}
 	}
 }
 
@@ -11563,11 +11675,23 @@ private:
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 3;
+	uint32_t spriteNum_ = 5;
 
 	Vector2 rePos_ = { 0,620 };
 	Vector2 toPos_ = { 0,620 };
 
+
+	// スプライト用変数
+	float time_ = 0.0f;
+	float uiOffset_ = 760.0f;
+
+	Vector4 reColor_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 toColor_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 uiColor_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	// 選択中表示位置
+	Vector2 reBasePos_ = { 0,620 };
+	Vector2 toBasePos_ = { 0,620 };
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
 	bool isTransitioning_ = false;
@@ -11582,6 +11706,32 @@ private:
 	Vector3 particlePosition_ = { 0.0f,0.0f,-3.5f };
 	Vector3 petalPosition_ = { 0.0f,12.0f,-18.0f };
 
+	// 次のシーン選択肢
+	enum class MenuOption
+	{
+		None,
+		Retry,      // GAMEPLAY
+		Title       // TITLE
+	};
+
+	// Open直後の決定入力を無視する用
+	bool ignoreConfirm_ = false;     
+	uint32_t selectedIndex_ = 0;     // 0: Retry, 1: Title
+	MenuOption selectedOption_ = MenuOption::None;
+
+	// スティック判定用
+	float prevStickX_ = 0.0f;
+	bool leftPadStick_ = false;
+	bool rightPadStick_ = false;
+
+	// 項目ごとのタイマー
+	float retrySwayTimer_ = 0.0f;
+	float titleSwayTimer_ = 0.0f;
+
+	// 最後に計算したオフセットを保持
+	float retrySwayOffsetX_ = 0.0f;
+	float titleSwayOffsetX_ = 0.0f;
+	
 };
 
 
@@ -11626,6 +11776,13 @@ void GameOverScene::Initialize()
 		else if (i == 2)
 		{
 			sprite->Initialize("toTitle.png", toPos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+		}
+		else if (i == 3)
+		{
+			sprite->Initialize("endUI.png", rePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+		} else if (i == 4)
+		{
+			sprite->Initialize("titleControllerUI.png", { 0.0f,20.0f }, uiColor_, { 0,0 });
 		}
 
 		sprites_.push_back(std::move(sprite));
@@ -11706,26 +11863,6 @@ void GameOverScene::Update()
 	camera_->SetPosition(cameraPosition_);
 	camera_->SetRotate(cameraRotate_);
 
-	// rePos_とtoPos_を範囲で往復させる
-	{
-		static float timer = 0.0f;
-		const float speed = 2.0f; // 速さ
-		const float minX = 0.0f;
-		const float maxX = 30.0f;
-		const float mid = (minX + maxX) * 0.5f;
-		const float amp = (maxX - minX) * 0.5f;
-
-		timer += dt;
-		const float x1 = mid + amp * std::sinf(timer * speed);
-		const float x2 = mid + amp * std::sinf(timer * speed + 3.14159265358979f); // 逆位相
-
-		rePos_.x = x1;
-		toPos_.x = x2;
-	}
-	sprites_[1]->SetPosition(rePos_);
-	sprites_[2]->SetPosition(toPos_);
-
-
 	for (auto& sprite : sprites_)
 	{
 		sprite->Update();
@@ -11772,35 +11909,126 @@ void GameOverScene::Update()
 
 #endif // USE_IMGUI
 
-
-	if (!isTransitioning_ && 
-	   (IIEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) or
-	   (IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::A))))
+	// 選択中のスプライトだけ左右往復させる
 	{
-		// トランジション開始
-		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
-		isTransitioning_ = true;
-		transition_->Start([]
-			{
-				// シーン切り替え
-				IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
-			});
+		const float speed = 2.0f;
+		const float minX = 0.0f;
+		const float maxX = 30.0f;
+		const float mid = (minX + maxX) * 0.5f;
+		const float amp = (maxX - minX) * 0.5f;
+
+		// まず基準位置へ
+		rePos_ = reBasePos_;
+		toPos_ = toBasePos_;
+
+		// 選択中の方だけ timer を進め、offset を更新する
+		if (selectedIndex_ == 0) // Retry 選択中
+		{
+			retrySwayTimer_ += dt;
+			retrySwayOffsetX_ = mid + amp * std::sinf(retrySwayTimer_ * speed);
+
+		} else if (selectedIndex_ == 1) // Title 選択中
+		{
+			titleSwayTimer_ += dt;
+			titleSwayOffsetX_ = mid + amp * std::sinf(titleSwayTimer_ * speed);
+
+		}
+
+		// 位置へ反映t
+		rePos_.x += retrySwayOffsetX_;
+		toPos_.x += titleSwayOffsetX_;
+
+		sprites_[1]->SetPosition(rePos_);
+		sprites_[2]->SetPosition(toPos_);
+
+		Vector2 cursorPos = (selectedIndex_ == 0) ? rePos_ : toPos_;
+		if (selectedIndex_ == 1)
+		{
+			cursorPos.x += uiOffset_;
+		}
+		sprites_[3]->SetPosition(cursorPos);
+
+		// 透明度の上下
+		const float alphaSpeed = 4.0f;
+		time_ += dt;
+		uiColor_.w = 0.5f * (1.0f + std::sinf(time_ * alphaSpeed));
+
+		sprites_[4]->SetColor(uiColor_);
 	}
 
-	if(!isTransitioning_ && 
-	   (IIEngine::Input::GetInstance()->TriggerKey(DIK_R) or
-	   (IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::B))))
+	// !isTransitioning_ のときだけ受付
+	if (!isTransitioning_)
 	{
-		// トランジション開始
-		transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
-		isTransitioning_ = true;
-		transition_->Start([]
-			{
-				// シーン切り替え
-				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
-			});
+		auto* input = IIEngine::Input::GetInstance();
+
+		const int menuCount = 2; // Retry, Title
+
+		// パッドの左スティック左右
+		leftPadStick_ = false;
+		rightPadStick_ = false;
+
+		if (input->IsPadConnected())
+		{
+			const float threshold = 0.6f;
+			float x = input->GetLeftStick().x; // -1..1 想定
+
+			// 左
+			leftPadStick_ = (prevStickX_ >= -threshold && x < -threshold);
+			// 右
+			rightPadStick_ = (prevStickX_ <= threshold && x > threshold);
+
+			prevStickX_ = x;
+		} else
+		{
+			prevStickX_ = 0.0f;
+		}
+
+		// 左へ移動
+		if (input->TriggerKey(DIK_A) or input->TriggerKey(DIK_LEFT) or
+			(input->IsPadConnected() &&
+				(input->TriggerPadButton(ControllerButtonType::DPadLEFT) or leftPadStick_)))
+		{
+			selectedIndex_ = (selectedIndex_ - 1 + menuCount) % menuCount;
+		}
+
+		// 右へ移動
+		if (input->TriggerKey(DIK_D) or input->TriggerKey(DIK_RIGHT) or
+			(input->IsPadConnected() &&
+				(input->TriggerPadButton(ControllerButtonType::DPadRIGHT) or rightPadStick_)))
+		{
+			selectedIndex_ = (selectedIndex_ + 1) % menuCount;
+		}
+
+		// 決定
+		if (input->TriggerKey(DIK_RETURN) or input->TriggerKey(DIK_SPACE) or
+			(input->IsPadConnected() &&
+				input->PushPadButton(ControllerButtonType::A)))
+		{
+			selectedOption_ = (selectedIndex_ == 0) ? MenuOption::Retry : MenuOption::Title;
+		}
+
+		
+
+		// 選択確定したらトランジション開始
+		if (selectedOption_ != MenuOption::None)
+		{
+			transition_ = std::make_unique<IIEngine::BlockRiseTransition>();
+			isTransitioning_ = true;
+
+			const MenuOption decided = selectedOption_;
+			selectedOption_ = MenuOption::None;
+
+			transition_->Start([decided]
+				{
+					if (decided == MenuOption::Title)
+					{
+						IIEngine::SceneManager::GetInstance()->ChangeScene("TITLE");
+					} else // Retry
+					{
+						IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+					}
+				});
+		}
 	}
 
 }
@@ -11920,10 +12148,22 @@ private:
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 3;
+	uint32_t spriteNum_ = 5;
 
 	Vector2 rePos_ = { 0,620 };
 	Vector2 toPos_ = { 0,620 };
+
+	// スプライト用変数
+	float time_ = 0.0f;
+	float uiOffset_ = 760.0f;
+
+	Vector4 reColor_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 toColor_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 uiColor_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	// 選択中表示位置
+	Vector2 reBasePos_ = { 0,620 };
+	Vector2 toBasePos_ = { 0,620 };
 
 	// 遷移
 	std::unique_ptr<IIEngine::BlockRiseTransition> transition_ = nullptr;
@@ -11937,6 +12177,32 @@ private:
 
 	// エネミー
 	std::unique_ptr<EnemyManager> pEnemyManager_ = nullptr;
+
+	// 次のシーン選択肢
+	enum class MenuOption
+	{
+		None,
+		Retry,      // GAMEPLAY
+		Title       // TITLE
+	};
+
+	// Open直後の決定入力を無視する用
+	bool ignoreConfirm_ = false;
+	uint32_t selectedIndex_ = 0;     // 0: Retry, 1: Title
+	MenuOption selectedOption_ = MenuOption::None;
+
+	// スティック判定用
+	float prevStickX_ = 0.0f;
+	bool leftPadStick_ = false;
+	bool rightPadStick_ = false;
+
+	// 項目ごとのタイマー
+	float retrySwayTimer_ = 0.0f;
+	float titleSwayTimer_ = 0.0f;
+
+	// 最後に計算したオフセットを保持
+	float retrySwayOffsetX_ = 0.0f;
+	float titleSwayOffsetX_ = 0.0f;
 
 };
 
@@ -12012,24 +12278,18 @@ void GamePlayScene::Initialize()
 		}
 		if (i == 1)
 		{
-			sprite->Initialize("playSPACE.png", spacePos_, color_, { 0,0 });
+			sprite->Initialize("playEvading.png", spacePos_, color_, { 0,0 });
 		}
 		if (i == 2)
 		{
-			sprite->Initialize("playW.png", wPos_, color_, { 0,0 });
+			sprite->Initialize("playContorollerMove.png", wPos_, color_, { 0,0 });
 		}
 		if (i == 3)
 		{
-			sprite->Initialize("playA.png", aPos_, color_, { 0,0 });
+			sprite->Initialize("playContorollerAttack.png", aPos_, color_, { 0,0 });
 		}
-		if (i == 4)
-		{
-			sprite->Initialize("playS.png", sPos_, color_, { 0,0 });
-		}
-		if (i == 5)
-		{
-			sprite->Initialize("playD.png", dPos_, color_, { 0,0 });
-		}
+
+		
 
 		sprites_.push_back(std::move(sprite));
 	}
@@ -12350,9 +12610,9 @@ void GamePlayScene::Update()
 	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
 	{
-		// sprite の順序: space, W, A, S, D の 5 つを順番に動かす
+		// sprite の順序: 攻撃, 移動, 回避 の 3 つを順番に動かす
 		static float seqTimer = 0.0f;
-		constexpr int kCount = 5;
+		constexpr int kCount = 3;
 		const float slotDuration = 0.2f; // 各スロットの所要時間
 		const float totalDuration = slotDuration * kCount;
 
@@ -12372,17 +12632,13 @@ void GamePlayScene::Update()
 
 		spacePos_.y = calcY(0);
 		wPos_.y = calcY(1);
-		aPos_.y = calcY(2);
-		sPos_.y = calcY(3);
-		dPos_.y = calcY(4);
 
-		if (sprites_.size() >= 6)
+		if (sprites_.size() >= 4)
 		{
 			sprites_[1]->SetPosition({ spacePos_.x, spacePos_.y });
 			sprites_[2]->SetPosition({ wPos_.x, wPos_.y });
 			sprites_[3]->SetPosition({ aPos_.x, aPos_.y });
-			sprites_[4]->SetPosition({ sPos_.x, sPos_.y });
-			sprites_[5]->SetPosition({ dPos_.x, dPos_.y });
+
 		}
 	}
 
@@ -12745,11 +13001,11 @@ private:
 
 	// 2Dスプライト
 	std::vector<std::unique_ptr<IIEngine::Sprite>>sprites_ = {};
-	Vector4 color_ = { 0.0f,0.0f,0.0f,1.0f };
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	// 変更後の色(薄めの赤)
 	Vector4 usedColor_ = { 1.0f,0.5f,0.5f,1.0f };
 	// 描画するスプライトの数
-	uint32_t spriteNum_ = 6;
+	uint32_t spriteNum_ = 4;
 
 	Vector2 uiPos_ = { 0,520 };
 	Vector2 spacePos_ = { 0.0f,0.0f };
@@ -12804,9 +13060,9 @@ private:
 	Vector3 camStart_ = { 0.16f, 5.0f, 8.0f };
 	Vector3 camControl1_ = { 0.16f, 5.0f, -8.0f };
 	Vector3 camControl2_ = { 0.16f, 50.0f, -20.0f };
-	Vector3 camEnd_ = { 0.16f, 78.5f, -19.8f };
+	Vector3 camEnd_ = { 0.2f, 48.7f, -36.0f };
 	Vector3 camStartRot_ = { 0.0f, 0.0f, 0.0f };
-	Vector3 camEndRot_ = { 1.4f, 0.0f, 0.0f };
+	Vector3 camEndRot_ = { 0.95f, 0.0f, 0.0f };
 
 	// 死亡カメラ演出変数
 	bool isDeathCamera_ = false;
@@ -13234,7 +13490,7 @@ void TitleScene::Initialize()
 		}
 		if(i == 1)
 		{
-			sprite->Initialize("titleUI.png", { 0,0 }, color_, { 0,0 });
+			sprite->Initialize("titleControllerUI.png", { 0,0 }, color_, { 0,0 });
 		}
 
 		sprites_.push_back(std::move(sprite));
@@ -13594,7 +13850,7 @@ private:
 	float environmentStrength_ = 1.0f;
 
 
-	// パーティクル用変数
+	// スプライト用変数
 	float time_ = 0.0f;
 
 };
