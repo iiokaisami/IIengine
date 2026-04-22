@@ -412,6 +412,12 @@
     <ClCompile Include="gameEngine\io\Controller.cpp">
       <Filter>gameEngine\io</Filter>
     </ClCompile>
+    <ClCompile Include="application\objects\enemy\Guardian.cpp">
+      <Filter>application\objects\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\bullet\TrackingBullet.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPatternController.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\FanPattern.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -762,6 +768,13 @@
     <ClInclude Include="gameEngine\io\ComPtr.h">
       <Filter>gameEngine\io</Filter>
     </ClInclude>
+    <ClInclude Include="application\objects\enemy\Guardian.h">
+      <Filter>application\objects\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\bullet\TrackingBullet.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\IBulletPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPatternController.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\FanPattern.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
