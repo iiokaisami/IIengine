@@ -9719,7 +9719,8 @@ void Player::Attack()
 {
 	if (IIEngine::Input::GetInstance()->PushKey(DIK_SPACE) or
 		(IIEngine::Input::GetInstance()->IsPadConnected() &&
-		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::RT)))
+		(IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::RT) or
+		IIEngine::Input::GetInstance()->PushPadButton(ControllerButtonType::RB))))
 	{
 		if (shootCooldownSec_ <= 0.0f)
 		{
