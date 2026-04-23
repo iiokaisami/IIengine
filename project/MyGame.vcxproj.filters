@@ -415,7 +415,6 @@
     <ClCompile Include="application\objects\enemy\Guardian.cpp">
       <Filter>application\objects\enemy</Filter>
     </ClCompile>
-    <ClCompile Include="application\objects\enemy\bullet\TrackingBullet.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPatternController.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\FanPattern.cpp" />
   </ItemGroup>
@@ -771,7 +770,6 @@
     <ClInclude Include="application\objects\enemy\Guardian.h">
       <Filter>application\objects\enemy</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\bullet\TrackingBullet.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\IBulletPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPatternController.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\FanPattern.h" />

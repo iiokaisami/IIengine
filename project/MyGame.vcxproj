@@ -223,7 +223,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\TrackingBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -345,7 +344,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
     <ClInclude Include="gameEngine\io\InputData.h" />
     <ClInclude Include="application\objects\enemy\Guardian.h" />
-    <ClInclude Include="application\objects\enemy\bullet\TrackingBullet.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\IBulletPattern.h" />
   </ItemGroup>
   <ItemGroup>
