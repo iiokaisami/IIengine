@@ -3,9 +3,11 @@
 #include "../../baseObject/Character.h"
 #include "bullet/PlayerBullet.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
-
 #include "postEffect/PostEffectManager.h"
 
+#include "motion/PlayerDeathMotion.h"
+#include "motion/PlayerClearMotion.h"
+#include "motion/PlayerAutoMotion.h"
 
 #include "Quaternion.h"
 #include <Object3d.h>
@@ -52,10 +54,21 @@ public:
 	/// </summary>
 	void ClearSceneUpdate();
 
-private: // 内部処理
 
-	// 死亡演出更新
-	bool UpdateDeathMotion();
+	/// <summary>
+	/// 回転更新
+	/// </summary>
+	/// <param name="_toAngle">向きたい方向ベクトル</param>
+	void RotationUpdate(const Vector3& _toAngle);
+
+	// movement/combat最低限
+	const Vector3& GetMoveSpeed() const { return moveSpeed_; }
+	void SetVelocity(const Vector3& v) { moveVelocity_ = v; }
+
+	// 弾生成だけを担当する関数
+	void FireBulletForward();
+
+private: // 内部処理
 
 	// 操作更新
 	void UpdateControl();
@@ -75,15 +88,6 @@ private: // 内部処理
 	// 最も近い敵インジケーター更新
 	void UpdateNearEnemyIndicator();
 
-	// 死亡演出
-	void DeadEffect();
-
-	// オート移動
-	void AutoMove();
-
-	// オート攻撃
-	void AutoAttack();
-
 	// 移動制限
 	void ClampPosition();
 
@@ -102,11 +106,9 @@ private: // 内部処理
 	// ロックオン
 	void LockOn();
 
-	/// <summary>
-	/// 回転更新
-	/// </summary>
-	/// <param name="_toAngle">向きたい方向ベクトル</param>
-	void RotationUpdate(const Vector3& _toAngle);
+	// タイトルデモで死んでいるときに復活させる
+	void ReviveIfDeadInTitleDemo();
+
 
 private: // 衝突判定
 
@@ -134,10 +136,11 @@ public: // ゲッター
 	Vector3 GetVelocity() const { return moveVelocity_; }
 
 	// オートフラグのゲッター
-	bool IsAutoControl() const { return isAutoControl_; }
+	bool IsAutoControl() const { return autoMotion_.IsActive(); }
 
 	// 死亡演出がアクティブかどうか
-	bool IsDeathMotionComplete() const { return deathMotion_.isComplete; }
+	bool IsDeathMotionComplete() const { return deathMotion_.IsComplete(); }
+
 
 public: // セッター
 
@@ -151,7 +154,7 @@ public: // セッター
 	/// オートフラグのセッター
 	/// </summary>
 	/// <param name="_isAuto">オートフラグ</param>
-	void SetAutoControl(bool _isAuto) { isAutoControl_ = _isAuto; }
+	void SetAutoControl(bool _enable);
 
 	/// <summary>
 	/// 移動可能フラグのセッター
@@ -207,9 +210,6 @@ private:
 
 	// デフォルト位置
 	Vector3 defaultPosition_ = { 0.2f,0.7f,-1.2f };
-
-	// タイトル用オートフラグ(trueだったら自動で動く 入力は受け付けない)
-	bool isAutoControl_ = false;
 
 	// ヒットした瞬間のフラグ
 	bool isHitMoment_ = false;
@@ -334,66 +334,13 @@ private:
 	// バリア破壊フラグ
 	bool isBarrierBroken_ = false;
 
-	// デスモーション用構造体
-	struct Motion
-	{
-		bool isActive = false;
-		bool isComplete = false;
-		float timerSec = 0.0f;           
-		float shakeSec = 40.0f;                              // ぷるぷる継続フレーム数
-		// 振動パラメータ
-		float wobbleAmplitude = 0.10f;                       // 振幅
-		float wobbleFreqHz = 10.0f * kDefaultFrameRate;      // 周波数
-		// 保存しておく基底トランスフォーム
-		Vector3 startPosition = { 0.0f, 0.0f, 0.0f };
-		Vector3 startRotation = { 0.0f, 0.0f, 0.0f };
-		Vector3 startScale = { 1.0f, 1.0f, 1.0f };
-		// pop スケール（はじける最大値、ただし今回は瞬時消失でも可）
-		float popScale = 2.0f;
-	};
-
-	Motion deathMotion_;
-
-	// クリアシーン用構造体
-	struct ClearMotion
-	{
-		Vector3 center = { 0.0f, 0.0f, 0.0f };
-		float radius = 3.0f;
-		float angleSpeed = 1.5f;
-		float currentAngle = 0.0f;
-		float initialAngle = 0.0f;
-		bool clockwise = true;
-		Vector3 position;
-		Vector3 rotation;
-		Vector3 scale;
-	};
-
-	ClearMotion clearMotion_;
+	// 各動きの呼び出し
+	PlayerDeathMotion deathMotion_;
+	PlayerClearMotion clearMotion_;
+	PlayerAutoMotion  autoMotion_;
 	
 	// 回転の線形補間率
 	float turnLerpRate_ = 0.2f;
-
-	// オート攻撃の間隔
-	float autoAttackIntervalSec_ = 0.8f;
-
-	// クリアシーンの軌道パラメータ
-	Vector3 clearOrbitCenter_ = { 0.0f, 0.5f, 0.0f };
-	float clearOrbitRadius_ = 8.0f;
-	float clearOrbitAngularSpeed_ = 1.5f;
-	float clearOrbitInitialAngle_ = 0.2f;
-	bool clearOrbitClockwise_ = false;
-
-	float clearPoyoAmpX_ = 0.2f;
-	float clearPoyoAmpY_ = 0.2f;
-	float clearPoyoAmpZ_ = 0.2f;
-	float clearPoyoFreqXZ_ = 1.2f;
-	float clearPoyoFreqY_ = 1.2f;
-	bool clearMaintainArea_ = false;
-	bool clearMaintainVolume_ = false;
-	Vector3 clearBaseScale_ = { 1.0f, 1.0f, 1.0f };
-	float clearScaleMin_ = 0.05f;
-	float clearScaleMax_ = 5.0f;
-	int clearWalkParticleCount_ = 1;
 
 	// ダメージエフェクトのパラメータ
 	float rgbShiftAmplitude_ = 0.25f;
@@ -411,17 +358,5 @@ private:
 	int hitParticleCountNormal_ = 5;
 	int hitParticleCountHeavy_ = 8;
 	float explosionDamage_ = 1.5f;
-
-	// オート移動のパラメータ
-	float autoMoveMinX_ = -15.0f, autoMoveMaxX_ = 15.0f;
-	float autoMoveMinZ_ = -15.0f, autoMoveMaxZ_ = 15.0f;
-	float autoMoveDirChangeMinSec_ = 1.0f;
-	float autoMoveDirChangeMaxSec_ = 2.5f;
-	float autoMoveMinDirLen_ = 0.1f;
-
-	// オート攻撃のパラメータ
-	float clearTotalTime_ = 0.0f;
-	float clearCurrentAngle_ = 0.2f;
-	float clearLastYaw_ = 0.0f;
 
 };

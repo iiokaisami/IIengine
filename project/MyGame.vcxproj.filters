@@ -412,6 +412,9 @@
     <ClCompile Include="gameEngine\io\Controller.cpp">
       <Filter>gameEngine\io</Filter>
     </ClCompile>
+    <ClCompile Include="application\objects\player\motion\PlayerDeathMotion.cpp" />
+    <ClCompile Include="application\objects\player\motion\PlayerClearMotion.cpp" />
+    <ClCompile Include="application\objects\player\motion\PlayerAutoMotion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -762,6 +765,10 @@
     <ClInclude Include="gameEngine\io\ComPtr.h">
       <Filter>gameEngine\io</Filter>
     </ClInclude>
+    <ClInclude Include="application\objects\player\motion\IPlayerMotion.h" />
+    <ClInclude Include="application\objects\player\motion\PlayerDeathMotion.h" />
+    <ClInclude Include="application\objects\player\motion\PlayerClearMotion.h" />
+    <ClInclude Include="application\objects\player\motion\PlayerAutoMotion.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

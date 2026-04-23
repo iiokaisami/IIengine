@@ -17,9 +17,6 @@ void Player::Initialize()
 	// ライト設定
 	object_->SetLighting(true);
 
-	// ステータス
-	isAutoControl_ = false;
-
 	// 使用枚数
 	spriteNum_ = 3;
 
@@ -70,15 +67,6 @@ void Player::Initialize()
 	evadeRemainingSec_ = 0.0f;
 	evadeCooldownSec_ = 0.0f;
 
-	// 死亡モーション初期値
-	deathMotion_.isActive = false;
-	deathMotion_.isComplete = false;
-	deathMotion_.timerSec = 0.0f;
-	deathMotion_.shakeSec = 40.0f / kDefaultFrameRate;
-	deathMotion_.wobbleAmplitude = 0.10f;
-	deathMotion_.wobbleFreqHz = 10.0f * kDefaultFrameRate;
-	deathMotion_.popScale = 2.0f;
-
 	// フレームレート補正
 	moveSpeed_.x *= kDefaultFrameRate;
 	moveSpeed_.z *= kDefaultFrameRate;
@@ -93,6 +81,11 @@ void Player::Initialize()
 
 	// バリア破壊フラグ
 	isBarrierBroken_ = false;
+
+	// Motion 初期化
+	deathMotion_.Reset();
+	clearMotion_.Reset();
+	autoMotion_.Reset();
 }
 
 void Player::Finalize()
@@ -117,14 +110,27 @@ void Player::Finalize()
 
 void Player::Update()
 {
-	// 死亡モーションがアクティブなら移動入力等を無視して DeadEffect を更新
-	UpdateDeathMotion();
+	if (deathMotion_.IsActive())
+	{
+		deathMotion_.Update(*this);
+
+		Character::Update();
+		return;
+	}
 
 	// 基底更新
 	Character::Update();
 
 	// 操作更新
-	UpdateControl();
+	if (autoMotion_.IsActive())
+	{
+		autoMotion_.Update(*this);
+		ReviveIfDeadInTitleDemo();
+	}
+	else
+	{
+		UpdateControl();
+	}
 
 	// 死亡したらy軸回転を徐々に0に&ノイズ解除
 	if (isDead_)
@@ -309,9 +315,6 @@ void Player::Move()
 
 	// 位置更新
 	position_ += moveVelocity_ * dt;
-
-	// 移動制限
-	//ClampPosition();
 }
 
 void Player::Attack()
@@ -322,28 +325,28 @@ void Player::Attack()
 	{
 		if (shootCooldownSec_ <= 0.0f)
 		{
-			// プレイヤーの向きに合わせて弾の速度を変更
-			Vector3 bulletVelocity =
-			{
-				std::cosf(rotation_.x) * std::sinf(rotation_.y),     // x
-				std::sinf(-rotation_.x),                             // y
-				std::cosf(rotation_.x) * std::cosf(rotation_.y)      // z
-			};
-
-			// 弾を生成し、初期化
-			auto newBullet = std::make_unique<PlayerBullet>();
-
-			newBullet->SetPosition(position_);
-			newBullet->Initialize();
-			newBullet->SetVelocity(bulletVelocity);
-
-			// 弾を登録する
-			pBullets_.push_back(std::move(newBullet));
+			FireBulletForward();
 
 			// クールタイムをリセット
 			shootCooldownSec_ = kShootCoolDownSec_;
 		}
 	}
+}
+
+void Player::FireBulletForward()
+{
+	Vector3 bulletVelocity =
+	{
+		std::cosf(rotation_.x) * std::sinf(rotation_.y),
+		std::sinf(-rotation_.x),
+		std::cosf(rotation_.x) * std::cosf(rotation_.y)
+	};
+
+	auto newBullet = std::make_unique<PlayerBullet>();
+	newBullet->SetPosition(position_);
+	newBullet->Initialize();
+	newBullet->SetVelocity(bulletVelocity);
+	pBullets_.push_back(std::move(newBullet));
 }
 
 void Player::Evade()
@@ -389,9 +392,6 @@ void Player::Evade()
 	{
 		// 回避移動
 		position_ += evadeDirection_ * Vector3{ evadeSpeed_.x, 0.0f, evadeSpeed_.z } *dt;
-
-		// 移動制限
-		//ClampPosition();
 
 		// 回避中の回転
 		float t = 1.0f - (evadeRemainingSec_ / kEvadeDurationSec_);
@@ -483,273 +483,41 @@ void Player::UpdateNearEnemyIndicator()
 
 }
 
-void Player::DeadEffect()
-{
-	if (!deathMotion_.isActive)
-	{
-		return;
-	}
-
-	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
-
-	
-	// ぷるぷるフェーズ
-	if (deathMotion_.timerSec < deathMotion_.shakeSec)
-	{
-		// 正規化 t [0,1]
-		float t = deathMotion_.timerSec / deathMotion_.shakeSec;
-		t = std::clamp(t, 0.0f, 1.0f);
-
-		// 減衰
-		float decay = 1.0f - t;
-
-		// 秒ベース角度（Hz）
-		float angular = deathMotion_.timerSec * deathMotion_.wobbleFreqHz * (2.0f * 3.14159265f);
-		float wobble = std::sin(angular) * deathMotion_.wobbleAmplitude * decay;
-
-		// 基準スケールに wobble を加算
-		float baseSx = deathMotion_.startScale.x;
-		float s = baseSx + wobble;
-		if (s < 0.001f)
-		{
-			s = 0.001f; // 負スケール防止
-		}
-		scale_.x = s;
-		scale_.y = s;
-		scale_.z = s;
-
-		// ちょっと上下に揺らす
-		position_ = deathMotion_.startPosition;
-		position_.y += std::sin(angular) * 0.01f * decay;
-
-		// 軽く回す
-		rotation_ = deathMotion_.startRotation;
-		rotation_.y += 0.04f * decay;
-
-		// 反映
-		if (object_)
-		{
-			SyncObjectTransform();
-		}
-
-		deathMotion_.timerSec += dt;
-		return;
-	}
-
-	// 最後は大きさ0にする
-	scale_.x = 0.0f;
-	scale_.y = 0.0f;
-	scale_.z = 0.0f;
-
-	if (object_)
-	{
-		SyncObjectTransform();
-	}
-
-	// パーティクルを発生させる
-	IIEngine::ParticleEmitter::Emit("rupture", position_, 20);
-
-	// モーション終了扱いにする
-	deathMotion_.isActive = false;
-	deathMotion_.isComplete = true;
-}
-
 void Player::StartDeathMotion()
 {
-	if (deathMotion_.isActive)
-	{
-		return;
-	}
-	// モーション開始
-	deathMotion_.isActive = true;
-	deathMotion_.timerSec = 0.0f;
-	// 基準トランスフォームを保存
-	deathMotion_.startPosition = position_;
-	deathMotion_.startRotation = rotation_;
-	deathMotion_.startScale = scale_;
-
-	if (object_)
-	{
-		SyncObjectTransform();
-	}
+	deathMotion_.Start(*this);
 }
 
 void Player::ClearSceneUpdate()
 {
-	isCanMove_ = false;
-
-	// delta
-	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
-
-	constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
-
-	// 調整用パラメータ
-	static Vector3 center{ 0.0f, 0.5f, 0.0f }; // 軌道中心（高さ = center.y）
-	static float radius = 8.0f;              // 軌道半径
-	static float angularSpeed = 1.5f;        // 角速度 (rad/s)
-	static float currentAngle = 0.2f;        // 現在角度（初期オフセット含む）
-	static bool clockwise = false;           // 回転方向
-
-	// パラメータ
-	static float poyoAmp = 0.2f;
-	static float poyoAmpZ = 0.2f;
-	static float poyoAmpY = 0.2f;
-	static float poyoFreq = 1.2f;
-	static float poyoFreqY = 1.2f;
-	static float poyoPhase = 0.0f;
-	static float poyoPhaseY = 0.0f;
-	static bool maintainArea = false;
-	static bool maintainVolume = false;
-	static Vector3 baseScale{ 1.0f, 1.0f, 1.0f };
-
-	static float totalTime = 0.0f;
-	totalTime += dt;
-
-	// 角度更新
-	float dir = clockwise ? -1.0f : 1.0f;
-	currentAngle += dir * angularSpeed * dt;
-	// 角度を安定化
-	if (currentAngle > TWO_PI) currentAngle = std::fmod(currentAngle, TWO_PI);
-	else if (currentAngle < 0.0f) currentAngle = std::fmod(currentAngle + TWO_PI, TWO_PI);
-
-	// 位置
-	clearMotion_.position.x = center.x + radius * std::cos(currentAngle);
-	clearMotion_.position.y = center.y;
-	clearMotion_.position.z = center.z + radius * std::sin(currentAngle);
-
-	// 進行方向に向ける円運動の速度ベクトル
-	float velX = -radius * std::sin(currentAngle) * (dir * angularSpeed);
-	float velZ = radius * std::cos(currentAngle) * (dir * angularSpeed);
-	// 小さな速度では直前の向きを保つためのガード
-	static float lastYaw = 0.0f;
-	if (std::abs(velX) < 1e-6f && std::abs(velZ) < 1e-6f)
+	if (!clearMotion_.IsActive()) 
 	{
-		// 速度がほぼ0なら角度は更新しない
-	} else
-	{
-		// atan2(x,z) を使って yaw を得る
-		lastYaw = std::atan2(velX, velZ);
+		clearMotion_.Start(*this);
 	}
-	clearMotion_.rotation.x = 0.0f;
-	clearMotion_.rotation.y = lastYaw;
-	clearMotion_.rotation.z = 0.0f;
-
-	// スケール
-	float omegaXZ = 2.0f * 3.14159265358979323846f * poyoFreq;
-	float sXZ = std::sin(omegaXZ * totalTime + poyoPhase);
-	float sx = 1.0f + poyoAmp * sXZ;
-	sx = std::max(0.05f, sx); // 極端に潰れないようにクランプ
-
-	float sz;
-	if (maintainArea)
-	{
-		// 面積維持
-		sz = 1.0f / sx;
-		sz = std::clamp(sz, 0.05f, 5.0f);
-	} else
-	{
-		sz = 1.0f + poyoAmpZ * std::sin(omegaXZ * totalTime + poyoPhase + 3.14159265f / 2.0f);
-		sz = std::clamp(sz, 0.05f, 5.0f);
-	}
-
-	// Y方向
-	float sy; // 実スケール
-	if (maintainVolume)
-	{
-
-		float sx_rel = std::max(0.01f, sx);
-		float sz_rel = std::max(0.01f, sz);
-		float sy_rel = 1.0f / (sx_rel * sz_rel);
-		sy_rel = std::clamp(sy_rel, 0.05f, 5.0f);
-		sy = baseScale.y * sy_rel;
-	} else
-	{
-		// Yは独立して振動させる
-		float omegaY = 2.0f * 3.14159265358979323846f * poyoFreqY;
-		float sY = std::sin(omegaY * totalTime + poyoPhaseY);
-		float sy_rel = 1.0f + poyoAmpY * sY;
-		sy_rel = std::clamp(sy_rel, 0.05f, 5.0f);
-		sy = baseScale.y * sy_rel;
-	}
-
-	// baseScale を乗算して最終スケールを出す
-	clearMotion_.scale.x = baseScale.x * sx; // 横方向
-	clearMotion_.scale.y = sy;               // 高さも変化させる
-	clearMotion_.scale.z = baseScale.z * sz; // 縦方向
-
-	position_ = clearMotion_.position;
-	rotation_ = clearMotion_.rotation;
-	scale_ = clearMotion_.scale;
-
-	SyncObjectTransform();
-
-	// パーティクル
-	IIEngine::ParticleEmitter::Emit("walk", clearMotion_.position, 1);
-
-}
-
-bool Player::UpdateDeathMotion()
-{
-	// 死亡モーションがアクティブなら更新
-	if (deathMotion_.isActive)
-	{
-		DeadEffect();
-
-	    // スキャンラインをoffに
-        PostEffectManager::GetInstance()->GetPassAs<ScanlinePass>("Scanline")->SetActive(false);
-	    // ChromaticPulseをoffに
-		PostEffectManager::GetInstance()->GetPassAs<ChromaticPulsePass>("ChromaticPulse")->SetActive(false);
-
-		return true;
-	}
-
-	return false;
+	clearMotion_.Update(*this);
 }
 
 void Player::UpdateControl()
 {
-	if (isAutoControl_)
+	if (!isCanMove_)
 	{
-		// オート移動
-		AutoMove();
-		// オート攻撃
-		AutoAttack();
-
-		isActive_ = false;
-
-		if (isDead_)
-		{
-			isDead_ = false;
-
-			hp_ = 8;
-		}
-
+		return;
 	}
-	else if (isCanMove_)
+
+	// 回避処理
+	Evade();
+
+	// アクティブフラグに回避フラグを入れる
+	isActive_ = isEvading_;
+
+	// ロックオン処理
+	LockOn();
+
+	// 回避中は移動・攻撃を無効化
+	if (!isEvading_ && !isDead_)
 	{
-		// 回避処理
-		Evade();
-		// アクティブフラグに回避フラグを入れる
-		isActive_ = isEvading_;
-
-		// ロックオン処理
-		LockOn();
-
-		// 回避中は移動・攻撃を無効化
-		if (!isEvading_ && !isDead_)
-		{
-			Move();
-			Attack();
-		}
-	}
-	else
-	{
-		if (isDead_)
-		{
-			isDead_ = false;
-
-			hp_ = 8;
-		}
+		Move();
+		Attack();
 	}
 }
 
@@ -770,109 +538,6 @@ void Player::UpdateStatus()
 	{
 		evadeCooldownSec_ -= dt;
 		if (evadeCooldownSec_ < 0.0f) evadeCooldownSec_ = 0.0f;
-	}
-}
-
-void Player::AutoMove()
-{
-	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
-
-	static float moveTimer = 0.0f;  // moveTimerを float型に変更
-	static Vector3 autoDir = { 0.0f, 0.0f, 1.0f }; // 初期は前進
-
-	// フィールド端の範囲
-	const float minX = -15.0f, maxX = 15.0f;
-	const float minZ = -15.0f, maxZ = 15.0f;
-
-	// moveTimerが0以下になったら新しいランダム方向を決める
-	if (moveTimer <= 0.0f)
-	{
-		// -1.0f～1.0fの範囲でランダムなx,zを生成
-		float randX = (float(rand()) / RAND_MAX) * 2.0f - 1.0f;
-		float randZ = (float(rand()) / RAND_MAX) * 2.0f - 1.0f;
-		Vector3 dir = { randX, 0.0f, randZ };
-		if (dir.Length() < 0.1f) dir.z = 1.0f; // ゼロベクトル対策
-		autoDir = dir.Normalize();
-
-		// moveTimerに次の方向転換までの時間（秒）をランダムで設定
-		moveTimer = 1.0f + static_cast<float>(rand() % 150) / 60.0f; // 1秒〜2.5秒
-	}
-	moveTimer -= dt;  // タイマーを減算（秒単位）
-
-	// 端に近づいたら強制的に内向きにリダイレクト
-	bool redirected = false;
-	Vector3 nextPos = position_ + Vector3{ autoDir.x * moveSpeed_.x, 0.0f, autoDir.z * moveSpeed_.z };
-
-	if (nextPos.x < minX or nextPos.x > maxX)
-	{
-		autoDir.x = -autoDir.x;
-		redirected = true;
-	}
-	if (nextPos.z < minZ or nextPos.z > maxZ)
-	{
-		autoDir.z = -autoDir.z;
-		redirected = true;
-	}
-
-	if (redirected)
-	{
-		// 端で方向反転したら新たに moveTimerを設定し、即座に再ランダム化しない
-		moveTimer = 1.0f + static_cast<float>(rand() % 150) / 60.0f; // 1秒〜2.5秒
-	}
-
-	// 移動速度を計算
-	moveVelocity_ = { autoDir.x * moveSpeed_.x, 0.0f, autoDir.z * moveSpeed_.z };
-
-	// プレイヤーの向き補間
-	if (moveVelocity_.x != 0.0f or moveVelocity_.z != 0.0f)
-	{
-		Vector3 normalizedDir = moveVelocity_.Normalize();
-		RotationUpdate(normalizedDir);
-	}
-
-	// 位置更新
-	position_ += moveVelocity_ * dt;
-
-	// 移動制限
-	ClampPosition();
-
-	// パーティクル
-	IIEngine::ParticleEmitter::Emit("walk", position_, 1);
-}
-
-void Player::AutoAttack()
-{
-	// デルタタイムを取得
-	const float dt = IIEngine::TimeManager::Instance().GetUnscaledDeltaTime();
-
-	// 一定間隔で自動攻撃
-	static float attackCooldown = 0.0f;
-
-	if (attackCooldown <= 0.0f)
-	{
-		// プレイヤーの向きに合わせて弾の速度を変更
-		Vector3 bulletVelocity =
-		{
-			std::cosf(rotation_.x) * std::sinf(rotation_.y),     // x
-			std::sinf(-rotation_.x),                             // y
-			std::cosf(rotation_.x) * std::cosf(rotation_.y)      // z
-		};
-		// 弾を生成し、初期化
-		auto newBullet = std::make_unique<PlayerBullet>();
-		newBullet->SetPosition(position_);
-		newBullet->Initialize();
-		newBullet->SetVelocity(bulletVelocity);
-
-		// 弾を登録する
-		pBullets_.push_back(std::move(newBullet));
-
-		// クールダウンをリセット
-		attackCooldown = autoAttackIntervalSec_;
-	} 
-	else
-	{
-		// クールダウンタイマーを減算
-		attackCooldown -= dt;
 	}
 }
 
@@ -980,7 +645,7 @@ void Player::EvadeComboInversion()
 
 void Player::HPDecreaseNoise()
 {
-	if (!isAutoControl_ && !isDead_ && isNoiseActive_)
+	if (!autoMotion_.IsActive() && !isDead_ && isNoiseActive_)
 	{
 		float hpRate = hp_ / maxHP_;
 		const float dangerThreshold = hpDangerThreshold_;
@@ -1127,6 +792,26 @@ void Player::LockOn()
 
 }
 
+void Player::ReviveIfDeadInTitleDemo()
+{
+	// タイトルデモ中のみ呼ばれる想定
+	if (!isDead_)
+	{
+		return;
+	}
+
+	isDead_ = false;
+	hp_ = 8.0f;
+
+	// 死亡演出が走っていたら止める
+	deathMotion_.Reset();
+
+	// ロックオン状態が残ると向きがズレるので解除
+	isLockOn_ = false;
+	lockOnChargeTimerSec_ = 0.0f;
+	preTargetPos_ = { 0.0f,0.0f,0.0f };
+}
+
 void Player::RotationUpdate(const Vector3& _toAngle)
 {
 	// ターゲットの方向に向ける
@@ -1219,7 +904,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			{
 				hp_ -= explosionDamage_;
 				IIEngine::ParticleEmitter::Emit("HitReaction", position_, hitParticleCountHeavy_);
-			} else
+			} 
+			else
 			{
 				isDead_ = true;
 			}
@@ -1348,5 +1034,19 @@ void Player::HitVignetteTrap()
 
 			vignetteRemainingSec_ = kMaxVignetteSec_;
 		}
+	}
+}
+
+void Player::SetAutoControl(bool _enable)
+{
+	if (_enable)
+	{
+		autoMotion_.Start(*this);
+	} 
+	else
+	{
+		autoMotion_.Reset();
+		// 手動に戻すなら移動許可を戻す
+		isCanMove_ = true;
 	}
 }
