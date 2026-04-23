@@ -9,15 +9,21 @@ class Player;
 class PlayerDeathMotion final : public IPlayerMotion
 {
 public:
-    void Start(Player& pPlayer) override;
-    bool Update(Player& pPlayer) override;
 
+	// 演出開始
+    void Start(Player& pPlayer) override;
+	// 毎フレーム更新。完了したら true を返す
+    bool Update(Player& pPlayer) override;
+    
+	// 状態のゲッター
     bool IsActive() const override { return motion_.isActive; }
+	// 完了のゲッター
     bool IsComplete() const override { return motion_.isComplete; }
+	// 再利用したい場合に備えて
     void Reset() override;
 
 private:
-
+	// 死亡エフェクト
     void DeadEffect(Player& player);
 
 private:

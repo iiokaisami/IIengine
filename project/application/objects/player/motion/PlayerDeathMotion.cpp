@@ -16,6 +16,7 @@ void PlayerDeathMotion::Start(Player& pPlayer)
 {
     if (motion_.isActive) return;
 
+	// 死亡モーション開始
     motion_.isActive = true;
     motion_.isComplete = false;
     motion_.timerSec = 0.0f;
@@ -36,7 +37,7 @@ void PlayerDeathMotion::Start(Player& pPlayer)
 bool PlayerDeathMotion::Update(Player& pPlayer)
 {
     if (!motion_.isActive) return false;
-
+   
     DeadEffect(pPlayer);
     return motion_.isComplete;
 }
@@ -48,17 +49,21 @@ void PlayerDeathMotion::DeadEffect(Player& pPlayer)
     // ぷるぷるフェーズ
     if (motion_.timerSec < motion_.shakeSec) 
     {
+		// 時間経過に応じて減衰するぷるぷるを加える
         float t = motion_.timerSec / motion_.shakeSec;
         t = std::clamp(t, 0.0f, 1.0f);
 
         float decay = 1.0f - t;
 
+		// 角度を計算してぷるぷるを加える
         float angular = motion_.timerSec * motion_.wobbleFreqHz * (2.0f * 3.14159265f);
         float wobble = std::sin(angular) * motion_.wobbleAmplitude * decay;
 
+		// スケールも時間経過に応じて減衰するぷるぷるを加える
         float baseS = motion_.startScale.x;
         float s = std::max(0.001f, baseS + wobble);
 
+		// 位置、回転、スケールを更新
         scale_.x = s;
         scale_.y = s;
         scale_.z = s;

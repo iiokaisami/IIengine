@@ -8,6 +8,7 @@
 #include "motion/PlayerDeathMotion.h"
 #include "motion/PlayerClearMotion.h"
 #include "motion/PlayerAutoMotion.h"
+#include "PlayerEffects.h"
 
 #include "Quaternion.h"
 #include <Object3d.h>
@@ -91,17 +92,8 @@ private: // 内部処理
 	// 移動制限
 	void ClampPosition();
 
-	// 回避スロー
-	void EvadeSlow();
-
-	// ダメージRGBShit
-	void DamageRGBShift();
-
 	// 回避コンボエフェクト
 	void EvadeComboInversion();
-
-	// HP減少ノイズ
-	void HPDecreaseNoise();
 
 	// ロックオン
 	void LockOn();
@@ -124,9 +116,6 @@ private: // 衝突判定
 	/// <param name="_other">衝突相手のコライダー</param>
 	void OnCollision(const IIEngine::Collider* _other)override;
 
-	// 暗闇トラップに衝突したときの処理
-	void HitVignetteTrap();
-
 public: // ゲッター
 
 	// ヒットした瞬間のフラグのゲッター
@@ -141,6 +130,8 @@ public: // ゲッター
 	// 死亡演出がアクティブかどうか
 	bool IsDeathMotionComplete() const { return deathMotion_.IsComplete(); }
 
+	// 最大HPのゲッター
+	float GetMaxHP() const { return maxHP_; }
 
 public: // セッター
 
@@ -178,7 +169,7 @@ public: // セッター
 	/// ノイズをアクティブにするかのセッター
 	/// </summary>
 	/// <param name="_isNoiseActive">ノイズをアクティブにするかのフラグ</param>
-	void SetIsNoiseActive(bool _isNoiseActive) { isNoiseActive_ = _isNoiseActive; }
+	void SetIsNoiseActive(bool _isNoiseActive) { effects_.SetNoiseEnabled(_isNoiseActive); }
 
 	/// <summary>
 	/// バリアが破壊されているかのフラグのセッター
@@ -216,18 +207,6 @@ private:
 
 	// ゴールに触れたかのフラグ
 	bool isTouchGoal_ = false;
-
-	// 暗闇トラップに当たったかどうか
-	bool isHitVignetteTrap_ = false;
-	// 暗闇を徐々に戻すフラグ
-	bool isFadingOut_ = false;
-	// 暗闇効果最大時間
-	static constexpr float kMaxVignetteSec_ = (60.0f * 3.0f) / kDefaultFrameRate;
-	// 暗闇タイマー
-	float vignetteRemainingSec_ = kMaxVignetteSec_;
-	// vignetteの強さ
-	float vignetteStrength_ = 0.0f;
-
 
 	// 回避フラグ
 	bool isEvading_ = false;
@@ -279,32 +258,6 @@ private:
 	Vector2 limitMax_ = { 40.0f, 30.0f };
 	Vector2 limitMin_ = { -40.0f, -30.0f };
 
-	// スローフラグ
-	bool isSlowMotion_ = false;
-	// Maxスロータイマー
-	const float kSlowDurationSec_ = 2.45f;
-	// 完全停止時間
-	const float kSlowHoldTime_ = 0.18f;
-	// 復帰時間
-	const float kSlowRecoverTime_ = 0.15f;
-	// スロータイマー
-	float slowTimerSec_ = kSlowHoldTime_ + kSlowRecoverTime_;
-	// スローの強さ
-	float slowDuration_ = 0.4f;
-	// ブラーの強さ
-	float radialStrength_ = 0.0f;
-
-	// RGBShiftタイマー
-	float rgbShiftTimer_ = 0.0f;
-	// RGBShift持続時間
-	float rgbShiftDuration_ = 0.35f;
-	// RGBShiftがアクティブかどうか
-	bool  isRGBShiftActive_ = false;
-
-	// ノイズの強さ
-	float finalStrength_ = 0.0f;
-	// ノイズの処理を施すかのフラグ
-	bool isNoiseActive_ = false;
 
 	// ロックオンの有無
 	bool isLockOn_ = false;
@@ -339,19 +292,11 @@ private:
 	PlayerClearMotion clearMotion_;
 	PlayerAutoMotion  autoMotion_;
 	
+	// 各種エフェクト
+	PlayerEffects effects_;
+
 	// 回転の線形補間率
 	float turnLerpRate_ = 0.2f;
-
-	// ダメージエフェクトのパラメータ
-	float rgbShiftAmplitude_ = 0.25f;
-	float rgbShiftOscillation_ = 40.0f;
-	float rgbShiftDamping_ = 8.0f;
-
-	float hpDangerThreshold_ = 0.3f;
-	float hpNoisePow_ = 2.5f;
-	float hpNoisePulseFreq_ = 12.0f;
-	float hpNoisePulseAmp_ = 0.15f;
-	float hpNoiseBaseGain_ = 2.5f;
 
 	// 死亡演出のパラメータ
 	float deathHpThreshold_ = 0.3f;

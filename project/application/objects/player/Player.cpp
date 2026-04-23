@@ -59,9 +59,6 @@ void Player::Initialize()
 	// 移動可能フラグ
 	isCanMove_ = true;
 
-	// 暗闇タイマー
-	vignetteRemainingSec_ = kMaxVignetteSec_;
-
 	// クールダウン
 	shootCooldownSec_ = 0.0f;
 	evadeRemainingSec_ = 0.0f;
@@ -76,8 +73,8 @@ void Player::Initialize()
 	// RGBShit
 	PostEffectManager::GetInstance()->SetActiveEffect("RGBShift", true);
 
-	// ノイズ
-	isNoiseActive_ = true;
+	// エフェクト初期化
+	effects_.Initialize();
 
 	// バリア破壊フラグ
 	isBarrierBroken_ = false;
@@ -132,14 +129,11 @@ void Player::Update()
 		UpdateControl();
 	}
 
-	// 死亡したらy軸回転を徐々に0に&ノイズ解除
+	// 死亡したらy軸回転を徐々に0に
 	if (isDead_)
 	{
 		rotation_.y = Lerp(rotation_.y, 0.0f, 0.05f);
-		// ノイズを徐々に0にする
-		finalStrength_ = Lerp(finalStrength_, 0.0f, 0.02f);
-		PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise")->SetIntensity(finalStrength_);
-
+		
 	}
 
 	// 弾の削除
@@ -155,26 +149,17 @@ void Player::Update()
 	}
 
 
-	// 暗闇処理
-	HitVignetteTrap();
-
 	// ステータス更新
 	UpdateStatus();
 
 	// 最も近い敵インジケーター更新
 	UpdateNearEnemyIndicator();
 
-	// スロー
-	EvadeSlow();
-
-	// RGBシフト
-	DamageRGBShift();
-
 	// 回避コンボ
 	EvadeComboInversion();
 
-	// HP減少ノイズ
-	HPDecreaseNoise();
+	effects_.Update(*this);
+
 }
 
 void Player::Draw()
@@ -547,79 +532,6 @@ void Player::ClampPosition()
 	position_.z = std::clamp(position_.z, limitMin_.y, limitMax_.y);
 }
 
-void Player::EvadeSlow()
-{
-	// 回避中のスローモーション
-	if (isSlowMotion_)
-	{
-		slowTimerSec_ -= TimeManager::Instance().GetUnscaledDeltaTime();
-
-		if (slowTimerSec_ > kSlowRecoverTime_)
-		{
-			// 固定スロー区間
-			TimeManager::Instance().SetTimeScale(0.1f);
-			radialStrength_ = 0.4f;
-		} 
-		else
-		{
-			// 復帰区間
-			float t = 1.0f - (slowTimerSec_ / kSlowRecoverTime_);
-			t = std::clamp(t, 0.0f, 1.0f);
-
-			float timeScale = std::lerp(0.1f, 1.0f, t);
-			TimeManager::Instance().SetTimeScale(timeScale);
-
-			radialStrength_ = std::lerp(0.8f, 0.0f, t);
-		}
-
-		// RadialBlurPassを取得
-		auto* radial = PostEffectManager::GetInstance()->GetPassAs<RadialBlurPass>("RadialBlur");
-		radial->SetStrength(radialStrength_);
-
-		if (slowTimerSec_ <= 0.0f)
-		{
-			isSlowMotion_ = false;
-			TimeManager::Instance().SetTimeScale(1.0f);
-			// ブラー解除
-			radial->SetStrength(0.0f);
-			PostEffectManager::GetInstance()->SetActiveEffect("RadialBlur", false);
-
-		}
-	}
-
-}
-
-void Player::DamageRGBShift()
-{
-	// delta
-	const float dt = TimeManager::Instance().GetDeltaTime();
-	
-	// RGBシフトエフェクトの更新
-	if (isRGBShiftActive_)
-	{
-		rgbShiftTimer_ += dt;
-
-		// 一定時間が経過したらエフェクトを無効化
-		if (rgbShiftTimer_ >= rgbShiftDuration_)
-		{
-			isRGBShiftActive_ = false;
-			rgbShiftTimer_ = 0.0f;
-		}
-
-		float t = rgbShiftTimer_;
-		float power = 0.0f;
-
-		// 大きければ強度も大きくなる
-		float amplitude = rgbShiftAmplitude_;
-		power = amplitude * abs(sin(t * rgbShiftOscillation_)) * exp(-t * rgbShiftDamping_);
-
-
-		// Powerをエフェクトに反映
-		PostEffectManager::GetInstance()->GetPassAs<RGBShiftPass>("RGBShift")->SetIntensity(power);
-	}
-
-}
-
 void Player::EvadeComboInversion()
 {
 	if (isEvading_)
@@ -641,49 +553,6 @@ void Player::EvadeComboInversion()
 
 	// 一度発動したらリセット
 	isEvadeComboActive_ = false;
-}
-
-void Player::HPDecreaseNoise()
-{
-	if (!autoMotion_.IsActive() && !isDead_ && isNoiseActive_)
-	{
-		float hpRate = hp_ / maxHP_;
-		const float dangerThreshold = hpDangerThreshold_;
-
-		auto* noise = PostEffectManager::GetInstance()->GetPassAs<NoisePass>("Noise");
-
-		// ゴールに触れたらノイズ下げる
-		if (isTouchGoal_)
-		{
-			// 強度を徐々に下げる
-			finalStrength_ = Lerp(finalStrength_, 0.0f, 0.02f);
-			noise->SetIntensity(finalStrength_);
-
-		}
-		else if (hpRate < dangerThreshold)
-		{
-			float t = 1.0f - (hpRate / dangerThreshold);
-			t = std::clamp(t, 0.0f, 1.0f);
-
-			// 強めイージング
-			float eased = powf(t, hpNoisePow_);
-
-			// 不安定揺らぎ
-			float time = TimeManager::Instance().GetTotalTime();
-			float pulse = sinf(time * hpNoisePulseFreq_) * hpNoisePulseAmp_;
-
-			// ベース強度アップ
-		    finalStrength_ = eased * hpNoiseBaseGain_ + pulse;
-			finalStrength_ = std::clamp(finalStrength_, 0.0f, 1.0f);
-
-			PostEffectManager::GetInstance()->SetActiveEffect("Noise", true);
-			noise->SetIntensity(finalStrength_);
-		} 
-		else
-		{
-			PostEffectManager::GetInstance()->SetActiveEffect("Noise", false);
-		}
-	}
 }
 
 void Player::LockOn()
@@ -858,8 +727,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			}
 
 			// スローモーション開始
-			isSlowMotion_ = true;
-			slowTimerSec_ = kSlowHoldTime_ + kSlowRecoverTime_;
+			effects_.StartEvadeSlow();
 
 			PostEffectManager::GetInstance()->SetActiveEffect("RadialBlur", true);
 		}
@@ -881,8 +749,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			isHitMoment_ = true;
 
 			// RGBシフトエフェクトの有効化
-			rgbShiftTimer_ = 0.0f;
-			isRGBShiftActive_ = true;
+			effects_.OnDamaged();
 
 			IIEngine::ParticleEmitter::Emit("HitReaction", position_, 5);
 		}
@@ -911,8 +778,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			}
 
 			// RGBシフトエフェクトの有効化
-			rgbShiftTimer_ = 0.0f;
-			isRGBShiftActive_ = true;
+			effects_.OnDamaged();
 
 			isHitMoment_ = true;
 		}
@@ -923,14 +789,15 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		if (_other->GetOwner()->IsActive())
 		{
 			// VignetteTrapに当たった場合
-			isHitVignetteTrap_ = true;
+			effects_.OnHitVignetteTrap();
 		}
 	}
 
-	if (_other->GetColliderID() == "Goal")
+	if (isBarrierBroken_ && _other->GetColliderID() == "Goal")
 	{
 		// ゴールに触れたらフラグ trueに
 		isTouchGoal_ = true;
+		effects_.OnTouchGoal(true);
 	}
 
 }
@@ -949,90 +816,6 @@ void Player::OnCollision(const Collider* _other)
 		{
 			// 自分のAABBと位置を渡して補正
 			CorrectOverlap(*otherAABB, aabb_, position_);
-		}
-	}
-}
-
-void Player::HitVignetteTrap()
-{
-	// デルタタイム
-	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
-
-	// フェードアウト中の処理
-	if (isFadingOut_)
-	{
-		static const float fadeDurationSec = 30.0f / kDefaultFrameRate;
-		static float fadeTimer = 0.0f;
-
-		fadeTimer += dt;
-
-		float t = fadeTimer / fadeDurationSec;
-		t = std::clamp(t, 0.0f, 1.0f);
-
-		vignetteStrength_ = std::lerp(1.8f, 0.0f, t);
-
-		PostEffectManager::GetInstance()->GetPassAs<VignettePass>("Vignette")->SetStrength(vignetteStrength_);
-
-		if (t >= 1.0f)
-		{
-			// 完了：すべてリセット
-			isFadingOut_ = false;
-			fadeTimer = 0.0f;
-			vignetteStrength_ = 0.0f;
-			PostEffectManager::GetInstance()->SetActiveEffect("Vignette", isHitVignetteTrap_);
-
-			// 環境マップを無効化
-			environmentStrength_ = 0.0f;
-			object_->SetEnvironmentStrength(environmentStrength_);
-
-		}
-
-		return;
-	}
-
-	// 通常の効果中
-	if (isHitVignetteTrap_)
-	{
-		// フェードインの開始タイミング
-		const float elapsedSec = kMaxVignetteSec_ - vignetteRemainingSec_;
-
-		const float fadeInDurationSec = 30.0f / kDefaultFrameRate;
-
-		if (elapsedSec < fadeInDurationSec)
-		{
-			// フェードイン
-			float t = elapsedSec / fadeInDurationSec;
-			t = std::clamp(t, 0.0f, 1.0f);
-
-			// 0→最大へ 
-			vignetteStrength_ = std::lerp(0.0f, 1.8f, t);
-		}
-		else
-		{
-			vignetteStrength_ = 1.8f;
-		}
-
-		// vignetteの強さを設定
-		PostEffectManager::GetInstance()->SetActiveEffect("Vignette", isHitVignetteTrap_);
-		PostEffectManager::GetInstance()->GetPassAs<VignettePass>("Vignette")->SetStrength(vignetteStrength_);
-
-		IIEngine::ParticleEmitter::Emit("debuff", position_, 2);
-
-		environmentStrength_ = 1.0f;
-
-		object_->SetEnvironmentMapHandle(cubeHandle_, true);
-		object_->SetEnvironmentStrength(environmentStrength_);
-
-
-		// タイマー更新
-		vignetteRemainingSec_ -= dt;
-
-		if (vignetteRemainingSec_ <= 0.0f)
-		{
-			isHitVignetteTrap_ = false;
-			isFadingOut_ = true;
-
-			vignetteRemainingSec_ = kMaxVignetteSec_;
 		}
 	}
 }

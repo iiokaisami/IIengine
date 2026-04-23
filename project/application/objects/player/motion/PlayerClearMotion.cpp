@@ -8,11 +8,13 @@ using namespace IIEngine;
 
 void PlayerClearMotion::Reset() 
 {
+	// 状態を初期化
     *this = PlayerClearMotion{};
 }
 
 void PlayerClearMotion::Start(Player& pPlayer)
 {
+	// 状態を初期化
     active_ = true;
     complete_ = false;
     totalTime_ = 0.0f;
@@ -28,8 +30,10 @@ bool PlayerClearMotion::Update(Player& pPlayer)
     const float dt = TimeManager::Instance().GetUnscaledDeltaTime();
     totalTime_ += dt;
 
+	// 角度更新
     constexpr float TWO_PI = 3.14159265358979323846f * 2.0f;
 
+	// 時計回りなら角度減少、反時計回りなら角度増加
     float dir = clockwise_ ? -1.0f : 1.0f;
     currentAngle_ += dir * angularSpeed_ * dt;
 
@@ -56,6 +60,7 @@ bool PlayerClearMotion::Update(Player& pPlayer)
     float sXZ = std::sin(omegaXZ * totalTime_ + poyoPhase_);
     float sx = std::max(0.05f, 1.0f + poyoAmpX_ * sXZ);
 
+	// Z軸はX軸と位相を90度ずらす
     float sz;
     if (maintainArea_)
     {
@@ -65,7 +70,7 @@ bool PlayerClearMotion::Update(Player& pPlayer)
     {
         sz = std::clamp(1.0f + poyoAmpZ_ * std::sin(omegaXZ * totalTime_ + poyoPhase_ + 3.14159265f / 2.0f), 0.05f, 5.0f);
     }
-
+	// Y軸はX軸と独立してぷるぷるさせる
     float sy;
     if (maintainVolume_) 
     {
@@ -82,6 +87,7 @@ bool PlayerClearMotion::Update(Player& pPlayer)
         sy = baseScale_.y * sy_rel;
     }
 
+	// 最終的なスケール
     Vector3 scale;
     scale.x = baseScale_.x * sx;
     scale.y = sy;

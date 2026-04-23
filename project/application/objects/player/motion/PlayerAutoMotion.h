@@ -9,19 +9,26 @@ class PlayerAutoMotion final : public IPlayerMotion
 {
 public:
 
+	// ランダムに動き回るモーション
     void Start(Player& pPlayer) override;
+    
+	// 移動と攻撃を行う。終了条件なしで、外部から止める必要がある
     bool Update(Player& pPlayer) override;
-
+	// 常にアクティブ
     bool IsActive() const override { return active_; }
-    bool IsComplete() const override { return false; } // 終了条件なし
+	// 終了条件なし
+    bool IsComplete() const override { return false; } 
+	// 再利用のためのリセット
     void Reset() override;
-
+	// 攻撃間隔のセッター
     void SetAttackInterval(float sec) { attackIntervalSec_ = sec; }
 
 private:
 
+	// アクティブフラグ
     bool active_ = false;
 
+	// 移動関連
     float moveTimer_ = 0.0f;
     Vector3 autoDir_ = { 0.0f, 0.0f, 1.0f };
 
