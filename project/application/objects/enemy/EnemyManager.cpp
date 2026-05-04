@@ -33,6 +33,11 @@ void EnemyManager::Finalize()
 	{
 		corruptor->Finalize();
 	}
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->Finalize();
+	}
+
 }
 
 void EnemyManager::Update()
@@ -132,6 +137,32 @@ void EnemyManager::Update()
 		pCorruptors_.end()
 	);
 
+	// ガーディアンの更新
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->SetPlayerPosition(playerPosition_);
+		guardian->Update(); 
+	}
+	// isDead がたったら削除
+	pGuardians_.erase(
+		std::remove_if(
+			pGuardians_.begin(),
+			pGuardians_.end(),
+			[this](std::unique_ptr<Guardian>& guardian)
+			{
+				if (guardian->IsDead())
+				{
+					guardian->Finalize();
+					// 敵のカウントを減らす
+					enemyCount_--;
+					return true;
+				}
+				return false;
+			}),
+		pGuardians_.end()
+	);
+
+
 	// ウェーブステートの更新
 	pState_->Update();
 	
@@ -169,6 +200,11 @@ void EnemyManager::Draw()
 		corruptor->Draw();
 	}
 
+	for(auto& guardian : pGuardians_)
+	{
+		guardian->Draw();
+	}
+
 }
 
 void EnemyManager::Draw2D()
@@ -184,6 +220,10 @@ void EnemyManager::Draw2D()
 	for (auto& corruptor : pCorruptors_)
 	{
 		corruptor->Draw2D();
+	}
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->Draw2D();
 	}
 	
 	pState_->Draw2D();
@@ -371,6 +411,22 @@ void EnemyManager::CorruptorInit(const Vector3& pos)
 	// 敵を登録
 	pCorruptors_.push_back(std::move(corruptor));
 	
+	// 敵のカウントを増やす
+	enemyCount_++;
+}
+
+void EnemyManager::GuardianInit(const Vector3& pos)
+{
+	// ガーディアン
+	std::unique_ptr<Guardian> guardian = std::make_unique<Guardian>();
+	guardian->SetPosition(pos);
+	guardian->Initialize();
+	guardian->SetPlayerPosition(playerPosition_);
+	guardian->Update();
+
+	// 敵を登録
+	pGuardians_.push_back(std::move(guardian));
+
 	// 敵のカウントを増やす
 	enemyCount_++;
 }

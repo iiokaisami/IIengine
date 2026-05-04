@@ -6,6 +6,7 @@
 #include "NormalEnemy.h"
 #include "TrapEnemy.h"
 #include "Corruptor.h"
+#include "Guardian.h"
 #include "waveState/EnemyWaveState.h"
 #include "../../../gameEngine/level_editor/LevelDataLoader.h"
 
@@ -65,6 +66,11 @@ public:
 	/// </summary>
 	/// <param name="pos">出現位置</param>
 	void CorruptorInit(const Vector3& pos);
+	/// <summary>
+	/// ガーディアンの初期化
+	/// </summary>
+	/// <param name="pos">出現位置</param>
+	void GuardianInit(const Vector3& pos);
 
 	/// <summary>
 	/// 敵のウェーブステート切り替え
@@ -132,6 +138,8 @@ private:
 	std::vector<std::unique_ptr<TrapEnemy>> pTrapEnemies_;
 	// コラプター
 	std::vector<std::unique_ptr<Corruptor>> pCorruptors_;
+	// ガーディアン
+	std::vector<std::unique_ptr<Guardian>> pGuardians_;
 
 	// 敵の数
 	uint32_t enemyCount_ = 0;
