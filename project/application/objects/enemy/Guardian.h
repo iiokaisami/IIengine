@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../baseObject/BaseEnemy.h"
+#include "behaviorState/guardianState/GuardianBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
 
@@ -36,6 +37,12 @@ public:
 	// 移動
 	void Move() override;
 
+	/// <summary>
+	/// 行動ステート切り替え
+	/// </summary>
+	/// <param name="_pState">新しいステートポインタ</param>
+	void ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState);
+
 public: // ゲッター
 
 public: // セッター	
@@ -59,6 +66,9 @@ private: // 衝突判定
 	void OnCollision(const IIEngine::Collider* _other)override;
 
 private:
+
+	// 行動ステート
+	std::unique_ptr<GuardianBehaviorState> pBehaviorState_ = nullptr;
 
 	float initialHP_ = 30.0f;
 

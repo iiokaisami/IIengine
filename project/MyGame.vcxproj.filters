@@ -415,8 +415,17 @@
     <ClCompile Include="application\objects\enemy\Guardian.cpp">
       <Filter>application\objects\enemy</Filter>
     </ClCompile>
-    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPatternController.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\FanPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorAttack.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -770,9 +779,17 @@
     <ClInclude Include="application\objects\enemy\Guardian.h">
       <Filter>application\objects\enemy</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\IBulletPattern.h" />
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPatternController.h" />
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\FanPattern.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorAttack.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

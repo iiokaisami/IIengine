@@ -1,5 +1,11 @@
 #include "Guardian.h"
 
+// BehaviorState
+#include "behaviorState/guardianState/GuardianBehaviorSpawn.h"
+#include "behaviorState/guardianState/GuardianBehaviorMove.h"
+#include "behaviorState/guardianState/GuardianBehaviorAttack.h"
+#include "behaviorState/guardianState/GuardianBehaviorHitReact.h"
+#include "behaviorState/guardianState/GuardianBehaviorDead.h"
 
 #include "TimeManager.h"
 
@@ -106,6 +112,10 @@ void Guardian::Move()
 
     IIEngine::ParticleEmitter::Emit("enemyWalk", position_, moveParticleCount_);
 
+}
+
+void Guardian::ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState)
+{
 }
 
 void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)

@@ -1,1 +1,0 @@
-#include "FanPattern.h"
