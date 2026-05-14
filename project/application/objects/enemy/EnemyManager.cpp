@@ -244,6 +244,11 @@ void EnemyManager::ImGuiDraw()
 		enemy->ImGuiDraw();
 	}
 
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->ImGuiDraw();
+	}
+
 #endif // USE_IMGUI
 }
 

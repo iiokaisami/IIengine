@@ -11,6 +11,7 @@ class Guardian;
 /// </summary>
 class GuardianBehaviorState
 {
+public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

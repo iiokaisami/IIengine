@@ -7,6 +7,11 @@
 #include "behaviorState/guardianState/GuardianBehaviorHitReact.h"
 #include "behaviorState/guardianState/GuardianBehaviorDead.h"
 
+// 弾のパターン
+#include "bullet/bulletPattern/SpreadShotPattern.h"
+#include "bullet/bulletPattern/SpiralShotPattern.h"
+#include "bullet/bulletPattern/LaserPattern.h"
+
 #include "TimeManager.h"
 
 using namespace IIEngine;
@@ -27,8 +32,13 @@ void Guardian::Initialize()
     // パーティクル
     IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 
-
     //vignetteTime_ = maxVignetteTimeFrames_;
+
+	// 弾幕のパターンを追加
+	attackController_.AddPattern(std::make_unique<SpreadShotPattern>(spreadCount_, spreadAngle_, spreadBulletSpeed_));
+	attackController_.AddPattern(std::make_unique<SpiralShotPattern>(spiralAngleSpeed_, spiralBulletSpeed_));
+	attackController_.AddPattern(std::make_unique<LaserPattern>(laserDirection_, laserSpeed_));
+
 }
 
 void Guardian::Finalize()
@@ -55,7 +65,9 @@ void Guardian::Update()
         isFarFromPlayer_ = false;
     }
 
-    Move();
+    //Move();
+
+    Attack();
 
     if (!isFollowingPath_)
     {
@@ -70,8 +82,11 @@ void Guardian::Update()
 
 void Guardian::Draw()
 {
+	// 基底クラスの描画処理を呼び出し
     Character::Draw();
 
+	// 弾の描画
+	bulletManager_.DrawAll();
 }
 
 void Guardian::ImGuiDraw()
@@ -84,7 +99,20 @@ void Guardian::ImGuiDraw()
     ImGui::Text("Is Invincible: %s", isInvincible_ ? "Yes" : "No");
     ImGui::Text("Is Following Path: %s", isFollowingPath_ ? "Yes" : "No");
     ImGui::Text("Is Far From Player: %s", isFarFromPlayer_ ? "Yes" : "No");
-	ImGui::End();
+	
+    int maxPattern = static_cast<int>(attackController_.PatternCount()) - 1;
+    int patternIndex = static_cast<int>(currentPatternIndex_);
+
+    if (ImGui::SliderInt("Bullet Pattern", &patternIndex, 0, maxPattern)) {
+        currentPatternIndex_ = static_cast<size_t>(patternIndex);
+        attackController_.SetPatternIndex(currentPatternIndex_);
+    }
+
+
+    ImGui::Text("Current Pattern Index: %d", patternIndex);
+    ImGui::Text("Total Patterns: %d", maxPattern + 1);
+    
+    ImGui::End();
 
 #endif // USE_IMGUI
 
@@ -114,8 +142,36 @@ void Guardian::Move()
 
 }
 
+void Guardian::Attack()
+{
+	float now = IIEngine::TimeManager::Instance().GetTotalTime();
+    float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+    // パターン切り替え管理
+    patternTimer_ += dt;
+    if (patternTimer_ >= patternInterval_)
+    {
+        currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
+        attackController_.SetPatternIndex(currentPatternIndex_);
+        patternTimer_ = 0.0f;
+    }
+
+    // 発射間隔管理
+    shootTimer_ += dt;
+    if (shootTimer_ >= shootInterval_) 
+    {
+        attackController_.FireCurrentPattern(position_, bulletManager_, now);
+        shootTimer_ = 0.0f;
+    }
+
+	bulletManager_.UpdateAll();
+
+}
+
 void Guardian::ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState)
 {
+    pBehaviorState_ = std::move(_pState);
+    pBehaviorState_->Initialize();
 }
 
 void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
@@ -177,7 +233,7 @@ void Guardian::OnCollision(const IIEngine::Collider* _other)
     }
 
     if (_other->GetColliderID() == "Wall" or
-        _other->GetColliderID() == "Barrie" or
+        _other->GetColliderID() == "Barrier" or
         _other->GetColliderID() == "Player")
     {
         // 相手のAABBを取得

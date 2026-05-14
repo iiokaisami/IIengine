@@ -484,7 +484,7 @@ void NormalEnemy::OnCollision(const Collider* _other)
     }
 
     if (_other->GetColliderID() == "Wall" or
-        _other->GetColliderID() == "Barrie" or
+        _other->GetColliderID() == "Barrier" or
         _other->GetColliderID() == "Player")
     {
         // 相手のAABBを取得

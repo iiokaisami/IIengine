@@ -186,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="gameEngine\3d\Model.cpp" />
     <ClCompile Include="gameEngine\3d\ModelCommon.cpp" />
@@ -362,6 +363,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

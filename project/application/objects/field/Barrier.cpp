@@ -7,7 +7,7 @@ using namespace IIEngine;
 void Barrier::Initialize()
 {
 	// 基底クラス初期化
-	StaticObject::Initialize("barrie.obj","Barrie");
+	StaticObject::Initialize("barrie.obj","Barrier");
 
 	// 大きさセット
 	scale_ = defaultScale_;

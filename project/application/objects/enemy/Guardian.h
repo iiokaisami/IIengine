@@ -1,9 +1,13 @@
 #pragma once
 
 #include "../../baseObject/BaseEnemy.h"
-#include "behaviorState/guardianState/GuardianBehaviorState.h"
 #include"../../../gameEngine/collider/ColliderManager.h"
 #include "../../../gameEngine/particle/ParticleEmitter.h"
+
+// 行動ステート
+#include "behaviorState/guardianState/GuardianBehaviorState.h"
+// 攻撃コントローラー
+#include "bullet/GuardianAttackController.h"
 
 #include <Object3d.h>
 #include <Framework.h>
@@ -36,6 +40,9 @@ public:
 
 	// 移動
 	void Move() override;
+
+	// 攻撃
+	void Attack() override;
 
 	/// <summary>
 	/// 行動ステート切り替え
@@ -71,6 +78,30 @@ private:
 	std::unique_ptr<GuardianBehaviorState> pBehaviorState_ = nullptr;
 
 	float initialHP_ = 30.0f;
+
+	// 攻撃コントローラー
+	GuardianAttackController attackController_;
+	// 弾の管理クラス
+	BulletManager bulletManager_;
+
+	// 確認用変数
+	size_t currentPatternIndex_ = 0;       // 現在のパターン
+	float patternInterval_ = 3.0f;         // パターン切り替え間隔[秒]
+	float patternTimer_ = 0.0f;            // 経過タイマー
+	float shootInterval_ = 0.5f;           // 発射間隔[秒]
+	float shootTimer_ = 0.0f;              // 次弾までのタイマー
+
+	// 各弾幕のパラメータ
+	// 扇状弾幕
+	uint32_t spreadCount_ = 5;
+	float spreadAngle_ = 60.0f;
+	float spreadBulletSpeed_ = 0.22f;
+	// 螺旋弾幕
+	float spiralAngleSpeed_ = 3.5f;
+	float spiralBulletSpeed_ = 0.18f;
+	// レーザー 
+	Vector3 laserDirection_ = { 0.0f, 0.0f, 1.0f };
+	float laserSpeed_ = 0.5f;
 
 	// パーティクル数
 	int spawnParticleCount_ = 2;

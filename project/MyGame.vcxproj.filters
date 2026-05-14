@@ -426,6 +426,7 @@
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletManager.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -790,6 +791,7 @@
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h" />
+    <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

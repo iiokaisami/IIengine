@@ -156,7 +156,7 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 void Corruptor::OnCollision(const Collider* _other)
 {
 	if (_other->GetColliderID() == "Wall" or
-		_other->GetColliderID() == "Barrie")
+		_other->GetColliderID() == "Barrier")
 	{
 		// 相手のAABBを取得
 		const AABB* otherAABB = _other->GetAABB();

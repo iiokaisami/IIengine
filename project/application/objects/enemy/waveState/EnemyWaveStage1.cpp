@@ -20,6 +20,9 @@ void EnemyWaveStage1::Initialize()
 	// ウェーブ開始エフェクト
 	EffectIntro();
 
+	// ガーディアンを出現(デバッグ用処理)
+	pEnemyManager_->GuardianInit({ 30.0f, 0.5f, 20.0f });
+
 }
 
 void EnemyWaveStage1::Update()
