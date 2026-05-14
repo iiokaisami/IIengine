@@ -412,6 +412,18 @@
     <ClCompile Include="gameEngine\io\Controller.cpp">
       <Filter>gameEngine\io</Filter>
     </ClCompile>
+    <ClCompile Include="application\objects\player\motion\PlayerAutoMotion.cpp">
+      <Filter>application\objects\player\motion</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\player\motion\PlayerClearMotion.cpp">
+      <Filter>application\objects\player\motion</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\player\motion\PlayerDeathMotion.cpp">
+      <Filter>application\objects\player\motion</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\player\PlayerEffects.cpp">
+      <Filter>application\objects\player</Filter>
+    </ClCompile>
     <ClCompile Include="application\objects\enemy\Guardian.cpp">
       <Filter>application\objects\enemy</Filter>
     </ClCompile>
@@ -792,6 +804,21 @@
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h" />
     <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h" />
+    <ClInclude Include="application\objects\player\motion\PlayerAutoMotion.h">
+      <Filter>application\objects\player\motion</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\player\motion\PlayerClearMotion.h">
+      <Filter>application\objects\player\motion</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\player\motion\PlayerDeathMotion.h">
+      <Filter>application\objects\player\motion</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\player\motion\IPlayerMotion.h">
+      <Filter>application\objects\player\motion</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\player\PlayerEffects.h">
+      <Filter>application\objects\player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -957,6 +984,9 @@
     </Filter>
     <Filter Include="gameEngine\time">
       <UniqueIdentifier>{8eac755d-2123-4816-9b9c-c9312d079d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\objects\player\motion">
+      <UniqueIdentifier>{ddfee423-e6f3-490e-a9e0-ea9d364eed18}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

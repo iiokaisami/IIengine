@@ -233,6 +233,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.cpp" />
+    <ClCompile Include="application\objects\player\motion\PlayerAutoMotion.cpp" />
+    <ClCompile Include="application\objects\player\motion\PlayerClearMotion.cpp" />
+    <ClCompile Include="application\objects\player\motion\PlayerDeathMotion.cpp" />
+    <ClCompile Include="application\objects\player\PlayerEffects.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -364,6 +368,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.h" />
     <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h" />
+    <ClInclude Include="application\objects\player\motion\IPlayerMotion.h" />
+    <ClInclude Include="application\objects\player\motion\PlayerAutoMotion.h" />
+    <ClInclude Include="application\objects\player\motion\PlayerClearMotion.h" />
+    <ClInclude Include="application\objects\player\motion\PlayerDeathMotion.h" />
+    <ClInclude Include="application\objects\player\PlayerEffects.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
