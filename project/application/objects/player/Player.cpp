@@ -743,7 +743,7 @@ void Player::OnCollisionTrigger(const Collider* _other)
 		_other->GetColliderID() == "Corruptor")
 	{
 		// プレイヤーのHPを減少
-		if (hp_ > 0.3)
+		if (hp_ > 0.3f)
 		{
 			hp_--;
 
@@ -807,7 +807,7 @@ void Player::OnCollision(const Collider* _other)
 {
 
 	if (_other->GetColliderID() == "Wall" or
-		(_other->GetColliderID() == "Barrie" or
+		(_other->GetColliderID() == "Barrier" or
 		_other->GetColliderID() == "NormalEnemy")
 		&& !isBarrierBroken_)
 	{
