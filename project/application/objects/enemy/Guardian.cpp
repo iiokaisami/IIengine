@@ -19,7 +19,7 @@ using namespace IIEngine;
 void Guardian::Initialize()
 {
     // Initialize を呼び出し共通プロパティを初期化
-    BaseEnemy::Initialize("guardian.obj", "guardian", initialHP_);
+    BaseEnemy::Initialize("guardian.obj", "Guardian", initialHP_);
 
     SyncObjectTransform();
 

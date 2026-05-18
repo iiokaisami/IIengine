@@ -88,7 +88,7 @@ private:
 	size_t currentPatternIndex_ = 0;       // 現在のパターン
 	float patternInterval_ = 3.0f;         // パターン切り替え間隔[秒]
 	float patternTimer_ = 0.0f;            // 経過タイマー
-	float shootInterval_ = 0.5f;           // 発射間隔[秒]
+	float shootInterval_ = 10.5f;           // 発射間隔[秒]
 	float shootTimer_ = 0.0f;              // 次弾までのタイマー
 
 	// 各弾幕のパラメータ
