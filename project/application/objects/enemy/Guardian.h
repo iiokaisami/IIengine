@@ -88,7 +88,7 @@ private:
 	size_t currentPatternIndex_ = 0;       // 現在のパターン
 	float patternInterval_ = 3.0f;         // パターン切り替え間隔[秒]
 	float patternTimer_ = 0.0f;            // 経過タイマー
-	float shootInterval_ = 10.5f;           // 発射間隔[秒]
+	float shootInterval_ = 3.0f;           // 発射間隔[秒]
 	float shootTimer_ = 0.0f;              // 次弾までのタイマー
 
 	// 各弾幕のパラメータ
@@ -99,6 +99,8 @@ private:
 	// 螺旋弾幕
 	float spiralAngleSpeed_ = 3.5f;
 	float spiralBulletSpeed_ = 0.18f;
+	uint32_t spiralShotsFired_ = 0;
+	uint32_t spiralMaxShots_ = 30;
 	// レーザー 
 	Vector3 laserDirection_ = { 0.0f, 0.0f, 1.0f };
 	float laserSpeed_ = 0.5f;

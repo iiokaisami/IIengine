@@ -25,7 +25,7 @@ public:
 	/// <param name="_origin">発射位置</param>
 	/// <param name="_manager">弾の管理クラス</param>
 	/// <param name="_time">発射時間</param>
-    void Fire(const Vector3& _origin, BulletManager& _manager, float _time) override;
+    void Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos) override;
     
 private:
     

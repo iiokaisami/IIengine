@@ -25,11 +25,15 @@ public:
 	/// <param name="_origin">発射位置</param>
 	/// <param name="_manager">弾管理者</param>
 	/// <param name="_time">経過時間</param>
-	void Fire(const Vector3& _origin, BulletManager& _manager, float _time) override;
+	void Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos) override;
 
 private:
 
+	// 弾の数
+	uint32_t bulletCount_ = 8;
+	// 螺旋の回転速度[度/秒]
 	float spiralSpeed_ = 2.0f;
+	// 弾の速度
 	float bulletSpeed_ = 0.1f;
 
 };

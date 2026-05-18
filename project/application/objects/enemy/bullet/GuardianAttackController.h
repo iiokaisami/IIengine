@@ -25,11 +25,11 @@ public:
 	/// <param name="_origin">弾の発射位置</param>
 	/// <param name="_manager">弾の管理クラス</param>
 	/// <param name="_time">現在の時間</param>
-    void FireCurrentPattern(const Vector3& _origin, BulletManager& _manager, float _time) 
+    void FireCurrentPattern(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos)
     {
         if (!patterns_.empty()) 
         {
-            patterns_[currentPatternIndex_]->Fire(_origin, _manager, _time);
+            patterns_[currentPatternIndex_]->Fire(_origin, _manager, _time, _playerPos);
         }
     }
 

@@ -147,23 +147,56 @@ void Guardian::Attack()
 	float now = IIEngine::TimeManager::Instance().GetTotalTime();
     float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
-    // パターン切り替え管理
-    patternTimer_ += dt;
-    if (patternTimer_ >= patternInterval_)
+    // SpiralShotPatternのインデックス(登録順)
+    int spiralIndex = 1; 
+    // 現在のパターンがSpiralShotPatternかどうか
+    bool isSpiral = (currentPatternIndex_ == spiralIndex);
+
+    // 発射間隔切り替え
+    if (isSpiral)
     {
-        currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
-        attackController_.SetPatternIndex(currentPatternIndex_);
-        patternTimer_ = 0.0f;
+		// SpiralShotPatternの発射間隔
+        shootInterval_ = 1.0f / 6.0f;
+    } 
+    else 
+    {
+        shootInterval_ = 3.0f; // 通常時
     }
 
     // 発射間隔管理
     shootTimer_ += dt;
-    if (shootTimer_ >= shootInterval_) 
+    if (shootTimer_ >= shootInterval_)
     {
-        attackController_.FireCurrentPattern(position_, bulletManager_, now);
+		// 現在のパターンで弾を発射
+        attackController_.FireCurrentPattern(position_, bulletManager_, now, playerPosition_);
         shootTimer_ = 0.0f;
-    }
 
+		// SpiralShotPatternの場合は撃った回数をカウント
+        if (isSpiral)
+        {
+            ++spiralShotsFired_;
+            // spiralMaxShots_分撃ち終わったら次へ
+            if (spiralShotsFired_ >= spiralMaxShots_) 
+            {
+				// 次のパターンへ切り替え
+                currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
+                attackController_.SetPatternIndex(currentPatternIndex_);
+                spiralShotsFired_ = 0;
+                patternTimer_ = 0.0f; // パターン切り替え直後から再カウント
+            }
+        }
+        else
+        {
+            // Spiral以外は従来通りパターンタイマーで管理
+            patternTimer_ += shootInterval_; 
+            if (patternTimer_ >= patternInterval_) 
+            {
+                currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
+                attackController_.SetPatternIndex(currentPatternIndex_);
+                patternTimer_ = 0.0f;
+            }
+        }
+    }
 	bulletManager_.UpdateAll();
 
 }
