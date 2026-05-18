@@ -65,7 +65,7 @@ void Guardian::Update()
         isFarFromPlayer_ = false;
     }
 
-    //Move();
+    Move();
 
     Attack();
 
@@ -122,6 +122,19 @@ void Guardian::Move()
 {
     // デルタタイム取得
     const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	// プレイヤーとの距離を計算
+    float distanceToPlayer = (playerPosition_ - position_).Length();
+
+	// プレイヤーに近づきすぎないようにする
+    if (distanceToPlayer <= kStopChasingDistance)
+    {
+        moveVelocity_ = { 0.0f, 0.0f, 0.0f };
+        // ここでposition_も変えずにSyncObjectTransform()だけでOK
+        SyncObjectTransform();
+        // 歩きパーティクルも止めるならemitしない
+        return;
+    }
 
     // 基底クラスの補間処理を使用
     toPlayer_ = playerPosition_ - position_;

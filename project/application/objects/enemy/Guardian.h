@@ -114,7 +114,7 @@ private:
 
 	// 移動関連
 	float moveInterpolateRate_ = 0.1f;
-	float moveVelocityDivisor_ = 7.0f;
+	float moveVelocityDivisor_ = 12.0f; // 大きいほど移動速度が遅くなる
 	float playerMoveRePathThreshold_ = 1.0f;
 	// 追尾停止距離
 	const float kStopChasingDistance = 15.0f;
