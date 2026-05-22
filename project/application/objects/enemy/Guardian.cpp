@@ -238,7 +238,7 @@ void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
     {
         if (_other->GetOwner()->IsActive())
         {
-            // プレイヤーのHPを減少
+            // HPを減少
             if (hp_ > 0)
             {
                 hp_ -= timeBombExplosionDamage_;

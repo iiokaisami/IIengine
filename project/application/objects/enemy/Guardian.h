@@ -57,6 +57,8 @@ public: // セッター
 	// プレイヤーの位置をセット
 	void SetPlayerPosition(const Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
 
+	// 無敵状態の設定
+	void SetInvincible(bool _isInvincible) { isInvincible_ = _isInvincible; }
 
 private: // 衝突判定
 
