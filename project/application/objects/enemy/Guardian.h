@@ -52,6 +52,10 @@ public:
 
 public: // ゲッター
 
+	// 攻撃がヒットしたかどうか
+	bool IsHit() const { return isHit_; }
+
+
 public: // セッター	
 
 	// プレイヤーの位置をセット
@@ -59,6 +63,18 @@ public: // セッター
 
 	// 無敵状態の設定
 	void SetInvincible(bool _isInvincible) { isInvincible_ = _isInvincible; }
+
+	// ヒットフラグの設定
+	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
+
+	// --- ステートでのTransform操作用関数(引数あり) ---
+
+	// オブジェクトの positionをセット
+	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
+	// オブジェクトの rotationをセット
+	void SetObjectRotation(const Vector3& _rotation) { object_->SetRotate(_rotation); }
+	// オブジェクトの scaleをセット
+	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
 
 private: // 衝突判定
 

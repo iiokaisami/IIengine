@@ -6,6 +6,18 @@ void BulletManager::AddBullet(std::unique_ptr<BaseBullet> _bullet)
     bullets_.emplace_back(std::move(_bullet));
 }
 
+void BulletManager::ClearBullets()
+{
+        for (auto& bullet : bullets_)
+    {
+        if (bullet)
+        {
+            bullet->Finalize();
+        }
+    }
+    bullets_.clear();
+}
+
 void BulletManager::UpdateAll()
 {
     for (auto& bullet : bullets_)

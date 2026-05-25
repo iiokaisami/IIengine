@@ -27,6 +27,20 @@ public:
 private:
 
 	// モーションのカウント
-	uint32_t deadCount_ = 0;
+	uint32_t deadCount_ = 30;
+
+	// 初回膨張
+	float startPopScale_ = 1.8f;
+	// 最終縮小
+	float endScale_ = 0.0f;
+	// 上昇量
+	float floatUpAmount_ = 0.1f;
+	// 回転速度
+	float rotSpeedY_ = 0.1f;
+	float rotSpeedX_ = 0.1f;
+
+	// パーティクルの数
+	int petalParticleCount_ = 6;
+	int ruptureParticleCount_ = 20;
 
 };

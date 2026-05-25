@@ -18,6 +18,11 @@ public:
 	/// <param name="_bullet">追加する弾のユニークポインタ</param>
     void AddBullet(std::unique_ptr<BaseBullet> _bullet);
 
+	/// <summary>
+	/// 全ての弾の消去
+	/// </summary>
+	void ClearBullets();
+
     /// <summary>
 	/// 全ての弾の更新と消去処理
     /// </summary>

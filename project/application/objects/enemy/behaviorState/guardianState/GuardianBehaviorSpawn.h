@@ -30,7 +30,7 @@ public:
 private:
 
 	// モーションのカウント
-	uint32_t spawnCount_ = 0;
+	uint32_t spawnCount_ = 30;
 
 };
 

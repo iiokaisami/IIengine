@@ -20,6 +20,22 @@ void GuardianBehaviorSpawn::Initialize()
 
 void GuardianBehaviorSpawn::Update()
 {
+	// 敵のトランスフォームを motion_.transformにセット
+	TransformUpdate(pGuardian_);
+
+	// イージングの進行度(0〜1)
+	float t = float(motion_.count) / motion_.maxCount;
+	motion_.transform.scale.x = Ease::OutBack(t);
+	motion_.transform.scale.y = Ease::OutBack(t);
+	motion_.transform.scale.z = Ease::OutBack(t);
+	Vector3 one = { 1.0f, 1.0f, 1.0f };
+
+	pGuardian_->SetObjectPosition(motion_.transform.position);
+	pGuardian_->SetObjectRotation(motion_.transform.rotation);
+	pGuardian_->SetObjectScale(one * motion_.transform.scale);
+
+	// モーションカウントを更新
+	MotionCount(motion_);
 
 	if (!motion_.isActive)
 	{

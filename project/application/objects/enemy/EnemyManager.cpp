@@ -33,6 +33,7 @@ void EnemyManager::Finalize()
 	{
 		corruptor->Finalize();
 	}
+
 	for (auto& guardian : pGuardians_)
 	{
 		guardian->Finalize();

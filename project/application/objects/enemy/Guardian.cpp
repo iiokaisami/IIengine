@@ -29,6 +29,9 @@ void Guardian::Initialize()
     // 出現時は無敵状態
     isInvincible_ = true;
 
+	// 行動ステートの初期化
+	pBehaviorState_ = std::make_unique<GuardianBehaviorSpawn>(this);
+
     // パーティクル
     IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 
@@ -43,6 +46,9 @@ void Guardian::Initialize()
 
 void Guardian::Finalize()
 {
+	// 弾のリソース解放
+	bulletManager_.ClearBullets();
+
     colliderManager_->DeleteCollider(&collider_);
 }
 
@@ -50,6 +56,10 @@ void Guardian::Update()
 {
     // 基底クラスの共通更新処理を呼び出し
     BaseEnemy::Update();
+
+	// 行動ステートの更新
+    pBehaviorState_->Update();
+	
 
     // モデル変形の更新
     object_->Update();
@@ -64,8 +74,6 @@ void Guardian::Update()
     {
         isFarFromPlayer_ = false;
     }
-
-    Move();
 
     Attack();
 

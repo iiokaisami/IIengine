@@ -30,7 +30,7 @@ public:
 private:
 
 	// モーションのカウント
-	uint32_t moveCount_ = 0;
+	uint32_t moveCount_ = 30;
 
 };
 

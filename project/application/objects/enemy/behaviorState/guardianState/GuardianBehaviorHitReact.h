@@ -30,6 +30,14 @@ public:
 private:
 
 	// モーションのカウント
-	uint32_t hitReactCount_ = 0;
+	uint32_t hitReactCount_ = 30;
+
+
+	// 振動の強さ
+	float shakeAmp_ = 0.1f;
+	// 振動の周期
+	int shakePeriodX_ = 2;
+	// 振動の周期
+	int shakePeriodZ_ = 3;
 
 };
