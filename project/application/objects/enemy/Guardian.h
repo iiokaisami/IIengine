@@ -50,11 +50,22 @@ public:
 	/// <param name="_pState">新しいステートポインタ</param>
 	void ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState);
 
+private: // 内部関数
+
+	// 向きをプレイヤーに向ける
+	void FaceToPlayer();
+
+	// 攻撃パターン切り替え
+	void SwitchAttackPattern(uint32_t _patternIndex);
+
+
 public: // ゲッター
 
 	// 攻撃がヒットしたかどうか
 	bool IsHit() const { return isHit_; }
 
+	// プレイヤーまでの距離を取得
+	float GetDistanceToPlayer() const {return (playerPosition_ - position_).Length();}
 
 public: // セッター	
 
@@ -109,6 +120,13 @@ private:
 	float shootInterval_ = 3.0f;           // 発射間隔[秒]
 	float shootTimer_ = 0.0f;              // 次弾までのタイマー
 
+	// 攻撃パターン切り替えの条件とインデックスのペア
+	struct PatternCondition
+	{
+		std::function<bool(const Guardian&)> condition;
+		size_t patternIndex;
+	};
+
 	// 各弾幕のパラメータ
 	// 扇状弾幕
 	uint32_t spreadCount_ = 5;
@@ -122,6 +140,11 @@ private:
 	// レーザー 
 	Vector3 laserDirection_ = { 0.0f, 0.0f, 1.0f };
 	float laserSpeed_ = 0.5f;
+
+	// 攻撃切り替え距離
+	const float kSpreadRange_ = 10.0f; // 近距離扇状
+	const float kSpiralRange_ = 15.0f; // 中距離螺旋
+	const float kLaserRange_ = 17.0f;  // 遠距離レーザー
 
 	// パーティクル数
 	int spawnParticleCount_ = 2;

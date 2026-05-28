@@ -35,8 +35,6 @@ void Guardian::Initialize()
     // パーティクル
     IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 
-    //vignetteTime_ = maxVignetteTimeFrames_;
-
 	// 弾幕のパターンを追加
 	attackController_.AddPattern(std::make_unique<SpreadShotPattern>(spreadCount_, spreadAngle_, spreadBulletSpeed_));
 	attackController_.AddPattern(std::make_unique<SpiralShotPattern>(spiralAngleSpeed_, spiralBulletSpeed_));
@@ -76,6 +74,9 @@ void Guardian::Update()
     }
 
     Attack();
+
+	// プレイヤーに向く
+    FaceToPlayer();
 
     if (!isFollowingPath_)
     {
@@ -120,6 +121,10 @@ void Guardian::ImGuiDraw()
     ImGui::Text("Current Pattern Index: %d", patternIndex);
     ImGui::Text("Total Patterns: %d", maxPattern + 1);
     
+	// プレイヤーとの距離を表示
+	float distanceToPlayer = position_.Distance(playerPosition_);
+        ImGui::Text("Distance to Player: %.2f", distanceToPlayer);
+
     ImGui::End();
 
 #endif // USE_IMGUI
@@ -149,10 +154,6 @@ void Guardian::Move()
     Vector3 direction = Normalize(toPlayer_);
     moveVelocity_ = InterpolateMovement(moveVelocity_, direction, moveInterpolateRate_);
 
-    // Y軸回転を進行方向に合わせる
-    rotation_.y = std::atan2(moveVelocity_.x, moveVelocity_.z);
-    rotation_.x = 0.0f;
-
     moveVelocity_ /= moveVelocityDivisor_;
     moveVelocity_.y = 0.0f;
     position_ += moveVelocity_ * dt * kDefaultFrameRate;
@@ -168,8 +169,38 @@ void Guardian::Attack()
 	float now = IIEngine::TimeManager::Instance().GetTotalTime();
     float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
+    std::vector<PatternCondition> patternConditions_ = 
+    {
+		// 条件とパターンインデックスのペアを定義
+        // 0: SpreadShotPattern
+        { [](const Guardian& g) { return g.GetDistanceToPlayer() < g.kSpreadRange_ && g.GetDistanceToPlayer() < g.kSpiralRange_; }, 0 },
+        // 1: SpiralShotPattern
+        { [](const Guardian& g) { return g.GetDistanceToPlayer() >= g.kSpiralRange_ && g.GetDistanceToPlayer() < g.kLaserRange_; }, 1 },
+        // 2: LaserPattern
+        { [](const Guardian& g) { return g.GetDistanceToPlayer() >= g.kLaserRange_; }, 2 },
+        
+    };
+
+	// 条件を順番に評価して、最初にマッチしたパターンに切り替える
+    for (const auto& entry : patternConditions_) 
+    {
+		// 条件を評価
+        if (entry.condition(*this)) 
+        {
+			// 条件にマッチしたパターンに切り替える(すでにそのパターンの場合は何もしない)
+            if (currentPatternIndex_ != entry.patternIndex) 
+            {
+				// パターン切り替え
+                currentPatternIndex_ = entry.patternIndex;
+                attackController_.SetPatternIndex(currentPatternIndex_);
+            }
+
+            break;
+        }
+    }
+
     // SpiralShotPatternのインデックス(登録順)
-    int spiralIndex = 1; 
+    uint32_t spiralIndex = 1; 
     // 現在のパターンがSpiralShotPatternかどうか
     bool isSpiral = (currentPatternIndex_ == spiralIndex);
 
@@ -226,6 +257,27 @@ void Guardian::ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pStat
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();
+}
+
+void Guardian::FaceToPlayer()
+{
+    Vector3 toPlayer = playerPosition_ - position_;
+
+    rotation_.x = 0.0f;
+    rotation_.y = std::atan2(toPlayer.x, toPlayer.z); 
+
+    SyncObjectTransform();
+}
+
+void Guardian::SwitchAttackPattern(uint32_t _patternIndex)
+{
+    if (currentPatternIndex_ != _patternIndex) 
+    {
+        currentPatternIndex_ = _patternIndex;
+        attackController_.SetPatternIndex(currentPatternIndex_);
+        spiralShotsFired_ = 0;
+        patternTimer_ = 0.0f;
+    }
 }
 
 void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
