@@ -18,7 +18,7 @@ void GuardianBehaviorHitReact::Initialize()
 void GuardianBehaviorHitReact::Update()
 {
 	// 敵のトランスフォームを motion_.transformにセット
-	TransformUpdate(pGuardian_);
+   	TransformUpdate(pGuardian_);
 	
 	Vector3 shakeOffset =
 	{

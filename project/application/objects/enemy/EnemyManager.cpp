@@ -488,6 +488,7 @@ bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos)
 	consider(pNormalEnemies_);
 	consider(pTrapEnemies_);
 	consider(pCorruptors_);
+	consider(pGuardians_);
 
 	return found;
 }
