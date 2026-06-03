@@ -2,7 +2,7 @@
 
 #include <Ease.h>
 
-BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken)
+BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, const std::function<Vector3()>& returnPos, const std::function<Vector3()>& getFollowCamPos, const std::function<bool()>& isBarrierBroken)
 	:camera_(std::move(camera)),
 	 getPlayerPos_(std::move(targetPos)),
 	 getGoalPos_(std::move(returnPos)),

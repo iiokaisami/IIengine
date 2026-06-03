@@ -251,7 +251,7 @@ void TrapEnemy::TrapInit()
     }
 }
 
-void TrapEnemy::ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pState)
+void TrapEnemy::ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState>&& _pState)
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();

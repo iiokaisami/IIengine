@@ -41,7 +41,7 @@ public:
 	/// 行動ステート切り替え
 	/// </summary>
 	/// <param name="_pState">新しいステートのポインタ</param>
-	void ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState> _pState);
+	void ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState>&& _pState);
 
 private: // 衝突判定
 
