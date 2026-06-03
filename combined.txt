@@ -3048,7 +3048,7 @@ void Corruptor::Move()
 
 }
 
-void Corruptor::ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState> _pState)
+void Corruptor::ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState>&& _pState)
 {
 	pBehaviorState_ = std::move(_pState);
 	pBehaviorState_->Initialize();
@@ -3150,7 +3150,7 @@ public:
 	/// 行動ステート切り替え
 	/// </summary>
 	/// <param name="_pState">新しいステートのポインタ</param>
-	void ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState> _pState);
+	void ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState>&& _pState);
 
 private: // 衝突判定
 
@@ -4293,7 +4293,7 @@ void NormalEnemy::Attack()
 }
 
 
-void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pState)
+void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState>&& _pState)
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();
@@ -4452,7 +4452,7 @@ public:
 	/// 行動ステート切り替え
 	/// </summary>
 	/// <param name="_pState">新しいステートポインタ</param>
-	void ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pState);
+	void ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState>&& _pState);
 
 private: // 衝突判定
 
@@ -4845,7 +4845,7 @@ void TrapEnemy::TrapInit()
     }
 }
 
-void TrapEnemy::ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pState)
+void TrapEnemy::ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState>&& _pState)
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();
@@ -5002,7 +5002,7 @@ public:
 	/// 行動ステート切り替え
 	/// </summary>
 	/// <param name="_pState">新しいステートのポインタ</param>
-	void ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pState);
+	void ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState>&& _pState);
 
 private:
 
@@ -14248,7 +14248,7 @@ File Path: project/application/scene/cameraController/BarrierBreakCameraControll
 
 #include <Ease.h>
 
-BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken)
+BarrierBreakCameraController::BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, const std::function<Vector3()>& returnPos, const std::function<Vector3()>& getFollowCamPos, const std::function<bool()>& isBarrierBroken)
 	:camera_(std::move(camera)),
 	 getPlayerPos_(std::move(targetPos)),
 	 getGoalPos_(std::move(returnPos)),
@@ -14418,7 +14418,7 @@ public:
 	/// <param name="returnPos">ゴール/バリア中心位置を返す</param>
 	/// <param name="getFollowCamPos">プレイヤーを追従するカメラの位置を返す</param>
 	/// <param name="isBarrierBroken">バリア破壊完了を返す</param>
-    BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
+    BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, const std::function<Vector3()>& returnPos, const std::function<Vector3()>& getFollowCamPos, const std::function<bool()>& isBarrierBroken);
 
 	// デストラクタ
 	~BarrierBreakCameraController() override = default;
@@ -14513,7 +14513,7 @@ File Path: project/application/scene/cameraController/ClearCameraController.cpp
 #include <Camera.h>
 #include <Ease.h>
 
-ClearCameraController::ClearCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float rotationSpeedMultiplier, float heightRise, float fadeStartThreshold)
+ClearCameraController::ClearCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, float duration, float rotations, float rotationSpeedMultiplier, float heightRise, float fadeStartThreshold)
     : camera_(std::move(camera)),
       getPlayerPos_(std::move(targetPos)),
       duration_(duration), 
@@ -14662,7 +14662,7 @@ public:
 	/// <param name="camera">カメラ</param>
 	/// <param name="targetPos">追尾対象の位置を返す関数</param>
 	/// <param name="duration">クリアカメラの持続時間</param>
-	ClearCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 20.0f, float rotationSpeedMultiplier = 0.12f, float heightRise = 30.0f, float fadeStartThreshold = 0.4f);
+	ClearCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, float duration = 3.0f, float rotations = 20.0f, float rotationSpeedMultiplier = 0.12f, float heightRise = 30.0f, float fadeStartThreshold = 0.4f);
 
 	// デストラクタ
 	~ClearCameraController() override = default;
@@ -14727,7 +14727,7 @@ File Path: project/application/scene/cameraController/DeathCameraController.cpp
 #include <Camera.h>
 #include <Ease.h>
 
-DeathCameraController::DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float endRadius, float endHeight)
+DeathCameraController::DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, float duration, float rotations, float endRadius, float endHeight)
 	: camera_(std::move(camera)),
       getPlayerPos_(std::move(targetPos)),
       duration_(duration),
@@ -14867,7 +14867,7 @@ public:
 	/// <param name="camera">カメラ</param>
 	/// <param name="targetPos">追尾対象の位置を返す関数</param>
 	/// <param name="duration">デスカメラの持続時間</param>
-	DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration = 3.0f, float rotations = 2.0f, float endRadius = 12.0f, float endHeight = 12.0f);
+	DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, float duration = 3.0f, float rotations = 2.0f, float endRadius = 12.0f, float endHeight = 12.0f);
 
 	// デストラクタ
 	~DeathCameraController() override = default;
@@ -14936,7 +14936,7 @@ File Path: project/application/scene/cameraController/FollowController.cpp
 
 #include <Camera.h>
 
-FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp, float rotationLerp, const Vector3& targetRot, const Vector3& offset)
+FollowController::FollowController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, const std::function<Vector3()>& targetVelocity, float positionLerp, float rotationLerp, const Vector3& targetRot, const Vector3& offset)
 	: camera_(camera),
       targetPos_(targetPos),
 	  targetVelocity_(targetVelocity),
@@ -15096,7 +15096,7 @@ public:
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
 	/// <param name="rotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
-	FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, const Vector3& targetRot = Vector3{ 1.2f, 0.0f, 0.0f }, const Vector3& offset = Vector3{ 0.0f, 45.0f, -35.0f });
+	FollowController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, const std::function<Vector3()>& targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, const Vector3& targetRot = Vector3{ 1.2f, 0.0f, 0.0f }, const Vector3& offset = Vector3{ 0.0f, 45.0f, -35.0f });
 
 	/// <summary>
 	/// 更新
@@ -15416,7 +15416,7 @@ File Path: project/application/scene/cameraController/ShakeController.cpp
 
 #include <Camera.h>
 
-ShakeController::ShakeController(std::shared_ptr<IIEngine::Camera> camera, std::function<bool()> consumeHit, float defaultDuration, float defaultAmp)
+ShakeController::ShakeController(std::shared_ptr<IIEngine::Camera> camera, const std::function<bool()>& consumeHit, float defaultDuration, float defaultAmp)
     : camera_(camera),
       consumeHit_(consumeHit),
       duration_(defaultDuration),
@@ -15468,7 +15468,7 @@ public:
 	/// <param name="consumeHit">ヒットを消費する関数(ヒットがあれば trueを返す)</param>
 	/// <param name="defaultDuration">シェイク継続時間</param>
 	/// <param name="defaultAmp">シェイク振幅</param>
-	ShakeController(std::shared_ptr<IIEngine::Camera> camera, std::function<bool()> consumeHit, float defaultDuration = 0.3f, float defaultAmp = 1.0f);
+	ShakeController(std::shared_ptr<IIEngine::Camera> camera, const std::function<bool()>& consumeHit, float defaultDuration = 0.3f, float defaultAmp = 1.0f);
 
 	/// <summary>
 	/// 更新
@@ -15676,7 +15676,7 @@ namespace IIEngine
 {
 
 	void Sprite::Initialize(const std::string& textureFilePath,
-		Vector2 position, Vector4 color, Vector2 anchorPoint)
+		Vector2 position, const Vector4& color, Vector2 anchorPoint)
 	{
 		spriteCommon_ = SpriteCommon::GetInstance();
 
@@ -15960,7 +15960,7 @@ namespace IIEngine
 		/// <param name="position">座標</param>
 		/// <param name="color">色</param>
 		/// <param name="anchorPoint">アンカーポイント</param>
-		void Initialize(const std::string& textureFilePath, Vector2 position, Vector4 color = { (1) , (1), (1), (1) }, Vector2 anchorPoint = { 0.0f,0.0f });
+		void Initialize(const std::string& textureFilePath, Vector2 position, const Vector4& color = { (1) , (1), (1), (1) }, Vector2 anchorPoint = { 0.0f,0.0f });
 
 		// 更新
 		void Update();
