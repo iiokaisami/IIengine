@@ -419,7 +419,7 @@ void NormalEnemy::Attack()
 }
 
 
-void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pState)
+void NormalEnemy::ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState>&& _pState)
 {
     pBehaviorState_ = std::move(_pState);
     pBehaviorState_->Initialize();

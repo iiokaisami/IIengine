@@ -30,7 +30,7 @@ public:
 	/// <param name="returnPos">ゴール/バリア中心位置を返す</param>
 	/// <param name="getFollowCamPos">プレイヤーを追従するカメラの位置を返す</param>
 	/// <param name="isBarrierBroken">バリア破壊完了を返す</param>
-    BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> returnPos, std::function<Vector3()> getFollowCamPos, std::function<bool()> isBarrierBroken);
+    BarrierBreakCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, const std::function<Vector3()>& returnPos, const std::function<Vector3()>& getFollowCamPos, const std::function<bool()>& isBarrierBroken);
 
 	// デストラクタ
 	~BarrierBreakCameraController() override = default;

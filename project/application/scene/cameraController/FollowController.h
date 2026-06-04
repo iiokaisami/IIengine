@@ -26,7 +26,7 @@ public:
 	/// <param name="positionLerp">位置の補間値(0.0f~1.0f)</param>
 	/// <param name="rotationLerp">回転の補間値(0.0f~1.0f)</param>
 	/// </summary>
-	FollowController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, std::function<Vector3()> targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, const Vector3& targetRot = Vector3{ 1.2f, 0.0f, 0.0f }, const Vector3& offset = Vector3{ 0.0f, 45.0f, -35.0f });
+	FollowController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, const std::function<Vector3()>& targetVelocity, float positionLerp = 0.8f, float rotationLerp = 0.25f, const Vector3& targetRot = Vector3{ 1.2f, 0.0f, 0.0f }, const Vector3& offset = Vector3{ 0.0f, 45.0f, -35.0f });
 
 	/// <summary>
 	/// 更新

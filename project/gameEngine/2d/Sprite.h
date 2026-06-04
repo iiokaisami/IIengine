@@ -30,7 +30,7 @@ namespace IIEngine
 		/// <param name="position">座標</param>
 		/// <param name="color">色</param>
 		/// <param name="anchorPoint">アンカーポイント</param>
-		void Initialize(const std::string& textureFilePath, Vector2 position, Vector4 color = { (1) , (1), (1), (1) }, Vector2 anchorPoint = { 0.0f,0.0f });
+		void Initialize(const std::string& textureFilePath, Vector2 position, const Vector4& color = { (1) , (1), (1), (1) }, Vector2 anchorPoint = { 0.0f,0.0f });
 
 		// 更新
 		void Update();

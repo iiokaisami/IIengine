@@ -8,7 +8,7 @@ namespace IIEngine
 {
 
 	void Sprite::Initialize(const std::string& textureFilePath,
-		Vector2 position, Vector4 color, Vector2 anchorPoint)
+		Vector2 position, const Vector4& color, Vector2 anchorPoint)
 	{
 		spriteCommon_ = SpriteCommon::GetInstance();
 

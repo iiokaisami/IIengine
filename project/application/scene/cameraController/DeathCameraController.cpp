@@ -3,7 +3,7 @@
 #include <Camera.h>
 #include <Ease.h>
 
-DeathCameraController::DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float endRadius, float endHeight)
+DeathCameraController::DeathCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, float duration, float rotations, float endRadius, float endHeight)
 	: camera_(std::move(camera)),
       getPlayerPos_(std::move(targetPos)),
       duration_(duration),

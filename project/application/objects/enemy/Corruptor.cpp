@@ -113,7 +113,7 @@ void Corruptor::Move()
 
 }
 
-void Corruptor::ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState> _pState)
+void Corruptor::ChangeBehaviorState(std::unique_ptr<CorruptorBehaviorState>&& _pState)
 {
 	pBehaviorState_ = std::move(_pState);
 	pBehaviorState_->Initialize();

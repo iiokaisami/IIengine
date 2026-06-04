@@ -45,7 +45,7 @@ public:
 	/// 行動ステート切り替え
 	/// </summary>
 	/// <param name="_pState">新しいステートのポインタ</param>
-	void ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState> _pState);
+	void ChangeBehaviorState(std::unique_ptr<TrapEnemyBehaviorState>&& _pState);
 
 private:
 

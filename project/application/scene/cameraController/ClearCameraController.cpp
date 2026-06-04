@@ -3,7 +3,7 @@
 #include <Camera.h>
 #include <Ease.h>
 
-ClearCameraController::ClearCameraController(std::shared_ptr<IIEngine::Camera> camera, std::function<Vector3()> targetPos, float duration, float rotations, float rotationSpeedMultiplier, float heightRise, float fadeStartThreshold)
+ClearCameraController::ClearCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& targetPos, float duration, float rotations, float rotationSpeedMultiplier, float heightRise, float fadeStartThreshold)
     : camera_(std::move(camera)),
       getPlayerPos_(std::move(targetPos)),
       duration_(duration), 

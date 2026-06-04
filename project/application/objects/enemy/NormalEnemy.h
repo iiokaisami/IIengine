@@ -45,7 +45,7 @@ public:
 	/// 行動ステート切り替え
 	/// </summary>
 	/// <param name="_pState">新しいステートポインタ</param>
-	void ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState> _pState);
+	void ChangeBehaviorState(std::unique_ptr<EnemyBehaviorState>&& _pState);
 
 private: // 衝突判定
 
