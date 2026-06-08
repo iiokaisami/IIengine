@@ -21,6 +21,9 @@ void Guardian::Initialize()
     // Initialize を呼び出し共通プロパティを初期化
     BaseEnemy::Initialize("guardian.obj", "Guardian", initialHP_);
 
+	position_.y = 1.0f; // 地面に立つようにY座標を調整
+	scale_ = { 2.0f, 2.0f, 2.0f };
+
     SyncObjectTransform();
 
     // ライト設定
