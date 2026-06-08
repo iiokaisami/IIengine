@@ -35,6 +35,7 @@ public:
 	// テクスチャの読み込み
 	virtual void LoadTextureWave1();
 	virtual void LoadTextureWave2();
+	virtual void LoadTextureWave3();
 
 	// テクスチャ更新
 	virtual void UpdateTexture();

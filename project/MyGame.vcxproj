@@ -130,6 +130,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\cameraController\BarrierBreakCameraController.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletManager.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\waveState\EnemyWaveStage3.cpp" />
     <ClCompile Include="gameEngine\io\Controller.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
@@ -259,6 +260,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\cameraController\BarrierBreakCameraController.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.h" />
+    <ClInclude Include="application\objects\enemy\waveState\EnemyWaveStage3.h" />
     <ClInclude Include="gameEngine\io\ComPtr.h" />
     <ClInclude Include="gameEngine\io\Controller.h" />
     <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />

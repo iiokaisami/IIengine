@@ -41,7 +41,7 @@ void EnemyWaveState::LoadTextureWave2()
         if (i == 0)
         {
 
-            sprite->Initialize("lastWave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+            sprite->Initialize("wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
         }
         if (i == 1)
         {
@@ -50,6 +50,26 @@ void EnemyWaveState::LoadTextureWave2()
 
         waveStartSprites_.push_back(std::move(sprite));
     }
+}
+
+void EnemyWaveState::LoadTextureWave3()
+{
+    for (uint32_t i = 0; i < spriteIndex_; i++)
+    {
+        auto sprite = std::make_unique<IIEngine::Sprite>();
+        
+        if (i == 0)
+        {
+            sprite->Initialize("lastWave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+        
+        if (i == 1)
+        {
+            sprite->Initialize("3wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+
+        waveStartSprites_.push_back(std::move(sprite));
+	}
 }
 
 void EnemyWaveState::UpdateTexture()
