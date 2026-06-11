@@ -21,6 +21,8 @@
     └── └── └── ├── Corruptor.h
     └── └── └── ├── EnemyManager.cpp
     └── └── └── ├── EnemyManager.h
+    └── └── └── ├── Guardian.cpp
+    └── └── └── ├── Guardian.h
     └── └── └── ├── NormalEnemy.cpp
     └── └── └── ├── NormalEnemy.h
     └── └── └── ├── TrapEnemy.cpp
@@ -35,6 +37,17 @@
     └── └── └── └── └── ├── CorruptorBehaviorSpawn.h
     └── └── └── └── └── ├── CorruptorBehaviorState.cpp
     └── └── └── └── └── └── CorruptorBehaviorState.h
+    └── └── └── └── ├── guardianState/
+    └── └── └── └── └── ├── GuardianBehaviorDead.cpp
+    └── └── └── └── └── ├── GuardianBehaviorDead.h
+    └── └── └── └── └── ├── GuardianBehaviorHitReact.cpp
+    └── └── └── └── └── ├── GuardianBehaviorHitReact.h
+    └── └── └── └── └── ├── GuardianBehaviorMove.cpp
+    └── └── └── └── └── ├── GuardianBehaviorMove.h
+    └── └── └── └── └── ├── GuardianBehaviorSpawn.cpp
+    └── └── └── └── └── ├── GuardianBehaviorSpawn.h
+    └── └── └── └── └── ├── GuardianBehaviorState.cpp
+    └── └── └── └── └── └── GuardianBehaviorState.h
     └── └── └── └── ├── normalEnemyState/
     └── └── └── └── └── ├── EnemyBehaviorAttack.cpp
     └── └── └── └── └── ├── EnemyBehaviorAttack.h
@@ -64,15 +77,30 @@
     └── └── └── ├── bullet/
     └── └── └── └── ├── EnemyBullet.cpp
     └── └── └── └── ├── EnemyBullet.h
+    └── └── └── └── ├── GuardianAttackController.cpp
+    └── └── └── └── ├── GuardianAttackController.h
     └── └── └── └── ├── TimeBomb.cpp
     └── └── └── └── ├── TimeBomb.h
     └── └── └── └── ├── VignetteTrap.cpp
-    └── └── └── └── └── VignetteTrap.h
+    └── └── └── └── ├── VignetteTrap.h
+    └── └── └── └── └── bulletPattern/
+    └── └── └── └──     ├── BulletManager.cpp
+    └── └── └── └──     ├── BulletManager.h
+    └── └── └── └──     ├── BulletPattern.cpp
+    └── └── └── └──     ├── BulletPattern.h
+    └── └── └── └──     ├── LaserPattern.cpp
+    └── └── └── └──     ├── LaserPattern.h
+    └── └── └── └──     ├── SpiralShotPattern.cpp
+    └── └── └── └──     ├── SpiralShotPattern.h
+    └── └── └── └──     ├── SpreadShotPattern.cpp
+    └── └── └── └──     └── SpreadShotPattern.h
     └── └── └── └── waveState/
     └── └── └──     ├── EnemyWaveStage1.cpp
     └── └── └──     ├── EnemyWaveStage1.h
     └── └── └──     ├── EnemyWaveStage2.cpp
     └── └── └──     ├── EnemyWaveStage2.h
+    └── └── └──     ├── EnemyWaveStage3.cpp
+    └── └── └──     ├── EnemyWaveStage3.h
     └── └── └──     ├── EnemyWaveState.cpp
     └── └── └──     └── EnemyWaveState.h
     └── └── ├── field/
@@ -414,6 +442,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\baseObject\Character.cpp" />
     <ClCompile Include="application\baseObject\BaseBullet.cpp" />
     <ClCompile Include="application\scene\cameraController\BarrierBreakCameraController.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletManager.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\waveState\EnemyWaveStage3.cpp" />
     <ClCompile Include="gameEngine\io\Controller.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\ChromaticPulsePass.cpp" />
     <ClCompile Include="gameEngine\transition\BaseTransition.cpp" />
@@ -462,6 +493,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\GamePlayScene.cpp" />
     <ClCompile Include="gameEngine\imgui\ImGuiManager.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp" />
+    <ClCompile Include="application\objects\enemy\Guardian.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="gameEngine\3d\Model.cpp" />
     <ClCompile Include="gameEngine\3d\ModelCommon.cpp" />
@@ -506,6 +545,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameEngine\base\postEffect\RGBShiftPass.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\NoisePass.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\ScanlinePass.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.cpp" />
     <ClCompile Include="application\objects\player\motion\PlayerAutoMotion.cpp" />
     <ClCompile Include="application\objects\player\motion\PlayerClearMotion.cpp" />
     <ClCompile Include="application\objects\player\motion\PlayerDeathMotion.cpp" />
@@ -530,6 +571,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\baseObject\Character.h" />
     <ClInclude Include="application\baseObject\BaseBullet.h" />
     <ClInclude Include="application\scene\cameraController\BarrierBreakCameraController.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.h" />
+    <ClInclude Include="application\objects\enemy\waveState\EnemyWaveStage3.h" />
     <ClInclude Include="gameEngine\io\ComPtr.h" />
     <ClInclude Include="gameEngine\io\Controller.h" />
     <ClInclude Include="gameEngine\base\postEffect\ChromaticPulsePass.h" />
@@ -628,6 +672,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="gameEngine\base\postEffect\NoisePass.h" />
     <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
     <ClInclude Include="gameEngine\io\InputData.h" />
+    <ClInclude Include="application\objects\enemy\Guardian.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h" />
     <ClInclude Include="application\objects\player\motion\IPlayerMotion.h" />
     <ClInclude Include="application\objects\player\motion\PlayerAutoMotion.h" />
     <ClInclude Include="application\objects\player\motion\PlayerClearMotion.h" />
@@ -1204,6 +1258,21 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="application\objects\player\PlayerEffects.cpp">
       <Filter>application\objects\player</Filter>
     </ClCompile>
+    <ClCompile Include="application\objects\enemy\Guardian.cpp">
+      <Filter>application\objects\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletManager.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp" />
+    <ClCompile Include="application\objects\enemy\waveState\EnemyWaveStage3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1554,6 +1623,20 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="gameEngine\io\ComPtr.h">
       <Filter>gameEngine\io</Filter>
     </ClInclude>
+    <ClInclude Include="application\objects\enemy\Guardian.h">
+      <Filter>application\objects\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h" />
+    <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h" />
     <ClInclude Include="application\objects\player\motion\PlayerAutoMotion.h">
       <Filter>application\objects\player\motion</Filter>
     </ClInclude>
@@ -1569,6 +1652,7 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\objects\player\PlayerEffects.h">
       <Filter>application\objects\player</Filter>
     </ClInclude>
+    <ClInclude Include="application\objects\enemy\waveState\EnemyWaveStage3.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -3288,6 +3372,12 @@ void EnemyManager::Finalize()
 	{
 		corruptor->Finalize();
 	}
+
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->Finalize();
+	}
+
 }
 
 void EnemyManager::Update()
@@ -3387,6 +3477,32 @@ void EnemyManager::Update()
 		pCorruptors_.end()
 	);
 
+	// ガーディアンの更新
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->SetPlayerPosition(playerPosition_);
+		guardian->Update(); 
+	}
+	// isDead がたったら削除
+	pGuardians_.erase(
+		std::remove_if(
+			pGuardians_.begin(),
+			pGuardians_.end(),
+			[this](std::unique_ptr<Guardian>& guardian)
+			{
+				if (guardian->IsDead())
+				{
+					guardian->Finalize();
+					// 敵のカウントを減らす
+					enemyCount_--;
+					return true;
+				}
+				return false;
+			}),
+		pGuardians_.end()
+	);
+
+
 	// ウェーブステートの更新
 	pState_->Update();
 	
@@ -3424,6 +3540,11 @@ void EnemyManager::Draw()
 		corruptor->Draw();
 	}
 
+	for(auto& guardian : pGuardians_)
+	{
+		guardian->Draw();
+	}
+
 }
 
 void EnemyManager::Draw2D()
@@ -3439,6 +3560,10 @@ void EnemyManager::Draw2D()
 	for (auto& corruptor : pCorruptors_)
 	{
 		corruptor->Draw2D();
+	}
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->Draw2D();
 	}
 	
 	pState_->Draw2D();
@@ -3457,6 +3582,11 @@ void EnemyManager::ImGuiDraw()
 	for (auto& enemy : pTrapEnemies_)
 	{
 		enemy->ImGuiDraw();
+	}
+
+	for (auto& guardian : pGuardians_)
+	{
+		guardian->ImGuiDraw();
 	}
 
 #endif // USE_IMGUI
@@ -3630,6 +3760,22 @@ void EnemyManager::CorruptorInit(const Vector3& pos)
 	enemyCount_++;
 }
 
+void EnemyManager::GuardianInit(const Vector3& pos)
+{
+	// ガーディアン
+	std::unique_ptr<Guardian> guardian = std::make_unique<Guardian>();
+	guardian->SetPosition(pos);
+	guardian->Initialize();
+	guardian->SetPlayerPosition(playerPosition_);
+	guardian->Update();
+
+	// 敵を登録
+	pGuardians_.push_back(std::move(guardian));
+
+	// 敵のカウントを増やす
+	enemyCount_++;
+}
+
 void EnemyManager::ChangeState(std::unique_ptr<EnemyWaveState> _pState)
 {
 	pState_ = std::move(_pState);
@@ -3681,6 +3827,7 @@ bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos)
 	consider(pNormalEnemies_);
 	consider(pTrapEnemies_);
 	consider(pCorruptors_);
+	consider(pGuardians_);
 
 	return found;
 }
@@ -3697,6 +3844,7 @@ File Path: project/application/objects/enemy/EnemyManager.h
 #include "NormalEnemy.h"
 #include "TrapEnemy.h"
 #include "Corruptor.h"
+#include "Guardian.h"
 #include "waveState/EnemyWaveState.h"
 #include "../../../gameEngine/level_editor/LevelDataLoader.h"
 
@@ -3756,6 +3904,11 @@ public:
 	/// </summary>
 	/// <param name="pos">出現位置</param>
 	void CorruptorInit(const Vector3& pos);
+	/// <summary>
+	/// ガーディアンの初期化
+	/// </summary>
+	/// <param name="pos">出現位置</param>
+	void GuardianInit(const Vector3& pos);
 
 	/// <summary>
 	/// 敵のウェーブステート切り替え
@@ -3815,6 +3968,11 @@ public: // セッター
 	/// <param name="obstacles">障害物の位置ベクトル配列</param>
 	void SetObstacles(const std::vector<Vector3>& _obstacles) { obstacles_ = _obstacles; }
 
+    /// <summary>
+    /// ウェーブチェンジフラグセット
+    /// </summary>
+	void SetIsWaveChange(bool _isWaveChange) { isWaveChange_ = _isWaveChange; }
+
 private:
 
 	// エネミー
@@ -3823,6 +3981,8 @@ private:
 	std::vector<std::unique_ptr<TrapEnemy>> pTrapEnemies_;
 	// コラプター
 	std::vector<std::unique_ptr<Corruptor>> pCorruptors_;
+	// ガーディアン
+	std::vector<std::unique_ptr<Guardian>> pGuardians_;
 
 	// 敵の数
 	uint32_t enemyCount_ = 0;
@@ -3864,6 +4024,555 @@ private:
 		{ -5.0f, 0.5f, -2.0f },
 		{ 5.0f, 0.5f, 5.0f },
 	};
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/Guardian.cpp
+============================================================
+#include "Guardian.h"
+
+// BehaviorState
+#include "behaviorState/guardianState/GuardianBehaviorSpawn.h"
+#include "behaviorState/guardianState/GuardianBehaviorMove.h"
+#include "behaviorState/guardianState/GuardianBehaviorHitReact.h"
+#include "behaviorState/guardianState/GuardianBehaviorDead.h"
+
+// 弾のパターン
+#include "bullet/bulletPattern/SpreadShotPattern.h"
+#include "bullet/bulletPattern/SpiralShotPattern.h"
+#include "bullet/bulletPattern/LaserPattern.h"
+
+#include "TimeManager.h"
+
+using namespace IIEngine;
+
+void Guardian::Initialize()
+{
+    // Initialize を呼び出し共通プロパティを初期化
+    BaseEnemy::Initialize("guardian.obj", "Guardian", initialHP_);
+
+	position_.y = 1.0f; // 地面に立つようにY座標を調整
+	scale_ = { 2.0f, 2.0f, 2.0f };
+
+    SyncObjectTransform();
+
+    // ライト設定
+    object_->SetLighting(true);
+
+    // スプライトの初期化
+    for (uint32_t i = 0; i < spriteNum_; ++i)
+    {
+        auto sprite = std::make_unique<Sprite>();
+
+        if (i == 0)
+        {
+            sprite->Initialize("white.png", { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.5f });
+            sprite->SetSize(hpBarSize_);
+        }
+
+        sprites_.push_back(std::move(sprite));
+    }
+
+    // 出現時は無敵状態
+    isInvincible_ = true;
+
+	// 行動ステートの初期化
+	pBehaviorState_ = std::make_unique<GuardianBehaviorSpawn>(this);
+
+    // パーティクル
+    IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
+
+	// 弾幕のパターンを追加
+	attackController_.AddPattern(std::make_unique<SpreadShotPattern>(spreadCount_, spreadAngle_, spreadBulletSpeed_));
+	attackController_.AddPattern(std::make_unique<SpiralShotPattern>(spiralAngleSpeed_, spiralBulletSpeed_));
+	attackController_.AddPattern(std::make_unique<LaserPattern>(laserDirection_, laserSpeed_));
+
+}
+
+void Guardian::Finalize()
+{
+	// 弾のリソース解放
+	bulletManager_.ClearBullets();
+
+    colliderManager_->DeleteCollider(&collider_);
+}
+
+void Guardian::Update()
+{
+    // 基底クラスの共通更新処理を呼び出し
+    BaseEnemy::Update();
+
+	// 行動ステートの更新
+    pBehaviorState_->Update();
+	
+    // モデル変形の更新
+    object_->Update();
+
+    // HPバー更新
+    UpdateHPBar();
+
+    // プレイヤーとの距離を計算
+    float distanceToPlayer = position_.Distance(playerPosition_);
+
+    if (distanceToPlayer <= kStopChasingDistance)
+    {
+        isFarFromPlayer_ = true;
+    } else
+    {
+        isFarFromPlayer_ = false;
+    }
+
+    Attack();
+
+	// プレイヤーに向く
+    FaceToPlayer();
+
+    if (!isFollowingPath_)
+    {
+        // プレイヤー位置が一定以上変化したらパスを再計算するフラグを立てる
+        if ((playerPosition_ - lastPlayerPos_).Length() > playerMoveRePathThreshold_)
+        {
+            pathDirty_ = true;
+            lastPlayerPos_ = playerPosition_;
+        }
+    }
+}
+
+void Guardian::Draw()
+{
+	// 基底クラスの描画処理を呼び出し
+    Character::Draw();
+
+	// 弾の描画
+	bulletManager_.DrawAll();
+}
+
+void Guardian::ImGuiDraw()
+{
+#ifdef USE_IMGUI
+    
+    ImGui::Begin("Guardian");
+    ImGui::Text("HP: %.1f", hp_);
+    ImGui::Text("Position: (%.2f, %.2f, %.2f)", position_.x, position_.y, position_.z);
+    ImGui::Text("Is Invincible: %s", isInvincible_ ? "Yes" : "No");
+    ImGui::Text("Is Following Path: %s", isFollowingPath_ ? "Yes" : "No");
+    ImGui::Text("Is Far From Player: %s", isFarFromPlayer_ ? "Yes" : "No");
+	
+    int maxPattern = static_cast<int>(attackController_.PatternCount()) - 1;
+    int patternIndex = static_cast<int>(currentPatternIndex_);
+
+    if (ImGui::SliderInt("Bullet Pattern", &patternIndex, 0, maxPattern)) {
+        currentPatternIndex_ = static_cast<size_t>(patternIndex);
+        attackController_.SetPatternIndex(currentPatternIndex_);
+    }
+
+
+    ImGui::Text("Current Pattern Index: %d", patternIndex);
+    ImGui::Text("Total Patterns: %d", maxPattern + 1);
+    
+	// プレイヤーとの距離を表示
+	float distanceToPlayer = position_.Distance(playerPosition_);
+        ImGui::Text("Distance to Player: %.2f", distanceToPlayer);
+
+    ImGui::End();
+
+#endif // USE_IMGUI
+
+}
+
+void Guardian::Move()
+{
+    // デルタタイム取得
+    const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	// プレイヤーとの距離を計算
+    float distanceToPlayer = (playerPosition_ - position_).Length();
+
+	// プレイヤーに近づきすぎないようにする
+    if (distanceToPlayer <= kStopChasingDistance)
+    {
+        moveVelocity_ = { 0.0f, 0.0f, 0.0f };
+        // ここでposition_も変えずにSyncObjectTransform()だけでOK
+        SyncObjectTransform();
+        // 歩きパーティクルも止めるならemitしない
+        return;
+    }
+
+    // 基底クラスの補間処理を使用
+    toPlayer_ = playerPosition_ - position_;
+    Vector3 direction = Normalize(toPlayer_);
+    moveVelocity_ = InterpolateMovement(moveVelocity_, direction, moveInterpolateRate_);
+
+    moveVelocity_ /= moveVelocityDivisor_;
+    moveVelocity_.y = 0.0f;
+    position_ += moveVelocity_ * dt * kDefaultFrameRate;
+
+    SyncObjectTransform();
+
+    IIEngine::ParticleEmitter::Emit("enemyWalk", position_, moveParticleCount_);
+
+}
+
+void Guardian::Attack()
+{
+	float now = IIEngine::TimeManager::Instance().GetTotalTime();
+    float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+    std::vector<PatternCondition> patternConditions_ = 
+    {
+		// 条件とパターンインデックスのペアを定義
+        // 0: SpreadShotPattern
+        { [](const Guardian& g) { return g.GetDistanceToPlayer() < g.kSpreadRange_ && g.GetDistanceToPlayer() < g.kSpiralRange_; }, 0 },
+        // 1: SpiralShotPattern
+        { [](const Guardian& g) { return g.GetDistanceToPlayer() >= g.kSpiralRange_ && g.GetDistanceToPlayer() < g.kLaserRange_; }, 1 },
+        // 2: LaserPattern
+        { [](const Guardian& g) { return g.GetDistanceToPlayer() >= g.kLaserRange_; }, 2 },
+        
+    };
+
+	// 条件を順番に評価して、最初にマッチしたパターンに切り替える
+    for (const auto& entry : patternConditions_) 
+    {
+		// 条件を評価
+        if (entry.condition(*this)) 
+        {
+			// 条件にマッチしたパターンに切り替える(すでにそのパターンの場合は何もしない)
+            if (currentPatternIndex_ != entry.patternIndex) 
+            {
+				// パターン切り替え
+                currentPatternIndex_ = entry.patternIndex;
+                attackController_.SetPatternIndex(currentPatternIndex_);
+            }
+
+            break;
+        }
+    }
+
+    // SpiralShotPatternのインデックス(登録順)
+    uint32_t spiralIndex = 1; 
+    // 現在のパターンがSpiralShotPatternかどうか
+    bool isSpiral = (currentPatternIndex_ == spiralIndex);
+
+    // 発射間隔切り替え
+    if (isSpiral)
+    {
+		// SpiralShotPatternの発射間隔
+        shootInterval_ = 1.0f / 6.0f;
+    } 
+    else 
+    {
+        shootInterval_ = 3.0f; // 通常時
+    }
+
+    // 発射間隔管理
+    shootTimer_ += dt;
+    if (shootTimer_ >= shootInterval_)
+    {
+		// 現在のパターンで弾を発射
+        attackController_.FireCurrentPattern(position_, bulletManager_, now, playerPosition_);
+        shootTimer_ = 0.0f;
+
+		// SpiralShotPatternの場合は撃った回数をカウント
+        if (isSpiral)
+        {
+            ++spiralShotsFired_;
+            // spiralMaxShots_分撃ち終わったら次へ
+            if (spiralShotsFired_ >= spiralMaxShots_) 
+            {
+				// 次のパターンへ切り替え
+                currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
+                attackController_.SetPatternIndex(currentPatternIndex_);
+                spiralShotsFired_ = 0;
+                patternTimer_ = 0.0f; // パターン切り替え直後から再カウント
+            }
+        }
+        else
+        {
+            // Spiral以外は従来通りパターンタイマーで管理
+            patternTimer_ += shootInterval_; 
+            if (patternTimer_ >= patternInterval_) 
+            {
+                currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
+                attackController_.SetPatternIndex(currentPatternIndex_);
+                patternTimer_ = 0.0f;
+            }
+        }
+    }
+	bulletManager_.UpdateAll();
+
+}
+
+void Guardian::ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState)
+{
+    pBehaviorState_ = std::move(_pState);
+    pBehaviorState_->Initialize();
+}
+
+void Guardian::FaceToPlayer()
+{
+    Vector3 toPlayer = playerPosition_ - position_;
+
+    rotation_.x = 0.0f;
+    rotation_.y = std::atan2(toPlayer.x, toPlayer.z); 
+
+    SyncObjectTransform();
+}
+
+void Guardian::SwitchAttackPattern(uint32_t _patternIndex)
+{
+    if (currentPatternIndex_ != _patternIndex) 
+    {
+        currentPatternIndex_ = _patternIndex;
+        attackController_.SetPatternIndex(currentPatternIndex_);
+        spiralShotsFired_ = 0;
+        patternTimer_ = 0.0f;
+    }
+}
+
+void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
+{
+    if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
+    {
+        // プレイヤーの弾と衝突した場合
+        if (hp_ > 0)
+        {
+            // HP減少
+            hp_--;
+
+            isHit_ = true;
+        }
+    }
+
+    if (!isInvincible_ && _other->GetColliderID() == "ExplosionTimeBomb")
+    {
+        if (_other->GetOwner()->IsActive())
+        {
+            // HPを減少
+            if (hp_ > 0)
+            {
+                hp_ -= timeBombExplosionDamage_;
+                isHit_ = true;
+            }
+        }
+    }
+
+    if (_other->GetColliderID() == "VignetteTrap")
+    {
+        if (_other->GetOwner()->IsActive())
+        {
+            // VignetteTrapに当たった場合
+            //isHitVignetteTrap_ = true;
+        }
+    }
+}
+
+void Guardian::OnCollision(const IIEngine::Collider* _other)
+{
+    if (_other->GetColliderID() == "NormalEnemy" or
+        _other->GetColliderID() == "TrapEnemy")
+    {
+
+        // 敵の位置
+        Vector3 enemyPosition = _other->GetOwner()->GetPosition();
+
+        // 敵同士が重ならないようにする
+        Vector3 direction = position_ - enemyPosition;
+        direction.Normalize();
+        float distance = 2.5f; // 敵同士の間の距離を調整するための値
+
+        // 互いに重ならないように少しずつ位置を調整
+        if ((position_ - enemyPosition).Length() < distance)
+        {
+            position_ += direction * 0.1f; // 微調整のための値
+        }
+    }
+
+    if (_other->GetColliderID() == "Wall" or
+        _other->GetColliderID() == "Barrier" or
+        _other->GetColliderID() == "Player")
+    {
+        // 相手のAABBを取得
+        const AABB* otherAABB = _other->GetAABB();
+
+        if (otherAABB)
+        {
+            // 自分のAABBと位置を渡して補正
+            CorrectOverlap(*otherAABB, aabb_, position_);
+
+            pathDirty_ = true;
+
+        }
+    }
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/Guardian.h
+============================================================
+#pragma once
+
+#include "../../baseObject/BaseEnemy.h"
+#include"../../../gameEngine/collider/ColliderManager.h"
+#include "../../../gameEngine/particle/ParticleEmitter.h"
+
+// 行動ステート
+#include "behaviorState/guardianState/GuardianBehaviorState.h"
+// 攻撃コントローラー
+#include "bullet/GuardianAttackController.h"
+
+#include <Object3d.h>
+#include <Framework.h>
+
+/// <summary>
+/// ガーディアン
+/// ボス的な存在
+/// </summary>
+class Guardian : public BaseEnemy
+{
+public:
+
+	Guardian() = default;
+	~Guardian() = default;
+
+	// 初期化
+	void Initialize() override;
+
+	// 終了
+	void Finalize() override;
+
+	// 更新
+	void Update() override;
+
+	// 描画
+	void Draw() override;
+
+	// ImGui
+	void ImGuiDraw();
+
+	// 移動
+	void Move() override;
+
+	// 攻撃
+	void Attack() override;
+
+	/// <summary>
+	/// 行動ステート切り替え
+	/// </summary>
+	/// <param name="_pState">新しいステートポインタ</param>
+	void ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState);
+
+private: // 内部関数
+
+	// 向きをプレイヤーに向ける
+	void FaceToPlayer();
+
+	// 攻撃パターン切り替え
+	void SwitchAttackPattern(uint32_t _patternIndex);
+
+
+public: // ゲッター
+
+	// 攻撃がヒットしたかどうか
+	bool IsHit() const { return isHit_; }
+
+	// プレイヤーまでの距離を取得
+	float GetDistanceToPlayer() const {return (playerPosition_ - position_).Length();}
+
+public: // セッター	
+
+	// プレイヤーの位置をセット
+	void SetPlayerPosition(const Vector3& _playerPosition) { playerPosition_ = _playerPosition; }
+
+	// 無敵状態の設定
+	void SetInvincible(bool _isInvincible) { isInvincible_ = _isInvincible; }
+
+	// ヒットフラグの設定
+	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
+
+	// --- ステートでのTransform操作用関数(引数あり) ---
+
+	// オブジェクトの positionをセット
+	void SetObjectPosition(const Vector3& _position) { object_->SetPosition(_position); }
+	// オブジェクトの rotationをセット
+	void SetObjectRotation(const Vector3& _rotation) { object_->SetRotate(_rotation); }
+	// オブジェクトの scaleをセット
+	void SetObjectScale(const Vector3& _scale) { object_->SetScale(_scale); }
+
+private: // 衝突判定
+
+	/// <summary>
+	/// 衝突時の処理
+	/// </summary>
+	/// <param name="_other">衝突相手のコライダー</param>
+	void OnCollisionTrigger(const IIEngine::Collider* _other)override;
+
+	/// <summary>
+	/// 衝突中の処理
+	/// </summary>
+	/// <param name="_other">衝突相手のコライダー</param>
+	void OnCollision(const IIEngine::Collider* _other)override;
+
+private:
+
+	// 行動ステート
+	std::unique_ptr<GuardianBehaviorState> pBehaviorState_ = nullptr;
+
+	float initialHP_ = 30.0f;
+
+	// 攻撃コントローラー
+	GuardianAttackController attackController_;
+	// 弾の管理クラス
+	BulletManager bulletManager_;
+
+	// 確認用変数
+	size_t currentPatternIndex_ = 0;       // 現在のパターン
+	float patternInterval_ = 3.0f;         // パターン切り替え間隔[秒]
+	float patternTimer_ = 0.0f;            // 経過タイマー
+	float shootInterval_ = 3.0f;           // 発射間隔[秒]
+	float shootTimer_ = 0.0f;              // 次弾までのタイマー
+
+	// 攻撃パターン切り替えの条件とインデックスのペア
+	struct PatternCondition
+	{
+		std::function<bool(const Guardian&)> condition;
+		size_t patternIndex;
+	};
+
+	// 各弾幕のパラメータ
+	// 扇状弾幕
+	uint32_t spreadCount_ = 5;
+	float spreadAngle_ = 60.0f;
+	float spreadBulletSpeed_ = 0.22f;
+	// 螺旋弾幕
+	float spiralAngleSpeed_ = 3.5f;
+	float spiralBulletSpeed_ = 0.18f;
+	uint32_t spiralShotsFired_ = 0;
+	uint32_t spiralMaxShots_ = 30;
+	// レーザー 
+	Vector3 laserDirection_ = { 0.0f, 0.0f, 1.0f };
+	float laserSpeed_ = 0.5f;
+
+	// 攻撃切り替え距離
+	const float kSpreadRange_ = 10.0f; // 近距離扇状
+	const float kSpiralRange_ = 15.0f; // 中距離螺旋
+	const float kLaserRange_ = 17.0f;  // 遠距離レーザー
+
+	// パーティクル数
+	int spawnParticleCount_ = 2;
+	int moveParticleCount_ = 1;	
+
+	// bomb ダメージ
+	float timeBombExplosionDamage_ = 1.5f;
+
+	// 移動関連
+	float moveInterpolateRate_ = 0.1f;
+	float moveVelocityDivisor_ = 12.0f; // 大きいほど移動速度が遅くなる
+	float playerMoveRePathThreshold_ = 1.0f;
+	// 追尾停止距離
+	const float kStopChasingDistance = 15.0f;
 
 };
 
@@ -5566,6 +6275,538 @@ protected:
 
 
 ============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorDead.cpp
+============================================================
+#include "GuardianBehaviorDead.h"
+
+#include <Ease.h>
+
+#include "../../Guardian.h"
+
+GuardianBehaviorDead::GuardianBehaviorDead(Guardian* _pGuardian) : GuardianBehaviorState("Dead", _pGuardian)
+{
+	motion_.isActive = true;
+	motion_.count = 0;
+	motion_.maxCount = deadCount_; // 移動モーションのカウントを設定
+}
+
+void GuardianBehaviorDead::Initialize()
+{
+}
+
+void GuardianBehaviorDead::Update()
+{
+	// 敵のトランスフォームを motion_.transformにセット
+	TransformUpdate(pGuardian_);
+	
+	float t = float(motion_.count) / motion_.maxCount;
+	
+	if (motion_.count == 0)
+	{
+		motion_.transform.scale = Vector3(startPopScale_, startPopScale_, startPopScale_); // 初回だけ一気に膨らむ
+	}
+	
+	// 徐々に縮む演出(1.8 → 0.0)
+ 	float scale = Lerp(startPopScale_, endScale_, Ease::InCubic(t));
+	motion_.transform.scale = (Vector3(scale, scale, scale));
+	
+	motion_.transform.position.y += Ease::OutQuad(t) * floatUpAmount_;
+	
+	motion_.transform.rotation.y += rotSpeedY_;
+	motion_.transform.rotation.x += rotSpeedX_;
+	
+	pGuardian_->SetObjectPosition(motion_.transform.position);
+	pGuardian_->SetObjectRotation(motion_.transform.rotation);
+	pGuardian_->SetObjectScale(motion_.transform.scale);
+
+	// モーションカウントを更新
+	MotionCount(motion_);
+
+	if (!motion_.isActive)
+	{
+		// 死亡モーションが終了したら、敵を削除
+		pGuardian_->SetIsDead(true);
+		// パーティクル
+		IIEngine::ParticleEmitter::Emit("petalGroup", motion_.transform.position, petalParticleCount_);
+		IIEngine::ParticleEmitter::Emit("rupture", motion_.transform.position, ruptureParticleCount_);
+	}
+
+}
+
+void GuardianBehaviorDead::ResetMotion()
+{
+}
+ 
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorDead.h
+============================================================
+#pragma once
+
+#include "GuardianBehaviorState.h"
+
+class GuardianBehaviorDead : public GuardianBehaviorState
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="_pGuardian">ガーディアンポインタ</param>
+	GuardianBehaviorDead(Guardian* _pGuardian);
+	
+	// デストラクタ
+	~GuardianBehaviorDead() = default;
+	
+	// 初期化
+	void Initialize() override;
+	
+	// 更新
+	void Update() override;
+
+	// モーションのカウント等をリセット
+	void ResetMotion() override;
+
+private:
+
+	// モーションのカウント
+	uint32_t deadCount_ = 30;
+
+	// 初回膨張
+	float startPopScale_ = 2.8f;
+	// 最終縮小
+	float endScale_ = 0.0f;
+	// 上昇量
+	float floatUpAmount_ = 0.1f;
+	// 回転速度
+	float rotSpeedY_ = 0.1f;
+	float rotSpeedX_ = 0.1f;
+
+	// パーティクルの数
+	int petalParticleCount_ = 6;
+	int ruptureParticleCount_ = 20;
+
+};
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorHitReact.cpp
+============================================================
+#include "GuardianBehaviorHitReact.h"
+
+#include "../../Guardian.h"
+#include "GuardianBehaviorMove.h"
+#include "GuardianBehaviorDead.h"
+
+GuardianBehaviorHitReact::GuardianBehaviorHitReact(Guardian* _pGuardian) : GuardianBehaviorState("HitReact", _pGuardian)
+{
+	motion_.isActive = true;
+	motion_.count = 0;
+	motion_.maxCount = hitReactCount_; // 移動モーションのカウントを設定
+}
+
+void GuardianBehaviorHitReact::Initialize()
+{
+}
+
+void GuardianBehaviorHitReact::Update()
+{
+	// 敵のトランスフォームを motion_.transformにセット
+   	TransformUpdate(pGuardian_);
+	
+	Vector3 shakeOffset =
+	{
+	((motion_.count % shakePeriodX_ == 0) ? 2.0f : -2.0f) * shakeAmp_,
+	0.0f, // Y軸は揺らさない
+	((motion_.count % shakePeriodZ_ == 0) ? 2.0f : -2.0f) * shakeAmp_
+	};
+	
+	Vector3 originPos = pGuardian_->GetPosition();
+	
+	pGuardian_->SetObjectPosition(originPos + shakeOffset);
+	
+	// モーションカウントを更新
+	MotionCount(motion_);
+	
+	if (!motion_.isActive)
+	{
+		if (pGuardian_->GetHP() <= 0)
+		{
+			// HPが0以下なら、死亡モーションに切り替え
+			pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorDead>(pGuardian_));
+			return;
+		} 
+		else if(pGuardian_->GetHP() > 0)
+		{
+			float hp = 0;
+			hp = pGuardian_->GetHP();
+			// 無敵状態を解除
+			pGuardian_->SetInvincible(false);
+			// ヒットリアクションモーションが終了したら、移動モーションに切り替え
+			pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorMove>(pGuardian_));
+		}
+	}
+
+}
+
+void GuardianBehaviorHitReact::ResetMotion()
+{
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorHitReact.h
+============================================================
+#pragma once
+
+#include "GuardianBehaviorState.h"
+
+/// <summary>
+/// ガーディアンのヒットリアクション
+/// </summary>
+class GuardianBehaviorHitReact : public GuardianBehaviorState
+{
+public:
+	
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="_pGuardian">ガーディアンポインタ</param>
+	GuardianBehaviorHitReact(Guardian* _pGuardian);
+	
+	// デストラクタ
+	~GuardianBehaviorHitReact() = default;
+	
+	// 初期化
+	void Initialize() override;
+	
+	// 更新
+	void Update() override;
+
+	// モーションのカウント等をリセット
+	void ResetMotion() override;
+
+private:
+
+	// モーションのカウント
+	uint32_t hitReactCount_ = 30;
+
+
+	// 振動の強さ
+	float shakeAmp_ = 0.2f;
+	// 振動の周期
+	int shakePeriodX_ = 2;
+	// 振動の周期
+	int shakePeriodZ_ = 3;
+
+};
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorMove.cpp
+============================================================
+#include "GuardianBehaviorMove.h"
+
+#include "../../Guardian.h"
+#include "GuardianBehaviorHitReact.h"
+
+GuardianBehaviorMove::GuardianBehaviorMove(Guardian* _pGuardian) : GuardianBehaviorState("Move", _pGuardian)
+{
+	motion_.isActive = true;
+	motion_.count = 0;
+	motion_.maxCount = moveCount_;
+}
+
+void GuardianBehaviorMove::Initialize()
+{
+}
+
+void GuardianBehaviorMove::Update()
+{
+	// 敵のトランスフォームを motion_.transformにセット
+	TransformUpdate(pGuardian_);
+
+	// 動く前に切り替え処理
+	if (pGuardian_->IsHit())
+	{
+		// ヒットフラグをリセット
+		pGuardian_->SetIsHit(false);
+	
+		// 無敵化
+		pGuardian_->SetInvincible(true);
+		
+		// ヒットしたら、ヒットリアクションモーションに切り替え
+		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorHitReact>(pGuardian_));
+		return;
+	}
+	else
+	{
+		// ステートが切り替わらなかったらもう一度
+		ResetMotion();
+	}
+
+	pGuardian_->Move();
+
+}
+
+void GuardianBehaviorMove::ResetMotion()
+{
+
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorMove.h
+============================================================
+#pragma once
+
+#include "GuardianBehaviorState.h"
+
+/// <summary>
+/// ガーディアンの移動
+/// </summary>
+class GuardianBehaviorMove : public GuardianBehaviorState
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="_pGuardian">ガーディアンポインタ</param>
+	GuardianBehaviorMove(Guardian* _pGuardian);
+
+	// デストラクタ
+	~GuardianBehaviorMove() = default;
+
+	// 初期化
+	void Initialize() override;
+
+	// 更新
+	void Update() override;
+
+	// モーションのカウント等をリセット
+	void ResetMotion() override;
+
+private:
+
+	// モーションのカウント
+	uint32_t moveCount_ = 30;
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorSpawn.cpp
+============================================================
+#include "GuardianBehaviorSpawn.h"
+
+#include <Ease.h>
+
+#include "../../Guardian.h"
+#include "GuardianBehaviorMove.h"
+
+GuardianBehaviorSpawn::GuardianBehaviorSpawn(Guardian* _pGuardian) : GuardianBehaviorState("Spawn", _pGuardian)
+{
+	// モーションの初期化
+	motion_.isActive = true;
+	motion_.count = 0;
+	motion_.maxCount = spawnCount_; // スポーンモーションのカウントを設定
+}
+
+void GuardianBehaviorSpawn::Initialize()
+{
+
+}
+
+void GuardianBehaviorSpawn::Update()
+{
+	// 敵のトランスフォームを motion_.transformにセット
+	TransformUpdate(pGuardian_);
+
+	// イージングの進行度(0〜1)
+	float t = float(motion_.count) / motion_.maxCount;
+	motion_.transform.scale.x = Ease::OutBack(t);
+	motion_.transform.scale.y = Ease::OutBack(t);
+	motion_.transform.scale.z = Ease::OutBack(t);
+	Vector3 one = { 1.0f, 1.0f, 1.0f };
+
+	pGuardian_->SetObjectPosition(motion_.transform.position);
+	pGuardian_->SetObjectRotation(motion_.transform.rotation);
+	pGuardian_->SetObjectScale(one * motion_.transform.scale);
+
+	// モーションカウントを更新
+	MotionCount(motion_);
+
+	if (!motion_.isActive)
+	{
+		// 無敵状態を解除
+		pGuardian_->SetInvincible(false);
+
+		// スポーンモーションが終了したら、次の状態に移行
+		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorMove>(pGuardian_));
+	}
+
+
+}
+
+void GuardianBehaviorSpawn::ResetMotion()
+{
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorSpawn.h
+============================================================
+#pragma once
+
+#include "GuardianBehaviorState.h"
+
+/// <summary>
+/// ガーディアンの出現
+/// </summary>
+class GuardianBehaviorSpawn : public GuardianBehaviorState
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="_pGuardian">ガーディアンポインタ</param>
+	GuardianBehaviorSpawn(Guardian* _pGuardian);
+	
+	// デストラクタ
+	~GuardianBehaviorSpawn() = default;
+	
+	// 初期化
+	void Initialize() override;
+	
+	// 更新
+	void Update() override;
+	
+	// モーションのカウント等をリセット
+	void ResetMotion() override;
+
+private:
+
+	// モーションのカウント
+	uint32_t spawnCount_ = 30;
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorState.cpp
+============================================================
+#include "GuardianBehaviorState.h"
+
+#include "../../Guardian.h"
+
+GuardianBehaviorState::~GuardianBehaviorState()
+{
+}
+
+void GuardianBehaviorState::MotionCount(Motion& _motion)
+{
+	if (_motion.count < _motion.maxCount)
+	{
+		_motion.count++;
+	}
+	else
+	{
+		// モーション終了 カウントリセット
+		_motion.isActive = false;
+		_motion.count = 0;
+	}
+}
+
+void GuardianBehaviorState::TransformUpdate(Guardian* _pGuardian)
+{
+	if (_pGuardian)
+	{
+		motion_.transform.position = _pGuardian->GetPosition();
+		motion_.transform.rotation = _pGuardian->GetRotation();
+		motion_.transform.scale = _pGuardian->GetScale();
+	}
+}
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorState.h
+============================================================
+#pragma once
+
+#include <sstream>
+#include <Vector3.h>
+
+// 前方宣言
+class Guardian;
+
+/// <summary>
+/// Guardianの行動ステート基底クラス
+/// </summary>
+class GuardianBehaviorState
+{
+public:
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="_state">ステート名</param>
+	/// <param name="_pGuardian">ガーディアンポインタ</param>
+	GuardianBehaviorState(const std::string& _state, Guardian* _pGuardian) :stateName_(_state), pGuardian_(_pGuardian) {};
+	virtual ~GuardianBehaviorState();
+
+	// 初期化
+	virtual void Initialize() = 0;
+
+	// 更新
+	virtual void Update() = 0;
+
+	// モーションのカウント等をリセット
+	virtual void ResetMotion() = 0;
+
+protected:
+
+	struct Transform
+	{
+		Vector3 position = { 0.0f, 0.0f, 0.0f };
+		Vector3 rotation = { 0.0f, 0.0f, 0.0f };
+		Vector3 scale = { 1.0f, 1.0f, 1.0f };
+	};
+
+	struct Motion
+	{
+		// モーションがアクティブかどうか
+		bool isActive = false;
+		// カウント
+		uint32_t count = 0;
+		// Maxカウント
+		uint32_t maxCount = 30;
+		// トランスフォーム
+		Transform transform;
+	};
+
+	/// <summary>
+	/// モーションのカウント
+	/// </summary>
+	/// <param name="_motion">モーション構造体</param>
+	void MotionCount(Motion& _motion);
+
+	/// <summary>
+	/// 敵のトランスフォームを motion_.transformにセット
+	/// </summary>
+	/// <param name="_pEnemy">ガーディアンポインタ</param>
+	void TransformUpdate(Guardian* _pEnemy);
+
+	std::string stateName_;
+	Guardian* pGuardian_ = nullptr;
+
+	Motion motion_;
+
+
+};
+
+
+
+============================================================
 File Path: project/application/objects/enemy/behaviorState/normalEnemyState/EnemyBehaviorAttack.cpp
 ============================================================
 #include "EnemyBehaviorAttack.h"
@@ -7231,6 +8472,76 @@ private: // メンバ変数
 
 
 ============================================================
+File Path: project/application/objects/enemy/bullet/GuardianAttackController.cpp
+============================================================
+#include "GuardianAttackController.h"
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/GuardianAttackController.h
+============================================================
+#pragma once
+
+#include <vector>
+#include <memory>
+
+#include "bulletPattern/BulletPattern.h"
+#include "bulletPattern/BulletManager.h"
+
+class GuardianAttackController
+{
+public:
+
+    /// <summary>
+	/// 弾パターンを追加する
+    /// </summary>
+	/// <param name="_pattern">追加する弾パターンのユニークポインタ</param>
+    void AddPattern(std::unique_ptr<BulletPattern> _pattern)
+    {
+        patterns_.emplace_back(std::move(_pattern));
+    }
+
+    /// <summary>
+	/// 現在のパターンで弾を発射する
+    /// </summary>
+	/// <param name="_origin">弾の発射位置</param>
+	/// <param name="_manager">弾の管理クラス</param>
+	/// <param name="_time">現在の時間</param>
+    void FireCurrentPattern(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos)
+    {
+        if (!patterns_.empty()) 
+        {
+            patterns_[currentPatternIndex_]->Fire(_origin, _manager, _time, _playerPos);
+        }
+    }
+
+    /// <summary>
+	/// 現在のパターンを切り替える
+    /// </summary>
+	/// <param name="_idx">切り替えるパターンのインデックス</param>
+    void SetPatternIndex(size_t _idx) 
+    {
+        if (_idx < patterns_.size()) currentPatternIndex_ = _idx;
+    }
+
+
+    /// <summary>
+	/// パターンの数を取得
+    /// </summary>
+    /// <returns>パターンの数</returns>
+    size_t PatternCount() const { return patterns_.size(); }
+
+private:
+
+    std::vector<std::unique_ptr<BulletPattern>> patterns_;
+    size_t currentPatternIndex_ = 0;
+
+
+};
+
+
+
+============================================================
 File Path: project/application/objects/enemy/bullet/TimeBomb.cpp
 ============================================================
 #include "TimeBomb.h"
@@ -8240,6 +9551,354 @@ private:
 
 
 ============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/BulletManager.cpp
+============================================================
+#include "BulletManager.h"
+
+void BulletManager::AddBullet(std::unique_ptr<BaseBullet> _bullet)
+{
+	_bullet->Initialize();
+    bullets_.emplace_back(std::move(_bullet));
+}
+
+void BulletManager::ClearBullets()
+{
+        for (auto& bullet : bullets_)
+    {
+        if (bullet)
+        {
+            bullet->Finalize();
+        }
+    }
+    bullets_.clear();
+}
+
+void BulletManager::UpdateAll()
+{
+    for (auto& bullet : bullets_)
+    {
+        if (bullet) bullet->Update();
+    }
+
+    // 消滅した弾はFinalize後erase
+    for (auto& bullet : bullets_) 
+    {
+        if (bullet && bullet->IsDead()) 
+        {
+            bullet->Finalize();
+        }
+    }
+
+	// 消滅した弾をリストから削除
+    bullets_.erase(
+        std::remove_if(bullets_.begin(), bullets_.end(),
+            [](const std::unique_ptr<BaseBullet>& b) { return b->IsDead(); }),
+        bullets_.end());
+}
+
+void BulletManager::DrawAll()
+{
+    for (auto& bullet : bullets_) { bullet->Draw(); }
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/BulletManager.h
+============================================================
+#pragma once
+
+#include <vector>
+#include <memory>
+
+#include "../../../../baseObject/BaseBullet.h"
+
+/// <summary>
+/// 弾の管理クラス
+/// </summary>
+class BulletManager
+{
+public:
+
+    /// <summary>
+	/// 弾の追加
+    /// </summary>
+	/// <param name="_bullet">追加する弾のユニークポインタ</param>
+    void AddBullet(std::unique_ptr<BaseBullet> _bullet);
+
+	/// <summary>
+	/// 全ての弾の消去
+	/// </summary>
+	void ClearBullets();
+
+    /// <summary>
+	/// 全ての弾の更新と消去処理
+    /// </summary>
+    void UpdateAll();
+
+    /// <summary>
+	/// 全ての弾の描画
+    /// </summary>
+    void DrawAll();
+
+private:
+
+	// 弾のリスト
+    std::vector<std::unique_ptr<BaseBullet>> bullets_;
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/BulletPattern.cpp
+============================================================
+#include "BulletPattern.h"
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/BulletPattern.h
+============================================================
+#pragma once
+
+#include <Vector3.h>
+
+#include "BulletManager.h"
+
+/// <summary>
+/// 弾のパターンを管理するクラス
+/// </summary>
+class BulletPattern
+{
+public:
+
+	virtual ~BulletPattern() = default;
+
+	/// <summary>
+	/// 発射
+	/// </summary>
+	/// <param name="_origin">発射位置</param>
+	/// <param name="_manager">弾の管理クラス</param>
+	/// <param name="_time">発射時間</param>
+	/// <param name="_playerPos">プレイヤーの位置</param>
+	virtual void Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos) = 0;
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/LaserPattern.cpp
+============================================================
+#include "LaserPattern.h"
+
+void LaserPattern::Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos)
+{
+    _time;
+
+    direction_ = Normalize(_playerPos - _origin);
+    auto laser = std::make_unique<EnemyBullet>();
+    laser->SetPosition(_origin);
+    laser->SetVelocity(direction_ * speed_);
+    _manager.AddBullet(std::move(laser));
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/LaserPattern.h
+============================================================
+#pragma once
+
+#include <Vector3.h>
+
+#include "BulletPattern.h"
+#include "../EnemyBullet.h"
+
+/// <summary>
+/// レーザーパターン
+/// </summary>
+class LaserPattern : public BulletPattern
+{
+public:
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="_direction">レーザーの方向</param>
+    /// <param name="_speed">レーザーの速度</param>
+    LaserPattern(const Vector3& _direction, float _speed): direction_(_direction.Normalize()), speed_(_speed) {}
+
+    /// <summary>
+	/// 発射
+    /// </summary>
+	/// <param name="_origin">発射位置</param>
+	/// <param name="_manager">弾の管理クラス</param>
+	/// <param name="_time">発射時間</param>
+    void Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos) override;
+    
+private:
+    
+    Vector3 direction_;
+    float speed_;
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/SpiralShotPattern.cpp
+============================================================
+#include "SpiralShotPattern.h"
+
+void SpiralShotPattern::Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos)
+{
+    _playerPos;
+
+
+    // 現在の角度を決める
+    float periodSec = 3.0f;
+    float angularSpeed = 360.0f / periodSec; // 1秒に何度進むか
+
+    float angle = std::fmod(_time * angularSpeed, 360.0f);
+
+    // 基準を"X+"に
+    float rad = angle * 3.14159265f / 180.0f;
+    Vector3 dir = { std::cos(rad), 0.0f, std::sin(rad) };
+
+    auto bullet = std::make_unique<EnemyBullet>();
+    bullet->SetPosition(_origin);
+    bullet->SetVelocity(dir * bulletSpeed_);
+    _manager.AddBullet(std::move(bullet));
+    
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/SpiralShotPattern.h
+============================================================
+#pragma once
+
+#include <cmath>
+
+#include "BulletPattern.h"
+#include "../EnemyBullet.h"
+
+/// <summary>
+/// 螺旋弾
+/// </summary>
+class SpiralShotPattern : public BulletPattern
+{
+public:
+
+    /// <summary>
+	/// コンストラクタ
+    /// </summary>
+    /// <param name="_spiralSpeed">螺旋の回転速度</param>
+    /// <param name="_bulletSpeed">弾の速度</param>
+    SpiralShotPattern(float _spiralSpeed, float _bulletSpeed): spiralSpeed_(_spiralSpeed), bulletSpeed_(_bulletSpeed) {}
+    
+	/// <summary>
+	/// 発射
+	/// </summary>
+	/// <param name="_origin">発射位置</param>
+	/// <param name="_manager">弾管理者</param>
+	/// <param name="_time">経過時間</param>
+	void Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos) override;
+
+private:
+
+	// 弾の数
+	uint32_t bulletCount_ = 8;
+	// 螺旋の回転速度[度/秒]
+	float spiralSpeed_ = 2.0f;
+	// 弾の速度
+	float bulletSpeed_ = 0.1f;
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/SpreadShotPattern.cpp
+============================================================
+#include "SpreadShotPattern.h"
+
+void SpreadShotPattern::Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos)
+{
+    _time;
+
+    // プレイヤー方向ベクトル
+    Vector3 toPlayer = _playerPos - _origin;
+    toPlayer.y = 0; // Y成分無視
+    Vector3 dir = Normalize(toPlayer);
+
+    // 角度(目標方向のY回転)を求める
+    float baseAngle = atan2(dir.z, dir.x) * 180.0f / 3.14159265f;
+
+	// 発射角度の計算
+    float startAngle = baseAngle - spreadAngle_ * 0.5f;
+    float angleStep = bulletCount_ > 1 ? (spreadAngle_ / (bulletCount_ - 1)) : 0.0f;
+
+	// 弾の生成と発射
+    for (uint32_t i = 0; i < bulletCount_; ++i) 
+    {
+        float angle = startAngle + angleStep * i;
+        float rad = angle * 3.14159265f / 180.0f;
+        Vector3 shotDir = { std::cos(rad), 0.0f, std::sin(rad) };
+
+        auto bullet = std::make_unique<EnemyBullet>();
+        bullet->SetPosition(_origin);
+        bullet->SetVelocity(shotDir * speed_);
+        _manager.AddBullet(std::move(bullet));
+    }
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/bulletPattern/SpreadShotPattern.h
+============================================================
+#pragma once
+
+#include <cmath>
+
+#include "BulletPattern.h"
+#include "../EnemyBullet.h"
+
+/// <summary>
+/// 拡散弾パターン
+/// </summary>
+class SpreadShotPattern : public BulletPattern
+{
+public:
+
+    /// <summary>
+	/// コンストラクタ
+    /// </summary>
+    /// <param name="_bulletCount">弾の数</param>
+    /// <param name="_spreadAngle">拡散角度</param>
+    /// <param name="_speed">弾の速度</param>
+    SpreadShotPattern(uint32_t _bulletCount, float _spreadAngle, float _speed): bulletCount_(_bulletCount), spreadAngle_(_spreadAngle), speed_(_speed) {}
+
+    /// <summary>
+	/// 弾の発射
+    /// </summary>
+    /// <param name="_origin">発射位置</param>
+    /// <param name="_manager">弾の管理者</param>
+    /// <param name="_time">発射時間</param>
+    void Fire(const Vector3& _origin, BulletManager& _manager, float _time, const Vector3& _playerPos) override;
+    
+private:
+    
+	// 弾の数
+    uint32_t bulletCount_;
+	// 拡散角度
+    float spreadAngle_;
+	// 弾の速度
+    float speed_;
+
+};
+
+
+============================================================
 File Path: project/application/objects/enemy/waveState/EnemyWaveStage1.cpp
 ============================================================
 #include "EnemyWaveStage1.h"
@@ -8337,6 +9996,7 @@ File Path: project/application/objects/enemy/waveState/EnemyWaveStage2.cpp
 #include "EnemyWaveStage2.h"
 
 #include "../EnemyManager.h"
+#include "EnemyWaveStage3.h"
 
 EnemyWaveStage2::EnemyWaveStage2(EnemyManager* _pEnemyManager) : EnemyWaveState("Stage1", _pEnemyManager)
 {
@@ -8357,6 +10017,7 @@ void EnemyWaveStage2::Initialize()
 
 	// ウェーブ開始エフェクト
 	EffectIntro();
+
 }
 
 void EnemyWaveStage2::Update()
@@ -8373,10 +10034,9 @@ void EnemyWaveStage2::Update()
 	// ステート切り替え
 	if (pEnemyManager_->IsWaveChange())
 	{
-		// ステート遷移3を作ったらここに追記
-
-		// 今はこのウェーブをクリアしたらゲームクリア
-		pEnemyManager_->SetAllEnemyDefeated(true);
+		// ステート遷移
+		pEnemyManager_->ChangeState(std::make_unique<EnemyWaveStage3>(pEnemyManager_));
+		
 	}
 }
 
@@ -8419,6 +10079,104 @@ public:
 	// 更新
 	void Update() override;
 
+	// 2D描画
+	void Draw2D() override;
+
+};
+
+
+
+============================================================
+File Path: project/application/objects/enemy/waveState/EnemyWaveStage3.cpp
+============================================================
+#include "EnemyWaveStage3.h"
+
+#include "../EnemyManager.h"
+
+EnemyWaveStage3::EnemyWaveStage3(EnemyManager* _pEnemyManager) : EnemyWaveState("Stage3", _pEnemyManager)
+{
+	LoadTextureWave3();
+}
+
+void EnemyWaveStage3::Initialize()
+{
+	// EnemyManagerから共有LevelDataを受け取る
+	SetLevelData(pEnemyManager_->GetLevelData());
+
+	currentWave_ = 3;
+	
+	showWaveStartSprite_ = true;
+	waveStartSpriteTimer_ = kWaveStartSpriteDuration_;
+	spritePos_ = { 1000,0 };
+	
+	// ウェーブ開始エフェクト
+	EffectIntro();
+
+	// ガーディアンを出現
+	pEnemyManager_->GuardianInit({ 30.0f, 0.5f, 20.0f });
+	
+	pEnemyManager_->SetIsWaveChange(false);
+
+}
+
+void EnemyWaveStage3::Update()
+{
+	// テクスチャ更新
+	UpdateTexture();
+	
+	// ウェーブ開始エフェクト更新
+	EffectUpdate();
+	
+	// 敵の発生コマンドを更新
+	UpdateEnemyPopCommands(pEnemyManager_);
+	
+	// ステート切り替え
+	if (pEnemyManager_->IsWaveChange())
+	{
+		// 今はこのウェーブをクリアしたらゲームクリア
+		pEnemyManager_->SetAllEnemyDefeated(true);
+	}
+
+}
+
+void EnemyWaveStage3::Draw2D()
+{
+	if (showWaveStartSprite_)
+	{
+		for (auto& sprite : waveStartSprites_)
+		{
+			sprite->Draw();
+		}
+	}
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/waveState/EnemyWaveStage3.h
+============================================================
+#pragma once
+
+#include "EnemyWaveState.h"
+
+/// <summary>
+///	敵のウェーブステート3
+/// </summary>
+class EnemyWaveStage3 : public EnemyWaveState
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="_pEnemyManager">エネミーマネージャーのポインタ</param>
+	EnemyWaveStage3(EnemyManager* _pEnemyManager);
+	
+	// 初期化
+	void Initialize() override;
+	
+	// 更新
+	void Update() override;
+	
 	// 2D描画
 	void Draw2D() override;
 
@@ -8472,7 +10230,7 @@ void EnemyWaveState::LoadTextureWave2()
         if (i == 0)
         {
 
-            sprite->Initialize("lastWave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+            sprite->Initialize("wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
         }
         if (i == 1)
         {
@@ -8481,6 +10239,26 @@ void EnemyWaveState::LoadTextureWave2()
 
         waveStartSprites_.push_back(std::move(sprite));
     }
+}
+
+void EnemyWaveState::LoadTextureWave3()
+{
+    for (uint32_t i = 0; i < spriteIndex_; i++)
+    {
+        auto sprite = std::make_unique<IIEngine::Sprite>();
+        
+        if (i == 0)
+        {
+            sprite->Initialize("lastWave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+        
+        if (i == 1)
+        {
+            sprite->Initialize("3wave.png", spritePos_, { 1.0f,1.0f,1.0f,1.0f }, { 0,0 });
+        }
+
+        waveStartSprites_.push_back(std::move(sprite));
+	}
 }
 
 void EnemyWaveState::UpdateTexture()
@@ -8748,6 +10526,7 @@ public:
 	// テクスチャの読み込み
 	virtual void LoadTextureWave1();
 	virtual void LoadTextureWave2();
+	virtual void LoadTextureWave3();
 
 	// テクスチャ更新
 	virtual void UpdateTexture();
@@ -25048,6 +26827,7 @@ namespace IIEngine
 		ModelManager::GetInstance()->LoadModel("goal/goal.obj");
 		ModelManager::GetInstance()->LoadModel("logo/logo.obj");
 		ModelManager::GetInstance()->LoadModel("barrie/barrie.obj");
+		ModelManager::GetInstance()->LoadModel("enemy/guardian/guardian.obj");
 
 	}
 
