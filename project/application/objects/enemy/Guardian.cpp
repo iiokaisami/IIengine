@@ -284,7 +284,7 @@ void Guardian::FaceToPlayer()
     rotation_.x = 0.0f;
     rotation_.y = std::atan2(toPlayer.x, toPlayer.z); 
 
-    SyncObjectTransform();
+	object_->SetRotate(rotation_);
 }
 
 void Guardian::SwitchAttackPattern(uint32_t _patternIndex)

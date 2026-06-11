@@ -34,7 +34,7 @@ private:
 	// 最終縮小
 	float endScale_ = 0.0f;
 	// 上昇量
-	float floatUpAmount_ = 0.1f;
+	float floatUpAmount_ = 0.2f;
 	// 回転速度
 	float rotSpeedY_ = 0.1f;
 	float rotSpeedX_ = 0.1f;

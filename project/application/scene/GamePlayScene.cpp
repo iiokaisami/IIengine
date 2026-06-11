@@ -419,13 +419,13 @@ void GamePlayScene::Update()
 
 		spacePos_.y = calcY(0);
 		wPos_.y = calcY(1);
+		aPos_.y = calcY(2);
 
 		if (sprites_.size() >= 4)
 		{
 			sprites_[1]->SetPosition({ spacePos_.x, spacePos_.y });
 			sprites_[2]->SetPosition({ wPos_.x, wPos_.y });
 			sprites_[3]->SetPosition({ aPos_.x, aPos_.y });
-
 		}
 	}
 
