@@ -130,6 +130,11 @@ public: // セッター
 	/// <param name="obstacles">障害物の位置ベクトル配列</param>
 	void SetObstacles(const std::vector<Vector3>& _obstacles) { obstacles_ = _obstacles; }
 
+    /// <summary>
+    /// ウェーブチェンジフラグセット
+    /// </summary>
+	void SetIsWaveChange(bool _isWaveChange) { isWaveChange_ = _isWaveChange; }
+
 private:
 
 	// エネミー

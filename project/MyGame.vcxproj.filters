@@ -430,7 +430,6 @@
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorAttack.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.cpp" />
@@ -796,7 +795,6 @@
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorAttack.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.h" />

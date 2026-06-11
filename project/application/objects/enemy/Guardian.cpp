@@ -3,7 +3,6 @@
 // BehaviorState
 #include "behaviorState/guardianState/GuardianBehaviorSpawn.h"
 #include "behaviorState/guardianState/GuardianBehaviorMove.h"
-#include "behaviorState/guardianState/GuardianBehaviorAttack.h"
 #include "behaviorState/guardianState/GuardianBehaviorHitReact.h"
 #include "behaviorState/guardianState/GuardianBehaviorDead.h"
 
@@ -28,6 +27,20 @@ void Guardian::Initialize()
 
     // ライト設定
     object_->SetLighting(true);
+
+    // スプライトの初期化
+    for (uint32_t i = 0; i < spriteNum_; ++i)
+    {
+        auto sprite = std::make_unique<Sprite>();
+
+        if (i == 0)
+        {
+            sprite->Initialize("white.png", { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.5f });
+            sprite->SetSize(hpBarSize_);
+        }
+
+        sprites_.push_back(std::move(sprite));
+    }
 
     // 出現時は無敵状態
     isInvincible_ = true;
@@ -61,9 +74,11 @@ void Guardian::Update()
 	// 行動ステートの更新
     pBehaviorState_->Update();
 	
-
     // モデル変形の更新
     object_->Update();
+
+    // HPバー更新
+    UpdateHPBar();
 
     // プレイヤーとの距離を計算
     float distanceToPlayer = position_.Distance(playerPosition_);

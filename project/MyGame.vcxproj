@@ -180,7 +180,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameEngine\imgui\ImGuiManager.cpp" />
     <ClCompile Include="gameEngine\base\postEffect\InversionPass.cpp" />
     <ClCompile Include="application\objects\enemy\Guardian.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorAttack.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.cpp" />
@@ -360,7 +359,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="gameEngine\base\postEffect\ScanlinePass.h" />
     <ClInclude Include="gameEngine\io\InputData.h" />
     <ClInclude Include="application\objects\enemy\Guardian.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorAttack.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.h" />

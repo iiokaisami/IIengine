@@ -34,7 +34,7 @@ private:
 
 
 	// 振動の強さ
-	float shakeAmp_ = 0.1f;
+	float shakeAmp_ = 0.2f;
 	// 振動の周期
 	int shakePeriodX_ = 2;
 	// 振動の周期

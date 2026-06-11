@@ -30,7 +30,7 @@ private:
 	uint32_t deadCount_ = 30;
 
 	// 初回膨張
-	float startPopScale_ = 1.8f;
+	float startPopScale_ = 2.8f;
 	// 最終縮小
 	float endScale_ = 0.0f;
 	// 上昇量

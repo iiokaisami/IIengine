@@ -22,9 +22,9 @@ void GuardianBehaviorHitReact::Update()
 	
 	Vector3 shakeOffset =
 	{
-	((motion_.count % shakePeriodX_ == 0) ? 1.0f : -1.0f) * shakeAmp_,
+	((motion_.count % shakePeriodX_ == 0) ? 2.0f : -2.0f) * shakeAmp_,
 	0.0f, // Y軸は揺らさない
-	((motion_.count % shakePeriodZ_ == 0) ? 1.0f : -1.0f) * shakeAmp_
+	((motion_.count % shakePeriodZ_ == 0) ? 2.0f : -2.0f) * shakeAmp_
 	};
 	
 	Vector3 originPos = pGuardian_->GetPosition();

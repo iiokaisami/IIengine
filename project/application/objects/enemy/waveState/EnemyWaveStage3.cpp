@@ -23,6 +23,8 @@ void EnemyWaveStage3::Initialize()
 
 	// ガーディアンを出現
 	pEnemyManager_->GuardianInit({ 30.0f, 0.5f, 20.0f });
+	
+	pEnemyManager_->SetIsWaveChange(false);
 
 }
 
