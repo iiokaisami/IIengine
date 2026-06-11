@@ -4318,7 +4318,7 @@ void Guardian::FaceToPlayer()
     rotation_.x = 0.0f;
     rotation_.y = std::atan2(toPlayer.x, toPlayer.z); 
 
-    SyncObjectTransform();
+	object_->SetRotate(rotation_);
 }
 
 void Guardian::SwitchAttackPattern(uint32_t _patternIndex)
@@ -6377,7 +6377,7 @@ private:
 	// 最終縮小
 	float endScale_ = 0.0f;
 	// 上昇量
-	float floatUpAmount_ = 0.1f;
+	float floatUpAmount_ = 0.2f;
 	// 回転速度
 	float rotSpeedY_ = 0.1f;
 	float rotSpeedX_ = 0.1f;
@@ -6415,9 +6415,9 @@ void GuardianBehaviorHitReact::Update()
 	
 	Vector3 shakeOffset =
 	{
-	((motion_.count % shakePeriodX_ == 0) ? 2.0f : -2.0f) * shakeAmp_,
+	((motion_.count % shakePeriodX_ == 0) ? 1.0f : -1.0f) * shakeAmp_,
 	0.0f, // Y軸は揺らさない
-	((motion_.count % shakePeriodZ_ == 0) ? 2.0f : -2.0f) * shakeAmp_
+	((motion_.count % shakePeriodZ_ == 0) ? 1.0f : -1.0f) * shakeAmp_
 	};
 	
 	Vector3 originPos = pGuardian_->GetPosition();
@@ -6492,7 +6492,7 @@ private:
 
 
 	// 振動の強さ
-	float shakeAmp_ = 0.2f;
+	float shakeAmp_ = 0.1f;
 	// 振動の周期
 	int shakePeriodX_ = 2;
 	// 振動の周期
@@ -14797,13 +14797,13 @@ void GamePlayScene::Update()
 
 		spacePos_.y = calcY(0);
 		wPos_.y = calcY(1);
+		aPos_.y = calcY(2);
 
 		if (sprites_.size() >= 4)
 		{
 			sprites_[1]->SetPosition({ spacePos_.x, spacePos_.y });
 			sprites_[2]->SetPosition({ wPos_.x, wPos_.y });
 			sprites_[3]->SetPosition({ aPos_.x, aPos_.y });
-
 		}
 	}
 
