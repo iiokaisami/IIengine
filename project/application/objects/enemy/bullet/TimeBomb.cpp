@@ -79,6 +79,9 @@ void TimeBomb::Update()
 
 		// 位置を速度で更新
 		position_ += velocity_ * dt;
+
+		// 飛行中のパーティクル
+		IIEngine::ParticleEmitter::Emit("enemyWalk", position_, flyingParticleCount_);
 	}
 
 	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)

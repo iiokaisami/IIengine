@@ -60,6 +60,9 @@ void VignetteTrap::Update()
 		velocity_.y += gravity_ * dt;
 		// 位置を速度で更新
 		position_ += velocity_ * dt;
+
+		// 飛行中のパーティクル
+		IIEngine::ParticleEmitter::Emit("enemyWalk", position_, flyingParticleCount_);
 	}
 	else
 	{
@@ -151,12 +154,28 @@ void VignetteTrap::LaunchTrap()
 	// XYの差分
 	Vector3 diff = landingPosition_ - position_;
 
+	// 頂点の高さ
+	float apexY = std::max(position_.y, landingPosition_.y) + arcHeight_;
+
+	// 頂点までの速度
+	velocity_.y = std::sqrt(-2.0f * gravity_ * (apexY - position_.y));
+
+	// 頂点までの時間
+	float timeToApex = velocity_.y / -gravity_;
+
+	// 頂点から着地点までの時間
+	float timeDown = std::sqrt(2.0f * (apexY - landingPosition_.y) / -gravity_);
+
+	// 全飛行時間
+	float totalTime = timeToApex + timeDown;
+
 	// XZ方向の初速度
-	velocity_.x = diff.x / flightTime_;
-	velocity_.z = diff.z / flightTime_;
+	velocity_.x = diff.x / totalTime;
+	velocity_.z = diff.z / totalTime;
 
 	// Y方向の初速度
-	velocity_.y = (diff.y - 0.5f * gravity_ * flightTime_ * flightTime_) / flightTime_;
+	velocity_.y = (diff.y - 0.5f * gravity_ * totalTime * totalTime) / totalTime;
+
 }
 
 void VignetteTrap::DeadMotion()

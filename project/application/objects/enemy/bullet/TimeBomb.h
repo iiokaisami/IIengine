@@ -149,6 +149,9 @@ private:
 	bool isLaunchingTrap_ = false; 
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
+	// 最高到達地点
+	float arcHeight_ = 3.0f;
+
 
 	//寿命
 	static const int32_t kLifeTime = 60 * 12;
@@ -172,9 +175,11 @@ private:
 	float radiusVariance_ = 1.5f;
 
 	// 爆発パーティクルの数
-	int explosionParticleCount_ = 6;
+	uint32_t explosionParticleCount_ = 6;
 	// 設置パーティクルの数
-	int setParticleCount_ = 7;
+	uint32_t setParticleCount_ = 7;
+	// 飛行中のパーティクル
+	uint32_t flyingParticleCount_ = 2;
 
 	// ゆらゆら用(回転)
 	// 揺れの経過時間

@@ -108,6 +108,13 @@ void Character::UpdateHPBar()
     sprites_[0]->Update();
 }
 
+Vector2 Character::GetScreenPosition(const Vector3& _worldPosition) const
+{
+    
+    return CameraManager::GetInstance().GetActiveCamera()->WorldToScreen(_worldPosition);
+    
+}
+
 void Character::CorrectOverlap(const AABB& otherAABB, AABB& selfAABB, Vector3& position)
 {
     Vector3 penetrationVector{};

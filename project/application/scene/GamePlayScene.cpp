@@ -563,6 +563,12 @@ void GamePlayScene::Update()
 			});
 	}
 
+	// デバッグ用: Guardianの出現トリガー
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_G))
+	{
+		pEnemyManager_->GuardianInit({ 30.0f, 0.5f, 20.0f });
+	}
+
 #endif // USE_IMGUI
 
 

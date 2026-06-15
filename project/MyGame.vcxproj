@@ -237,6 +237,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\objects\player\motion\PlayerClearMotion.cpp" />
     <ClCompile Include="application\objects\player\motion\PlayerDeathMotion.cpp" />
     <ClCompile Include="application\objects\player\PlayerEffects.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\ShockWave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -373,6 +374,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\objects\player\motion\PlayerClearMotion.h" />
     <ClInclude Include="application\objects\player\motion\PlayerDeathMotion.h" />
     <ClInclude Include="application\objects\player\PlayerEffects.h" />
+    <ClInclude Include="application\objects\enemy\bullet\ShockWave.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

@@ -221,6 +221,7 @@ void TrapEnemy::Move()
 
 	SyncObjectTransform();
 
+	// 歩行パーティクル
     IIEngine::ParticleEmitter::Emit("enemyWalk", position_, walkParticleCount_);
 }
 

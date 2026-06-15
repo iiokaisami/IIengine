@@ -120,9 +120,13 @@ private:
 	bool isLaunchingTrap_ = false;
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
+	// 最高到達地点
+	float arcHeight_ = 3.0f;
 
+	// 飛行中のパーティクル
+	uint32_t flyingParticleCount_ = 2;
 	// 設置パーティクルの数
-	int setParticleCount_ = 7;
+	uint32_t setParticleCount_ = 7;
 
 	//寿命
 	static const int32_t kLifeTime = 60 * 12;

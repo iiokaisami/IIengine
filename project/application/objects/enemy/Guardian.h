@@ -44,6 +44,9 @@ public:
 	// 攻撃
 	void Attack() override;
 
+	// ジャンプ攻撃
+	void JumpAttack();
+
 	/// <summary>
 	/// 行動ステート切り替え
 	/// </summary>
@@ -106,7 +109,7 @@ private:
 	// 行動ステート
 	std::unique_ptr<GuardianBehaviorState> pBehaviorState_ = nullptr;
 
-	float initialHP_ = 30.0f;
+	float initialHP_ = 10.0f;
 
 	// 攻撃コントローラー
 	GuardianAttackController attackController_;
@@ -145,6 +148,11 @@ private:
 	const float kSpreadRange_ = 10.0f; // 近距離扇状
 	const float kSpiralRange_ = 15.0f; // 中距離螺旋
 	const float kLaserRange_ = 17.0f;  // 遠距離レーザー
+
+
+	// ジャンプ最大高度
+	const float jumpMaxHeight_ = 5.0f;
+
 
 	// パーティクル数
 	int spawnParticleCount_ = 2;

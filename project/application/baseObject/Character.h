@@ -78,6 +78,7 @@ public: // ゲッター
 	// HP取得
 	virtual float   GetHP() const { return hp_; };
 	
+	Vector2 GetScreenPosition(const Vector3& _worldPosition) const;
 
 public: // セッター
 

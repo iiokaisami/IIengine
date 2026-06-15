@@ -271,6 +271,13 @@ void Guardian::Attack()
 
 }
 
+void Guardian::JumpAttack()
+{
+	// ジャンプ最高高度まで上昇
+
+
+}
+
 void Guardian::ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState)
 {
     pBehaviorState_ = std::move(_pState);
