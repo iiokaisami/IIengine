@@ -2,6 +2,7 @@
 
 #include "../../Guardian.h"
 #include "GuardianBehaviorHitReact.h"
+#include "GuardianBehaviorJump.h"
 
 GuardianBehaviorMove::GuardianBehaviorMove(Guardian* _pGuardian) : GuardianBehaviorState("Move", _pGuardian)
 {
@@ -30,6 +31,12 @@ void GuardianBehaviorMove::Update()
 		
 		// ヒットしたら、ヒットリアクションモーションに切り替え
 		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorHitReact>(pGuardian_));
+		return;
+	}
+	else if (pGuardian_->GetJumping())
+	{
+		// ジャンプ開始したら、ジャンプモーションに切り替え
+		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
 		return;
 	}
 	else

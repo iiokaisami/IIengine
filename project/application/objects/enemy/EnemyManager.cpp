@@ -250,6 +250,12 @@ void EnemyManager::ImGuiDraw()
 		guardian->ImGuiDraw();
 	}
 
+	// Guardian出現
+	if (ImGui::Button("Spawn Guardian"))
+	{
+		GuardianInit({ 0.0f, 1.0f, 3.0f });
+	}
+
 #endif // USE_IMGUI
 }
 

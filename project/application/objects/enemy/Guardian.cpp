@@ -143,6 +143,13 @@ void Guardian::ImGuiDraw()
 	float distanceToPlayer = position_.Distance(playerPosition_);
         ImGui::Text("Distance to Player: %.2f", distanceToPlayer);
 
+  
+    // ジャンプ開始
+	if (ImGui::Button("Start Jump"))
+	{
+		isJumping_ = true;
+	}
+
     ImGui::End();
 
 #endif // USE_IMGUI
@@ -235,7 +242,7 @@ void Guardian::Attack()
 
     // 発射間隔管理
     shootTimer_ += dt;
-    if (shootTimer_ >= shootInterval_)
+    if (shootTimer_ >= shootInterval_ && !isJumping_)
     {
 		// 現在のパターンで弾を発射
         attackController_.FireCurrentPattern(position_, bulletManager_, now, playerPosition_);
@@ -271,9 +278,99 @@ void Guardian::Attack()
 
 }
 
+void Guardian::StartJump()
+{
+	// ジャンプ状態を上昇に設定
+    jumpState_ = JumpState::Rise;
+
+	// ジャンプ開始位置を記録
+    jumpStartY_ = position_.y;
+
+	// 着地フラグをリセット
+    isLanding_ = false;
+}
+
 void Guardian::JumpAttack()
 {
-	// ジャンプ最高高度まで上昇
+	// ジャンプ状態に応じて処理を分岐
+    switch (jumpState_)
+    {
+    case JumpState::None:
+        break;
+
+    case JumpState::Rise:
+		// 上昇中の処理
+        UpdateJumpRise();
+        break;
+
+    case JumpState::Fall:
+		// 下降中の処理
+        UpdateJumpFall();
+        break;
+
+    case JumpState::Landing:
+		// 着地中の処理
+        UpdateJumpLanding();
+        break;
+    }
+
+
+}
+
+void Guardian::UpdateJumpRise()
+{
+    // deltaTime取得
+    float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	// 上昇速度を加算
+    position_.y += ascendSpeed_ * dt;
+
+	// 最大高度に達したら下降状態に切り替え
+    if (position_.y >= jumpStartY_ + jumpMaxHeight_)
+    {
+		// 最大高度に達したら位置を補正
+        position_.y = jumpStartY_ + jumpMaxHeight_;
+		// 下降状態に切り替え
+        jumpState_ = JumpState::Fall;
+    }
+
+}
+
+void Guardian::UpdateJumpFall()
+{
+    // deltaTime取得
+    float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	// 下降速度を加算
+    position_.y -= descendSpeed_ * dt;
+
+	// 地面に到達したら位置を補正して着地状態に切り替え
+    if (position_.y <= jumpStartY_)
+    {
+		// 地面に到達したら位置を補正
+        position_.y = jumpStartY_;
+
+		// 着地状態に切り替え
+        jumpState_ = JumpState::Landing;
+    }
+}
+
+void Guardian::UpdateJumpLanding()
+{
+	// 衝撃波を生成
+    SpawnShockWave();
+
+	// 着地パーティクルを生成
+    ParticleEmitter::Emit("enemyWalk",position_,50);
+
+	// 着地フラグを立てる
+	isLanding_ = true;
+
+    jumpState_ = JumpState::None;
+}
+
+void Guardian::SpawnShockWave()
+{
 
 
 }
@@ -337,7 +434,6 @@ void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
         if (_other->GetOwner()->IsActive())
         {
             // VignetteTrapに当たった場合
-            //isHitVignetteTrap_ = true;
         }
     }
 }
