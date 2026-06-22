@@ -498,3 +498,27 @@ bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos)
 
 	return found;
 }
+
+bool EnemyManager::GetGuardianLanding() const
+{
+	// ガーディアンの着地フラグを返す
+	for (const auto& guardian : pGuardians_)
+	{
+		if (guardian->GetLanding())
+		{
+			return true;
+		}
+	}
+
+	return false;
+	
+}
+
+void EnemyManager::SetGuardianLanding(bool isLanding)
+{
+	// ガーディアンの着地フラグをセット
+	for (const auto& guardian : pGuardians_)
+	{
+		guardian->SetLanding(isLanding);
+	}
+}

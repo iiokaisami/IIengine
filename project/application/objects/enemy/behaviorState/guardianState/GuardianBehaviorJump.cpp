@@ -29,7 +29,7 @@ void GuardianBehaviorJump::Update()
 		// ジャンプフラグをリセット
 		pGuardian_->SetJumping(false);
 		// 着地フラグをリセット
-		pGuardian_->SetLanding(false);
+		//pGuardian_->SetLanding(false);
 
 		// 着地したら、移動モーションに切り替え
 		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorMove>(pGuardian_));

@@ -485,6 +485,14 @@ void GamePlayScene::Update()
 
 	// エネミーの更新
 	pEnemyManager_->Update();
+	// Guardian着地の瞬間にカメラシェイク
+	if (pEnemyManager_->GetGuardianLanding())
+	{
+		camera_->GetCamera()->StartShake(0.5f, 1.5f);
+		
+		// シェイクを開始したらフラグを落とす 
+		pEnemyManager_->SetGuardianLanding(false); // consume
+	}
 	// 最も近いエネミーの位置を取得してプレイヤーにセット
 	Vector3 nearest;
 	if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest)) 

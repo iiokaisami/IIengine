@@ -104,6 +104,9 @@ public: // ゲッター
 	// 障害物の位置リスト取得
 	const std::vector<Vector3>& GetObstacles() const { return obstacles_; }
 
+	// Guardianの着地フラグを取得
+	bool GetGuardianLanding() const;
+
 public: // セッター
 
 	/// <summary>
@@ -134,6 +137,13 @@ public: // セッター
     /// ウェーブチェンジフラグセット
     /// </summary>
 	void SetIsWaveChange(bool _isWaveChange) { isWaveChange_ = _isWaveChange; }
+
+
+	/// <summary>
+    /// Guardianの着地フラグセット
+	/// </summary>
+	/// <param name="isLanding">着地フラグ</param>
+	void SetGuardianLanding(bool isLanding);
 
 private:
 
