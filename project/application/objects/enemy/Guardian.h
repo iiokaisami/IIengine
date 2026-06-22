@@ -9,6 +9,8 @@
 // 攻撃コントローラー
 #include "bullet/GuardianAttackController.h"
 
+#include "bullet/ShockWave.h"
+
 #include <Object3d.h>
 #include <Framework.h>
 
@@ -199,6 +201,8 @@ private:
 	// ジャンプ着地時のフラグ
 	bool isLanding_ = false;
 
+	// Guardian
+	std::unique_ptr<ShockWave> pShockWave_;
 
 	// パーティクル数
 	int spawnParticleCount_ = 2;

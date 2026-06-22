@@ -96,6 +96,18 @@ void Guardian::Update()
 	// プレイヤーに向く
     FaceToPlayer();
 
+	// 衝撃波の更新
+	if (pShockWave_)
+	{
+		pShockWave_->Update();
+	}
+    // 衝撃波の削除
+    if (pShockWave_ && pShockWave_->IsDead())
+    {
+		pShockWave_->Finalize();
+		pShockWave_.reset();
+    }
+
     if (!isFollowingPath_)
     {
         // プレイヤー位置が一定以上変化したらパスを再計算するフラグを立てる
@@ -114,6 +126,12 @@ void Guardian::Draw()
 
 	// 弾の描画
 	bulletManager_.DrawAll();
+	
+	// 衝撃波の描画
+	if (pShockWave_)
+	{
+		pShockWave_->Draw();
+	}
 }
 
 void Guardian::ImGuiDraw()
@@ -149,6 +167,11 @@ void Guardian::ImGuiDraw()
 	{
 		isJumping_ = true;
 	}
+	// 衝撃波のImGui表示
+    if (pShockWave_)
+    {
+		pShockWave_->ImGuiDraw();
+    }
 
     ImGui::End();
 
@@ -371,8 +394,9 @@ void Guardian::UpdateJumpLanding()
 
 void Guardian::SpawnShockWave()
 {
-
-
+	pShockWave_ = std::make_unique<ShockWave>();
+	pShockWave_->Initialize();
+	pShockWave_->SetPosition(position_);
 }
 
 void Guardian::ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState)

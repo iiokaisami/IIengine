@@ -471,6 +471,7 @@ namespace IIEngine
 		ModelManager::GetInstance()->LoadModel("logo/logo.obj");
 		ModelManager::GetInstance()->LoadModel("barrie/barrie.obj");
 		ModelManager::GetInstance()->LoadModel("enemy/guardian/guardian.obj");
+		ModelManager::GetInstance()->LoadModel("enemy/guardian/shockWave/shockWave.obj");
 
 	}
 
