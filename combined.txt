@@ -42,6 +42,8 @@
     └── └── └── └── └── ├── GuardianBehaviorDead.h
     └── └── └── └── └── ├── GuardianBehaviorHitReact.cpp
     └── └── └── └── └── ├── GuardianBehaviorHitReact.h
+    └── └── └── └── └── ├── GuardianBehaviorJump.cpp
+    └── └── └── └── └── ├── GuardianBehaviorJump.h
     └── └── └── └── └── ├── GuardianBehaviorMove.cpp
     └── └── └── └── └── ├── GuardianBehaviorMove.h
     └── └── └── └── └── ├── GuardianBehaviorSpawn.cpp
@@ -79,6 +81,8 @@
     └── └── └── └── ├── EnemyBullet.h
     └── └── └── └── ├── GuardianAttackController.cpp
     └── └── └── └── ├── GuardianAttackController.h
+    └── └── └── └── ├── ShockWave.cpp
+    └── └── └── └── ├── ShockWave.h
     └── └── └── └── ├── TimeBomb.cpp
     └── └── └── └── ├── TimeBomb.h
     └── └── └── └── ├── VignetteTrap.cpp
@@ -501,6 +505,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp" />
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorJump.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="gameEngine\3d\Model.cpp" />
     <ClCompile Include="gameEngine\3d\ModelCommon.cpp" />
@@ -551,6 +556,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\objects\player\motion\PlayerClearMotion.cpp" />
     <ClCompile Include="application\objects\player\motion\PlayerDeathMotion.cpp" />
     <ClCompile Include="application\objects\player\PlayerEffects.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\ShockWave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseObject\GameObject.h" />
@@ -687,6 +693,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\objects\player\motion\PlayerClearMotion.h" />
     <ClInclude Include="application\objects\player\motion\PlayerDeathMotion.h" />
     <ClInclude Include="application\objects\player\PlayerEffects.h" />
+    <ClInclude Include="application\objects\enemy\bullet\ShockWave.h" />
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorJump.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -1261,18 +1269,48 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="application\objects\enemy\Guardian.cpp">
       <Filter>application\objects\enemy</Filter>
     </ClCompile>
-    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.cpp" />
-    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletManager.cpp" />
-    <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp" />
-    <ClCompile Include="application\objects\enemy\waveState\EnemyWaveStage3.cpp" />
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletManager.cpp">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.cpp">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.cpp">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.cpp">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorJump.cpp">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.cpp">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.cpp">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.cpp">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\waveState\EnemyWaveStage3.cpp">
+      <Filter>application\objects\enemy\waveState</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.cpp">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.cpp">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClCompile>
+    <ClCompile Include="application\objects\enemy\bullet\ShockWave.cpp">
+      <Filter>application\objects\enemy\bullet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1626,17 +1664,6 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\objects\enemy\Guardian.h">
       <Filter>application\objects\enemy</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.h" />
-    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.h" />
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.h" />
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.h" />
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h" />
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h" />
-    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h" />
-    <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h" />
     <ClInclude Include="application\objects\player\motion\PlayerAutoMotion.h">
       <Filter>application\objects\player\motion</Filter>
     </ClInclude>
@@ -1652,7 +1679,46 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\objects\player\PlayerEffects.h">
       <Filter>application\objects\player</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\waveState\EnemyWaveStage3.h" />
+    <ClInclude Include="application\objects\enemy\bullet\ShockWave.h" />
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletPattern.h">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\bullet\GuardianAttackController.h">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorDead.h">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorHitReact.h">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorJump.h">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorMove.h">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorSpawn.h">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorState.h">
+      <Filter>application\objects\enemy\behaviorState\guardianState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\waveState\EnemyWaveStage3.h">
+      <Filter>application\objects\enemy\waveState</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpreadShotPattern.h">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\SpiralShotPattern.h">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h">
+      <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -1821,6 +1887,12 @@ File Path: project/MyGame.vcxproj.filters
     </Filter>
     <Filter Include="application\objects\player\motion">
       <UniqueIdentifier>{ddfee423-e6f3-490e-a9e0-ea9d364eed18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\objects\enemy\bullet\bulletPattern">
+      <UniqueIdentifier>{1e92a1b4-5dd5-4b4a-95b8-406b060bc980}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\objects\enemy\behaviorState\guardianState">
+      <UniqueIdentifier>{92d621fe-5fc8-4ca8-8de5-a0264c11aff9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
@@ -2566,6 +2638,13 @@ void Character::UpdateHPBar()
     sprites_[0]->Update();
 }
 
+Vector2 Character::GetScreenPosition(const Vector3& _worldPosition) const
+{
+    
+    return CameraManager::GetInstance().GetActiveCamera()->WorldToScreen(_worldPosition);
+    
+}
+
 void Character::CorrectOverlap(const AABB& otherAABB, AABB& selfAABB, Vector3& position)
 {
     Vector3 penetrationVector{};
@@ -2691,6 +2770,7 @@ public: // ゲッター
 	// HP取得
 	virtual float   GetHP() const { return hp_; };
 	
+	Vector2 GetScreenPosition(const Vector3& _worldPosition) const;
 
 public: // セッター
 
@@ -3589,6 +3669,12 @@ void EnemyManager::ImGuiDraw()
 		guardian->ImGuiDraw();
 	}
 
+	// Guardian出現
+	if (ImGui::Button("Spawn Guardian"))
+	{
+		GuardianInit({ 0.0f, 1.0f, 3.0f });
+	}
+
 #endif // USE_IMGUI
 }
 
@@ -3832,6 +3918,30 @@ bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos)
 	return found;
 }
 
+bool EnemyManager::GetGuardianLanding() const
+{
+	// ガーディアンの着地フラグを返す
+	for (const auto& guardian : pGuardians_)
+	{
+		if (guardian->GetLanding())
+		{
+			return true;
+		}
+	}
+
+	return false;
+	
+}
+
+void EnemyManager::SetGuardianLanding(bool isLanding)
+{
+	// ガーディアンの着地フラグをセット
+	for (const auto& guardian : pGuardians_)
+	{
+		guardian->SetLanding(isLanding);
+	}
+}
+
 
 ============================================================
 File Path: project/application/objects/enemy/EnemyManager.h
@@ -3942,6 +4052,9 @@ public: // ゲッター
 	// 障害物の位置リスト取得
 	const std::vector<Vector3>& GetObstacles() const { return obstacles_; }
 
+	// Guardianの着地フラグを取得
+	bool GetGuardianLanding() const;
+
 public: // セッター
 
 	/// <summary>
@@ -3972,6 +4085,13 @@ public: // セッター
     /// ウェーブチェンジフラグセット
     /// </summary>
 	void SetIsWaveChange(bool _isWaveChange) { isWaveChange_ = _isWaveChange; }
+
+
+	/// <summary>
+    /// Guardianの着地フラグセット
+	/// </summary>
+	/// <param name="isLanding">着地フラグ</param>
+	void SetGuardianLanding(bool isLanding);
 
 private:
 
@@ -4130,6 +4250,18 @@ void Guardian::Update()
 	// プレイヤーに向く
     FaceToPlayer();
 
+	// 衝撃波の更新
+	if (pShockWave_)
+	{
+		pShockWave_->Update();
+	}
+    // 衝撃波の削除
+    if (pShockWave_ && pShockWave_->IsDead())
+    {
+		pShockWave_->Finalize();
+		pShockWave_.reset();
+    }
+
     if (!isFollowingPath_)
     {
         // プレイヤー位置が一定以上変化したらパスを再計算するフラグを立てる
@@ -4148,6 +4280,12 @@ void Guardian::Draw()
 
 	// 弾の描画
 	bulletManager_.DrawAll();
+	
+	// 衝撃波の描画
+	if (pShockWave_)
+	{
+		pShockWave_->Draw();
+	}
 }
 
 void Guardian::ImGuiDraw()
@@ -4176,6 +4314,22 @@ void Guardian::ImGuiDraw()
 	// プレイヤーとの距離を表示
 	float distanceToPlayer = position_.Distance(playerPosition_);
         ImGui::Text("Distance to Player: %.2f", distanceToPlayer);
+
+	// 攻撃周期を表示
+	ImGui::Text("Attack Cycle: %.2f", attackCycle_);
+  
+    // ジャンプ開始
+	if (ImGui::Button("Start Jump"))
+	{
+		isJumping_ = true;
+	}
+
+
+	// 衝撃波のImGui表示
+    if (pShockWave_)
+    {
+		pShockWave_->ImGuiDraw();
+    }
 
     ImGui::End();
 
@@ -4269,7 +4423,7 @@ void Guardian::Attack()
 
     // 発射間隔管理
     shootTimer_ += dt;
-    if (shootTimer_ >= shootInterval_)
+    if (shootTimer_ >= shootInterval_ && !isJumping_)
     {
 		// 現在のパターンで弾を発射
         attackController_.FireCurrentPattern(position_, bulletManager_, now, playerPosition_);
@@ -4287,6 +4441,9 @@ void Guardian::Attack()
                 attackController_.SetPatternIndex(currentPatternIndex_);
                 spiralShotsFired_ = 0;
                 patternTimer_ = 0.0f; // パターン切り替え直後から再カウント
+
+                // 攻撃カウントを増加
+                ++attackCycle_;
             }
         }
         else
@@ -4298,11 +4455,116 @@ void Guardian::Attack()
                 currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
                 attackController_.SetPatternIndex(currentPatternIndex_);
                 patternTimer_ = 0.0f;
+
+                // 攻撃カウントを増加
+                ++attackCycle_;
             }
         }
     }
 	bulletManager_.UpdateAll();
 
+}
+
+void Guardian::StartJump()
+{
+	// ジャンプ状態を上昇に設定
+    jumpState_ = JumpState::Rise;
+
+	// ジャンプ開始位置を記録
+    jumpStartY_ = position_.y;
+
+	// 着地フラグをリセット
+    isLanding_ = false;
+
+	// 攻撃周期をリセット
+	attackCycle_ = 0.0f;
+
+}
+
+void Guardian::JumpAttack()
+{
+	// ジャンプ状態に応じて処理を分岐
+    switch (jumpState_)
+    {
+    case JumpState::None:
+        break;
+
+    case JumpState::Rise:
+		// 上昇中の処理
+        UpdateJumpRise();
+        break;
+
+    case JumpState::Fall:
+		// 下降中の処理
+        UpdateJumpFall();
+        break;
+
+    case JumpState::Landing:
+		// 着地中の処理
+        UpdateJumpLanding();
+        break;
+    }
+
+
+}
+
+void Guardian::UpdateJumpRise()
+{
+    // deltaTime取得
+    float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	// 上昇速度を加算
+    position_.y += ascendSpeed_ * dt;
+
+	// 最大高度に達したら下降状態に切り替え
+    if (position_.y >= jumpStartY_ + jumpMaxHeight_)
+    {
+		// 最大高度に達したら位置を補正
+        position_.y = jumpStartY_ + jumpMaxHeight_;
+		// 下降状態に切り替え
+        jumpState_ = JumpState::Fall;
+    }
+
+}
+
+void Guardian::UpdateJumpFall()
+{
+    // deltaTime取得
+    float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	// 下降速度を加算
+    position_.y -= descendSpeed_ * dt;
+
+	// 地面に到達したら位置を補正して着地状態に切り替え
+    if (position_.y <= jumpStartY_)
+    {
+		// 地面に到達したら位置を補正
+        position_.y = jumpStartY_;
+
+		// 着地状態に切り替え
+        jumpState_ = JumpState::Landing;
+    }
+}
+
+void Guardian::UpdateJumpLanding()
+{
+	// 衝撃波を生成
+    SpawnShockWave();
+
+	// 着地パーティクルを生成
+    ParticleEmitter::Emit("enemyWalk",position_,50);
+
+	// 着地フラグを立てる
+	isLanding_ = true;
+
+    jumpState_ = JumpState::None;
+}
+
+void Guardian::SpawnShockWave()
+{
+	pShockWave_ = std::make_unique<ShockWave>();
+	pShockWave_->Initialize();
+	pShockWave_->SetPosition(position_);
 }
 
 void Guardian::ChangeBehaviorState(std::unique_ptr<GuardianBehaviorState> _pState)
@@ -4364,7 +4626,6 @@ void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
         if (_other->GetOwner()->IsActive())
         {
             // VignetteTrapに当たった場合
-            //isHitVignetteTrap_ = true;
         }
     }
 }
@@ -4423,6 +4684,8 @@ File Path: project/application/objects/enemy/Guardian.h
 // 攻撃コントローラー
 #include "bullet/GuardianAttackController.h"
 
+#include "bullet/ShockWave.h"
+
 #include <Object3d.h>
 #include <Framework.h>
 
@@ -4458,6 +4721,24 @@ public:
 	// 攻撃
 	void Attack() override;
 
+	// ジャンプ開始
+	void StartJump();
+
+	// ジャンプ攻撃
+	void JumpAttack();
+
+	// ジャンプ上昇
+	void UpdateJumpRise();
+
+	// ジャンプ下降
+	void UpdateJumpFall();
+
+	// ジャンプ着地
+	void UpdateJumpLanding();
+
+	// 衝撃波生成
+	void SpawnShockWave();
+	
 	/// <summary>
 	/// 行動ステート切り替え
 	/// </summary>
@@ -4479,7 +4760,23 @@ public: // ゲッター
 	bool IsHit() const { return isHit_; }
 
 	// プレイヤーまでの距離を取得
-	float GetDistanceToPlayer() const {return (playerPosition_ - position_).Length();}
+	float GetDistanceToPlayer() const { return (playerPosition_ - position_).Length(); }
+
+	// ジャンプ開始
+	bool GetJumping() const { return isJumping_; }
+
+	// ジャンプ着地フラグを取得
+	float GetLanding() const { return isLanding_; }
+
+	// ジャンプ開始HPを取得
+	float GetJumpStartHP() const { return kJumpStartHP_; }
+
+	// ジャンプ周期を取得
+	float GetJumpCycle() const { return kJumpCycle_; }
+
+	// 攻撃周期を取得
+	float GetAttackCycle() const { return attackCycle_; }
+
 
 public: // セッター	
 
@@ -4491,6 +4788,12 @@ public: // セッター
 
 	// ヒットフラグの設定
 	void SetIsHit(bool _isHit) { isHit_ = _isHit; }
+
+	// ジャンプ開始の設定
+	void SetJumping(bool _isJumping) { isJumping_ = _isJumping; }
+
+	// ジャンプ着地フラグの設定
+	void SetLanding(bool _isLanding) { isLanding_ = _isLanding; }
 
 	// --- ステートでのTransform操作用関数(引数あり) ---
 
@@ -4559,6 +4862,38 @@ private:
 	const float kSpreadRange_ = 10.0f; // 近距離扇状
 	const float kSpiralRange_ = 15.0f; // 中距離螺旋
 	const float kLaserRange_ = 17.0f;  // 遠距離レーザー
+
+	// ジャンプアタックの状態
+	enum class JumpState
+	{
+		None,
+		Rise,
+		Fall,
+		Landing
+	};
+	JumpState jumpState_ = JumpState::None;
+
+	// ジャンプ開始HP
+	const float kJumpStartHP_ = 18.0f;
+	// ジャンプ周期
+	const float kJumpCycle_ = 4.0f;
+	// 攻撃周期
+	float attackCycle_ = 0.0f;
+	// ジャンプ開始
+	bool isJumping_ = false;
+	// ジャンプ開始時のY
+	float jumpStartY_ = 0.0f;
+	// ジャンプ最大高度
+	const float jumpMaxHeight_ = 8.0f;
+	// ジャンプ上昇速度
+	float ascendSpeed_ = 8.0f;
+	// ジャンプ下降速度
+	float descendSpeed_ = 25.0f;
+	// ジャンプ着地時のフラグ
+	bool isLanding_ = false;
+
+	// Guardian
+	std::unique_ptr<ShockWave> pShockWave_;
 
 	// パーティクル数
 	int spawnParticleCount_ = 2;
@@ -5524,6 +5859,7 @@ void TrapEnemy::Move()
 
 	SyncObjectTransform();
 
+	// 歩行パーティクル
     IIEngine::ParticleEmitter::Emit("enemyWalk", position_, walkParticleCount_);
 }
 
@@ -6501,12 +6837,101 @@ private:
 };
 
 ============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorJump.cpp
+============================================================
+#include "GuardianBehaviorJump.h"
+
+#include "../../Guardian.h"
+#include "GuardianBehaviorMove.h"
+
+GuardianBehaviorJump::GuardianBehaviorJump(Guardian* _pGuardian) : GuardianBehaviorState("Jump", _pGuardian)
+{
+	motion_.isActive = true;
+	motion_.count = 0;
+	motion_.maxCount = moveCount_;
+}
+
+void GuardianBehaviorJump::Initialize()
+{
+	// ジャンプ開始
+	pGuardian_->StartJump();
+}
+
+void GuardianBehaviorJump::Update()
+{
+	// 敵のトランスフォームを motion_.transformにセット
+	TransformUpdate(pGuardian_);
+
+	// ジャンプ攻撃
+	pGuardian_->JumpAttack();
+
+	if (pGuardian_->GetLanding())
+	{
+		// ジャンプフラグをリセット
+		pGuardian_->SetJumping(false);
+
+		// 着地したら、移動に切り替え
+		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorMove>(pGuardian_));
+		
+		return;
+	}
+
+}
+
+void GuardianBehaviorJump::ResetMotion()
+{}
+
+
+============================================================
+File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorJump.h
+============================================================
+#pragma once
+
+#include "GuardianBehaviorState.h"
+
+/// <summary>
+/// ガーディアンのジャンプ
+/// </summary>
+class GuardianBehaviorJump : public GuardianBehaviorState
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="_pGuardian">ガーディアンポインタ</param>
+	GuardianBehaviorJump(Guardian* _pGuardian);
+	
+	// デストラクタ
+	~GuardianBehaviorJump() = default;
+	
+	// 初期化
+	void Initialize() override;
+	
+	// 更新
+	void Update() override;
+	
+	// モーションのカウント等をリセット
+	void ResetMotion() override;
+
+
+private:
+
+	// モーションのカウント
+	uint32_t moveCount_ = 30;
+
+};
+
+
+
+============================================================
 File Path: project/application/objects/enemy/behaviorState/guardianState/GuardianBehaviorMove.cpp
 ============================================================
 #include "GuardianBehaviorMove.h"
 
 #include "../../Guardian.h"
 #include "GuardianBehaviorHitReact.h"
+#include "GuardianBehaviorJump.h"
 
 GuardianBehaviorMove::GuardianBehaviorMove(Guardian* _pGuardian) : GuardianBehaviorState("Move", _pGuardian)
 {
@@ -6535,6 +6960,19 @@ void GuardianBehaviorMove::Update()
 		
 		// ヒットしたら、ヒットリアクションモーションに切り替え
 		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorHitReact>(pGuardian_));
+		return;
+	}
+	else if (pGuardian_->GetJumping())
+	{
+		// ジャンプ開始したら、ジャンプモーションに切り替え
+		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
+		return;
+	}
+	else if (pGuardian_->GetHP() <= pGuardian_->GetJumpStartHP() &&
+		     pGuardian_->GetAttackCycle() >= pGuardian_->GetJumpCycle())
+	{
+		// HPがジャンプ開始HP以下になったら、ジャンプモーションに切り替え
+		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
 		return;
 	}
 	else
@@ -8542,6 +8980,208 @@ private:
 
 
 ============================================================
+File Path: project/application/objects/enemy/bullet/ShockWave.cpp
+============================================================
+#include "ShockWave.h"
+#include "TimeManager.h"
+
+using namespace IIEngine;
+
+void ShockWave::Initialize()
+{
+	// --- 3Dオブジェクト ---
+	object_ = std::make_unique<Object3d>();
+	object_->Initialize("shockWave.obj");
+
+	scale_ = { baseScale_,1.0f,baseScale_ };
+	SyncObjectTransform();
+
+	object_->SetLighting(true);
+
+	// 当たり判定
+	colliderManager_ = ColliderManager::GetInstance();
+	objectName_ = "EnemyBullet";
+
+	desc =
+	{
+		//ここに設定
+		.owner = this,
+		.colliderID = objectName_,
+		.shape = Shape::AABB,
+		.shapeData = &aabb_,
+		.attribute = colliderManager_->GetNewAttribute(objectName_),
+		.onCollisionTrigger = std::bind(&ShockWave::OnCollisionTrigger, this, std::placeholders::_1),
+	};
+	collider_.MakeAABBDesc(desc);
+	colliderManager_->RegisterCollider(&collider_);
+
+	lifeTimeFrames_ = kLifeTime;
+
+	isFading_ = false;
+
+}
+
+void ShockWave::Finalize()
+{
+	colliderManager_->DeleteCollider(&collider_);
+}
+
+void ShockWave::Update()
+{
+	const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
+
+	SyncObjectTransform();
+
+	BaseBullet::Update();
+
+	// 徐々にx,zのスケールを大きくしていく
+	scale_.x += expansionSpeed_ * dt * kDefaultFrameRate;
+	scale_.z += expansionSpeed_ * dt * kDefaultFrameRate;
+
+	// x,zをシェイクさせる
+	position_.x += sinf(IIEngine::TimeManager::Instance().GetTotalTime() * shakeFrequency_) * shakeAmplitude_;
+	position_.z += sinf(IIEngine::TimeManager::Instance().GetTotalTime() * shakeFrequency_) * shakeAmplitude_;
+
+	// コライダー更新
+	aabb_.min = position_ - object_->GetScale();
+	aabb_.max = position_ + object_->GetScale();
+	collider_.SetPosition(position_);
+
+	// 消滅フラグがたったら徐々に小さくしていく
+	if (isFading_)
+	{
+		scale_.y -= 0.01f; // 徐々に小さくする
+		position_.y -= 0.01f; // 徐々に下に落とす
+
+		object_->SetPosition(position_);
+		object_->SetScale(scale_);
+		// Update
+		object_->Update();
+		
+
+		if (scale_.y < 0.01f) // 十分小さくなったら消滅
+		{
+			isDead_ = true;
+		}
+	}
+	else
+	{
+		// フラグが立っていない場合は寿命更新
+		lifeTimeFrames_--;
+		// 寿命が尽きたら消滅フラグを立てる
+		if (lifeTimeFrames_ <= 0)
+		{
+			isFading_ = true;
+		}
+	}
+
+
+}
+
+void ShockWave::Draw()
+{
+	object_->Draw();
+}
+
+void ShockWave::ImGuiDraw()
+{
+#ifdef USE_IMGUI
+
+	ImGui::Begin("ShockWave");
+
+	ImGui::SliderFloat3("position", &position_.x, -30.0f, 30.0f);
+	ImGui::SliderFloat3("rotation", &rotation_.x, -3.14f, 3.14f);
+	ImGui::SliderFloat3("scale", &scale_.x, 0.0f, 70.0f);
+
+	ImGui::End();
+
+#endif // USE_IMGUI
+}
+
+void ShockWave::OnCollisionTrigger(const IIEngine::Collider* _other)
+{
+	if (_other->GetColliderID() == "Player" &&
+		!hasCollided_)
+	{
+		isFading_ = true;
+		hasCollided_ = true;
+	}
+}
+
+
+============================================================
+File Path: project/application/objects/enemy/bullet/ShockWave.h
+============================================================
+#pragma once
+
+#include "../../../baseObject/BaseBullet.h"
+#include"../../../../gameEngine/collider/ColliderManager.h"
+
+#include <Object3d.h>
+
+/// <summary>
+/// 衝撃波クラス
+/// </summary>
+class ShockWave : public BaseBullet
+{
+public:
+
+	ShockWave() = default;
+	~ShockWave() = default;
+
+	// 初期化
+	void Initialize() override;
+
+	// 終了
+	void Finalize() override;
+
+	// 更新
+	void Update() override;
+
+	// 描画
+	void Draw() override;
+
+	// ImGui
+	void ImGuiDraw();
+
+private: // 衝突判定
+
+	/// <summary>
+	/// 衝突時処理
+	/// </summary>
+	/// <param name="_other">衝突相手のコライダー</param>
+	void OnCollisionTrigger(const IIEngine::Collider* _other);
+
+public: // ゲッター
+
+public: // セッター
+
+private: // メンバ変数
+
+	// 基本サイズ
+	float baseScale_ = 0.5f;
+
+	// 拡大速度
+	float expansionSpeed_ = 0.2f;
+
+	// 寿命
+	static const uint32_t kLifeTime = 60 * 5;
+
+	// 消滅開始
+	bool isFading_ = false;
+
+	// 衝突済みフラグ
+	bool hasCollided_ = false;
+
+	// シェイクの振幅
+	float shakeAmplitude_ = 0.05f;
+	// シェイクの周波数
+	float shakeFrequency_ = 10.0f;
+
+};
+
+
+============================================================
 File Path: project/application/objects/enemy/bullet/TimeBomb.cpp
 ============================================================
 #include "TimeBomb.h"
@@ -8625,6 +9265,9 @@ void TimeBomb::Update()
 
 		// 位置を速度で更新
 		position_ += velocity_ * dt;
+
+		// 飛行中のパーティクル
+		IIEngine::ParticleEmitter::Emit("enemyWalk", position_, flyingParticleCount_);
 	}
 
 	if ((position_ - landingPosition_).Length() < landingEpsilon_ or position_.y <= groundY_)
@@ -9061,6 +9704,9 @@ private:
 	bool isLaunchingTrap_ = false; 
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
+	// 最高到達地点
+	float arcHeight_ = 3.0f;
+
 
 	//寿命
 	static const int32_t kLifeTime = 60 * 12;
@@ -9084,9 +9730,11 @@ private:
 	float radiusVariance_ = 1.5f;
 
 	// 爆発パーティクルの数
-	int explosionParticleCount_ = 6;
+	uint32_t explosionParticleCount_ = 6;
 	// 設置パーティクルの数
-	int setParticleCount_ = 7;
+	uint32_t setParticleCount_ = 7;
+	// 飛行中のパーティクル
+	uint32_t flyingParticleCount_ = 2;
 
 	// ゆらゆら用(回転)
 	// 揺れの経過時間
@@ -9167,6 +9815,9 @@ void VignetteTrap::Update()
 		velocity_.y += gravity_ * dt;
 		// 位置を速度で更新
 		position_ += velocity_ * dt;
+
+		// 飛行中のパーティクル
+		IIEngine::ParticleEmitter::Emit("enemyWalk", position_, flyingParticleCount_);
 	}
 	else
 	{
@@ -9258,12 +9909,28 @@ void VignetteTrap::LaunchTrap()
 	// XYの差分
 	Vector3 diff = landingPosition_ - position_;
 
+	// 頂点の高さ
+	float apexY = std::max(position_.y, landingPosition_.y) + arcHeight_;
+
+	// 頂点までの速度
+	velocity_.y = std::sqrt(-2.0f * gravity_ * (apexY - position_.y));
+
+	// 頂点までの時間
+	float timeToApex = velocity_.y / -gravity_;
+
+	// 頂点から着地点までの時間
+	float timeDown = std::sqrt(2.0f * (apexY - landingPosition_.y) / -gravity_);
+
+	// 全飛行時間
+	float totalTime = timeToApex + timeDown;
+
 	// XZ方向の初速度
-	velocity_.x = diff.x / flightTime_;
-	velocity_.z = diff.z / flightTime_;
+	velocity_.x = diff.x / totalTime;
+	velocity_.z = diff.z / totalTime;
 
 	// Y方向の初速度
-	velocity_.y = (diff.y - 0.5f * gravity_ * flightTime_ * flightTime_) / flightTime_;
+	velocity_.y = (diff.y - 0.5f * gravity_ * totalTime * totalTime) / totalTime;
+
 }
 
 void VignetteTrap::DeadMotion()
@@ -9510,9 +10177,13 @@ private:
 	bool isLaunchingTrap_ = false;
 	// 着弾までの時間
 	float flightTime_ = 1.0f;
+	// 最高到達地点
+	float arcHeight_ = 3.0f;
 
+	// 飛行中のパーティクル
+	uint32_t flyingParticleCount_ = 2;
 	// 設置パーティクルの数
-	int setParticleCount_ = 7;
+	uint32_t setParticleCount_ = 7;
 
 	//寿命
 	static const int32_t kLifeTime = 60 * 12;
@@ -14863,6 +15534,14 @@ void GamePlayScene::Update()
 
 	// エネミーの更新
 	pEnemyManager_->Update();
+	// Guardian着地の瞬間にカメラシェイク
+	if (pEnemyManager_->GetGuardianLanding())
+	{
+		camera_->GetCamera()->StartShake(0.5f, 1.5f);
+		
+		// シェイクを開始したらフラグを落とす 
+		pEnemyManager_->SetGuardianLanding(false); // consume
+	}
 	// 最も近いエネミーの位置を取得してプレイヤーにセット
 	Vector3 nearest;
 	if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest)) 
@@ -14939,6 +15618,12 @@ void GamePlayScene::Update()
 				// シーン切り替え
 				IIEngine::SceneManager::GetInstance()->ChangeScene("GAMEOVER");
 			});
+	}
+
+	// デバッグ用: Guardianの出現トリガー
+	if (IIEngine::Input::GetInstance()->TriggerKey(DIK_G))
+	{
+		pEnemyManager_->GuardianInit({ 30.0f, 0.5f, 20.0f });
 	}
 
 #endif // USE_IMGUI
@@ -26828,6 +27513,7 @@ namespace IIEngine
 		ModelManager::GetInstance()->LoadModel("logo/logo.obj");
 		ModelManager::GetInstance()->LoadModel("barrie/barrie.obj");
 		ModelManager::GetInstance()->LoadModel("enemy/guardian/guardian.obj");
+		ModelManager::GetInstance()->LoadModel("enemy/guardian/shockWave/shockWave.obj");
 
 	}
 
