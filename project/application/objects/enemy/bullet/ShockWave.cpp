@@ -33,6 +33,8 @@ void ShockWave::Initialize()
 
 	lifeTimeFrames_ = kLifeTime;
 
+	isFading_ = false;
+
 }
 
 void ShockWave::Finalize()
@@ -52,6 +54,10 @@ void ShockWave::Update()
 	scale_.x += expansionSpeed_ * dt * kDefaultFrameRate;
 	scale_.z += expansionSpeed_ * dt * kDefaultFrameRate;
 
+	// x,zをシェイクさせる
+	position_.x += sinf(IIEngine::TimeManager::Instance().GetTotalTime() * shakeFrequency_) * shakeAmplitude_;
+	position_.z += sinf(IIEngine::TimeManager::Instance().GetTotalTime() * shakeFrequency_) * shakeAmplitude_;
+
 	// コライダー更新
 	aabb_.min = position_ - object_->GetScale();
 	aabb_.max = position_ + object_->GetScale();
@@ -61,7 +67,15 @@ void ShockWave::Update()
 	if (isFading_)
 	{
 		scale_.y -= 0.01f; // 徐々に小さくする
-		if (scale_.y < 0.05f) // 十分小さくなったら消滅
+		position_.y -= 0.01f; // 徐々に下に落とす
+
+		object_->SetPosition(position_);
+		object_->SetScale(scale_);
+		// Update
+		object_->Update();
+		
+
+		if (scale_.y < 0.01f) // 十分小さくなったら消滅
 		{
 			isDead_ = true;
 		}
@@ -89,7 +103,7 @@ void ShockWave::ImGuiDraw()
 {
 #ifdef USE_IMGUI
 
-	ImGui::Begin("EnemyBullet");
+	ImGui::Begin("ShockWave");
 
 	ImGui::SliderFloat3("position", &position_.x, -30.0f, 30.0f);
 	ImGui::SliderFloat3("rotation", &rotation_.x, -3.14f, 3.14f);
@@ -102,8 +116,7 @@ void ShockWave::ImGuiDraw()
 
 void ShockWave::OnCollisionTrigger(const IIEngine::Collider* _other)
 {
-	if (!_other->GetOwner()->IsActive() &&
-		(_other->GetColliderID() == "Player") &&
+	if (_other->GetColliderID() == "Player" &&
 		!hasCollided_)
 	{
 		isFading_ = true;

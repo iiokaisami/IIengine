@@ -59,4 +59,9 @@ private: // メンバ変数
 	// 衝突済みフラグ
 	bool hasCollided_ = false;
 
+	// シェイクの振幅
+	float shakeAmplitude_ = 0.05f;
+	// シェイクの周波数
+	float shakeFrequency_ = 10.0f;
+
 };

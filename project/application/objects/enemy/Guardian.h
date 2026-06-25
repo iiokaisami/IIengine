@@ -93,6 +93,16 @@ public: // ゲッター
 	// ジャンプ着地フラグを取得
 	float GetLanding() const { return isLanding_; }
 
+	// ジャンプ開始HPを取得
+	float GetJumpStartHP() const { return kJumpStartHP_; }
+
+	// ジャンプ周期を取得
+	float GetJumpCycle() const { return kJumpCycle_; }
+
+	// 攻撃周期を取得
+	float GetAttackCycle() const { return attackCycle_; }
+
+
 public: // セッター	
 
 	// プレイヤーの位置をセット
@@ -188,6 +198,12 @@ private:
 	};
 	JumpState jumpState_ = JumpState::None;
 
+	// ジャンプ開始HP
+	const float kJumpStartHP_ = 18.0f;
+	// ジャンプ周期
+	const float kJumpCycle_ = 4.0f;
+	// 攻撃周期
+	float attackCycle_ = 0.0f;
 	// ジャンプ開始
 	bool isJumping_ = false;
 	// ジャンプ開始時のY

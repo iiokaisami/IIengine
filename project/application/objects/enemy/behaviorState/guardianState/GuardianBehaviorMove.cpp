@@ -39,6 +39,13 @@ void GuardianBehaviorMove::Update()
 		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
 		return;
 	}
+	else if (pGuardian_->GetHP() <= pGuardian_->GetJumpStartHP() &&
+		     pGuardian_->GetAttackCycle() >= pGuardian_->GetJumpCycle())
+	{
+		// HPがジャンプ開始HP以下になったら、ジャンプモーションに切り替え
+		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
+		return;
+	}
 	else
 	{
 		// ステートが切り替わらなかったらもう一度

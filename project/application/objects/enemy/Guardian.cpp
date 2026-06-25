@@ -161,12 +161,16 @@ void Guardian::ImGuiDraw()
 	float distanceToPlayer = position_.Distance(playerPosition_);
         ImGui::Text("Distance to Player: %.2f", distanceToPlayer);
 
+	// 攻撃周期を表示
+	ImGui::Text("Attack Cycle: %.2f", attackCycle_);
   
     // ジャンプ開始
 	if (ImGui::Button("Start Jump"))
 	{
 		isJumping_ = true;
 	}
+
+
 	// 衝撃波のImGui表示
     if (pShockWave_)
     {
@@ -283,6 +287,9 @@ void Guardian::Attack()
                 attackController_.SetPatternIndex(currentPatternIndex_);
                 spiralShotsFired_ = 0;
                 patternTimer_ = 0.0f; // パターン切り替え直後から再カウント
+
+                // 攻撃カウントを増加
+                ++attackCycle_;
             }
         }
         else
@@ -294,6 +301,9 @@ void Guardian::Attack()
                 currentPatternIndex_ = (currentPatternIndex_ + 1) % attackController_.PatternCount();
                 attackController_.SetPatternIndex(currentPatternIndex_);
                 patternTimer_ = 0.0f;
+
+                // 攻撃カウントを増加
+                ++attackCycle_;
             }
         }
     }
@@ -311,6 +321,10 @@ void Guardian::StartJump()
 
 	// 着地フラグをリセット
     isLanding_ = false;
+
+	// 攻撃周期をリセット
+	attackCycle_ = 0.0f;
+
 }
 
 void Guardian::JumpAttack()
