@@ -4876,7 +4876,7 @@ private:
 	// ジャンプ開始HP
 	const float kJumpStartHP_ = 18.0f;
 	// ジャンプ周期
-	const float kJumpCycle_ = 4.0f;
+	const float kJumpCycle_ = 3.0f;
 	// 攻撃周期
 	float attackCycle_ = 0.0f;
 	// ジャンプ開始
@@ -6732,6 +6732,7 @@ File Path: project/application/objects/enemy/behaviorState/guardianState/Guardia
 #include "../../Guardian.h"
 #include "GuardianBehaviorMove.h"
 #include "GuardianBehaviorDead.h"
+#include "GuardianBehaviorJump.h"
 
 GuardianBehaviorHitReact::GuardianBehaviorHitReact(Guardian* _pGuardian) : GuardianBehaviorState("HitReact", _pGuardian)
 {
@@ -6771,6 +6772,16 @@ void GuardianBehaviorHitReact::Update()
 			pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorDead>(pGuardian_));
 			return;
 		} 
+		else if (pGuardian_->GetHP() <= pGuardian_->GetJumpStartHP() &&
+			pGuardian_->GetAttackCycle() >= pGuardian_->GetJumpCycle())
+		{
+			// 無敵状態を解除
+			pGuardian_->SetInvincible(false);
+
+			// HPがジャンプ開始HP以下になったら、ジャンプモーションに切り替え
+			pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
+			return;
+		}
 		else if(pGuardian_->GetHP() > 0)
 		{
 			float hp = 0;
@@ -6960,12 +6971,6 @@ void GuardianBehaviorMove::Update()
 		
 		// ヒットしたら、ヒットリアクションモーションに切り替え
 		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorHitReact>(pGuardian_));
-		return;
-	}
-	else if (pGuardian_->GetJumping())
-	{
-		// ジャンプ開始したら、ジャンプモーションに切り替え
-		pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
 		return;
 	}
 	else if (pGuardian_->GetHP() <= pGuardian_->GetJumpStartHP() &&
@@ -9000,7 +9005,7 @@ void ShockWave::Initialize()
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
-	objectName_ = "EnemyBullet";
+	objectName_ = "ShockWave";
 
 	desc =
 	{
@@ -9018,6 +9023,7 @@ void ShockWave::Initialize()
 	lifeTimeFrames_ = kLifeTime;
 
 	isFading_ = false;
+
 
 }
 
@@ -12569,7 +12575,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			(_other->GetColliderID() == "VignetteTrap") or
 			(_other->GetColliderID() == "EnemyBullet") or
 			(_other->GetColliderID() == "SetTimeBomb") or
-			(_other->GetColliderID() == "Corruptor");
+			(_other->GetColliderID() == "Corruptor") or
+			(_other->GetColliderID() == "ShockWave");
 		if (isSlowMotionTarget)
 		{
 			if (!hasEvadeSlowHit_)
@@ -12603,7 +12610,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 	if (_other->GetColliderID() == "EnemyBullet" or
 		_other->GetColliderID() == "NormalEnemy" or
 		_other->GetColliderID() == "TrapEnemy" or
-		_other->GetColliderID() == "Corruptor")
+		_other->GetColliderID() == "Corruptor" or
+		_other->GetColliderID() == "Guardian")
 	{
 		// プレイヤーのHPを減少
 		if (hp_ > 0.3f)
@@ -12645,6 +12653,26 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			effects_.OnDamaged();
 
 			isHitMoment_ = true;
+		}
+	}
+
+	if (_other->GetColliderID() == "ShockWave")
+	{
+		// プレイヤーのHPを減少
+		if (hp_ > 0.3f)
+		{
+			hp_ -= shockwaveDamage_;
+
+			isHitMoment_ = true;
+
+			// RGBシフトエフェクトの有効化
+			effects_.OnDamaged();
+
+			IIEngine::ParticleEmitter::Emit("HitReaction", position_, 5);
+		} 
+		else
+		{
+			isDead_ = true;
 		}
 	}
 
@@ -13008,6 +13036,7 @@ private:
 	int hitParticleCountNormal_ = 5;
 	int hitParticleCountHeavy_ = 8;
 	float explosionDamage_ = 1.5f;
+	float shockwaveDamage_ = 2.0f;
 
 };
 
