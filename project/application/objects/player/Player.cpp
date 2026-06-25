@@ -706,7 +706,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			(_other->GetColliderID() == "VignetteTrap") or
 			(_other->GetColliderID() == "EnemyBullet") or
 			(_other->GetColliderID() == "SetTimeBomb") or
-			(_other->GetColliderID() == "Corruptor");
+			(_other->GetColliderID() == "Corruptor") or
+			(_other->GetColliderID() == "ShockWave");
 		if (isSlowMotionTarget)
 		{
 			if (!hasEvadeSlowHit_)
@@ -740,7 +741,8 @@ void Player::OnCollisionTrigger(const Collider* _other)
 	if (_other->GetColliderID() == "EnemyBullet" or
 		_other->GetColliderID() == "NormalEnemy" or
 		_other->GetColliderID() == "TrapEnemy" or
-		_other->GetColliderID() == "Corruptor")
+		_other->GetColliderID() == "Corruptor" or
+		_other->GetColliderID() == "Guardian")
 	{
 		// プレイヤーのHPを減少
 		if (hp_ > 0.3f)
@@ -782,6 +784,26 @@ void Player::OnCollisionTrigger(const Collider* _other)
 			effects_.OnDamaged();
 
 			isHitMoment_ = true;
+		}
+	}
+
+	if (_other->GetColliderID() == "ShockWave")
+	{
+		// プレイヤーのHPを減少
+		if (hp_ > 0.3f)
+		{
+			hp_ -= shockwaveDamage_;
+
+			isHitMoment_ = true;
+
+			// RGBシフトエフェクトの有効化
+			effects_.OnDamaged();
+
+			IIEngine::ParticleEmitter::Emit("HitReaction", position_, 5);
+		} 
+		else
+		{
+			isDead_ = true;
 		}
 	}
 

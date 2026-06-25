@@ -303,5 +303,6 @@ private:
 	int hitParticleCountNormal_ = 5;
 	int hitParticleCountHeavy_ = 8;
 	float explosionDamage_ = 1.5f;
+	float shockwaveDamage_ = 2.0f;
 
 };

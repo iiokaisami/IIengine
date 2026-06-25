@@ -16,7 +16,7 @@ void ShockWave::Initialize()
 
 	// 当たり判定
 	colliderManager_ = ColliderManager::GetInstance();
-	objectName_ = "EnemyBullet";
+	objectName_ = "ShockWave";
 
 	desc =
 	{
@@ -34,6 +34,7 @@ void ShockWave::Initialize()
 	lifeTimeFrames_ = kLifeTime;
 
 	isFading_ = false;
+
 
 }
 

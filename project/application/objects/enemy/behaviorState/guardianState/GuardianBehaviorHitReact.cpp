@@ -3,6 +3,7 @@
 #include "../../Guardian.h"
 #include "GuardianBehaviorMove.h"
 #include "GuardianBehaviorDead.h"
+#include "GuardianBehaviorJump.h"
 
 GuardianBehaviorHitReact::GuardianBehaviorHitReact(Guardian* _pGuardian) : GuardianBehaviorState("HitReact", _pGuardian)
 {
@@ -42,6 +43,16 @@ void GuardianBehaviorHitReact::Update()
 			pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorDead>(pGuardian_));
 			return;
 		} 
+		else if (pGuardian_->GetHP() <= pGuardian_->GetJumpStartHP() &&
+			pGuardian_->GetAttackCycle() >= pGuardian_->GetJumpCycle())
+		{
+			// 無敵状態を解除
+			pGuardian_->SetInvincible(false);
+
+			// HPがジャンプ開始HP以下になったら、ジャンプモーションに切り替え
+			pGuardian_->ChangeBehaviorState(std::make_unique<GuardianBehaviorJump>(pGuardian_));
+			return;
+		}
 		else if(pGuardian_->GetHP() > 0)
 		{
 			float hp = 0;
