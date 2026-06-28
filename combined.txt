@@ -154,6 +154,8 @@
     └──         ├── DeathCameraController.h
     └──         ├── FollowController.cpp
     └──         ├── FollowController.h
+    └──         ├── GuardianAppearCameraController.cpp
+    └──         ├── GuardianAppearCameraController.h
     └──         ├── ICameraController.h
     └──         ├── SceneCamera.cpp
     └──         ├── SceneCamera.h
@@ -506,6 +508,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.cpp" />
     <ClCompile Include="application\objects\enemy\bullet\GuardianAttackController.cpp" />
     <ClCompile Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorJump.cpp" />
+    <ClCompile Include="application\scene\cameraController\GuardianAppearCameraController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="gameEngine\3d\Model.cpp" />
     <ClCompile Include="gameEngine\3d\ModelCommon.cpp" />
@@ -695,6 +698,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\objects\player\PlayerEffects.h" />
     <ClInclude Include="application\objects\enemy\bullet\ShockWave.h" />
     <ClInclude Include="application\objects\enemy\behaviorState\guardianState\GuardianBehaviorJump.h" />
+    <ClInclude Include="application\scene\cameraController\GuardianAppearCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -1311,6 +1315,7 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="application\objects\enemy\bullet\ShockWave.cpp">
       <Filter>application\objects\enemy\bullet</Filter>
     </ClCompile>
+    <ClCompile Include="application\scene\cameraController\GuardianAppearCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1719,6 +1724,7 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h">
       <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
     </ClInclude>
+    <ClInclude Include="application\scene\cameraController\GuardianAppearCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -3860,6 +3866,10 @@ void EnemyManager::GuardianInit(const Vector3& pos)
 
 	// 敵のカウントを増やす
 	enemyCount_++;
+
+	// ガーディアン出現要求フラグを立てる
+	guardianSpawnRequested_ = true;
+
 }
 
 void EnemyManager::ChangeState(std::unique_ptr<EnemyWaveState> _pState)
@@ -3931,6 +3941,20 @@ bool EnemyManager::GetGuardianLanding() const
 
 	return false;
 	
+}
+
+bool EnemyManager::GetGuardianPosition(Vector3& outPos) const
+{
+	// ガーディアンの位置を返す
+	for (const auto& guardian : pGuardians_)
+	{
+		if (guardian->GetLanding())
+		{
+			outPos = guardian->GetPosition();
+			return true;
+		}
+	}
+	return false;
 }
 
 void EnemyManager::SetGuardianLanding(bool isLanding)
@@ -4055,6 +4079,27 @@ public: // ゲッター
 	// Guardianの着地フラグを取得
 	bool GetGuardianLanding() const;
 
+	// Guardianの位置を取得
+	bool GetGuardianPosition(Vector3& outPos) const;
+
+	// Guardianの出現演出要求フラグを取得
+	bool IsGuardianSpawnRequested() const {return guardianSpawnRequested_;}
+
+	// Guardian取得(カメラ演出用)
+	const std::vector<std::unique_ptr<Guardian>>& GetGuardians() const{return pGuardians_;}
+
+	// Guardianの出現演出要求フラグを消費
+	bool ConsumeGuardianSpawnRequest()
+	{
+		if (guardianSpawnRequested_)
+		{
+			guardianSpawnRequested_ = false;
+			return true;
+		}
+
+		return false;
+	}
+
 public: // セッター
 
 	/// <summary>
@@ -4145,6 +4190,9 @@ private:
 		{ 5.0f, 0.5f, 5.0f },
 	};
 
+	// Guardian出現演出要求
+	bool guardianSpawnRequested_ = false;
+
 };
 
 
@@ -4203,7 +4251,7 @@ void Guardian::Initialize()
 	pBehaviorState_ = std::make_unique<GuardianBehaviorSpawn>(this);
 
     // パーティクル
-    IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
+    //IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 
 	// 弾幕のパターンを追加
 	attackController_.AddPattern(std::make_unique<SpreadShotPattern>(spreadCount_, spreadAngle_, spreadBulletSpeed_));
@@ -15238,6 +15286,32 @@ void GamePlayScene::Initialize()
 		[this]() -> bool { return pGoal_->IsBarrierDestroyed(); } // Barrier破壊完了
 	);
 
+	// ガーディアン出現カメラコントローラ作成
+	camera_->AddController<GuardianAppearCameraController>(
+		camera_->GetCamera(),
+
+		// Guardian位置
+		[this]()
+		{
+			const auto& guardians =
+				pEnemyManager_->GetGuardians();
+
+			if (!guardians.empty())
+			{
+				return guardians.front()->GetPosition();
+			}
+
+			return Vector3{};
+		},
+
+		// Follow位置
+		[this]()
+		{
+			return pPlayer_->GetPosition()
+				+ cameraTargetOffset_;
+		}
+	);
+
 	// コールバック設定
 	if (auto* barrierCam = camera_->FindController<BarrierBreakCameraController>())
 	{
@@ -15311,6 +15385,20 @@ void GamePlayScene::Initialize()
 		{
 			follow->Stop();
 		}
+	}
+	// コールバック設定
+	if (auto* guardianCam =
+		camera_->FindController<GuardianAppearCameraController>())
+	{
+		guardianCam->SetOnFinish([this]()
+			{
+				if (auto* follow =
+					camera_->FindController<FollowController>())
+				{
+					follow->SnapToTarget();
+					follow->Start();
+				}
+			});
 	}
 
 	// シーン開始時遷移演出
@@ -15561,25 +15649,41 @@ void GamePlayScene::Update()
 	// プレイヤーのHPバー更新(カメラの更新後に呼び出したい)
 	pPlayer_->UpdateHPBar();
 
-	// エネミーの更新
-	pEnemyManager_->Update();
-	// Guardian着地の瞬間にカメラシェイク
-	if (pEnemyManager_->GetGuardianLanding())
 	{
-		camera_->GetCamera()->StartShake(0.5f, 1.5f);
-		
-		// シェイクを開始したらフラグを落とす 
-		pEnemyManager_->SetGuardianLanding(false); // consume
-	}
-	// 最も近いエネミーの位置を取得してプレイヤーにセット
-	Vector3 nearest;
-	if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest)) 
-	{
-		pPlayer_->SetTargetEnemyPosition(nearest);
-	}
-	else 
-	{
-		pPlayer_->ClearTargetEnemy();
+		// エネミーの更新
+		pEnemyManager_->Update();
+		// Guardian出現演出要求があればカメラ演出開始
+		if (pEnemyManager_->ConsumeGuardianSpawnRequest())
+		{
+			if (auto* follow =
+				camera_->FindController<FollowController>())
+			{
+				follow->Stop();
+			}
+
+			if (auto* guardianCam =
+				camera_->FindController<GuardianAppearCameraController>())
+			{
+				guardianCam->Start();
+			}
+		}
+		// Guardian着地の瞬間にカメラシェイク
+		if (pEnemyManager_->GetGuardianLanding())
+		{
+			camera_->GetCamera()->StartShake(0.5f, 1.5f);
+
+			// シェイクを開始したらフラグを落とす 
+			pEnemyManager_->SetGuardianLanding(false); // consume
+		}
+		// 最も近いエネミーの位置を取得してプレイヤーにセット
+		Vector3 nearest;
+		if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest))
+		{
+			pPlayer_->SetTargetEnemyPosition(nearest);
+		} else
+		{
+			pPlayer_->ClearTargetEnemy();
+		}
 	}
 
 	// フィールドの更新
@@ -15812,6 +15916,7 @@ File Path: project/application/scene/GamePlayScene.h
 #include "cameraController/DeathCameraController.h"
 #include "cameraController/ClearCameraController.h"
 #include "cameraController/BarrierBreakCameraController.h"
+#include "cameraController/GuardianAppearCameraController.h"
 
 #include "PauseMenu.h"
 
@@ -17667,6 +17772,281 @@ private:
 	// 補間進行度
 	float blendingProgress_ = 0.0f;
 	
+};
+
+============================================================
+File Path: project/application/scene/cameraController/GuardianAppearCameraController.cpp
+============================================================
+#include "GuardianAppearCameraController.h"
+
+#include <Ease.h>
+
+GuardianAppearCameraController::GuardianAppearCameraController(std::shared_ptr<IIEngine::Camera> camera, const std::function<Vector3()>& getGuardianPos, const std::function<Vector3()>& getFollowCameraPos, float moveDuration, float waitDuration, float returnDuration)
+    :
+    camera_(std::move(camera)),
+    getGuardianPos_(std::move(getGuardianPos)),
+    getFollowCameraPos_(std::move(getFollowCameraPos)),
+    moveDuration_(moveDuration),
+    waitDuration_(waitDuration),
+    returnDuration_(returnDuration)
+{}
+
+void GuardianAppearCameraController::Update(float dt)
+{
+    if (!active_ || !camera_)
+    {
+        return;
+    }
+
+    switch (phase_)
+    {
+        //----------------------------------
+        // Guardianへ移動
+        //----------------------------------
+    case Phase::MoveToGuardian:
+    {
+        timer_ += dt;
+
+        float t = std::clamp(timer_ / moveDuration_, 0.0f, 1.0f);
+        float e = Ease::InOutQuad(t);
+
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, e);
+        camera_->SetPosition(camPos);
+
+        // Guardianを見る
+        Vector3 dir = guardianPos_ - camPos;
+
+        float yaw = atan2(dir.x, dir.z);
+        float horizontal = sqrt(dir.x * dir.x + dir.z * dir.z);
+        float pitch = atan2(-dir.y, horizontal);
+
+        camera_->SetRotate({ pitch, yaw, 0.0f });
+
+        if (t >= 1.0f)
+        {
+            arrivedPos_ = camPos;
+            arrivedRot_ = camera_->GetRotate();
+
+            phase_ = Phase::Wait;
+            timer_ = 0.0f;
+        }
+
+        break;
+    }
+
+    //----------------------------------
+    // Guardianを見る
+    //----------------------------------
+    case Phase::Wait:
+    {
+        // タイマーを進める
+        timer_ += dt;
+
+        // 到着位置・回転を維持
+        camera_->SetPosition(arrivedPos_);
+        camera_->SetRotate(arrivedRot_);
+
+        if (timer_ >= waitDuration_)
+        {
+            phase_ = Phase::Return;
+			timer_ = 0.0f;
+
+            phaseFromPos_ = camera_->GetPosition();
+
+            phaseToPos_ = getFollowCameraPos_();
+
+            returnStartRot_ = camera_->GetRotate();
+            returnTargetRot_ = startRot_;
+        }
+
+        break;
+    }
+
+    //----------------------------------
+    // Followへ戻る
+    //----------------------------------
+    case Phase::Return:
+    {
+        timer_ += dt;
+
+        float t = std::clamp(timer_ / returnDuration_, 0.0f, 1.0f);
+        float e = Ease::InOutQuad(t);
+
+        Vector3 camPos = Lerp(phaseFromPos_, phaseToPos_, e);
+        camera_->SetPosition(camPos);
+
+        Vector3 rot = Lerp(returnStartRot_, returnTargetRot_, e);
+        camera_->SetRotate(rot);
+
+        if (t >= 1.0f)
+        {
+            camera_->SetPosition(phaseToPos_);
+            camera_->SetRotate(startRot_);
+
+            active_ = false;
+            phase_ = Phase::Finished;
+
+            if (onFinish_)
+            {
+                onFinish_();
+            }
+        }
+
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+void GuardianAppearCameraController::Start()
+{
+    if (active_)
+    {
+        return;
+    }
+
+    if (!camera_ || !getGuardianPos_ || !getFollowCameraPos_)
+    {
+        return;
+    }
+
+    active_ = true;
+    timer_ = 0.0f;
+    phase_ = Phase::MoveToGuardian;
+
+    // 開始位置
+    phaseFromPos_ = camera_->GetPosition();
+    startRot_ = camera_->GetRotate();
+
+    // Guardian位置を固定
+    guardianPos_ = getGuardianPos_();
+
+    // Follow位置を固定
+    returnCameraPos_ = getFollowCameraPos_();
+
+    // Guardianを少し斜め上から映す
+    phaseToPos_ = guardianPos_ + Vector3{ 0.0f, 20.0f, -24.0f };
+}
+
+
+============================================================
+File Path: project/application/scene/cameraController/GuardianAppearCameraController.h
+============================================================
+#pragma once
+
+#include <memory>
+#include <functional>
+#include <algorithm>
+
+#include <Vector3.h>
+
+#include "ICameraController.h"
+#include "../../../gameEngine/3d/Camera.h"
+
+/// <summary>
+/// ガーディアン出現カメラコントローラー
+/// </summary>
+class GuardianAppearCameraController : public ICameraController
+{
+public:
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="camera">カメラ</param>
+	/// <param name="getGuardianPos">ガーディアンの位置を取得する関数</param>
+	/// <param name="getFollowCameraPos">フォローカメラの位置を取得する関数</param>
+	/// <param name="moveDuration">移動時間</param>
+	/// <param name="waitDuration">待機時間</param>
+	/// <param name="returnDuration">戻る時間</param>
+	GuardianAppearCameraController(	std::shared_ptr<IIEngine::Camera> camera,const std::function<Vector3()>& getGuardianPos,const std::function<Vector3()>& getFollowCameraPos,float moveDuration = 0.8f,float waitDuration = 1.2f,float returnDuration = 0.6f);
+
+	// デストラクタ
+	~GuardianAppearCameraController() override = default;
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="dt">経過時間</param>
+	void Update(float dt) override;
+
+    void Start() override;
+    void Stop() override
+    {
+        active_ = false;
+    }
+
+    bool IsActive() const override
+    {
+        return active_;
+    }
+
+public:
+
+    void SetOnFinish(std::function<void()> cb)
+    {
+        onFinish_ = std::move(cb);
+    }
+
+private:
+
+    enum class Phase
+    {
+        None,
+        MoveToGuardian,
+        Wait,
+        Return,
+        Finished
+    };
+
+private:
+
+    std::shared_ptr<IIEngine::Camera> camera_;
+
+    std::function<Vector3()> getGuardianPos_;
+    std::function<Vector3()> getFollowCameraPos_;
+
+    bool active_ = false;
+
+    Phase phase_ = Phase::None;
+
+    float timer_ = 0.0f;
+
+
+    float moveDuration_ = 0.7f;
+    float waitDuration_ = 0.8f;
+    float returnDuration_ = 0.6f;
+
+    Vector3 guardianOffset_ =
+    {
+        0.0f,
+        8.0f,
+        -12.0f
+    };
+
+    Vector3 fromPos_;
+    Vector3 toPos_;
+
+    Vector3 fromRot_;
+    Vector3 toRot_;
+
+    std::function<void()> onFinish_;
+
+    Vector3 guardianPos_{};
+    Vector3 returnCameraPos_{};
+
+    Vector3 phaseFromPos_{};
+    Vector3 phaseToPos_{};
+
+    Vector3 arrivedPos_{};
+    Vector3 arrivedRot_{};
+
+    Vector3 startRot_{};
+    Vector3 returnStartRot_{};
+    Vector3 returnTargetRot_{};
+
 };
 
 ============================================================
