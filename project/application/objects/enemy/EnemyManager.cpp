@@ -441,6 +441,10 @@ void EnemyManager::GuardianInit(const Vector3& pos)
 
 	// 敵のカウントを増やす
 	enemyCount_++;
+
+	// ガーディアン出現要求フラグを立てる
+	guardianSpawnRequested_ = true;
+
 }
 
 void EnemyManager::ChangeState(std::unique_ptr<EnemyWaveState> _pState)
@@ -512,6 +516,20 @@ bool EnemyManager::GetGuardianLanding() const
 
 	return false;
 	
+}
+
+bool EnemyManager::GetGuardianPosition(Vector3& outPos) const
+{
+	// ガーディアンの位置を返す
+	for (const auto& guardian : pGuardians_)
+	{
+		if (guardian->GetLanding())
+		{
+			outPos = guardian->GetPosition();
+			return true;
+		}
+	}
+	return false;
 }
 
 void EnemyManager::SetGuardianLanding(bool isLanding)

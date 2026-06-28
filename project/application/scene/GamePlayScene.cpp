@@ -160,6 +160,32 @@ void GamePlayScene::Initialize()
 		[this]() -> bool { return pGoal_->IsBarrierDestroyed(); } // Barrier破壊完了
 	);
 
+	// ガーディアン出現カメラコントローラ作成
+	camera_->AddController<GuardianAppearCameraController>(
+		camera_->GetCamera(),
+
+		// Guardian位置
+		[this]()
+		{
+			const auto& guardians =
+				pEnemyManager_->GetGuardians();
+
+			if (!guardians.empty())
+			{
+				return guardians.front()->GetPosition();
+			}
+
+			return Vector3{};
+		},
+
+		// Follow位置
+		[this]()
+		{
+			return pPlayer_->GetPosition()
+				+ cameraTargetOffset_;
+		}
+	);
+
 	// コールバック設定
 	if (auto* barrierCam = camera_->FindController<BarrierBreakCameraController>())
 	{
@@ -233,6 +259,20 @@ void GamePlayScene::Initialize()
 		{
 			follow->Stop();
 		}
+	}
+	// コールバック設定
+	if (auto* guardianCam =
+		camera_->FindController<GuardianAppearCameraController>())
+	{
+		guardianCam->SetOnFinish([this]()
+			{
+				if (auto* follow =
+					camera_->FindController<FollowController>())
+				{
+					follow->SnapToTarget();
+					follow->Start();
+				}
+			});
 	}
 
 	// シーン開始時遷移演出
@@ -483,25 +523,41 @@ void GamePlayScene::Update()
 	// プレイヤーのHPバー更新(カメラの更新後に呼び出したい)
 	pPlayer_->UpdateHPBar();
 
-	// エネミーの更新
-	pEnemyManager_->Update();
-	// Guardian着地の瞬間にカメラシェイク
-	if (pEnemyManager_->GetGuardianLanding())
 	{
-		camera_->GetCamera()->StartShake(0.5f, 1.5f);
-		
-		// シェイクを開始したらフラグを落とす 
-		pEnemyManager_->SetGuardianLanding(false); // consume
-	}
-	// 最も近いエネミーの位置を取得してプレイヤーにセット
-	Vector3 nearest;
-	if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest)) 
-	{
-		pPlayer_->SetTargetEnemyPosition(nearest);
-	}
-	else 
-	{
-		pPlayer_->ClearTargetEnemy();
+		// エネミーの更新
+		pEnemyManager_->Update();
+		// Guardian出現演出要求があればカメラ演出開始
+		if (pEnemyManager_->ConsumeGuardianSpawnRequest())
+		{
+			if (auto* follow =
+				camera_->FindController<FollowController>())
+			{
+				follow->Stop();
+			}
+
+			if (auto* guardianCam =
+				camera_->FindController<GuardianAppearCameraController>())
+			{
+				guardianCam->Start();
+			}
+		}
+		// Guardian着地の瞬間にカメラシェイク
+		if (pEnemyManager_->GetGuardianLanding())
+		{
+			camera_->GetCamera()->StartShake(0.5f, 1.5f);
+
+			// シェイクを開始したらフラグを落とす 
+			pEnemyManager_->SetGuardianLanding(false); // consume
+		}
+		// 最も近いエネミーの位置を取得してプレイヤーにセット
+		Vector3 nearest;
+		if (pEnemyManager_->GetNearestEnemyPosition(pPlayer_->GetPosition(), nearest))
+		{
+			pPlayer_->SetTargetEnemyPosition(nearest);
+		} else
+		{
+			pPlayer_->ClearTargetEnemy();
+		}
 	}
 
 	// フィールドの更新

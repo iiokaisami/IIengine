@@ -49,7 +49,7 @@ void Guardian::Initialize()
 	pBehaviorState_ = std::make_unique<GuardianBehaviorSpawn>(this);
 
     // パーティクル
-    IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
+    //IIEngine::ParticleEmitter::Emit("laserGroup", position_, spawnParticleCount_);
 
 	// 弾幕のパターンを追加
 	attackController_.AddPattern(std::make_unique<SpreadShotPattern>(spreadCount_, spreadAngle_, spreadBulletSpeed_));

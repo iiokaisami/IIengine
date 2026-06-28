@@ -469,6 +469,7 @@
     <ClCompile Include="application\objects\enemy\bullet\ShockWave.cpp">
       <Filter>application\objects\enemy\bullet</Filter>
     </ClCompile>
+    <ClCompile Include="application\scene\cameraController\GuardianAppearCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -877,6 +878,7 @@
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h">
       <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
     </ClInclude>
+    <ClInclude Include="application\scene\cameraController\GuardianAppearCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">

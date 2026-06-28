@@ -107,6 +107,27 @@ public: // ゲッター
 	// Guardianの着地フラグを取得
 	bool GetGuardianLanding() const;
 
+	// Guardianの位置を取得
+	bool GetGuardianPosition(Vector3& outPos) const;
+
+	// Guardianの出現演出要求フラグを取得
+	bool IsGuardianSpawnRequested() const {return guardianSpawnRequested_;}
+
+	// Guardian取得(カメラ演出用)
+	const std::vector<std::unique_ptr<Guardian>>& GetGuardians() const{return pGuardians_;}
+
+	// Guardianの出現演出要求フラグを消費
+	bool ConsumeGuardianSpawnRequest()
+	{
+		if (guardianSpawnRequested_)
+		{
+			guardianSpawnRequested_ = false;
+			return true;
+		}
+
+		return false;
+	}
+
 public: // セッター
 
 	/// <summary>
@@ -196,6 +217,9 @@ private:
 		{ -5.0f, 0.5f, -2.0f },
 		{ 5.0f, 0.5f, 5.0f },
 	};
+
+	// Guardian出現演出要求
+	bool guardianSpawnRequested_ = false;
 
 };
 

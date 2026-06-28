@@ -21,6 +21,7 @@
 #include "cameraController/DeathCameraController.h"
 #include "cameraController/ClearCameraController.h"
 #include "cameraController/BarrierBreakCameraController.h"
+#include "cameraController/GuardianAppearCameraController.h"
 
 #include "PauseMenu.h"
 
