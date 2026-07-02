@@ -4924,7 +4924,7 @@ private:
 	// ジャンプ開始HP
 	const float kJumpStartHP_ = 18.0f;
 	// ジャンプ周期
-	const float kJumpCycle_ = 3.0f;
+	const float kJumpCycle_ = 2.0f;
 	// 攻撃周期
 	float attackCycle_ = 0.0f;
 	// ジャンプ開始
@@ -6729,6 +6729,9 @@ File Path: project/application/objects/enemy/behaviorState/guardianState/Guardia
 
 #include "GuardianBehaviorState.h"
 
+/// <summary>
+/// ガーディアンの死亡
+/// </summary>
 class GuardianBehaviorDead : public GuardianBehaviorState
 {
 public:
@@ -8875,7 +8878,6 @@ void EnemyBullet::OnCollisionTrigger(const Collider* _other)
 {
 	if (!_other->GetOwner()->IsActive() && 
 		(_other->GetColliderID() == "Player" or
-		_other->GetColliderID() == "PlayerBullet" or
 		_other->GetColliderID() == "Wall" or
 		_other->GetColliderID() == "TrapEnemy" or
 		_other->GetColliderID() == "Barrier"))
@@ -13045,7 +13047,7 @@ private:
 	// ロックオンのターゲット位置
 	Vector3 lockOnTargetPosition_{};
 	// ロックオンのチャージ範囲
-	float lockOnChargeRange_ = 12.0f;
+	float lockOnChargeRange_ = 17.0f;
 	// ロックオンのチャージ時間
 	const float kLockOnChargeMaxTimeSec_ = 2.0f;
 	// ロックオンのチャージタイマー
@@ -13757,8 +13759,12 @@ File Path: project/application/objects/player/motion/IPlayerMotion.h
 ============================================================
 #pragma once
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// プレイヤーの演出モーションの基底クラス
+/// </summary>
 class IPlayerMotion 
 {
 public:
@@ -13870,8 +13876,12 @@ File Path: project/application/objects/player/motion/PlayerAutoMotion.h
 #include "IPlayerMotion.h"
 #include <MyMath.h>
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// プレイヤーの自動モーション
+/// </summary>
 class PlayerAutoMotion final : public IPlayerMotion
 {
 public:
@@ -14027,8 +14037,12 @@ File Path: project/application/objects/player/motion/PlayerClearMotion.h
 
 #include <MyMath.h>
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// ゲームクリア時の演出モーション 
+/// </summary>
 class PlayerClearMotion final : public IPlayerMotion 
 {
 public:
@@ -14181,8 +14195,12 @@ File Path: project/application/objects/player/motion/PlayerDeathMotion.h
 
 #include <MyMath.h>
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// プレイヤー死亡時の演出モーション
+/// </summary>
 class PlayerDeathMotion final : public IPlayerMotion
 {
 public:
