@@ -4,8 +4,12 @@
 
 #include <MyMath.h>
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// ゲームクリア時の演出モーション 
+/// </summary>
 class PlayerClearMotion final : public IPlayerMotion 
 {
 public:

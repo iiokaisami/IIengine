@@ -2,6 +2,9 @@
 
 #include "GuardianBehaviorState.h"
 
+/// <summary>
+/// ガーディアンの死亡
+/// </summary>
 class GuardianBehaviorDead : public GuardianBehaviorState
 {
 public:

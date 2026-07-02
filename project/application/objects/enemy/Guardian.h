@@ -201,7 +201,7 @@ private:
 	// ジャンプ開始HP
 	const float kJumpStartHP_ = 18.0f;
 	// ジャンプ周期
-	const float kJumpCycle_ = 3.0f;
+	const float kJumpCycle_ = 2.0f;
 	// 攻撃周期
 	float attackCycle_ = 0.0f;
 	// ジャンプ開始

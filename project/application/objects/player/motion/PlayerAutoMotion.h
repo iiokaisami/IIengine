@@ -3,8 +3,12 @@
 #include "IPlayerMotion.h"
 #include <MyMath.h>
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// プレイヤーの自動モーション
+/// </summary>
 class PlayerAutoMotion final : public IPlayerMotion
 {
 public:

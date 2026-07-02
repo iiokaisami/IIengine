@@ -4,8 +4,12 @@
 
 #include <MyMath.h>
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// プレイヤー死亡時の演出モーション
+/// </summary>
 class PlayerDeathMotion final : public IPlayerMotion
 {
 public:

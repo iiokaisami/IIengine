@@ -87,7 +87,6 @@ void EnemyBullet::OnCollisionTrigger(const Collider* _other)
 {
 	if (!_other->GetOwner()->IsActive() && 
 		(_other->GetColliderID() == "Player" or
-		_other->GetColliderID() == "PlayerBullet" or
 		_other->GetColliderID() == "Wall" or
 		_other->GetColliderID() == "TrapEnemy" or
 		_other->GetColliderID() == "Barrier"))

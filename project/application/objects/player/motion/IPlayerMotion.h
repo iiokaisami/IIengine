@@ -1,7 +1,11 @@
 #pragma once
 
+// 前方宣言
 class Player;
 
+/// <summary>
+/// プレイヤーの演出モーションの基底クラス
+/// </summary>
 class IPlayerMotion 
 {
 public:

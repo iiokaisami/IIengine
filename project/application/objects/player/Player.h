@@ -264,7 +264,7 @@ private:
 	// ロックオンのターゲット位置
 	Vector3 lockOnTargetPosition_{};
 	// ロックオンのチャージ範囲
-	float lockOnChargeRange_ = 12.0f;
+	float lockOnChargeRange_ = 17.0f;
 	// ロックオンのチャージ時間
 	const float kLockOnChargeMaxTimeSec_ = 2.0f;
 	// ロックオンのチャージタイマー
