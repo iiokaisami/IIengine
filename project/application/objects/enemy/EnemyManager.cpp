@@ -48,120 +48,36 @@ void EnemyManager::Update()
 	// アップデートするフレーム数計算
 	const int framesThisUpdate = std::max(1, static_cast<int>(dt * updateFrameRateBase_ + 0.5f));
 
-	// ノーマルエネミーの更新
-	for (auto& enemy : pNormalEnemies_)
-	{
-		enemy->SetPlayerPosition(playerPosition_);
-		enemy->Update();
-		toPlayerDistance_.push_back(enemy->GetToPlayer());
-	}
+	// エネミーの更新
 
-	// isDeath がたったら削除
-	pNormalEnemies_.erase(
-		std::remove_if(
-			pNormalEnemies_.begin(),
-			pNormalEnemies_.end(),
-			[this](std::unique_ptr<NormalEnemy>& enemy)
+	// ノーマルエネミーの限定処理
+	UpdateEnemyList(pNormalEnemies_,
+		[&](NormalEnemy& enemy)
+		{
+			toPlayerDistance_.push_back(enemy.GetToPlayer());
+		});
+
+	// トラップエネミーの限定処理
+	UpdateEnemyList(pTrapEnemies_,
+		[&](TrapEnemy& enemy)
+		{
+			const auto& traps =	enemy.GetRemainingTimeBombPositions();
+
+			for (const auto& pos : traps)
 			{
-				if (enemy->IsDead())
-				{
-					enemy->Finalize();
+				CorruptorInit(pos);
+			}
+		});
 
-					// 敵のカウントを減らす
-					enemyCount_--;
+	UpdateEnemyList(pCorruptors_,
+		[](Corruptor&)
+		{
+		});
 
-					return true;
-				}
-				return false;
-			}),
-		pNormalEnemies_.end()
-	);
-
-	// トラップエネミーの更新
-	for (auto& enemy : pTrapEnemies_)
-	{
-		enemy->SetPlayerPosition(playerPosition_);
-		enemy->Update();
-	}
-
-	// isDead がたったら削除
-	pTrapEnemies_.erase(
-		std::remove_if(
-			pTrapEnemies_.begin(),
-			pTrapEnemies_.end(),
-			[this](std::unique_ptr<TrapEnemy>& enemy)
-			{
-				if (enemy->IsDead())
-				{
-					// Finalize 前に残っている罠の位置を取得
-					const auto& remainingTraps = enemy->GetRemainingTimeBombPositions();
-
-					// 出現位置にCorruptorを生成
-					for (const auto& trapPos : remainingTraps)
-					{
-						CorruptorInit(trapPos);
-					}
-
-					enemy->Finalize();
-					// 敵のカウントを減らす
-					enemyCount_--;
-					return true;
-				}
-				return false;
-			}),
-		pTrapEnemies_.end()
-	);
-
-	// コラプターの更新
-	for(auto& corruptor : pCorruptors_)
-	{
-		corruptor->SetPlayerPosition(playerPosition_);
-		corruptor->Update();
-	}
-
-	// isDead がたったら削除
-	pCorruptors_.erase(
-		std::remove_if(
-			pCorruptors_.begin(),
-			pCorruptors_.end(),
-			[this](std::unique_ptr<Corruptor>& corruptor)
-			{
-				if (corruptor->IsDead())
-				{
-					corruptor->Finalize();
-					// 敵のカウントを減らす
-					enemyCount_--;
-					return true;
-				}
-				return false;
-			}),
-		pCorruptors_.end()
-	);
-
-	// ガーディアンの更新
-	for (auto& guardian : pGuardians_)
-	{
-		guardian->SetPlayerPosition(playerPosition_);
-		guardian->Update(); 
-	}
-	// isDead がたったら削除
-	pGuardians_.erase(
-		std::remove_if(
-			pGuardians_.begin(),
-			pGuardians_.end(),
-			[this](std::unique_ptr<Guardian>& guardian)
-			{
-				if (guardian->IsDead())
-				{
-					guardian->Finalize();
-					// 敵のカウントを減らす
-					enemyCount_--;
-					return true;
-				}
-				return false;
-			}),
-		pGuardians_.end()
-	);
+	UpdateEnemyList(pGuardians_,
+		[](Guardian&)
+		{
+		});
 
 
 	// ウェーブステートの更新

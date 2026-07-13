@@ -117,6 +117,9 @@ private:
 	// 被弾フラグ
 	bool isHit_ = false;
 
+	// CDタイマー
+	float cooldownTimer_ = 0.0f;
+
 	// プレイヤーとの距離が一定以上かどうか
 	bool isFarFromPlayer_ = false;
 

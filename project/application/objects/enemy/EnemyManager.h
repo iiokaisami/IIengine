@@ -78,6 +78,51 @@ public:
 	/// <param name="_pState">新しいステート</param>
 	void ChangeState(std::unique_ptr<EnemyWaveState>_pState);
 
+private: // 内部関数
+
+	/// <summary>
+	/// 敵リストの更新(死亡時の処理付き)
+	/// </summary>
+	/// <typeparam name="T">敵の型</typeparam>
+	/// <typeparam name="DeadFunc">死亡時の処理の型</typeparam>
+	/// <param name="enemies">敵リスト</param>
+	/// <param name="onDead">死亡時の処理</param>
+	template<class T, class DeadFunc>
+	void UpdateEnemyList(std::vector<std::unique_ptr<T>>& enemies, DeadFunc onDead)
+	{
+		for (auto& enemy : enemies)
+		{
+			enemy->SetPlayerPosition(playerPosition_);
+			enemy->Update();
+		}
+
+		enemies.erase(
+			std::remove_if(
+				enemies.begin(),
+				enemies.end(),
+				[&](std::unique_ptr<T>& enemy)
+				{
+					if (!enemy->IsDead())
+					{
+						return false;
+					}
+
+					// 敵固有処理
+					onDead(*enemy);
+
+					enemy->Finalize();
+
+					// 敵のカウントを減らす
+					enemyCount_--;
+
+					return true;
+				}),
+			enemies.end());
+	}
+
+
+public: // ゲッター
+
 	/// <summary>
 	/// 最も近い敵の位置を取得
 	/// </summary>
@@ -85,9 +130,6 @@ public:
 	/// <param name="outPos">最も近い敵の位置</param>
 	/// <returns>最も近い敵が存在するかどうか</returns>
 	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
-
-
-public: // ゲッター
 
 	// プレイヤーとの距離のゲッター
 	const std::vector<Vector3>& GetToPlayerDistance() const { return toPlayerDistance_; }

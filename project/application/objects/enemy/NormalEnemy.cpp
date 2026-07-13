@@ -381,13 +381,13 @@ void NormalEnemy::Attack()
     const float bulletCooldown = attackCooldownSec_;
 
     // クールタイム管理
-    static float cooldownTimer = 0.0f;
+    cooldownTimer_ = 0.0f;
     const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
-    cooldownTimer -= dt;
+    cooldownTimer_ -= dt;
 
     // 弾の発射
-    if (cooldownTimer <= 0.0f)
+    if (cooldownTimer_ <= 0.0f)
     {
         for (int i = 0; i < bulletCount; ++i)
         {
@@ -414,7 +414,7 @@ void NormalEnemy::Attack()
         }
 
         // クールタイマーリセット
-        cooldownTimer = bulletCooldown;
+        cooldownTimer_ = bulletCooldown;
     }
 }
 
