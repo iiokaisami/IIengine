@@ -444,14 +444,8 @@ void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
 {
     if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
     {
-        // プレイヤーの弾と衝突した場合
-        if (hp_ > 0)
-        {
-            // HP減少
-            hp_--;
-
-            isHit_ = true;
-        }
+        // 弾の衝突時にダメージを受ける処理
+        ReceiveBulletDamage(_other);
     }
 
     if (!isInvincible_ && _other->GetColliderID() == "ExplosionTimeBomb")
@@ -482,35 +476,15 @@ void Guardian::OnCollision(const IIEngine::Collider* _other)
         _other->GetColliderID() == "TrapEnemy")
     {
 
-        // 敵の位置
-        Vector3 enemyPosition = _other->GetOwner()->GetPosition();
-
-        // 敵同士が重ならないようにする
-        Vector3 direction = position_ - enemyPosition;
-        direction.Normalize();
-        float distance = 2.5f; // 敵同士の間の距離を調整するための値
-
-        // 互いに重ならないように少しずつ位置を調整
-        if ((position_ - enemyPosition).Length() < distance)
-        {
-            position_ += direction * 0.1f; // 微調整のための値
-        }
+        // 敵同士の衝突時に距離を保つように押し出す処理
+        SeparateFromEnemy(_other, 2.5f);
     }
 
     if (_other->GetColliderID() == "Wall" or
         _other->GetColliderID() == "Barrier" or
         _other->GetColliderID() == "Player")
     {
-        // 相手のAABBを取得
-        const AABB* otherAABB = _other->GetAABB();
-
-        if (otherAABB)
-        {
-            // 自分のAABBと位置を渡して補正
-            CorrectOverlap(*otherAABB, aabb_, position_);
-
-            pathDirty_ = true;
-
-        }
+        // 衝突時に押し出す処理
+        ResolveWallCollision(_other);
     }
 }

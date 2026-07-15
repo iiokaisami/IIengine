@@ -32,6 +32,25 @@ public:
 	// 障害物の位置リストをセット
 	void SetObstaclePositions(const std::vector<Vector3>& _obstaclePositions) { obstaclePositions_ = _obstaclePositions; }
 
+	/// <summary>
+	/// 敵同士の衝突時に距離を保つように押し出す処理
+	/// </summary>
+	/// <param name="other">衝突相手のコライダー</param>
+	/// <param name="Distance">保ちたい距離</param>
+	void SeparateFromEnemy(const IIEngine::Collider* _other, float _Distance);
+
+	/// <summary>
+	/// 壁との衝突時に押し出す処理
+	/// </summary>
+	/// <param name="_other">衝突相手のコライダー</param>
+	void ResolveWallCollision(const IIEngine::Collider* _other);
+
+	/// <summary>
+	/// 弾の衝突時にダメージを受ける処理
+	/// </summary>
+	/// <param name="_other">衝突相手のコライダー</param>
+	void ReceiveBulletDamage(const IIEngine::Collider* _other);
+
 protected:
 
 	// 進行方向の補間処理

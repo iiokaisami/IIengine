@@ -41,6 +41,47 @@ void BaseEnemy::Move()
 
 }
 
+void BaseEnemy::SeparateFromEnemy(const IIEngine::Collider* _other, float _Distance)
+{
+    Vector3 enemyPosition = _other->GetOwner()->GetPosition();
+
+    Vector3 direction = position_ - enemyPosition;
+    direction.Normalize();
+
+    if ((position_ - enemyPosition).Length() < _Distance)
+    {
+        position_ += direction * 0.1f;
+    }
+}
+
+void BaseEnemy::ResolveWallCollision(const IIEngine::Collider* _other)
+{
+    // 相手のAABBを取得
+    const IIEngine::AABB* otherAABB = _other->GetAABB();
+
+    if (otherAABB)
+    {
+        // 自分のAABBと位置を渡して補正
+        CorrectOverlap(*otherAABB, aabb_, position_);
+
+        pathDirty_ = true;
+
+    }
+}
+
+void BaseEnemy::ReceiveBulletDamage(const IIEngine::Collider* _other)
+{
+    // プレイヤーの弾と衝突した場合
+    if (hp_ > 0.0f)
+    {
+        // HP減少
+        hp_--;
+
+        isHit_ = true;
+    }
+
+}
+
 Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
 {
     if (currentVelocity.Length() < directionEpsilon_)
