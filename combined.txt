@@ -1315,7 +1315,9 @@ File Path: project/MyGame.vcxproj.filters
     <ClCompile Include="application\objects\enemy\bullet\ShockWave.cpp">
       <Filter>application\objects\enemy\bullet</Filter>
     </ClCompile>
-    <ClCompile Include="application\scene\cameraController\GuardianAppearCameraController.cpp" />
+    <ClCompile Include="application\scene\cameraController\GuardianAppearCameraController.cpp">
+      <Filter>application\scene\cameraController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameEngine\2d\Sprite.h">
@@ -1684,7 +1686,6 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\objects\player\PlayerEffects.h">
       <Filter>application\objects\player</Filter>
     </ClInclude>
-    <ClInclude Include="application\objects\enemy\bullet\ShockWave.h" />
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\BulletManager.h">
       <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
     </ClInclude>
@@ -1724,7 +1725,12 @@ File Path: project/MyGame.vcxproj.filters
     <ClInclude Include="application\objects\enemy\bullet\bulletPattern\LaserPattern.h">
       <Filter>application\objects\enemy\bullet\bulletPattern</Filter>
     </ClInclude>
-    <ClInclude Include="application\scene\cameraController\GuardianAppearCameraController.h" />
+    <ClInclude Include="application\scene\cameraController\GuardianAppearCameraController.h">
+      <Filter>application\scene\cameraController</Filter>
+    </ClInclude>
+    <ClInclude Include="application\objects\enemy\bullet\ShockWave.h">
+      <Filter>application\objects\enemy\bullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BoxFilter.hlsli">
@@ -2079,6 +2085,46 @@ void BaseEnemy::Move()
 
 }
 
+void BaseEnemy::SeparateFromEnemy(const IIEngine::Collider* _other, float _Distance)
+{
+    Vector3 enemyPosition = _other->GetOwner()->GetPosition();
+
+    Vector3 direction = position_ - enemyPosition;
+    direction.Normalize();
+
+    if ((position_ - enemyPosition).Length() < _Distance)
+    {
+        position_ += direction * 0.1f;
+    }
+}
+
+void BaseEnemy::ResolveWallCollision(const IIEngine::Collider* _other)
+{
+    // 相手のAABBを取得
+    const IIEngine::AABB* otherAABB = _other->GetAABB();
+
+    if (otherAABB)
+    {
+        // 自分のAABBと位置を渡して補正
+        CorrectOverlap(*otherAABB, aabb_, position_);
+
+        pathDirty_ = true;
+
+    }
+}
+
+void BaseEnemy::ReceiveBulletDamage()
+{
+    // 弾と衝突した場合
+    if (hp_ > 0.0f)
+    {
+        // HP減少
+        hp_--;
+
+    }
+
+}
+
 Vector3 BaseEnemy::InterpolateMovement(const Vector3& currentVelocity, const Vector3& targetDirection, float interpolationRate)
 {
     if (currentVelocity.Length() < directionEpsilon_)
@@ -2400,6 +2446,24 @@ public:
 
 	// 障害物の位置リストをセット
 	void SetObstaclePositions(const std::vector<Vector3>& _obstaclePositions) { obstaclePositions_ = _obstaclePositions; }
+
+	/// <summary>
+	/// 敵同士の衝突時に距離を保つように押し出す処理
+	/// </summary>
+	/// <param name="other">衝突相手のコライダー</param>
+	/// <param name="Distance">保ちたい距離</param>
+	void SeparateFromEnemy(const IIEngine::Collider* _other, float _Distance);
+
+	/// <summary>
+	/// 壁との衝突時に押し出す処理
+	/// </summary>
+	/// <param name="_other">衝突相手のコライダー</param>
+	void ResolveWallCollision(const IIEngine::Collider* _other);
+
+	/// <summary>
+	/// 弾の衝突時にダメージを受ける処理
+	/// </summary>
+	void ReceiveBulletDamage();
 
 protected:
 
@@ -3228,14 +3292,10 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 {
 	if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
 	{
-		// プレイヤーの弾と衝突した場合
-		if (hp_ > 0.0f)
-		{
-			// HP減少
-			hp_--;
+		// 弾の衝突時にダメージを受ける処理
+		ReceiveBulletDamage();
 
-			isHit_ = true;
-		}
+		isHit_ = true;
 	}
 
 	if (_other->GetColliderID() == "NormalEnemy" or
@@ -3243,18 +3303,8 @@ void Corruptor::OnCollisionTrigger(const Collider* _other)
 		_other->GetColliderID() == "Corruptor")
 	{
 
-		// 敵の位置
-		Vector3 enemyPosition = _other->GetOwner()->GetPosition();
-
-		// 敵同士が重ならないようにする
-		Vector3 direction = position_ - enemyPosition;
-		direction.Normalize();
-
-		// 互いに重ならないように少しずつ位置を調整
-		if ((position_ - enemyPosition).Length() < separationDistance_)
-		{
-			position_ += direction * 0.1f; // 微調整のための値
-		}
+		// 敵同士の衝突時に距離を保つように押し出す処理
+		SeparateFromEnemy(_other, separationDistance_);
 	}
 }
 
@@ -3263,14 +3313,8 @@ void Corruptor::OnCollision(const Collider* _other)
 	if (_other->GetColliderID() == "Wall" or
 		_other->GetColliderID() == "Barrier")
 	{
-		// 相手のAABBを取得
-		const AABB* otherAABB = _other->GetAABB();
-
-		if (otherAABB)
-		{
-			// 自分のAABBと位置を渡して補正
-			CorrectOverlap(*otherAABB, aabb_, position_);
-		}
+		// 衝突時に押し出す処理
+		ResolveWallCollision(_other);
 	}
 }
 
@@ -3473,120 +3517,36 @@ void EnemyManager::Update()
 	// アップデートするフレーム数計算
 	const int framesThisUpdate = std::max(1, static_cast<int>(dt * updateFrameRateBase_ + 0.5f));
 
-	// ノーマルエネミーの更新
-	for (auto& enemy : pNormalEnemies_)
-	{
-		enemy->SetPlayerPosition(playerPosition_);
-		enemy->Update();
-		toPlayerDistance_.push_back(enemy->GetToPlayer());
-	}
+	// エネミーの更新
 
-	// isDeath がたったら削除
-	pNormalEnemies_.erase(
-		std::remove_if(
-			pNormalEnemies_.begin(),
-			pNormalEnemies_.end(),
-			[this](std::unique_ptr<NormalEnemy>& enemy)
+	// ノーマルエネミーの限定処理
+	UpdateEnemyList(pNormalEnemies_,
+		[&](NormalEnemy& enemy)
+		{
+			toPlayerDistance_.push_back(enemy.GetToPlayer());
+		});
+
+	// トラップエネミーの限定処理
+	UpdateEnemyList(pTrapEnemies_,
+		[&](TrapEnemy& enemy)
+		{
+			const auto& traps =	enemy.GetRemainingTimeBombPositions();
+
+			for (const auto& pos : traps)
 			{
-				if (enemy->IsDead())
-				{
-					enemy->Finalize();
+				CorruptorInit(pos);
+			}
+		});
 
-					// 敵のカウントを減らす
-					enemyCount_--;
+	UpdateEnemyList(pCorruptors_,
+		[](Corruptor&)
+		{
+		});
 
-					return true;
-				}
-				return false;
-			}),
-		pNormalEnemies_.end()
-	);
-
-	// トラップエネミーの更新
-	for (auto& enemy : pTrapEnemies_)
-	{
-		enemy->SetPlayerPosition(playerPosition_);
-		enemy->Update();
-	}
-
-	// isDead がたったら削除
-	pTrapEnemies_.erase(
-		std::remove_if(
-			pTrapEnemies_.begin(),
-			pTrapEnemies_.end(),
-			[this](std::unique_ptr<TrapEnemy>& enemy)
-			{
-				if (enemy->IsDead())
-				{
-					// Finalize 前に残っている罠の位置を取得
-					const auto& remainingTraps = enemy->GetRemainingTimeBombPositions();
-
-					// 出現位置にCorruptorを生成
-					for (const auto& trapPos : remainingTraps)
-					{
-						CorruptorInit(trapPos);
-					}
-
-					enemy->Finalize();
-					// 敵のカウントを減らす
-					enemyCount_--;
-					return true;
-				}
-				return false;
-			}),
-		pTrapEnemies_.end()
-	);
-
-	// コラプターの更新
-	for(auto& corruptor : pCorruptors_)
-	{
-		corruptor->SetPlayerPosition(playerPosition_);
-		corruptor->Update();
-	}
-
-	// isDead がたったら削除
-	pCorruptors_.erase(
-		std::remove_if(
-			pCorruptors_.begin(),
-			pCorruptors_.end(),
-			[this](std::unique_ptr<Corruptor>& corruptor)
-			{
-				if (corruptor->IsDead())
-				{
-					corruptor->Finalize();
-					// 敵のカウントを減らす
-					enemyCount_--;
-					return true;
-				}
-				return false;
-			}),
-		pCorruptors_.end()
-	);
-
-	// ガーディアンの更新
-	for (auto& guardian : pGuardians_)
-	{
-		guardian->SetPlayerPosition(playerPosition_);
-		guardian->Update(); 
-	}
-	// isDead がたったら削除
-	pGuardians_.erase(
-		std::remove_if(
-			pGuardians_.begin(),
-			pGuardians_.end(),
-			[this](std::unique_ptr<Guardian>& guardian)
-			{
-				if (guardian->IsDead())
-				{
-					guardian->Finalize();
-					// 敵のカウントを減らす
-					enemyCount_--;
-					return true;
-				}
-				return false;
-			}),
-		pGuardians_.end()
-	);
+	UpdateEnemyList(pGuardians_,
+		[](Guardian&)
+		{
+		});
 
 
 	// ウェーブステートの更新
@@ -4050,6 +4010,51 @@ public:
 	/// <param name="_pState">新しいステート</param>
 	void ChangeState(std::unique_ptr<EnemyWaveState>_pState);
 
+private: // 内部関数
+
+	/// <summary>
+	/// 敵リストの更新(死亡時の処理付き)
+	/// </summary>
+	/// <typeparam name="T">敵の型</typeparam>
+	/// <typeparam name="DeadFunc">死亡時の処理の型</typeparam>
+	/// <param name="enemies">敵リスト</param>
+	/// <param name="onDead">死亡時の処理</param>
+	template<class T, class DeadFunc>
+	void UpdateEnemyList(std::vector<std::unique_ptr<T>>& enemies, DeadFunc onDead)
+	{
+		for (auto& enemy : enemies)
+		{
+			enemy->SetPlayerPosition(playerPosition_);
+			enemy->Update();
+		}
+
+		enemies.erase(
+			std::remove_if(
+				enemies.begin(),
+				enemies.end(),
+				[&](std::unique_ptr<T>& enemy)
+				{
+					if (!enemy->IsDead())
+					{
+						return false;
+					}
+
+					// 敵固有処理
+					onDead(*enemy);
+
+					enemy->Finalize();
+
+					// 敵のカウントを減らす
+					enemyCount_--;
+
+					return true;
+				}),
+			enemies.end());
+	}
+
+
+public: // ゲッター
+
 	/// <summary>
 	/// 最も近い敵の位置を取得
 	/// </summary>
@@ -4057,9 +4062,6 @@ public:
 	/// <param name="outPos">最も近い敵の位置</param>
 	/// <returns>最も近い敵が存在するかどうか</returns>
 	bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
-
-
-public: // ゲッター
 
 	// プレイヤーとの距離のゲッター
 	const std::vector<Vector3>& GetToPlayerDistance() const { return toPlayerDistance_; }
@@ -4646,14 +4648,10 @@ void Guardian::OnCollisionTrigger(const IIEngine::Collider* _other)
 {
     if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
     {
-        // プレイヤーの弾と衝突した場合
-        if (hp_ > 0)
-        {
-            // HP減少
-            hp_--;
+        // 弾の衝突時にダメージを受ける処理
+        ReceiveBulletDamage();
 
-            isHit_ = true;
-        }
+        isHit_ = true;
     }
 
     if (!isInvincible_ && _other->GetColliderID() == "ExplosionTimeBomb")
@@ -4684,36 +4682,16 @@ void Guardian::OnCollision(const IIEngine::Collider* _other)
         _other->GetColliderID() == "TrapEnemy")
     {
 
-        // 敵の位置
-        Vector3 enemyPosition = _other->GetOwner()->GetPosition();
-
-        // 敵同士が重ならないようにする
-        Vector3 direction = position_ - enemyPosition;
-        direction.Normalize();
-        float distance = 2.5f; // 敵同士の間の距離を調整するための値
-
-        // 互いに重ならないように少しずつ位置を調整
-        if ((position_ - enemyPosition).Length() < distance)
-        {
-            position_ += direction * 0.1f; // 微調整のための値
-        }
+        // 敵同士の衝突時に距離を保つように押し出す処理
+        SeparateFromEnemy(_other, 2.5f);
     }
 
     if (_other->GetColliderID() == "Wall" or
         _other->GetColliderID() == "Barrier" or
         _other->GetColliderID() == "Player")
     {
-        // 相手のAABBを取得
-        const AABB* otherAABB = _other->GetAABB();
-
-        if (otherAABB)
-        {
-            // 自分のAABBと位置を渡して補正
-            CorrectOverlap(*otherAABB, aabb_, position_);
-
-            pathDirty_ = true;
-
-        }
+        // 衝突時に押し出す処理
+        ResolveWallCollision(_other);
     }
 }
 
@@ -5347,13 +5325,13 @@ void NormalEnemy::Attack()
     const float bulletCooldown = attackCooldownSec_;
 
     // クールタイム管理
-    static float cooldownTimer = 0.0f;
+    cooldownTimer_ = 0.0f;
     const float dt = IIEngine::TimeManager::Instance().GetDeltaTime();
 
-    cooldownTimer -= dt;
+    cooldownTimer_ -= dt;
 
     // 弾の発射
-    if (cooldownTimer <= 0.0f)
+    if (cooldownTimer_ <= 0.0f)
     {
         for (int i = 0; i < bulletCount; ++i)
         {
@@ -5380,7 +5358,7 @@ void NormalEnemy::Attack()
         }
 
         // クールタイマーリセット
-        cooldownTimer = bulletCooldown;
+        cooldownTimer_ = bulletCooldown;
     }
 }
 
@@ -5395,14 +5373,10 @@ void NormalEnemy::OnCollisionTrigger(const Collider* _other)
 {
     if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
     {
-        // プレイヤーの弾と衝突した場合
-        if (hp_ > 0)
-        {
-            // HP減少
-            hp_--;
+        // 弾の衝突時にダメージを受ける処理
+        ReceiveBulletDamage();
 
-            isHit_ = true;
-        }
+        isHit_ = true;
     }
 
     if (!isInvincible_ && _other->GetColliderID() == "ExplosionTimeBomb")
@@ -5433,37 +5407,18 @@ void NormalEnemy::OnCollision(const Collider* _other)
     if (_other->GetColliderID() == "NormalEnemy" or
         _other->GetColliderID() == "TrapEnemy")
     {
-
-        // 敵の位置
-        Vector3 enemyPosition = _other->GetOwner()->GetPosition();
-
-        // 敵同士が重ならないようにする
-        Vector3 direction = position_ - enemyPosition;
-        direction.Normalize();
-        float distance = 2.5f; // 敵同士の間の距離を調整するための値
-
-        // 互いに重ならないように少しずつ位置を調整
-        if ((position_ - enemyPosition).Length() < distance)
-        {
-            position_ += direction * 0.1f; // 微調整のための値
-        }
+		// 敵同士の衝突時に距離を保つように押し出す処理
+        SeparateFromEnemy(_other, 2.5f);
+        
     }
 
     if (_other->GetColliderID() == "Wall" or
         _other->GetColliderID() == "Barrier" or
         _other->GetColliderID() == "Player")
     {
-        // 相手のAABBを取得
-        const AABB* otherAABB = _other->GetAABB();
-
-        if (otherAABB)
-        {
-            // 自分のAABBと位置を渡して補正
-            CorrectOverlap(*otherAABB, aabb_, position_);
-
-            pathDirty_ = true;
-
-        }
+		// 衝突時に押し出す処理
+        ResolveWallCollision(_other);
+        
     }
 }
 
@@ -5615,6 +5570,9 @@ private:
 
 	// 被弾フラグ
 	bool isHit_ = false;
+
+	// CDタイマー
+	float cooldownTimer_ = 0.0f;
 
 	// プレイヤーとの距離が一定以上かどうか
 	bool isFarFromPlayer_ = false;
@@ -5980,14 +5938,10 @@ void TrapEnemy::OnCollisionTrigger(const Collider* _other)
 {
     if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
     {
-        // プレイヤーの弾と衝突した場合
-        if (hp_ > 0)
-        {
-            // HP減少
-            hp_--;
+        // 弾の衝突時にダメージを受ける処理
+        ReceiveBulletDamage();
 
-            isHit_ = true;
-        }
+        isHit_ = true;
     }
 }
 
@@ -5997,33 +5951,17 @@ void TrapEnemy::OnCollision(const Collider* _other)
         _other->GetColliderID() == "TrapEnemy")
     {
 
-        // 敵の位置
-        Vector3 enemyPosition = _other->GetOwner()->GetPosition();
-
-        // 敵同士が重ならないようにする
-        Vector3 direction = position_ - enemyPosition;
-        direction.Normalize();
-        float distance = 2.5f; // 敵同士の間の距離を調整するための値
-
-        // 互いに重ならないように少しずつ位置を調整
-        if ((position_ - enemyPosition).Length() < distance)
-        {
-            position_ += direction * 0.1f; // 微調整のための値
-        }
+        // 敵同士の衝突時に距離を保つように押し出す処理
+        SeparateFromEnemy(_other, 2.5f);
     }
 
     if (_other->GetColliderID() == "Wall" or 
         _other->GetColliderID() == "Barrier" or
         _other->GetColliderID() == "Player")
     {
-        // 相手のAABBを取得
-        const AABB* otherAABB = _other->GetAABB();
-      
-        if (otherAABB)
-        {
-            // 自分のAABBと位置を渡して補正
-            CorrectOverlap(*otherAABB, aabb_, position_);
-        }
+
+        // 衝突時に押し出す処理
+        ResolveWallCollision(_other);
     }
 }
 
