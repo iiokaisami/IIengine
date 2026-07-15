@@ -295,7 +295,9 @@ void TrapEnemy::OnCollisionTrigger(const Collider* _other)
     if (_other->GetColliderID() == "PlayerBullet" && !isInvincible_)
     {
         // 弾の衝突時にダメージを受ける処理
-        ReceiveBulletDamage(_other);
+        ReceiveBulletDamage();
+
+        isHit_ = true;
     }
 }
 

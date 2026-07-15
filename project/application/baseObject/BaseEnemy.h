@@ -48,8 +48,7 @@ public:
 	/// <summary>
 	/// 弾の衝突時にダメージを受ける処理
 	/// </summary>
-	/// <param name="_other">衝突相手のコライダー</param>
-	void ReceiveBulletDamage(const IIEngine::Collider* _other);
+	void ReceiveBulletDamage();
 
 protected:
 

@@ -69,15 +69,14 @@ void BaseEnemy::ResolveWallCollision(const IIEngine::Collider* _other)
     }
 }
 
-void BaseEnemy::ReceiveBulletDamage(const IIEngine::Collider* _other)
+void BaseEnemy::ReceiveBulletDamage()
 {
-    // プレイヤーの弾と衝突した場合
+    // 弾と衝突した場合
     if (hp_ > 0.0f)
     {
         // HP減少
         hp_--;
 
-        isHit_ = true;
     }
 
 }
