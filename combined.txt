@@ -12017,6 +12017,12 @@ void Player::Update()
 
 	effects_.Update(*this);
 
+	// ゲームオーバーシーンならHpを0にしない
+	if (isGameOverScene_)
+	{
+		hp_ = maxHP_;
+	}
+
 }
 
 void Player::Draw()
@@ -12898,6 +12904,12 @@ public: // セッター
 	/// <param name="_isBarrierBroken">バリアが破壊されているかのフラグ</param>
 	void SetIsBarrierBroken(bool _isBarrierBroken) { isBarrierBroken_ = _isBarrierBroken; }
 
+	/// <summary>
+	/// ゲームオーバーシーンかどうかのフラグのセッター
+	/// </summary>
+	/// <param name="_isGameOverSceneActive"></param>
+	void SetIsGameOverSceneActive(bool _isGameOverSceneActive) { isGameOverScene_ = _isGameOverSceneActive; }
+
 private:
 
 	// 最も近い敵
@@ -13025,6 +13037,9 @@ private:
 	int hitParticleCountHeavy_ = 8;
 	float explosionDamage_ = 1.5f;
 	float shockwaveDamage_ = 2.0f;
+
+	// ゲームオーバーシーンかどうか
+	bool isGameOverScene_ = false;
 
 };
 
@@ -13613,6 +13628,12 @@ void PlayerBullet::OnCollisionTrigger(const Collider* _other)
 {
 	if (_other->GetColliderID() != "Player" && _other->GetColliderID() != "Field")
 	{
+		// ShockWaveとの衝突は無視する
+		if (_other->GetColliderID() == "ShockWave")
+		{
+			return;
+		}
+
 		isDead_ = true;
 	}  
 }
@@ -14667,6 +14688,7 @@ void GameOverScene::Initialize()
 	pPlayer_->Initialize();
 	pPlayer_->SetPosition({ 0.0f,0.0f,0.0f });
 	pPlayer_->SetIsCanMove(false); // 移動不可
+	pPlayer_->SetIsGameOverSceneActive(true); // ゲームオーバーシーン用のフラグを立てる
 
 	// エネミー
 	pEnemyManager_ = std::make_unique<EnemyManager>();
