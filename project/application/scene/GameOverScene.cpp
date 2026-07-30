@@ -57,6 +57,7 @@ void GameOverScene::Initialize()
 	pPlayer_->Initialize();
 	pPlayer_->SetPosition({ 0.0f,0.0f,0.0f });
 	pPlayer_->SetIsCanMove(false); // 移動不可
+	pPlayer_->SetIsGameOverSceneActive(true); // ゲームオーバーシーン用のフラグを立てる
 
 	// エネミー
 	pEnemyManager_ = std::make_unique<EnemyManager>();

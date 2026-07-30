@@ -160,6 +160,12 @@ void Player::Update()
 
 	effects_.Update(*this);
 
+	// ゲームオーバーシーンならHpを0にしない
+	if (isGameOverScene_)
+	{
+		hp_ = maxHP_;
+	}
+
 }
 
 void Player::Draw()

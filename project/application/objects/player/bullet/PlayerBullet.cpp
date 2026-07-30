@@ -88,6 +88,12 @@ void PlayerBullet::OnCollisionTrigger(const Collider* _other)
 {
 	if (_other->GetColliderID() != "Player" && _other->GetColliderID() != "Field")
 	{
+		// ShockWaveとの衝突は無視する
+		if (_other->GetColliderID() == "ShockWave")
+		{
+			return;
+		}
+
 		isDead_ = true;
 	}  
 }

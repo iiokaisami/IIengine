@@ -177,6 +177,12 @@ public: // セッター
 	/// <param name="_isBarrierBroken">バリアが破壊されているかのフラグ</param>
 	void SetIsBarrierBroken(bool _isBarrierBroken) { isBarrierBroken_ = _isBarrierBroken; }
 
+	/// <summary>
+	/// ゲームオーバーシーンかどうかのフラグのセッター
+	/// </summary>
+	/// <param name="_isGameOverSceneActive"></param>
+	void SetIsGameOverSceneActive(bool _isGameOverSceneActive) { isGameOverScene_ = _isGameOverSceneActive; }
+
 private:
 
 	// 最も近い敵
@@ -304,5 +310,8 @@ private:
 	int hitParticleCountHeavy_ = 8;
 	float explosionDamage_ = 1.5f;
 	float shockwaveDamage_ = 2.0f;
+
+	// ゲームオーバーシーンかどうか
+	bool isGameOverScene_ = false;
 
 };
